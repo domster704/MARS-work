@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
+
+    <ViewFlipper
+        android:id="@+id/viewflipper"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="6dp">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/orders_journal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:longClickable="false"
+            android:orientation="horizontal"
+            android:screenOrientation="landscape"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="100dp"
+                android:layout_height="25dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/journFrom"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/txtBDate"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/textView16"
+                android:background="@android:drawable/editbox_dropdown_light_frame"
+                android:ems="10"
+                android:focusable="false"
+                android:gravity="center_vertical|center_horizontal"
+                android:inputType="date"
+                android:textColor="#000000"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/txtBDate"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="@string/journTo"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/txtEDate"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/textView17"
+                android:background="@android:drawable/editbox_dropdown_light_frame"
+                android:ems="10"
+                android:focusable="false"
+                android:gravity="center_vertical|center_horizontal"
+                android:inputType="date"
+                android:textColor="#000000"
+                android:textSize="14dp" />
+
+            <Button
+                android:id="@+id/btShowOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/txtEDate"
+                android:layout_toRightOf="@+id/txtEDate"
+                android:background="@android:drawable/btn_default_small"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="@string/journFilter"
+                android:textColor="#000000"
+                android:textSize="12dp" />
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/txtBDate"
+                android:layout_toRightOf="@+id/textView19"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/smsTime"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/txtBDate"
+                android:layout_toRightOf="@+id/textView18"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/smsHead"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/textView22"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_alignBottom="@+id/textView18"
+                android:layout_toEndOf="@+id/textView18"
+                android:layout_toRightOf="@+id/textView18"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/smsText"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <GridView
+                android:id="@+id/listSMS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView22"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true" />
+
+            <TextView
+                android:id="@+id/textView19"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignTop="@+id/textView18"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/smsDate"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <Button
+                android:id="@+id/btUpdateSMS"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_above="@+id/textView21"
+                android:layout_toEndOf="@+id/btShowOrders"
+                android:background="@android:drawable/btn_default_small"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="@string/smsbtUpdate"
+                android:textColor="#000000"
+                android:textSize="12dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/ordersdt_details"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:screenOrientation="landscape">
+
+            <TextView
+                android:id="@+id/textView23"
+                android:layout_width="100dp"
+                android:layout_height="25dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/nomenCod"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/textView27"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/txtLastVer"
+                android:layout_toRightOf="@+id/textView23"
+                android:background="@drawable/table_header"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="15dp"
+                android:text="@string/nomenDescr"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/txtLastVer"
+                android:layout_width="100dp"
+                android:layout_height="25dp"
+                android:layout_above="@+id/listOrdersDt"
+                android:layout_toLeftOf="@+id/txtCurVer"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/nomenQty"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/txtCurVer"
+                android:layout_width="100dp"
+                android:layout_height="25dp"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/textView24"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/nomenPrice"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/textView24"
+                android:layout_width="100dp"
+                android:layout_height="25dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/nomenSum"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
+
+            <GridView
+                android:id="@+id/listOrdersDt"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/textView23"
+                android:layout_alignParentLeft="true" />
+
+        </RelativeLayout>
+
+    </ViewFlipper>
+</RelativeLayout>

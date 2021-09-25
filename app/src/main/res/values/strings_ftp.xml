@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ftp_server">91.208.84.67</string>
+    <string name="ftp_user">amberftp</string>
+    <string name="ftp_pass">201002</string>
+
+    <string name="ftp_update_server">185.201.89.169</string>
+    <string name="ftp_update_user">amberftp</string>
+    <string name="ftp_update_pass">103343</string>
+    <string name="newpass">Xtkjdtr-gfhj[jl</string>
+    <string name="newpass2">Человек-пароход</string>
+</resources>

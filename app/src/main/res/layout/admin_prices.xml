@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TabPrices"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <!-- <Button
+            android:id="@+id/btSetPricePerm"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPriceIzh"
+            android:layout_alignEnd="@+id/btSetPriceChelny"
+            android:layout_alignParentLeft="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_perm" />
+
+        <Button
+            android:id="@+id/btSetPriceEkt"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPricePerm"
+            android:layout_alignStart="@+id/btSetPricePerm"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_ekt" />
+
+        <Button
+            android:id="@+id/btSetPriceIzh"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPriceKazan"
+            android:layout_alignEnd="@+id/btSetPriceChelny"
+            android:layout_alignParentLeft="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_izh" />
+
+        <Button
+            android:id="@+id/btSetPriceKazan"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPriceKirov"
+            android:layout_alignEnd="@+id/btSetPriceChelny"
+            android:layout_alignParentLeft="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_kazan" />
+
+        <Button
+            android:id="@+id/btSetPriceKirov"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPriceChelny"
+            android:layout_alignEnd="@+id/btSetPriceChelny"
+            android:layout_alignParentLeft="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_kirov" />
+
+        <Button
+            android:id="@+id/btSetPriceChelny"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btSetPriceUfa"
+            android:layout_alignEnd="@+id/btSetPriceUfa"
+            android:layout_alignParentLeft="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_chelny" />
+
+        <Button
+            android:id="@+id/btSetPriceUfa"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@android:drawable/btn_default"
+            android:enabled="false"
+            android:text="@string/adm_set_price_ufa" />  -->
+
+        <Spinner
+            android:id="@+id/spnCentype"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_below="@+id/tvSelectCenType"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0sp" />
+
+        <TextView
+            android:id="@+id/tvSelectCenType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Укажите тип цен"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+</ScrollView>

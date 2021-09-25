@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/horizontalScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/tvHeadZakaz"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:orientation="horizontal"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:screenOrientation="landscape">
+
+        <TextView
+            android:id="@+id/ColDebetContr"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetFirma"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:textAlignment="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetStatus"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetCredit"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetDogovor"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA7"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA14"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA21"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA28"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA35"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA42"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA49"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA56"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA63"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetA64"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetDolg"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetOTG30"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetOPL30"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/ColDebetKOB"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+</HorizontalScrollView>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="orderHeader">Работа с заказами</string>
+    <string name="journal">Журнал заказов</string>
+    <string name="order_header">Шапка заказа</string>
+    <string name="form_order">Формирование заказа</string>
+    <string name="view_order">Просмотр заказа</string>
+    <string name="send_orders">Отправка заказов</string>
+
+    <string name="debet_dolg">Дебитор. задолженность</string>
+    <string name="tp_messages">Сообщения</string>
+    <string name="back_messages">Написать сообщение в центр</string>
+
+    <string name="update_header">Обновления</string>
+    <string name="update_data">Обновить данные</string>
+    <string name="update_app">Обновить приложение</string>
+
+    <string name="info">Информация</string>
+    <string name="info_app">Общая информация</string>
+    <string name="help_app">Справка</string>
+
+    <string name="download_img">Загрузка фотографий</string>
+
+    <string name="app_admin">Администратор</string>
+    <string name="exit_user">Завершить сеанс пользователя</string>
+    <string name="exit_app">Выход</string>
+</resources>

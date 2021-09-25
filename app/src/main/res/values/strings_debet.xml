@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debetContr">Контрагент</string>
+    <string name="debetStatus">Статус</string>
+    <string name="debetCredit">Кредит</string>
+    <string name="debetA7">до 7 дней</string>
+    <string name="debetA14">до 14 дней</string>
+    <string name="debetA21">до 21 дня</string>
+    <string name="debetA28">до 28 дней</string>
+    <string name="debetA35">до 35 дней</string>
+    <string name="debetA42">до 42 дней</string>
+    <string name="debetA49">до 49 дней</string>
+    <string name="debetA56">до 56 дней</string>
+    <string name="debetA63">до 63 дней</string>
+    <string name="debetA64">до 64 дней</string>
+    <string name="debetDolg">Долг</string>
+    <string name="debetFilter">Показать</string>
+    <string name="debetClearFilter">X</string>
+    <string name="debetOTG30">ОТГ30</string>
+    <string name="debetOPL30">ОПЛ30</string>
+    <string name="debetKOB">К. ОБ.</string>
+</resources>

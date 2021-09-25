@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sql_server">91.208.84.67</string>
+    <string name="sql_port">1439</string>
+    <string name="sql_user">sa</string>
+    <string name="sql_pass">Yjdfz Ptkfylbz.ru</string>
+    <string name="sql_db">IZH_2015</string>
+</resources>

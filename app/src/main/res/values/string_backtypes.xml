@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spin_backtypes_items">
+        <item id="0">Выберите тип возврата</item>
+        <!--<item id="1">Брак</item>-->
+        <!--<item id="2">Пересортица</item>-->
+        <!--<item id="3">Просроченный товар</item>-->
+        <!--<item id="4">Недовоз</item>-->
+        <!--<item id="5">Некондиция</item>-->
+        <!--<item id="6">Излишки</item>-->
+        <!--<item id="7">Не заказывали</item>-->
+        <!--<item id="8">Неоплата товара</item>-->
+        <item id="1">Брак</item>
+        <item id="2">Просроченный товар</item>
+        <item id="3">Пересортица</item>
+        <item id="4">Недовоз (склад)</item>
+        <item id="9">Не заказывали</item>
+        <item id="19">Неоплата товара</item>
+    </string-array>
+</resources>

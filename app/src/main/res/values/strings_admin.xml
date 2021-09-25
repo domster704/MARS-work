@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="adm_clear_sgi">Очистить таблицу СГИ</string>
+    <string name="adm_clear_groups">Очистить таблицу товарных групп</string>
+    <string name="adm_clear_nomen">Очистить таблицу номенклатуры</string>
+    <string name="adm_clear_contrs">Очистить таблицу контрагентов</string>
+    <string name="adm_clear_addrs">Очистить таблицу адресов</string>
+    <string name="adm_clear_tp">Очистить таблицу торговых представителей</string>
+    <string name="adm_clear_debet">Очистить таблицу дебиторки</string>
+    <string name="adm_clear_all">Очистить все таблицы</string>
+    <string name="adm_compact_db">Сжать базу данных</string>
+    <string name="adm_check_db">Проверить базу данных</string>
+    <string name="adm_delete_dbf">Удалить все DBF файлы</string>
+    <string name="adm_set_price_perm">Установить цены Пермь</string>
+    <string name="adm_set_price_izh">Установить цены ОПТ</string>
+    <string name="adm_set_price_kazan">Установить цены Казань</string>
+    <string name="adm_set_price_kirov">Установить цены Киров</string>
+    <string name="adm_set_price_chelny">Установить цены Н. Челны</string>
+    <string name="adm_set_price_ufa">Установить цены Уфа</string>
+    <string name="adm_set_price_ekt">Установить цены Екатеринбург</string>
+    <string name="adm_clear_zakazy">Очистить таблицу заказов</string>
+    <string name="adm_clear_zakazydt">Очистить таблицу заказов (табличная часть)</string>
+    <string name="adm_clear_deleted_zakaz">Удалить отмененные/удаленные заказы</string>
+    <string name="adm_set_ImagesPath">Указать путь к папке с фотографиями</string>
+    <string name="adm_lbl_ImagesPath">Путь к папке с фотографиями: </string>
+    <string name="adm_set_SDPath">Указать путь к карте памяти</string>
+    <string name="adm_lbl_SDPath">Путь к карте памяти: </string>
+    <string name="adm_TestDownloadPhoto">Тестовая загрузка фотографий: </string>
+    <string name="adm_UnlockTP">Разблокировать ТП</string>
+    <string name="adm_LockTP">Заблокировать ТП</string>
+    <string name="adm_pass">14042016</string>
+</resources>

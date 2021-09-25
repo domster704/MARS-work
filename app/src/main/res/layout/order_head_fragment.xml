@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/order_header"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderTp"
+        android:textColor="#000000" />
+
+    <Spinner
+        android:id="@+id/SpinTP"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView4"
+        android:gravity="center_vertical|center_horizontal"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textView9"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderContr"
+        android:textColor="#000000" />
+
+    <Spinner
+        android:id="@+id/SpinContr"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/txtContrFilter"
+        android:layout_toStartOf="@+id/btContrDebet"
+        android:layout_toLeftOf="@+id/btContrDebet"
+        android:layout_toRightOf="@+id/textView5"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textView4"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderFindContr"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/txtContrFilter"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/SpinTP"
+        android:layout_toRightOf="@+id/textView4"
+        android:imeOptions="flagNoExtractUi"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textView5"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderAddr"
+        android:textColor="#000000" />
+
+    <Spinner
+        android:id="@+id/SpinAddr"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textView5"
+        android:layout_toRightOf="@+id/textView11"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textView40"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderComment"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/txtComment"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/textView13"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@+id/chkGetMoney"
+        android:layout_toRightOf="@+id/chkGetMoney"
+        android:editable="true"
+        android:gravity="top"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/btSaveHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="17dp"
+        android:background="@android:drawable/btn_default"
+        android:padding="15dp"
+        android:text="@string/OrdHeaderSave"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/textView15"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderDate"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/btClearOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_alignTop="@+id/btSaveHeader"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_toStartOf="@+id/btSaveHeader"
+        android:layout_toLeftOf="@+id/btSaveHeader"
+        android:background="@android:drawable/btn_default"
+        android:padding="15dp"
+        android:text="@string/OrdHeaderClear"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/txtDelivDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/txtComment"
+        android:layout_alignLeft="@+id/txtComment"
+        android:layout_alignTop="@+id/textView15"
+        android:ems="10"
+        android:focusable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:singleLine="true"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/btContrDebet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/SpinAddr"
+        android:layout_below="@+id/txtContrFilter"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@android:drawable/btn_default"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="@string/OrdHeaderDebet" />
+
+    <CheckBox
+        android:id="@+id/chkGetMoney"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView13"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="17dp"
+        android:text="@string/OrdHeaderGetMoney" />
+
+    <CheckBox
+        android:id="@+id/chkGetBackward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/chkGetMoney"
+        android:layout_marginStart="75dp"
+        android:layout_marginLeft="75dp"
+        android:layout_toEndOf="@+id/chkGetMoney"
+        android:layout_toRightOf="@+id/chkGetMoney"
+        android:text="@string/OrdHeaderGetBackward" />
+
+    <TextView
+        android:id="@+id/textView40"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/txtDelivDate"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:text="@string/OrdHeaderTime"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/txtDelivTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtDelivDate"
+        android:layout_alignBottom="@+id/txtDelivDate"
+        android:layout_marginEnd="43dp"
+        android:layout_marginRight="43dp"
+        android:layout_toStartOf="@+id/btContrDebet"
+        android:layout_toLeftOf="@+id/btContrDebet"
+        android:ems="10"
+        android:focusable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:singleLine="true"
+        android:textColor="#000000" />
+
+    <Spinner
+        android:id="@+id/spinBackwardType"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btClearOrder"
+        android:layout_alignLeft="@+id/btClearOrder"
+        android:layout_alignTop="@+id/chkGetBackward"
+        android:layout_alignBottom="@+id/chkGetBackward"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true" />
+
+    <Button
+        android:id="@+id/btResetTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btSaveHeader"
+        android:layout_alignLeft="@+id/btSaveHeader"
+        android:layout_alignTop="@+id/txtDelivTime"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:background="@android:drawable/btn_default"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="@string/OrdHeaderXTime" />
+</RelativeLayout>

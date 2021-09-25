@@ -1,0 +1,27 @@
+    body{
+    padding: 10px 10px;
+    }
+
+    ol li, ul li{
+    line-height: 20px;
+    text-align: justify;
+    font-family: tahoma;
+    }
+
+    .menu_item{
+    display: block;
+    height: 25px;
+    line-height: 25px;
+    text-decoration: none;
+    color: #1e4d79;
+    }
+
+    p {
+    text-align: justify;
+    }
+
+    .article{
+        text-decoration: none;
+        color: #1e4d79;
+        font-weight: bold;
+    }

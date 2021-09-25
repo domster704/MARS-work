@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="false"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView31"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:text="@string/downloadphotos_descr"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#680404"
+        android:textSize="14dp" />
+
+    <Button
+        android:id="@+id/btBeginDownload"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btStopDownload"
+        android:layout_toStartOf="@+id/btStopDownload"
+        android:layout_toLeftOf="@+id/btStopDownload"
+        android:background="@android:drawable/btn_default"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Начать загрузку" />
+
+    <Button
+        android:id="@+id/btStopDownload"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvFilesCnt"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="64dp"
+        android:background="@android:drawable/btn_default"
+        android:enabled="false"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Остановить загрузку" />
+
+    <TextView
+        android:id="@+id/tvFilesCnt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pbFiles"
+        android:layout_alignEnd="@+id/btStopDownload"
+        android:layout_alignRight="@+id/btStopDownload"
+        android:paddingRight="20dp"
+        android:text="0 / 0"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ProgressBar
+        android:id="@+id/pbFiles"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="700dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView32"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" />
+
+    <TextView
+        android:id="@+id/tvPerc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tvFilesCnt"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="20dp"
+        android:text="0%"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView32"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:text="Прогресс загрузки фотографий:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000" />
+
+    <CheckBox
+        android:id="@+id/chkOnlyNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvPerc"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="Загрузить только новые" />
+</RelativeLayout>

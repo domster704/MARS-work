@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/OrderNomenSales"
+        android:icon="@drawable/percent_sale"
+        android:title="Просчитать цены с учетом скидки/наценки"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/NomenDiscount"
+        android:icon="@drawable/sale"
+        android:title="Скидка/наценка в процентах"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/ClearOrderTB"
+        android:title="Очистить заказ"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/GoToOrderHead"
+        android:title="Шапка заказа"
+        app:showAsAction="always" />
+    <!--<item  android:id="@+id/SaveOrderChanges" android:title="Сохранить изменения в заказе" app:showAsAction="always"/>-->
+</menu>

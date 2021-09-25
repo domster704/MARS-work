@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/goToGroup"
+        android:showAsAction="always"
+        android:title="Перейти в группу"
+        android:visible="true"></item>
+    <item
+        android:id="@+id/showPhoto"
+        android:showAsAction="always"
+        android:title="Фото"
+        android:visible="true"></item>
+    <item
+        android:id="@+id/setBeginPos"
+        android:showAsAction="always"
+        android:title="Установить как начальную позицию"
+        android:visible="true"></item>
+    <item
+        android:id="@+id/setEndPos"
+        android:showAsAction="always"
+        android:title="Установить как конечную позицию"
+        android:visible="true"></item>
+    <item
+        android:id="@+id/resetBeginEndPos"
+        android:showAsAction="always"
+        android:title="Сбросить начальную/конечную позиции"
+        android:visible="true"></item>
+</menu>

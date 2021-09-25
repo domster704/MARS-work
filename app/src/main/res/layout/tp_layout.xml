@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/ColTP_ROWID"
+        android:layout_width="25dp"
+        android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="5sp"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
+        android:textColor="#000000"
+        android:visibility="invisible"></TextView>
+
+    <TextView
+        android:id="@+id/ColTPID"
+        android:layout_width="25dp"
+        android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_toRightOf="@+id/ColTP_ROWID"
+        android:paddingLeft="5sp"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
+        android:textColor="#000000"
+        android:visibility="invisible"></TextView>
+
+    <TextView
+        android:id="@+id/ColTPDescr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/ColTPID"
+        android:gravity="center_vertical"
+        android:paddingLeft="5sp"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
+        android:textColor="#000000"
+        android:textSize="15dp"></TextView>
+
+</RelativeLayout>

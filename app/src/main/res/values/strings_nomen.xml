@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nomenCod">Код</string>
+    <string name="nomenDescr">Наименование</string>
+    <string name="nomenQty">Количество</string>
+    <string name="nomenOst">Ост.</string>
+    <string name="nomenVKorob">В кор.</string>
+    <string name="nomenPrice">Цена</string>
+    <string name="nomenZakaz">Заказ</string>
+    <string name="nomenSum">Сумма</string>
+    <string name="nomenSetQty">Введите количество</string>
+    <string name="nomenMP">МП</string>
+    <string name="nomenMH">МХ</string>
+    <string name="nomenGroup">Товарная группа</string>
+    <string name="nomenMultiQty">По сколько будем добавлять?</string>
+    <string name="nomenSaleMarkup">Введите процент скидки/наценки</string>
+    <string name="nomenPP">№ п/п</string>
+    <string name="nomenBeginPP">Начальный № п/п</string>
+    <string name="nomenEndPP">Конечный № п/п</string>
+</resources>

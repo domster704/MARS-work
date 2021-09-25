@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appUpdateApp">Проверить наличие обновлений</string>
+    <string name="appInstallUpdate">Загрузить и установить обновление</string>
+    <string name="appCurVer">Текущая версия:</string>
+    <string name="appLastVer">Доступная версия:</string>
+    <string name="appNotification">Программа автоматически проверяет наличие обновлений для программы. Перед обновлением программы в обязательном порядке должны быть сохранены и отправлены все заказы. В ином случае будут заблокированы все фукнции формирования заказов.</string>
+</resources>

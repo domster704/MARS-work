@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_order_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
+
+    <Spinner
+        android:id="@+id/SpinSgi"
+        android:layout_width="480dp"
+        android:layout_height="50dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+    <Spinner
+        android:id="@+id/SpinGrups"
+        android:layout_width="512dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@+id/SpinSgi"
+        android:layout_toRightOf="@+id/SpinSgi"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+    <TextView
+        android:id="@+id/tvHeadCod"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/SpinSgi"
+        android:layout_toEndOf="@+id/textView30"
+        android:layout_toRightOf="@+id/textView30"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenCod"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tvHeadDescr"
+        android:layout_width="600dp"
+        android:layout_height="25dp"
+        android:layout_alignTop="@+id/tvHeadCod"
+        android:layout_toLeftOf="@+id/tvHeadMP"
+        android:layout_toEndOf="@+id/textView8"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenDescr"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="75dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/SpinGrups"
+        android:layout_toStartOf="@+id/textView12"
+        android:layout_toLeftOf="@+id/textView12"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenOst"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_alignTop="@+id/textView10"
+        android:layout_toStartOf="@+id/tvHeadZakaz"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenPrice"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tvHeadZakaz"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_alignTop="@+id/textView12"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenZakaz"
+        android:textColor="#000000" />
+
+    <GridView
+        android:id="@+id/listContrs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvHeadCod"
+        android:layout_alignParentLeft="true"
+        android:clickable="true"
+        android:fastScrollEnabled="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:longClickable="true"
+        android:textFilterEnabled="true" />
+
+    <TextView
+        android:id="@+id/textView30"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinSgi"
+        android:layout_toEndOf="@+id/tvPosition"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/textView34"
+        android:layout_width="75dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/SpinGrups"
+        android:layout_toStartOf="@+id/textView10"
+        android:layout_toLeftOf="@+id/textView10"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenVKorob"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tvHeadMP"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/SpinGrups"
+        android:layout_toStartOf="@+id/textView34"
+        android:layout_toLeftOf="@+id/textView34"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenMP"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinSgi"
+        android:layout_toEndOf="@+id/tvHeadCod"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenMH"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/tvPosition"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinSgi"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenPP"
+        android:textColor="#000000" />
+
+</RelativeLayout>

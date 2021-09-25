@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smsDate">Дата</string>
+    <string name="smsTime">Время</string>
+    <string name="smsHead">Заголовок</string>
+    <string name="smsText">Сообщение</string>
+    <string name="smsbtUpdate">Получить новые</string>
+    <string name="from_TP">От кого</string>
+    <string name="sms_head">Заголовок сообщения</string>
+    <string name="sms_text">Текст сообщения</string>
+</resources>
