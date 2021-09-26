@@ -49,7 +49,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class journal_Fragment extends Fragment {
+public class JournalFragment extends Fragment {
     public GlobalVars glbVars;
     Menu mainMenu;
     SearchView searchView;
@@ -58,7 +58,7 @@ public class journal_Fragment extends Fragment {
     Statement stmt;
     ResultSet reset;
     private int progressStatus = 0;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private android.support.v7.widget.Toolbar toolbar;
     GridView orderList, orderdtList;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
@@ -75,24 +75,24 @@ public class journal_Fragment extends Fragment {
 
     ProgressDialog progress;
 
-    public journal_Fragment () {
+    public JournalFragment() {
 
     }
 
-    public boolean onKeyDown( int keyCode, KeyEvent event )  {
-        if ( keyCode == KeyEvent.KEYCODE_BACK) {
-                int Lay = glbVars.viewFlipper.getDisplayedChild();
-                if (Lay==1) {
-                    glbVars.ordStatus = null;
-                    glbVars.viewFlipper.setDisplayedChild(0);
-                } else {
-                    return false;
-                }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            int Lay = glbVars.viewFlipper.getDisplayedChild();
+            if (Lay == 1) {
+                glbVars.ordStatus = null;
+                glbVars.viewFlipper.setDisplayedChild(0);
+            } else {
+                return false;
             }
-        return super.getActivity().onKeyDown( keyCode, event );
+        }
+        return super.getActivity().onKeyDown(keyCode, event);
     }
 
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.journal_fragment, container, false);
 //        setHasOptionsMenu(true);
@@ -128,7 +128,8 @@ public class journal_Fragment extends Fragment {
         super.onAttach(activity);
     }
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
@@ -141,10 +142,10 @@ public class journal_Fragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
-        glbVars.toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
-        glbVars.viewFlipper = (ViewFlipper) getActivity().findViewById(R.id.viewflipper);
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
 
         c = Calendar.getInstance();
         df = new SimpleDateFormat(myFormat);
@@ -155,15 +156,15 @@ public class journal_Fragment extends Fragment {
         CalBDate = Calendar.getInstance();
         CalEDate = Calendar.getInstance();
 
-        txtBDate = (EditText) getActivity().findViewById(R.id.txtBDate);
-        txtEDate = (EditText) getActivity().findViewById(R.id.txtEDate);
-        txtBDate.setText(glbVars.getCalculatedDate(myFormat, -10));
+        txtBDate = getActivity().findViewById(R.id.txtBDate);
+        txtEDate = getActivity().findViewById(R.id.txtEDate);
+        txtBDate.setText(GlobalVars.getCalculatedDate(myFormat, -10));
         txtEDate.setText(formattedDate);
 
-        btOrderFilter = (Button) getActivity().findViewById(R.id.btShowOrders);
-        btUpdateStatus = (Button) getActivity().findViewById(R.id.btUpdateStatus);
-        glbVars.gdOrders = (GridView) getActivity().findViewById(R.id.listSMS);
-        glbVars.orderdtList = (GridView) getActivity().findViewById(R.id.listOrdersDt);
+        btOrderFilter = getActivity().findViewById(R.id.btShowOrders);
+        btUpdateStatus = getActivity().findViewById(R.id.btUpdateStatus);
+        glbVars.gdOrders = getActivity().findViewById(R.id.listSMS);
+        glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
         sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
         final DatePickerDialog.OnDateSetListener Bdate = new DatePickerDialog.OnDateSetListener() {
@@ -234,14 +235,14 @@ public class journal_Fragment extends Fragment {
 
     }
 
-    private AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
+    private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-            tvOrder = (TextView) myView.findViewById(R.id.ColOrdDocNo);
-            tvContr = (TextView) myView.findViewById(R.id.ColOrdContr);
-            tvAddr = (TextView) myView.findViewById(R.id.ColOrdAddr);
-            tvDocDate = (TextView) myView.findViewById(R.id.ColOrdDocDate);
-            tvStatus = (TextView) myView.findViewById(R.id.ColOrdStatus);
+            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
+            tvContr = myView.findViewById(R.id.ColOrdContr);
+            tvAddr = myView.findViewById(R.id.ColOrdAddr);
+            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
+            tvStatus = myView.findViewById(R.id.ColOrdStatus);
             glbVars.ordStatus = tvStatus.getText().toString();
             final String ID = tvOrder.getText().toString();
             glbVars.LoadOrdersDetails(ID);
@@ -249,11 +250,11 @@ public class journal_Fragment extends Fragment {
         }
     };
 
-    private AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
+    private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            tvOrder = (TextView) view.findViewById(R.id.ColOrdDocNo);
-            tvStatus = (TextView) view.findViewById(R.id.ColOrdStatus);
+            tvOrder = view.findViewById(R.id.ColOrdDocNo);
+            tvStatus = view.findViewById(R.id.ColOrdStatus);
             final String ID = tvOrder.getText().toString();
             final String Status = tvStatus.getText().toString();
             nomPopupMenu = new PopupMenu(getActivity(), view);
@@ -269,7 +270,7 @@ public class journal_Fragment extends Fragment {
                             } catch (DBFException e) {
                                 e.printStackTrace();
                             } finally {
-                                if (!FileName.equals("")){
+                                if (!FileName.equals("")) {
                                     SendDBFFile(FileName);
                                 } else {
                                     Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
@@ -279,26 +280,26 @@ public class journal_Fragment extends Fragment {
                         case R.id.CtxOrdEdit:
                             glbVars.OrderID = ID;
 
-                        // Use the Builder class for convenient dialog construction
-                        builder = new AlertDialog.Builder(getActivity());
-                        builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
-                                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                            // Use the Builder class for convenient dialog construction
+                            builder = new AlertDialog.Builder(getActivity());
+                            builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
+                                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                                    }
-                                })
-                                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        EditOrder(ID);
-                                    }
-                                })
-                        ;
-                        builder.create();
-                        builder.show();
+                                        }
+                                    })
+                                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            EditOrder(ID);
+                                        }
+                                    })
+                            ;
+                            builder.create();
+                            builder.show();
 
                             return true;
                         case R.id.CtxOrdDelete:
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='"+ID+"'");
+                            glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='" + ID + "'");
                             glbVars.Orders.requery();
                             glbVars.OrdersAdapter.notifyDataSetChanged();
                             return true;
@@ -341,12 +342,9 @@ public class journal_Fragment extends Fragment {
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    if (newText.equals("")) {
-                        return false;
-                    } else {
-                        return true;
-                    }
+                    return !newText.equals("");
                 }
+
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     return false;
@@ -375,7 +373,7 @@ public class journal_Fragment extends Fragment {
                 String password = getResources().getString(R.string.ftp_pass);
 
                 FTPClient ftpClient = new FTPClient();
-                try{
+                try {
 
                     ftpClient.connect(server, 21);
                     ftpClient.login(username, password);
@@ -386,7 +384,7 @@ public class journal_Fragment extends Fragment {
                     InputStream inputStream;
 
 //                    File secondLocalFile = new File(glbVars.GetSDCardpath()+glbVars.DBFolder+"/"+tmp_filename);
-                    File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/"+tmp_filename);
+                    File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
 
                     String secondRemoteFile = tmp_filename;
                     inputStream = new FileInputStream(secondLocalFile);
@@ -402,7 +400,7 @@ public class journal_Fragment extends Fragment {
                     inputStream.close();
                     outputStream.close();
 
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -417,7 +415,7 @@ public class journal_Fragment extends Fragment {
         return true;
     }
 
-    private void EditOrder (final String OrderID){
+    private void EditOrder(final String OrderID) {
         progress = null;
         progress = new ProgressDialog(getActivity());
         progress.setIndeterminate(false);
@@ -429,17 +427,16 @@ public class journal_Fragment extends Fragment {
 
         new Thread(new Runnable() {
             @Override
-            public void run()
-            {
-                Cursor cNom, cHead  = null;
+            public void run() {
+                Cursor cNom, cHead = null;
                 glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID, CONTR_ID, ADDR_ID, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ZAKAZY WHERE DOCNO='"+OrderID+"'", null);
-                if (cHead.moveToNext()){
+                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID, CONTR_ID, ADDR_ID, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ZAKAZY WHERE DOCNO='" + OrderID + "'", null);
+                if (cHead.moveToNext()) {
                     try {
                         if (glbVars.db.getCount() == 0) {
-                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE) VALUES ('"+cHead.getString(0)+"', '"+cHead.getString(1)+"', '"+ cHead.getString(2)+"', '"+cHead.getString(3)+"', '"+cHead.getString(4)+"', '"+cHead.getString(5)+"', "+cHead.getInt(6)+", "+cHead.getInt(7)+", "+cHead.getInt(8)+")");
+                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE) VALUES ('" + cHead.getString(0) + "', '" + cHead.getString(1) + "', '" + cHead.getString(2) + "', '" + cHead.getString(3) + "', '" + cHead.getString(4) + "', '" + cHead.getString(5) + "', " + cHead.getInt(6) + ", " + cHead.getInt(7) + ", " + cHead.getInt(8) + ")");
                         } else {
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET TP_ID = '"+cHead.getString(0)+"', CONTR_ID = '"+cHead.getString(1)+"',ADDR_ID = '"+ cHead.getString(2)+"',DATA = '"+cHead.getString(3)+"', COMMENT = '"+cHead.getString(4)+"', DELIV_TIME = '"+cHead.getString(5)+"', GETMONEY = "+cHead.getString(6)+", GETBACKWARD = "+cHead.getString(7)+", BACKTYPE = "+cHead.getString(8));
+                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET TP_ID = '" + cHead.getString(0) + "', CONTR_ID = '" + cHead.getString(1) + "',ADDR_ID = '" + cHead.getString(2) + "',DATA = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4) + "', DELIV_TIME = '" + cHead.getString(5) + "', GETMONEY = " + cHead.getString(6) + ", GETBACKWARD = " + cHead.getString(7) + ", BACKTYPE = " + cHead.getString(8));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -449,10 +446,10 @@ public class journal_Fragment extends Fragment {
                 }
 
                 glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cNom = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='"+OrderID+"'", null);
+                cNom = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cNom.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ="+cNom.getInt(0)+" WHERE ID='"+cNom.getString(1)+"'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(0) + " WHERE ID='" + cNom.getString(1) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -484,13 +481,13 @@ public class journal_Fragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cursor  = null;
+                Cursor cursor = null;
                 glbVars.db.getWritableDatabase().beginTransaction();
                 glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='"+OrderID+"'", null);
+                cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cursor.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ="+cursor.getInt(0)+" WHERE ID='"+cursor.getString(1)+"'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(0) + " WHERE ID='" + cursor.getString(1) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -510,7 +507,7 @@ public class journal_Fragment extends Fragment {
         }).start();
     }
 
-    private void ConnectToSql(){
+    private void ConnectToSql() {
         String connString;
         String sql_server = getResources().getString(R.string.sql_server);
         String sql_port = getResources().getString(R.string.sql_port);
@@ -525,7 +522,8 @@ public class journal_Fragment extends Fragment {
             e.printStackTrace();
         }
     }
-    private void UpdateStatus(){
+
+    private void UpdateStatus() {
         Thread thUpdateStatus;
         progress = null;
         progress = new ProgressDialog(getActivity());
@@ -535,7 +533,7 @@ public class journal_Fragment extends Fragment {
         progress.setCanceledOnTouchOutside(false);
         progress.show();
 
-        if (conn==null){
+        if (conn == null) {
             ConnectToSql();
         }
 
@@ -567,7 +565,7 @@ public class journal_Fragment extends Fragment {
                         CONTR = reset.getString(2);
                         TP = reset.getString(3);
                         STATUS = reset.getInt(4);
-                        c = glbVars.db.getWritableDatabase().rawQuery("SELECT DOCNO FROM ZAKAZY WHERE DOCNO='" + ID + "' AND TP_ID='"+TP+"' AND CONTR_ID='"+CONTR+"'", null);
+                        c = glbVars.db.getWritableDatabase().rawQuery("SELECT DOCNO FROM ZAKAZY WHERE DOCNO='" + ID + "' AND TP_ID='" + TP + "' AND CONTR_ID='" + CONTR + "'", null);
                         if (c.moveToFirst()) {
                             statement.clearBindings();
                             statement.bindLong(1, STATUS);

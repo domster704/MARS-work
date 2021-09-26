@@ -161,7 +161,7 @@ public class GlobalVars extends Application {
     //    public GPSTracker gps;
     public int BeginPos = 0, EndPos = 0;
     public Connection conn = null;
-//    public SQLiteDatabase geoDB = null;
+    //    public SQLiteDatabase geoDB = null;
     public AdapterView.OnItemClickListener GridNomenClick = new AdapterView.OnItemClickListener() {
 
         @Override
@@ -201,22 +201,22 @@ public class GlobalVars extends Application {
             } else {
 
 
-                TextView c = (TextView) myView.findViewById(R.id.ColNomID);
+                TextView c = myView.findViewById(R.id.ColNomID);
                 final String ID = c.getText().toString();
 
-                final TextView c1 = (TextView) myView.findViewById(R.id.ColNomZakaz);
+                final TextView c1 = myView.findViewById(R.id.ColNomZakaz);
                 String Qty = c1.getText().toString();
 
-                TextView c2 = (TextView) myView.findViewById(R.id.ColNomOst);
+                TextView c2 = myView.findViewById(R.id.ColNomOst);
                 final int Ost = Integer.parseInt(c2.getText().toString());
 
-                TextView c3 = (TextView) myView.findViewById(R.id.ColNomCod);
+                TextView c3 = myView.findViewById(R.id.ColNomCod);
                 String Code = c3.getText().toString();
 
-                TextView c4 = (TextView) myView.findViewById(R.id.ColNomDescr);
+                TextView c4 = myView.findViewById(R.id.ColNomDescr);
                 String Descr = c4.getText().toString();
 
-                TextView c5 = (TextView) myView.findViewById(R.id.ColNomPrice);
+                TextView c5 = myView.findViewById(R.id.ColNomPrice);
 
                 LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
                 View promptView;
@@ -239,11 +239,11 @@ public class GlobalVars extends Application {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(frContext);
                     alertDialogBuilder.setView(promptView);
 
-                    final EditText input = (EditText) promptView.findViewById(R.id.edPPQty);
-                    final TextView txtCod = (TextView) promptView.findViewById(R.id.txtNomCode);
-                    final TextView txtDescr = (TextView) promptView.findViewById(R.id.txtNomDescr);
-                    final TextView txtOst = (TextView) promptView.findViewById(R.id.txtNomOst);
-                    final TextView txtGrup = (TextView) promptView.findViewById(R.id.txtNomGroup);
+                    final EditText input = promptView.findViewById(R.id.edPPQty);
+                    final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
+                    final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
+                    final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
+                    final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
 
                     input.setText(myNom.getString(6));
                     txtCod.setText(myNom.getString(2));
@@ -276,7 +276,7 @@ public class GlobalVars extends Application {
                     input.performClick();
                     input.setPressed(true);
                     input.invalidate();
-                    InputMethodManager imm = (InputMethodManager) glbContext.getSystemService(glbContext.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) glbContext.getSystemService(INPUT_METHOD_SERVICE);
                     imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
                     alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
@@ -336,8 +336,8 @@ public class GlobalVars extends Application {
             final String Sgi;
             final String curSgi;
 
-            TextView txtSgi = (TextView) getView().findViewById(R.id.ColSgiID);
-            final TextView tvPhoto = (TextView) myView.findViewById(R.id.ColNomCod);
+            TextView txtSgi = getView().findViewById(R.id.ColSgiID);
+            final TextView tvPhoto = myView.findViewById(R.id.ColNomCod);
             curSgi = txtSgi.getText().toString();
 
             Cursor c = myNom;
@@ -349,11 +349,11 @@ public class GlobalVars extends Application {
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
             nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             if (BeginPos != 0) {
-                nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + String.valueOf(BeginPos) + ")");
+                nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
             }
 
             if (EndPos != 0) {
-                nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + String.valueOf(EndPos) + ")");
+                nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + EndPos + ")");
             }
 
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -381,7 +381,7 @@ public class GlobalVars extends Application {
                                 }
 
                             }
-                            LoadNom(Grup.toString());
+                            LoadNom(Grup);
                             return true;
                         case R.id.showPhoto:
                             isSecondPhoto = false;
@@ -452,21 +452,21 @@ public class GlobalVars extends Application {
                 return;
             }
 
-            TextView c = (TextView) myView.findViewById(R.id.ColOrdDtID);
+            TextView c = myView.findViewById(R.id.ColOrdDtID);
             final String ID = c.getText().toString();
 
-            final TextView c1 = (TextView) myView.findViewById(R.id.ColOrdDtQty);
+            final TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
             String Qty = c1.getText().toString();
 
-            TextView c3 = (TextView) myView.findViewById(R.id.ColOrdDtCod);
+            TextView c3 = myView.findViewById(R.id.ColOrdDtCod);
             String Code = c3.getText().toString();
 
-            TextView c4 = (TextView) myView.findViewById(R.id.ColOrdDtDescr);
+            TextView c4 = myView.findViewById(R.id.ColOrdDtDescr);
             String Descr = c4.getText().toString();
 
-            TextView c5 = (TextView) myView.findViewById(R.id.ColOrdDtPrice);
+            TextView c5 = myView.findViewById(R.id.ColOrdDtPrice);
 
-            TextView c6 = (TextView) myView.findViewById(R.id.ColOrdDtZakazID);
+            TextView c6 = myView.findViewById(R.id.ColOrdDtZakazID);
             final String Zakaz_id = c6.getText().toString();
 
             LayoutInflater layoutInflater = LayoutInflater.from(CurAc);
@@ -474,10 +474,10 @@ public class GlobalVars extends Application {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurAc);
             alertDialogBuilder.setView(promptView);
 
-            final EditText input = (EditText) promptView.findViewById(R.id.edPPQty);
-            final TextView txtCod = (TextView) promptView.findViewById(R.id.txtNomCode);
-            final TextView txtDescr = (TextView) promptView.findViewById(R.id.txtNomDescr);
-            final TextView txtOst = (TextView) promptView.findViewById(R.id.txtNomOst);
+            final EditText input = promptView.findViewById(R.id.edPPQty);
+            final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
+            final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
+            final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
 
             input.setText(c1.getText());
             txtCod.setText(c3.getText());
@@ -510,7 +510,7 @@ public class GlobalVars extends Application {
             input.performClick();
             input.setPressed(true);
             input.invalidate();
-            InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(CurAc.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
             alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
@@ -557,8 +557,8 @@ public class GlobalVars extends Application {
             final String Sgi;
             final String curSgi;
 
-            grupID = (TextView) myView.findViewById(R.id.ColNomGRUPID);
-            sgiID = (TextView) myView.findViewById(R.id.ColNomSGIID);
+            grupID = myView.findViewById(R.id.ColNomGRUPID);
+            sgiID = myView.findViewById(R.id.ColNomSGIID);
 
             Cursor c = myNom;
             Grup = c.getString(7);
@@ -574,7 +574,7 @@ public class GlobalVars extends Application {
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.goToGroup:
-                            fragment = new form_order_Fragment();
+                            fragment = new FormOrderFragment();
                             if (fragment != null) {
                                 fragmentTransaction = fragManager.beginTransaction();
 
@@ -588,7 +588,7 @@ public class GlobalVars extends Application {
                         case R.id.showPhoto:
                             isSecondPhoto = false;
                             String photoDir = getPhotoDir();
-                            tvPhoto = (TextView) myView.findViewById(R.id.ColNomCod);
+                            tvPhoto = myView.findViewById(R.id.ColNomCod);
                             String FileName = tvPhoto.getText().toString() + ".jpg";
                             File imgFile = new File(photoDir + "/" + FileName);
 
@@ -615,7 +615,7 @@ public class GlobalVars extends Application {
             return true;
         }
     };
-    private AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
+    private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
 
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -678,7 +678,7 @@ public class GlobalVars extends Application {
 
     public void LoadSgi() {
         mySgi = db.getAllSgi();
-        spSgi = (Spinner) view.findViewById(R.id.SpinSgi);
+        spSgi = view.findViewById(R.id.SpinSgi);
 
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"ID", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr});
@@ -786,7 +786,7 @@ public class GlobalVars extends Application {
     }
 
     public void LoadNom(String GrupID) {
-        myNom = db.getNomByGrup(GrupID);
+        myNom = db.getNomByGroup(GrupID);
         nomenList.setAdapter(null);
         NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
         nomenList.post(new Runnable() {
@@ -1039,7 +1039,7 @@ public class GlobalVars extends Application {
 
     public boolean isNetworkAvailable() {
 
-        ConnectivityManager connectivityManager = (ConnectivityManager) glbContext.getSystemService(glbContext.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) glbContext.getSystemService(CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (activeNetworkInfo == null) {
@@ -1201,7 +1201,7 @@ public class GlobalVars extends Application {
         alertPhoto.getWindow().setLayout(600, 400);
         alertPhoto.show();
 
-        imageView = (SubsamplingScaleImageView) alertPhoto.findViewById(R.id.ivPhoto);
+        imageView = alertPhoto.findViewById(R.id.ivPhoto);
         imageView.setMaxScale(3f);
         imageView.setDoubleTapZoomScale(1F);
 
@@ -1394,8 +1394,8 @@ public class GlobalVars extends Application {
 
         String curdate = df.format(Calendar.getInstance().getTime());
 
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate.toString() + ".dbf";
-        DBF_FileName = "orders_" + curdate.toString() + ".dbf";
+        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
+        DBF_FileName = "orders_" + curdate + ".dbf";
 
 //        String FileName = GetSDCardpath()+"ARMTP_DB/orders_"+curdate.toString()+".dbf";
 //        DBF_FileName = "orders_"+curdate.toString()+".dbf";
@@ -1413,7 +1413,7 @@ public class GlobalVars extends Application {
 
         DBFWriter Table = new DBFWriter(DBFFile);
         Table.setCharactersetName("cp866");
-        DBFField fields[] = new DBFField[14];
+        DBFField[] fields = new DBFField[14];
 
         fields[0] = new DBFField();
         fields[0].setName("TP");
@@ -1509,7 +1509,7 @@ public class GlobalVars extends Application {
                 getBackward = c.getDouble(14);
                 getBacktype = c.getDouble(15);
 
-                Object rowData[] = new Object[14];
+                Object[] rowData = new Object[14];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
@@ -1548,7 +1548,7 @@ public class GlobalVars extends Application {
 
     public void LoadOrdersDetails(String ZakazID) {
         orderdtList.setAdapter(null);
-        OrdersDt = db.getZakazDatails(ZakazID);
+        OrdersDt = db.getZakazDetails(ZakazID);
         OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOM_ID", "COD5", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
         orderdtList.setAdapter(OrdersDtAdapter);
         orderdtList.setOnItemClickListener(OrderDtNomenClick);
@@ -1581,8 +1581,8 @@ public class GlobalVars extends Application {
         String curdate = df.format(Calendar.getInstance().getTime());
 
 //        String FileName = GetSDCardpath()+"ARMTP_DB/orders_"+curdate.toString()+".dbf";
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate.toString() + ".dbf";
-        DBF_FileName = "orders_" + curdate.toString() + ".dbf";
+        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
+        DBF_FileName = "orders_" + curdate + ".dbf";
 
         c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
         if (c.getCount() == 0) {
@@ -1597,7 +1597,7 @@ public class GlobalVars extends Application {
 
         DBFWriter Table = new DBFWriter(DBFFile);
         Table.setCharactersetName("cp866");
-        DBFField fields[] = new DBFField[14];
+        DBFField[] fields = new DBFField[14];
 
         fields[0] = new DBFField();
         fields[0].setName("TP");
@@ -1691,7 +1691,7 @@ public class GlobalVars extends Application {
                 getBackward = c.getDouble(14);
                 getBacktype = c.getDouble(15);
 
-                Object rowData[] = new Object[14];
+                Object[] rowData = new Object[14];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
@@ -1812,7 +1812,7 @@ public class GlobalVars extends Application {
             ftpClient.setFileType(FTP.ASCII_FILE_TYPE);
 
             InputStream is = new BufferedInputStream(ftpClient.retrieveFileStream("ver.txt"));
-            String result[] = convertStreamToString(is);
+            String[] result = convertStreamToString(is);
             version = result[0];
             versionName = result[1];
 
@@ -1855,7 +1855,7 @@ public class GlobalVars extends Application {
             ftpClient.setFileType(FTP.ASCII_FILE_TYPE);
 
             InputStream is = new BufferedInputStream(ftpClient.retrieveFileStream("ver.txt"));
-            String result[] = convertStreamToString(is);
+            String[] result = convertStreamToString(is);
             version = result[0];
             versionName = result[1];
 
@@ -2212,15 +2212,15 @@ public class GlobalVars extends Application {
         AlertDialog.Builder SaleDlg = new AlertDialog.Builder(CurAc);
         SaleDlg.setView(SaleMarkupView);
 
-        final EditText edPercent = (EditText) SaleMarkupView.findViewById(R.id.txtPercent);
+        final EditText edPercent = SaleMarkupView.findViewById(R.id.txtPercent);
 
         SaleDlg
                 .setCancelable(true)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        RadioGroup radiogroup = (RadioGroup) SaleMarkupView.findViewById(R.id.radioGroup);
+                        RadioGroup radiogroup = SaleMarkupView.findViewById(R.id.radioGroup);
                         int selectedId = radiogroup.getCheckedRadioButtonId();
-                        RadioButton radioButton = (RadioButton) SaleMarkupView.findViewById(selectedId);
+                        RadioButton radioButton = SaleMarkupView.findViewById(selectedId);
                         String perc = "0";
 
                         if (radioButton.getText().equals("Скидка")) {
@@ -2377,7 +2377,7 @@ public class GlobalVars extends Application {
             }
         }
         cur.close();
-        GridView gdNomen = (GridView) view.findViewById(R.id.listContrs);
+        GridView gdNomen = view.findViewById(R.id.listContrs);
         myNom.requery();
         NomenAdapter.notifyDataSetChanged();
         gdNomen.invalidateViews();
@@ -2392,7 +2392,7 @@ public class GlobalVars extends Application {
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            TextView tvDescr = (TextView) view.findViewById(R.id.ColContrAddrDescr);
+            TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
 
             if (!cursor.getString(3).equals("")) {
                 tvDescr.setText(cursor.getString(2) + " / " + cursor.getString(3));
@@ -2407,7 +2407,7 @@ public class GlobalVars extends Application {
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            TextView tvDescr = (TextView) view.findViewById(R.id.ColContrAddrDescr);
+            TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
 
             if (position % 2 == 0) {
                 tvDescr.setBackgroundColor(Color.rgb(201, 235, 255));
@@ -2525,7 +2525,7 @@ public class GlobalVars extends Application {
             });
 
             if (isDiscount && Discount != 0) {
-                tvPrice.setText(String.valueOf(String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100)));
+                tvPrice.setText(String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100));
             }
 
             if (tvPhoto != null && !cursor.getString(9).equals("")) {
@@ -2620,9 +2620,9 @@ public class GlobalVars extends Application {
             int resID = glbContext.getResources().getIdentifier("photo_free", "drawable", glbContext.getPackageName());
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            TextView tvPhoto = (TextView) view.findViewById(R.id.ColNomPhoto);
-            TextView tvDescr = (TextView) view.findViewById(R.id.ColNomDescr);
-            TextView tvQty = (TextView) view.findViewById(R.id.ColOrdDtQty);
+            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
+            TextView tvDescr = view.findViewById(R.id.ColNomDescr);
+            TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
 
             if (tvPhoto != null && !cursor.getString(9).equals("")) {
                 if (cursor.getInt(18) == 1) {
@@ -2853,20 +2853,20 @@ public class GlobalVars extends Application {
         public View getView(int position, View convertView, ViewGroup parent) {
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            TextView tvContr = (TextView) view.findViewById(R.id.ColDebetContr);
-            TextView tvStatus = (TextView) view.findViewById(R.id.ColDebetStatus);
-            TextView tvCredit = (TextView) view.findViewById(R.id.ColDebetCredit);
-            TextView tvA7 = (TextView) view.findViewById(R.id.ColDebetA7);
-            TextView tvA14 = (TextView) view.findViewById(R.id.ColDebetA14);
-            TextView tvA21 = (TextView) view.findViewById(R.id.ColDebetA21);
-            TextView tvA28 = (TextView) view.findViewById(R.id.ColDebetA28);
-            TextView tvA35 = (TextView) view.findViewById(R.id.ColDebetA35);
-            TextView tvA42 = (TextView) view.findViewById(R.id.ColDebetA42);
-            TextView tvA49 = (TextView) view.findViewById(R.id.ColDebetA49);
-            TextView tvA56 = (TextView) view.findViewById(R.id.ColDebetA56);
-            TextView tvA63 = (TextView) view.findViewById(R.id.ColDebetA63);
-            TextView tvA64 = (TextView) view.findViewById(R.id.ColDebetA64);
-            TextView tvDolg = (TextView) view.findViewById(R.id.ColDebetDolg);
+            TextView tvContr = view.findViewById(R.id.ColDebetContr);
+            TextView tvStatus = view.findViewById(R.id.ColDebetStatus);
+            TextView tvCredit = view.findViewById(R.id.ColDebetCredit);
+            TextView tvA7 = view.findViewById(R.id.ColDebetA7);
+            TextView tvA14 = view.findViewById(R.id.ColDebetA14);
+            TextView tvA21 = view.findViewById(R.id.ColDebetA21);
+            TextView tvA28 = view.findViewById(R.id.ColDebetA28);
+            TextView tvA35 = view.findViewById(R.id.ColDebetA35);
+            TextView tvA42 = view.findViewById(R.id.ColDebetA42);
+            TextView tvA49 = view.findViewById(R.id.ColDebetA49);
+            TextView tvA56 = view.findViewById(R.id.ColDebetA56);
+            TextView tvA63 = view.findViewById(R.id.ColDebetA63);
+            TextView tvA64 = view.findViewById(R.id.ColDebetA64);
+            TextView tvDolg = view.findViewById(R.id.ColDebetDolg);
             if (position % 2 == 0) {
                 view.setBackgroundResource(R.drawable.debet_item_border_blue);
             } else {
@@ -2963,7 +2963,7 @@ public class GlobalVars extends Application {
 
             Cursor cursor = getCursor();
 
-            Button btMarkAsRead = (Button) view.findViewById(R.id.btMarkAsRead);
+            Button btMarkAsRead = view.findViewById(R.id.btMarkAsRead);
             if (cursor.getInt(5) == 0) {
                 btMarkAsRead.setVisibility(View.INVISIBLE);
             } else {

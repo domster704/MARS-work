@@ -22,8 +22,7 @@ import java.util.Date;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
-public class messages_Fragment extends Fragment {
-    private android.support.v7.widget.Toolbar toolbar;
+public class MessagesFragment extends Fragment {
     Button btMarkAsRead;
     Calendar CalBDate, CalEDate;
     EditText txtBDate, txtEDate;
@@ -31,13 +30,14 @@ public class messages_Fragment extends Fragment {
     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
     String currentDate = sdf.format(new Date());
     public GlobalVars glbVars;
-    public messages_Fragment () {
+
+    public MessagesFragment() {
 
     }
 
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-         View rootView = inflater.inflate(R.layout.messages_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.messages_fragment, container, false);
         glbVars.view = rootView;
         return rootView;
     }
@@ -58,7 +58,8 @@ public class messages_Fragment extends Fragment {
         super.onAttach(activity);
     }
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
@@ -71,14 +72,14 @@ public class messages_Fragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        glbVars.smsList = (GridView) getActivity().findViewById(R.id.listSMS);
-        toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
-        glbVars.toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
-        btMarkAsRead = (Button) getActivity().findViewById(R.id.btMarkAsRead);
-        txtBDate = (EditText) getActivity().findViewById(R.id.txtBDate);
-        txtEDate = (EditText) getActivity().findViewById(R.id.txtEDate);
-        btOrderFilter = (Button) getActivity().findViewById(R.id.btShowOrders);
-        btUpdateSMS = (Button) getActivity().findViewById(R.id.btUpdateSMS);
+        glbVars.smsList = getActivity().findViewById(R.id.listSMS);
+        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        btMarkAsRead = getActivity().findViewById(R.id.btMarkAsRead);
+        txtBDate = getActivity().findViewById(R.id.txtBDate);
+        txtEDate = getActivity().findViewById(R.id.txtEDate);
+        btOrderFilter = getActivity().findViewById(R.id.btShowOrders);
+        btUpdateSMS = getActivity().findViewById(R.id.btUpdateSMS);
 
         toolbar.setSubtitle("");
 
@@ -152,9 +153,9 @@ public class messages_Fragment extends Fragment {
             }
         });
 
-        glbVars.smsList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id){
-                glbVars.SmsDB.execSQL("UPDATE MSGS SET IS_NEW = 0 WHERE ROW_ID="+id);
+        glbVars.smsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                glbVars.SmsDB.execSQL("UPDATE MSGS SET IS_NEW = 0 WHERE ROW_ID=" + id);
                 glbVars.SMSadapter.notifyDataSetChanged();
                 glbVars.cur_sms.requery();
                 Integer count = glbVars.getSMSCount();

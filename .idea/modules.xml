@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS-work.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS-work.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS-work.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS-work.app.iml" />
     </modules>
   </component>
 </project>

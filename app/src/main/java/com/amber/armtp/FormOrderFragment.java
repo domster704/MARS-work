@@ -25,7 +25,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class form_order_Fragment extends Fragment{
+public class FormOrderFragment extends Fragment {
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences APKsettings;
@@ -38,12 +38,14 @@ public class form_order_Fragment extends Fragment{
     TextView UnIFilterTypeID, UniFilterID;
     private android.support.v7.widget.Toolbar toolbar;
     public GlobalVars glbVars;
-	public form_order_Fragment(){}
+
+    public FormOrderFragment() {
+    }
 
 
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
- 
+
         View rootView = inflater.inflate(R.layout.form_order_fragment, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
@@ -52,7 +54,8 @@ public class form_order_Fragment extends Fragment{
         return rootView;
     }
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
@@ -72,7 +75,7 @@ public class form_order_Fragment extends Fragment{
         inflater.inflate(R.menu.form_order_menu, menu);
         mainMenu = menu;
 
-        if (glbVars.db.CheckForSales()>0){
+        if (glbVars.db.CheckForSales() > 0) {
             mainMenu.getItem(2).setEnabled(false);
             glbVars.setSaleIcon(mainMenu, 1, true);
         } else {
@@ -80,11 +83,7 @@ public class form_order_Fragment extends Fragment{
             glbVars.setSaleIcon(mainMenu, 1, false);
         }
 
-        if (glbVars.isDiscount){
-            glbVars.setDiscountIcon(mainMenu, 2, true);
-        } else {
-            glbVars.setDiscountIcon(mainMenu, 2, false);
-        }
+        glbVars.setDiscountIcon(mainMenu, 2, glbVars.isDiscount);
 
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -106,8 +105,8 @@ public class form_order_Fragment extends Fragment{
                 final EditText edBeginPP = RangeDlgView.findViewById(R.id.edBeginPP);
                 final EditText edEndPP = RangeDlgView.findViewById(R.id.edEndPP);
                 final EditText edPPQty = RangeDlgView.findViewById(R.id.edPPQty);
-                edBeginPP.setText((glbVars.BeginPos!=0? String.valueOf(glbVars.BeginPos):"0"));
-                edEndPP.setText((glbVars.EndPos!=0? String.valueOf(glbVars.EndPos):"0"));
+                edBeginPP.setText((glbVars.BeginPos != 0 ? String.valueOf(glbVars.BeginPos) : "0"));
+                edEndPP.setText((glbVars.EndPos != 0 ? String.valueOf(glbVars.EndPos) : "0"));
                 edPPQty.setText("0");
 
                 RangeDlg
@@ -123,16 +122,16 @@ public class form_order_Fragment extends Fragment{
                         });
 
                 final AlertDialog alertDlg = RangeDlg.create();
-                alertDlg.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                alertDlg.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
                 alertDlg.show();
 
                 EditText edInput;
 
-                if (glbVars.BeginPos!=0 && glbVars.EndPos!=0){
+                if (glbVars.BeginPos != 0 && glbVars.EndPos != 0) {
                     edInput = edPPQty;
-                } else if (glbVars.BeginPos!=0){
-                    if (glbVars.EndPos!=0){
+                } else if (glbVars.BeginPos != 0) {
+                    if (glbVars.EndPos != 0) {
                         edInput = edPPQty;
                     } else {
                         edInput = edEndPP;
@@ -152,7 +151,7 @@ public class form_order_Fragment extends Fragment{
                 alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (edBeginPP.getText().toString()!="" && edEndPP.getText().toString()!="" && edPPQty.getText().toString()!=""){
+                        if (edBeginPP.getText().toString() != "" && edEndPP.getText().toString() != "" && edPPQty.getText().toString() != "") {
                             glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
                             glbVars.BeginPos = 0;
                             glbVars.EndPos = 0;
@@ -167,7 +166,7 @@ public class form_order_Fragment extends Fragment{
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                            if (!edBeginPP.getText().toString().equals("")){
+                            if (!edBeginPP.getText().toString().equals("")) {
                                 edEndPP.requestFocus();
                                 edEndPP.selectAll();
                                 edEndPP.performClick();
@@ -183,7 +182,7 @@ public class form_order_Fragment extends Fragment{
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                            if (!edEndPP.getText().toString().equals("")){
+                            if (!edEndPP.getText().toString().equals("")) {
                                 edPPQty.requestFocus();
                                 edPPQty.selectAll();
                                 edPPQty.performClick();
@@ -204,7 +203,7 @@ public class form_order_Fragment extends Fragment{
                 return true;
             case R.id.NomenSales:
 
-                if (glbVars.isSales){
+                if (glbVars.isSales) {
                     mainMenu.getItem(2).setEnabled(true);
                     glbVars.setSaleIcon(mainMenu, 1, false);
                 } else {
@@ -214,12 +213,12 @@ public class form_order_Fragment extends Fragment{
 
                 glbVars.db.calcSales(glbVars.db.GetContrID());
 
-                if (glbVars.NomenAdapter!=null){
+                if (glbVars.NomenAdapter != null) {
                     glbVars.myNom.requery();
                     glbVars.NomenAdapter.notifyDataSetChanged();
                 }
                 setContrAndSum();
-                if (glbVars.isDiscount){
+                if (glbVars.isDiscount) {
                     glbVars.isDiscount = false;
                     glbVars.Discount = 0;
                     mainMenu.getItem(2).setEnabled(false);
@@ -231,7 +230,7 @@ public class form_order_Fragment extends Fragment{
                 glbVars.CalculatePercentSale(mainMenu, 0);
                 return true;
             case R.id.NomenMultiSelect:
-                if (!glbVars.isMultiSelect){
+                if (!glbVars.isMultiSelect) {
 
                     LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
                     View promptView;
@@ -256,7 +255,7 @@ public class form_order_Fragment extends Fragment{
                             });
 
                     final AlertDialog alertD = alertDialogBuilder.create();
-                    alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                    alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
                     alertD.show();
                     input.requestFocus();
@@ -296,35 +295,34 @@ public class form_order_Fragment extends Fragment{
                 return true;
 
             case R.id.NomenFilters:
-                    LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-                    final View promptView;
-;
-                    promptView = layoutInflater.inflate(R.layout.nom_filters, null);
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                    alertDialogBuilder.setView(promptView);
+                LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+                final View promptView;
+                promptView = layoutInflater.inflate(R.layout.nom_filters, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                alertDialogBuilder.setView(promptView);
                 glbVars.SetSelectedSgi("0", "0");
                 glbVars.SetSelectedGrup("0");
 
-                    alertDialogBuilder
-                            .setCancelable(true)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                }
-                            })
-                            .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            })
-                            .setNeutralButton("Сбросить фильтры", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                }
-                            })
-                    ;
+                alertDialogBuilder
+                        .setCancelable(true)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setNeutralButton("Сбросить фильтры", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                ;
 
-                    final AlertDialog alertD = alertDialogBuilder.create();
-                    alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                    alertD.show();
+                final AlertDialog alertD = alertDialogBuilder.create();
+                alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                alertD.show();
                 glbVars.LoadFiltersSgi(promptView);
                 glbVars.LoadFiltersGroups(promptView);
                 glbVars.LoadFiltersTovcat(promptView);
@@ -347,43 +345,43 @@ public class form_order_Fragment extends Fragment{
                 String ModelID = settings.getString("ColModelID", "0");
                 String ColorID = settings.getString("ColColorID", "0");
 
-                if (!SgiFID.equals("0")){
+                if (!SgiFID.equals("0")) {
                     glbVars.SetSelectedFilterSgi(SgiFID);
                 }
 
-                if (!GrupFID.equals("0")){
+                if (!GrupFID.equals("0")) {
                     glbVars.SetSelectedFilterGroup(GrupFID);
                 }
 
-                if (!TovcatID.equals("0")){
+                if (!TovcatID.equals("0")) {
                     glbVars.SetSelectedFilterTovcat(TovcatID);
                 }
 
-                if (!FuncID.equals("0")){
+                if (!FuncID.equals("0")) {
                     glbVars.SetSelectedFilterFunc(FuncID);
                 }
 
-                if (!BrandID.equals("0")){
+                if (!BrandID.equals("0")) {
                     glbVars.SetSelectedFilterBrand(BrandID);
                 }
 
-                if (!WCID.equals("0")){
+                if (!WCID.equals("0")) {
                     glbVars.SetSelectedFilterWC(WCID);
                 }
 
-                if (!ProdID.equals("0")){
+                if (!ProdID.equals("0")) {
                     glbVars.SetSelectedFilterProd(ProdID);
                 }
 
-                if (!FocusID.equals("0")){
+                if (!FocusID.equals("0")) {
                     glbVars.SetSelectedFilterFocus(FocusID);
                 }
 
-                if (!ModelID.equals("0")){
+                if (!ModelID.equals("0")) {
                     glbVars.SetSelectedFilterModel(ModelID);
                 }
 
-                if (!ColorID.equals("0")){
+                if (!ColorID.equals("0")) {
                     glbVars.SetSelectedFilterColor(ColorID);
                 }
 //                    input.requestFocus();
@@ -394,37 +392,37 @@ public class form_order_Fragment extends Fragment{
 //                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
 //                    imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
-                    alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FilterSgi_ID = promptView.findViewById(R.id.ColSgiFID);
-                            FilterGroup_ID = promptView.findViewById(R.id.ColGroupFID);
-                            FilterTovcat_ID = promptView.findViewById(R.id.ColTovcatID);
-                            FilterFunc_ID = promptView.findViewById(R.id.ColFuncID);
-                            FilterBrand_ID = promptView.findViewById(R.id.ColBrandID);
-                            FilterWC_ID = promptView.findViewById(R.id.ColWCID);
-                            FilterProd_ID = promptView.findViewById(R.id.ColProdID);
-                            FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
-                            FilterModel_ID = promptView.findViewById(R.id.ColModelID);
-                            FilterColor_ID = promptView.findViewById(R.id.ColColorID);
+                alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FilterSgi_ID = promptView.findViewById(R.id.ColSgiFID);
+                        FilterGroup_ID = promptView.findViewById(R.id.ColGroupFID);
+                        FilterTovcat_ID = promptView.findViewById(R.id.ColTovcatID);
+                        FilterFunc_ID = promptView.findViewById(R.id.ColFuncID);
+                        FilterBrand_ID = promptView.findViewById(R.id.ColBrandID);
+                        FilterWC_ID = promptView.findViewById(R.id.ColWCID);
+                        FilterProd_ID = promptView.findViewById(R.id.ColProdID);
+                        FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
+                        FilterModel_ID = promptView.findViewById(R.id.ColModelID);
+                        FilterColor_ID = promptView.findViewById(R.id.ColColorID);
 
-                            editor.putString("ColSgiFID", FilterSgi_ID.getText().toString());
-                            editor.putString("ColGrupFID", FilterGroup_ID.getText().toString());
-                            editor.putString("ColTovcatID", FilterTovcat_ID.getText().toString());
-                            editor.putString("ColFuncID", FilterFunc_ID.getText().toString());
-                            editor.putString("ColBrandID", FilterBrand_ID.getText().toString());
-                            editor.putString("ColWCID", FilterWC_ID.getText().toString());
-                            editor.putString("ColProdID", FilterProd_ID.getText().toString());
-                            editor.putString("ColFocusID", FilterFocus_ID.getText().toString());
-                            editor.putString("ColModelID", FilterModel_ID.getText().toString());
-                            editor.putString("ColColorID", FilterColor_ID.getText().toString());
+                        editor.putString("ColSgiFID", FilterSgi_ID.getText().toString());
+                        editor.putString("ColGrupFID", FilterGroup_ID.getText().toString());
+                        editor.putString("ColTovcatID", FilterTovcat_ID.getText().toString());
+                        editor.putString("ColFuncID", FilterFunc_ID.getText().toString());
+                        editor.putString("ColBrandID", FilterBrand_ID.getText().toString());
+                        editor.putString("ColWCID", FilterWC_ID.getText().toString());
+                        editor.putString("ColProdID", FilterProd_ID.getText().toString());
+                        editor.putString("ColFocusID", FilterFocus_ID.getText().toString());
+                        editor.putString("ColModelID", FilterModel_ID.getText().toString());
+                        editor.putString("ColColorID", FilterColor_ID.getText().toString());
 
-                            editor.commit();
+                        editor.commit();
 //                            System.out.print("FilterProd_ID: " + FilterProd_ID.getText().toString());
-                            glbVars.LoadNomByFilters(FilterSgi_ID.getText().toString(), FilterGroup_ID.getText().toString(), FilterTovcat_ID.getText().toString(), FilterFunc_ID.getText().toString(), FilterBrand_ID.getText().toString(), FilterWC_ID.getText().toString(), FilterProd_ID.getText().toString(), FilterFocus_ID.getText().toString(), FilterModel_ID.getText().toString(), FilterColor_ID.getText().toString());
-                            alertD.dismiss();
-                        }
-                    });
+                        glbVars.LoadNomByFilters(FilterSgi_ID.getText().toString(), FilterGroup_ID.getText().toString(), FilterTovcat_ID.getText().toString(), FilterFunc_ID.getText().toString(), FilterBrand_ID.getText().toString(), FilterWC_ID.getText().toString(), FilterProd_ID.getText().toString(), FilterFocus_ID.getText().toString(), FilterModel_ID.getText().toString(), FilterColor_ID.getText().toString());
+                        alertD.dismiss();
+                    }
+                });
 
                 alertD.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -482,8 +480,8 @@ public class form_order_Fragment extends Fragment{
 //                        })
                 ;
 
-                final AlertDialog alertD1= alertDialogBuilder1.create();
-                alertD1.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                final AlertDialog alertD1 = alertDialogBuilder1.create();
+                alertD1.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
                 alertD1.show();
                 glbVars.LoadUniFilters(promptView1, "");
                 glbVars.txtUniFilter = promptView1.findViewById(R.id.txtUniFilter);
@@ -498,8 +496,11 @@ public class form_order_Fragment extends Fragment{
                         }
                     }
 
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
                 });
 //                glbVars.LoadFiltersGroups(promptView);
 //                glbVars.LoadFiltersTovcat(promptView);
@@ -562,31 +563,31 @@ public class form_order_Fragment extends Fragment{
     private final SearchView.OnQueryTextListener searchTextListner =
             new SearchView.OnQueryTextListener() {
                 boolean isSearchClicked = false;
+
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     String ItemID = "";
-                    if(glbVars.myGrups!=null){
+                    if (glbVars.myGrups != null) {
                         ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("ID"));
                     }
 
                     if (newText.equals("")) {
-                        if (!isSearchClicked){
+                        if (!isSearchClicked) {
                             glbVars.LoadNom(ItemID);
                             searchView.clearFocus();
                             searchView.setIconified(true);
                         }
                         return true;
                     } else {
-                        if (newText.length()>=1){
-                            if (!ItemID.equals("0")){
+                        if (newText.length() >= 1) {
+                            if (!ItemID.equals("0")) {
                                 glbVars.SearchNomInGroup(newText, ItemID);
                                 return true;
                             } else {
                                 glbVars.LoadNom(ItemID);
                                 return true;
                             }
-                        }
-                        else {
+                        } else {
                             return false;
                         }
                     }
@@ -617,7 +618,7 @@ public class form_order_Fragment extends Fragment{
 
         glbVars.isMultiSelect = false;
         glbVars.MultiQty = 0;
-        if (txtSgi!=null && txtGroup!=null) {
+        if (txtSgi != null && txtGroup != null) {
             editor.putString("ColSgiID", txtSgi.getText().toString());
             editor.putString("ColGrupID", txtGroup.getText().toString());
             editor.putInt("ColPosition", glbVars.nomenList.getFirstVisiblePosition());
@@ -634,7 +635,7 @@ public class form_order_Fragment extends Fragment{
         int VisiblePos = settings.getInt("ColPosition", 0);
         glbVars.nomenList.setSelection(VisiblePos);
 
-        if (!SgiID.equals("0")){
+        if (!SgiID.equals("0")) {
             glbVars.LoadGroups(SgiID);
             glbVars.SetSelectedSgi(SgiID, GrupID);
             glbVars.SetSelectedGrup(GrupID);
@@ -662,11 +663,11 @@ public class form_order_Fragment extends Fragment{
         editor = settings.edit();
 
         glbVars.LoadSgi();
-        if (glbVars.frSgi != "" && glbVars.frSgi!=null){
+        if (glbVars.frSgi != "" && glbVars.frSgi != null) {
             glbVars.SetSelectedSgi(glbVars.frSgi, glbVars.frGroup);
             glbVars.LoadGroups(glbVars.frSgi);
             glbVars.SetSelectedGrup(glbVars.frGroup);
-        };
+        }
 
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
@@ -679,9 +680,9 @@ public class form_order_Fragment extends Fragment{
         super.onAttach(activity);
     }
 
-    private void setContrAndSum(){
+    private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         toolbar.setSubtitle(ToolBarContr + OrderSum);
     }
- }
+}

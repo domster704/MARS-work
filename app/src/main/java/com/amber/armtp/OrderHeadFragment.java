@@ -33,19 +33,22 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class order_head_Fragment extends Fragment {
+public class OrderHeadFragment extends Fragment {
     SQLiteDatabase InsDB = null;
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences APKsettings;
     SharedPreferences.Editor editor;
-	public order_head_Fragment(){}
+
+    public OrderHeadFragment() {
+    }
+
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v7.widget.Toolbar toolbar;
     public GlobalVars glbVars;
 
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.order_head_fragment, container, false);
@@ -55,7 +58,8 @@ public class order_head_Fragment extends Fragment {
         return rootView;
     }
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
@@ -74,24 +78,16 @@ public class order_head_Fragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.order_head_menu, menu);
         mainMenu = menu;
-        if (glbVars.db.CheckForSales()>0){
-            glbVars.setSaleIcon(mainMenu, 0, true);
-        } else {
-            glbVars.setSaleIcon(mainMenu, 0, false);
-        }
+        glbVars.setSaleIcon(mainMenu, 0, glbVars.db.CheckForSales() > 0);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.OrdSumWithSales:
-                if (glbVars.isSales){
-                    glbVars.setSaleIcon(mainMenu, 0, false);
-                } else {
-                    glbVars.setSaleIcon(mainMenu, 0, true);
-                }
+                glbVars.setSaleIcon(mainMenu, 0, !glbVars.isSales);
                 glbVars.db.calcSales(glbVars.db.GetContrID());
-                if (glbVars.NomenAdapter!=null){
+                if (glbVars.NomenAdapter != null) {
                     glbVars.myNom.requery();
                     glbVars.NomenAdapter.notifyDataSetChanged();
                 }
@@ -99,7 +95,7 @@ public class order_head_Fragment extends Fragment {
                 return true;
             case R.id.SaveOrder:
                 try {
-                    if (!glbVars.OrderID.equals("")){
+                    if (!glbVars.OrderID.equals("")) {
                         SaveEditOrder(glbVars.OrderID);
 //                        glbVars.db.resetContrSales();
                     } else {
@@ -111,7 +107,7 @@ public class order_head_Fragment extends Fragment {
                 }
                 return true;
             case R.id.ViewOrder:
-                fragment = new view_order_Fragment();
+                fragment = new ViewOrderFragment();
                 if (fragment != null) {
                     fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
@@ -170,14 +166,17 @@ public class order_head_Fragment extends Fragment {
                 }
             }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
         });
 
         glbVars.chkGetBackward.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if ( isChecked ) {
+                if (isChecked) {
                     glbVars.spnBackwardType.setEnabled(true);
                     glbVars.spnBackwardType.setSelection(0);
                 } else {
@@ -271,12 +270,12 @@ public class order_head_Fragment extends Fragment {
                 String CONTR_ID = glbVars.spContr.getText().toString();
                 String CurContr = glbVars.db.GetContrID();
 
-                if (!CurContr.equals(CONTR_ID)){
+                if (!CurContr.equals(CONTR_ID)) {
                     glbVars.db.resetContrSales();
                     setContrAndSum();
                 }
 
-                if (glbVars.spAddr!=null) {
+                if (glbVars.spAddr != null) {
                     ADDR_ID = glbVars.spAddr.getText().toString();
                 } else {
                     ADDR_ID = "0";
@@ -314,16 +313,16 @@ public class order_head_Fragment extends Fragment {
                         break;
                 }
 
-                Integer ordMoney = glbVars.chkGetMoney.isChecked()? 1:0;
-                Integer ordBackward = glbVars.chkGetBackward.isChecked()? 1:0;
-                Long ordBackwardType = glbVars.chkGetBackward.isChecked()? BackwardType:0;
+                Integer ordMoney = glbVars.chkGetMoney.isChecked() ? 1 : 0;
+                Integer ordBackward = glbVars.chkGetBackward.isChecked() ? 1 : 0;
+                Long ordBackwardType = glbVars.chkGetBackward.isChecked() ? BackwardType : 0;
 
-                if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")){
+                if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
                     Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                if (ordBackward==1 && ordBackwardType==0){
+                if (ordBackward == 1 && ordBackwardType == 0) {
                     Toast.makeText(getActivity(), "Необходимо выбрать причину возврата товара", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -331,7 +330,7 @@ public class order_head_Fragment extends Fragment {
                 editor.putString("TP_ID", TP_ID);
                 editor.commit();
 
-                if (glbVars.db.CheckTPAccess(TP_ID)>0){
+                if (glbVars.db.CheckTPAccess(TP_ID) > 0) {
                     editor.putBoolean("TP_LOCK", true);
                     editor.commit();
                 }
@@ -393,7 +392,7 @@ public class order_head_Fragment extends Fragment {
                 glbVars.tvContr = getActivity().findViewById(R.id.ColContrID);
                 String DebetContr = glbVars.tvContr.getText().toString();
                 if (!DebetContr.equals("0")) {
-                    fragment = new debet_Fragment();
+                    fragment = new DebetFragment();
                     if (fragment != null) {
                         glbVars.DebetContr = DebetContr;
                         fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -417,13 +416,13 @@ public class order_head_Fragment extends Fragment {
         int TPDefaultRowid = glbVars.db.GetTPByID(stTP_ID);
 
 //        System.out.println("TPDefaultRowid: " + TPDefaultRowid);
-        if (glbVars.CheckTPLock()){
+        if (glbVars.CheckTPLock()) {
             glbVars.TPList.setSelection(TPDefaultRowid);
         } else {
             if (stTP_ID.equals("0")) {
                 glbVars.TPList.setSelection(TPRowid);
             } else {
-                if (TPRowid!=TPDefaultRowid && TPRowid!=0) {
+                if (TPRowid != TPDefaultRowid && TPRowid != 0) {
                     glbVars.TPList.setSelection(TPRowid);
                 } else {
                     glbVars.TPList.setSelection(TPDefaultRowid);
@@ -449,13 +448,9 @@ public class order_head_Fragment extends Fragment {
             glbVars.txtTime.setText(DelivTime, TextView.BufferType.EDITABLE);
         }
 
-        if (GetMoney){
-            glbVars.chkGetMoney.setChecked(true);
-        } else {
-            glbVars.chkGetMoney.setChecked(false);
-        }
+        glbVars.chkGetMoney.setChecked(GetMoney);
 
-        if (GetBackward){
+        if (GetBackward) {
             glbVars.chkGetBackward.setChecked(true);
             glbVars.spnBackwardType.setEnabled(true);
 //            spnBackwardType.setSelection(BackwardType);
@@ -493,18 +488,18 @@ public class order_head_Fragment extends Fragment {
 
     }
 
-    public void SetSelectedContr(int ROWID){
+    public void SetSelectedContr(int ROWID) {
         for (int i = 0; i < glbVars.spinContr.getCount(); i++) {
             Cursor value = (Cursor) glbVars.spinContr.getItemAtPosition(i);
             int id = value.getInt(value.getColumnIndexOrThrow("_id"));
-            if (ROWID==id) {
+            if (ROWID == id) {
                 glbVars.spinContr.setSelection(i);
                 break;
             }
         }
     }
 
-    public void SaveEditOrder(final String OrderID){
+    public void SaveEditOrder(final String OrderID) {
         final ProgressDialog progress;
         progress = new ProgressDialog(getActivity());
         progress.setIndeterminate(false);
@@ -514,57 +509,57 @@ public class order_head_Fragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-        Cursor cHead, c, c2 = null;
+                Cursor cHead, c, c2 = null;
 
-        c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
-        c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-        if(c.getCount()==0) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
+                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                if (c.getCount() == 0) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return;
                 }
-            });
-            return;
-        }
 
-        c2.moveToFirst();
+                c2.moveToFirst();
 
-        if(c2.getInt(1)==0) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
+                if (c2.getInt(1) == 0) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return;
                 }
-            });
-            return;
-        }
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progress.show();
-            }
-        });
-        glbVars.db.getWritableDatabase().beginTransaction();
-        cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ORDERS", null);
-        if (cHead.moveToNext()){
-            try {
-                glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP_ID = '"+cHead.getString(0)+"', CONTR_ID = '"+cHead.getString(1)+"',ADDR_ID = '"+ cHead.getString(2)+"', DELIVERY_DATE = '"+cHead.getString(3)+"', COMMENT = '"+cHead.getString(4)+"', DELIV_TIME = '"+cHead.getString(5)+"', GETMONEY = "+cHead.getInt(6)+", GETBACKWARD = "+cHead.getInt(7)+", BACKTYPE = "+cHead.getInt(8)+" WHERE DOCNO='"+OrderID+"'");
-                glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='"+OrderID+"'");
-                glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '"+OrderID+"', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
-                glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.show();
+                    }
+                });
+                glbVars.db.getWritableDatabase().beginTransaction();
+                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ORDERS", null);
+                if (cHead.moveToNext()) {
+                    try {
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP_ID = '" + cHead.getString(0) + "', CONTR_ID = '" + cHead.getString(1) + "',ADDR_ID = '" + cHead.getString(2) + "', DELIVERY_DATE = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4) + "', DELIV_TIME = '" + cHead.getString(5) + "', GETMONEY = " + cHead.getInt(6) + ", GETBACKWARD = " + cHead.getInt(7) + ", BACKTYPE = " + cHead.getInt(8) + " WHERE DOCNO='" + OrderID + "'");
+                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + OrderID + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-            cHead.close();
-            glbVars.db.getWritableDatabase().setTransactionSuccessful();
-            glbVars.db.getWritableDatabase().endTransaction();
-            glbVars.db.ClearOrderHeader();
-            glbVars.db.ResetNomen();
-            glbVars.OrderID = "";
-        }
+                    cHead.close();
+                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.db.getWritableDatabase().endTransaction();
+                    glbVars.db.ClearOrderHeader();
+                    glbVars.db.ResetNomen();
+                    glbVars.OrderID = "";
+                }
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -621,7 +616,7 @@ public class order_head_Fragment extends Fragment {
 
                 c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-                if(c.getCount()==0) {
+                if (c.getCount() == 0) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -633,7 +628,7 @@ public class order_head_Fragment extends Fragment {
                 }
                 c2.moveToFirst();
 
-                if(c2.getInt(1)==0) {
+                if (c2.getInt(1) == 0) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -670,7 +665,7 @@ public class order_head_Fragment extends Fragment {
 
                 int Docno = glbVars.db.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
-                IDDOC += "."+TP_ID;
+                IDDOC += "." + TP_ID;
 
                 sql = "INSERT INTO ZAKAZY(DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
                 stmt = glbVars.db.getWritableDatabase().compileStatement(sql);
@@ -698,20 +693,18 @@ public class order_head_Fragment extends Fragment {
                 }
 
                 c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT ID, COD, DESCR, ZAKAZ, ROUND(PRICE,2) AS [CENA], CODE FROM Nomen where ZAKAZ<>0", null);
-                if(c1.getCount()==0) {
+                if (c1.getCount() == 0) {
                     c1.close();
                     return;
                 } else {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '"+IDDOC+"', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
+                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + IDDOC + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                     glbVars.db.ClearOrderHeader();
                     glbVars.db.ResetNomen();
 //
                 }
-
-
 
 
                 getActivity().runOnUiThread(new Runnable() {
@@ -743,7 +736,7 @@ public class order_head_Fragment extends Fragment {
         glbVars.spnBackwardType.setAdapter(adapter);
     }
 
-    private void setContrAndSum(){
+    private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         toolbar.setSubtitle(ToolBarContr + OrderSum);

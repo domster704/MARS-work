@@ -1,6 +1,5 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,16 +8,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.Toast;
+
 import com.linuxense.javadbf.DBFException;
 
-public class send_orders_Fragment extends Fragment{
-    private android.support.v7.widget.Toolbar toolbar;
-    public send_orders_Fragment(){}
+import java.util.Objects;
+
+public class SendOrdersFragment extends Fragment {
+    public SendOrdersFragment() {
+    }
+
     public GlobalVars glbVars;
 
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.send_orders_fragment, container, false);
         setHasOptionsMenu(true);
@@ -32,15 +34,10 @@ public class send_orders_Fragment extends Fragment{
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
-    }
-
-    @Override public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
@@ -48,30 +45,29 @@ public class send_orders_Fragment extends Fragment{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.actionSendOrders:
-                if (glbVars.isNetworkAvailable()==true){
-                    try {
-                        glbVars.SendOrders();
-                    } catch (DBFException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+        if (item.getItemId() == R.id.actionSendOrders) {
+            if (glbVars.isNetworkAvailable()) {
+                try {
+                    glbVars.SendOrders();
+                } catch (DBFException e) {
+                    e.printStackTrace();
                 }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            } else {
+                Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        glbVars.toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar = (android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
-        glbVars.orderList = (GridView) getActivity().findViewById(R.id.listSMS);
+        glbVars.orderList = getActivity().findViewById(R.id.listSMS);
         glbVars.LoadOrdersForSend();
     }
 

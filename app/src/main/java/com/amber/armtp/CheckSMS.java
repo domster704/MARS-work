@@ -1,6 +1,7 @@
 package com.amber.armtp;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
@@ -15,14 +16,8 @@ import java.sql.Statement;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
-//import android.app.NotificationManager;
-//import android.app.PendingIntent;
-//import android.support.v4.app.NotificationCompat;
 
 public class CheckSMS extends IntentService {
-
-    //    public static final long NOTIFY_INTERVAL = 3600 * 1000; // интервал проверки обновления 1 час
-//    public static final long NOTIFY_INTERVAL = 300 * 1000; // интервал проверки обновления 1 час
     public GlobalVars glbVars;
     Connection conn = null;
     int NOTIFICATION_ID;
@@ -47,7 +42,6 @@ public class CheckSMS extends IntentService {
         sql_db = this.getResources().getString(R.string.sql_db);
         sql_loging = this.getResources().getString(R.string.sql_user);
         sql_pass = this.getResources().getString(R.string.sql_pass);
-//        Toast.makeText(this, "Запущно фоновое обновление дебиторки", Toast.LENGTH_LONG).show();
         // Don't let this service restart automatically if it has been stopped by the OS.
         return START_NOT_STICKY;
     }
@@ -56,39 +50,22 @@ public class CheckSMS extends IntentService {
         super.onCreate();
         glbVars = (GlobalVars) this.getApplicationContext();
         glbVars.glbContext = this.getApplicationContext();
-
-//        NOTIFICATION_ID = 1;
-//        NotificationCompat.Builder builder =
-//                new NotificationCompat.Builder(this)
-//                        .setSmallIcon(R.mipmap.ic_launcher)
-//                        .setContentTitle("НЬЮ АРМ")
-//                        .setSound(soundUri)
-//                        .setContentText("Запущено фоновое обновление дебиторки");
-//
-//        Intent targetIntent = new Intent(this, MainActivity.class);
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        builder.setContentIntent(contentIntent);
-//        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        nManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-//        Toast.makeText(this, "Запущен сервис приема сообщений", Toast.LENGTH_LONG).show();
         int Rowid = 0;
         int msgRow;
         String TP_ID, TP_IDS, MSG_HEAD, MSG, MSG_DATE, MSG_TIME;
         Statement stmt;
         ResultSet reset = null;
         Cursor c;
-        if (glbVars.isNetworkAvailable() == true) {
+        if (glbVars.isNetworkAvailable()) {
 
             if (glbVars.SmsDB == null) {
-//                            glbVars.SmsDB = openOrCreateDatabase(glbVars.GetSDCardpath() + glbVars.DBFolder + "/armtp_msg.db", MODE_MULTI_PROCESS, null);
-                glbVars.SmsDB = openOrCreateDatabase("armtp_msg.db", MODE_MULTI_PROCESS, null);
+                glbVars.SmsDB = openOrCreateDatabase("armtp_msg.db", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING, null);
             }
 
-//                        glbVars.SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
             glbVars.SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW_ID INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
             Cursor cursor = glbVars.SmsDB.rawQuery("SELECT CASE WHEN MAX(ROW_ID) IS NULL THEN 0 ELSE MAX(ROW_ID) END AS ROW_ID FROM MSGS", null);
             if (cursor.moveToNext()) {
@@ -143,8 +120,7 @@ public class CheckSMS extends IntentService {
             i.putExtra("SmsCount", count);
             sendBroadcast(i);
 
-//                        Отключено 18-08-2016 для проверки работы на Android SDK 24/6
-
+            // Отключено 18-08-2016 для проверки работы на Android SDK 24/6
             ShortcutBadger.applyCount(getApplicationContext(), count.equals("") ? 0 : Integer.parseInt(count));
 
             try {
@@ -162,23 +138,7 @@ public class CheckSMS extends IntentService {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-//                        NOTIFICATION_ID = 2;
-//                        NotificationCompat.Builder builder =
-//                                new NotificationCompat.Builder(this)
-//                                        .setSmallIcon(R.mipmap.ic_launcher)
-//                                        .setContentTitle("НЬЮ АРМ")
-//                                        .setSound(soundUri)
-//                                        .setContentText("Фоновое обновление дебиторки завершено");
-//
-//                        Intent targetIntent = new Intent(this, MainActivity.class);
-//                        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//                        builder.setContentIntent(contentIntent);
-//                        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                        nManager.notify(NOTIFICATION_ID, builder.build());
-        } else {
-//                        System.out.println("При фоновом обновление дебиторки не удалось подключиться к интернету");
         }
-
     }
 
     public void onDestroy() {
@@ -192,8 +152,6 @@ public class CheckSMS extends IntentService {
 
             connString = "jdb" + "c:jtds:sqlserver://" + sql_server + ":" + sql_port + ";instance=MSSQLSERVER;databaseName=" + sql_db + ";user=" + sql_loging + ";password=" + sql_pass;
             conn = DriverManager.getConnection(connString, sql_loging, sql_pass);
-            if (conn != null) {
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

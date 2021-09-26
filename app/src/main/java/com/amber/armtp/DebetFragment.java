@@ -1,6 +1,6 @@
 package com.amber.armtp;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-public class debet_Fragment extends Fragment {
+import java.util.Objects;
+
+public class DebetFragment extends Fragment {
     public GlobalVars glbVars;
 
     SearchView searchView;
@@ -31,31 +33,35 @@ public class debet_Fragment extends Fragment {
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
 
-	public debet_Fragment(){}
-	@Override
+    public DebetFragment() {
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.debet_fragment, container, false);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
         glbVars.view = rootView;
         return rootView;
     }
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
     }
 
 
+    @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
@@ -76,7 +82,7 @@ public class debet_Fragment extends Fragment {
         int DebRPRowid = glbVars.db.GetTPByID(DebTP_ID);
         SetSelectedDebTP(DebRPRowid);
 
-        if (glbVars.DebetContr!=null && !glbVars.DebetContr.equals("")){
+        if (glbVars.DebetContr != null && !glbVars.DebetContr.equals("")) {
             glbVars.LoadDebetByContr(glbVars.DebetContr);
             glbVars.SetSelectedContr(glbVars.DebetContr);
         }
@@ -84,7 +90,7 @@ public class debet_Fragment extends Fragment {
         glbVars.btFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                glbVars.tvContr = getActivity().findViewById(R.id.ColContrID);
+                glbVars.tvContr = Objects.requireNonNull(getActivity()).findViewById(R.id.ColContrID);
                 glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
                 String DebetContr = glbVars.tvContr.getText().toString();
                 String DebetTp = glbVars.tvTP.getText().toString();
@@ -92,10 +98,10 @@ public class debet_Fragment extends Fragment {
             }
         });
 
-       glbVars.spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        glbVars.spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
                 String ItemID = glbVars.curDebetTp.getString(glbVars.curDebetTp.getColumnIndex("ID"));
-                settings = getActivity().getSharedPreferences("apk_version", 0);
+                settings = Objects.requireNonNull(getActivity()).getSharedPreferences("apk_version", 0);
                 editor = settings.edit();
                 editor.putString("debet_tp", ItemID);
                 editor.commit();
@@ -131,31 +137,9 @@ public class debet_Fragment extends Fragment {
     private final SearchView.OnQueryTextListener searchTextListner =
             new SearchView.OnQueryTextListener() {
                 boolean isSearchClicked = false;
+
                 @Override
                 public boolean onQueryTextChange(String newText) {
-//                    String ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("ID"));
-//                    if (newText.equals("")) {
-//                        if (!isSearchClicked){
-//                            glbVars.LoadNom(ItemID);
-//                            searchView.clearFocus();
-//                            searchView.setIconified(true);
-//                        }
-//                        return true;
-//                    } else {
-//                        if (newText.length()>=1){
-//                            if (!ItemID.equals("0")){
-//                                glbVars.SearchNomInGroup(newText, ItemID);
-//                                return true;
-//                            } else {
-//                                glbVars.LoadNom(ItemID);
-//                                return true;
-//                            }
-//                        }
-//                        else {
-//                            return false;
-//                        }
-//                    }
-//
                     return false;
                 }
 
@@ -175,31 +159,22 @@ public class debet_Fragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.returnToOrderHead:
-                fragment = new order_head_Fragment();
-                if (fragment != null) {
-                    fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
-                    fragmentTransaction.commit();
-                    toolbar.setTitle("Шапка заказа");
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.returnToOrderHead) {
+            fragment = new OrderHeadFragment();
+            fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
+            fragmentTransaction.commit();
+            toolbar.setTitle("Шапка заказа");
+            return true;
         }
-    }
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
+        return super.onOptionsItemSelected(item);
     }
 
-    public void SetSelectedDebTP(int ROWID){
+    public void SetSelectedDebTP(int ROWID) {
         for (int i = 0; i < glbVars.spTP.getCount(); i++) {
             Cursor value = (Cursor) glbVars.spTP.getItemAtPosition(i);
             int id = value.getInt(value.getColumnIndexOrThrow("_id"));
-            if (ROWID==id) {
+            if (ROWID == id) {
                 glbVars.spTP.setSelection(i);
                 break;
             }

@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -38,7 +36,10 @@ import java.io.File;
 /**
  * Панель админа
  */
-public class admin_Fragment extends Fragment {
+public class AdminFragment extends Fragment {
+    private final int LOCATION_SDPATH = 1;
+    private final int LOCATION_PHOTO_PATH = 2;
+    public GlobalVars glbVars;
     SharedPreferences settings, PriceSettings, settingPaths;
     SharedPreferences.Editor editor, PriceEditor, settingPathEditor;
     Button btClearSgi,
@@ -52,34 +53,22 @@ public class admin_Fragment extends Fragment {
             btCompactDb,
             btCheckDb,
             btDeleteDBF,
-    //            btPricePerm,
-//            btPriceIzh,
-//            btPriceKazan,
-//            btPriceKirov,
-//            btPriceChelny,
-//            btPriceUfa,
-//            btPriceEkt,
-    btClearZakazy,
+            btClearZakazy,
             btClearZakazyDt,
             btDeleteCanceledZakaz,
             btUnlockTP,
             btLockTP,
             btSaveUpdateSrv;
     Button btSetPhotoPath, btSetSDPath;
-
     Button btnLogin, btnCancel;
     TextView tvPhotoPath, tvSDPath, tbPublicPhoto;
     Switch swTestLoadPhoto;
     EditText etPass, etUpdateSrv, etSqlPort, etSqlLogin, etSqlPass, etSqlDB;
     EditText etFtpPhoto, etFtpPhotoUser, etFtpPhotoPass;
     EditText etFtpUpdate, etFtpUpdateUser, etFtpUpdatePass;
-    SQLiteDatabase DB = null;
     Dialog login;
     Boolean isSelectPath = false;
     String CenTypeID;
-    private final int LOCATION_SDPATH = 1;
-    private final int LOCATION_PHOTO_PATH = 2;
-    public GlobalVars glbVars;
 
     @Nullable
     @Override
@@ -87,12 +76,6 @@ public class admin_Fragment extends Fragment {
         View v = inflater.inflate(R.layout.admin_fragment, container, false);
         glbVars.view = v;
         return v;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
     }
 
     @Override
@@ -107,6 +90,7 @@ public class admin_Fragment extends Fragment {
 
     /**
      * Получение элементов фрагмента и изменение их параметров
+     *
      * @param savedInstanceState
      */
     @Override
@@ -181,14 +165,6 @@ public class admin_Fragment extends Fragment {
         btLockTP = getActivity().findViewById(R.id.btLockTp);
         btSaveUpdateSrv = getActivity().findViewById(R.id.btSaveSrv);
 
-//        btPricePerm = getActivity().findViewById(R.id.btSetPricePerm);
-//        btPriceIzh =  getActivity().findViewById(R.id.btSetPriceIzh);
-//        btPriceKazan = getActivity().findViewById(R.id.btSetPriceKazan);
-//        btPriceKirov = getActivity().findViewById(R.id.btSetPriceKirov);
-//        btPriceChelny = getActivity().findViewById(R.id.btSetPriceChelny);
-//        btPriceUfa = getActivity().findViewById(R.id.btSetPriceUfa);
-//        btPriceEkt = getActivity().findViewById(R.id.btSetPriceEkt);
-
         btDeleteCanceledZakaz = getActivity().findViewById(R.id.btDeleteCanceledZakaz);
 
         btSetPhotoPath = getActivity().findViewById(R.id.btSetImagesPath);
@@ -224,15 +200,9 @@ public class admin_Fragment extends Fragment {
         etFtpPhotoPass.setText(settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_pass)));
         etFtpPhotoUser.setText(settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_user)));
 
-
         CenTypeID = settings.getString("usr_centype", "");
 
-        int Region = 0;
-        Region = PriceSettings.getInt("Region", 0);
-        String PhotoPath = "";
-        PhotoPath = settingPaths.getString("PhotoPath", "");
-
-        Boolean TestLoad = settingPaths.getBoolean("TestingLoad", false);
+        boolean TestLoad = settingPaths.getBoolean("TestingLoad", false);
 
         swTestLoadPhoto.setChecked(TestLoad);
     }
@@ -675,62 +645,6 @@ public class admin_Fragment extends Fragment {
             }
         });
 
-//        btPricePerm.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 1);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceIzh.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 2);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceKazan.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 3);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceKirov.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 4);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceChelny.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 5);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceUfa.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 6);
-//                PriceEditor.commit();
-//            }
-//        });
-//
-//        btPriceEkt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PriceEditor.putInt("Region", 7);
-//                PriceEditor.commit();
-//            }
-//        });
-
         btSetPhotoPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -815,13 +729,6 @@ public class admin_Fragment extends Fragment {
         btClearAll.setEnabled(EnableButtons);
         btCheckDb.setEnabled(EnableButtons);
         btDeleteDBF.setEnabled(EnableButtons);
-//        btPricePerm.setEnabled(EnableButtons);
-//        btPriceIzh.setEnabled(EnableButtons);
-//        btPriceKazan.setEnabled(EnableButtons);
-//        btPriceKirov.setEnabled(EnableButtons);
-//        btPriceChelny.setEnabled(EnableButtons);
-//        btPriceUfa.setEnabled(EnableButtons);
-//        btPriceEkt.setEnabled(EnableButtons);
         btDeleteCanceledZakaz.setEnabled(EnableButtons);
         btSetPhotoPath.setEnabled(EnableButtons);
         btSetSDPath.setEnabled(EnableButtons);
