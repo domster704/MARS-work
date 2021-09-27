@@ -49,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-
     public GlobalVars globalVariable;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Fragment fragment = null;
@@ -102,71 +102,28 @@ public class MainActivity extends AppCompatActivity {
         settings = getSharedPreferences("apk_version", 0);
         editor = settings.edit();
 
-        String ftp_photo_srv = settings.getString("FtpPhotoSrv", "");
-        if (Objects.equals(ftp_photo_srv, "")) {
-            editor.putString("FtpPhotoSrv", getResources().getString(R.string.ftp_server));
-            editor.commit();
+        String[][] ftpPhoto = new String[][]{
+                new String[]{"FtpPhotoSrv", getResources().getString(R.string.ftp_server)},
+                new String[]{"FtpPhotoUser", getResources().getString(R.string.ftp_user)},
+                new String[]{"FtpPhotoPass", getResources().getString(R.string.ftp_pass)},
+                new String[]{"AppUpdateSrv", getResources().getString(R.string.ftp_update_server)},
+                new String[]{"AppUpdateUser", getResources().getString(R.string.ftp_update_user)},
+                new String[]{"AppUpdatePass", getResources().getString(R.string.ftp_update_pass)},
+                new String[]{"UpdateSrv", getResources().getString(R.string.ftp_server)},
+                new String[]{"sqlPort", getResources().getString(R.string.sql_port)},
+                new String[]{"sqlDB", getResources().getString(R.string.sql_db)},
+                new String[]{"sqlLogin", getResources().getString(R.string.sql_user)},
+                new String[]{"sqlPass", getResources().getString(R.string.sql_pass)},
+        };
+
+        for (String[] i : ftpPhoto) {
+            String ftpPhotoVar = settings.getString(i[0], "");
+            if (Objects.equals(ftpPhotoVar, "")) {
+                editor.putString(i[0], i[1]);
+                editor.commit();
+            }
         }
 
-        String ftp_photo_user = settings.getString("FtpPhotoUser", "");
-        if (Objects.equals(ftp_photo_user, "")) {
-            editor.putString("FtpPhotoUser", getResources().getString(R.string.ftp_user));
-            editor.commit();
-        }
-
-        String ftp_photo_pass = settings.getString("FtpPhotoPass", "");
-        if (Objects.equals(ftp_photo_pass, "")) {
-            editor.putString("FtpPhotoPass", getResources().getString(R.string.ftp_pass));
-            editor.commit();
-        }
-
-        String ftp_up_server = settings.getString("AppUpdateSrv", "");
-        if (Objects.equals(ftp_up_server, "")) {
-            editor.putString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server));
-            editor.commit();
-        }
-
-        String ftp_up_user = settings.getString("AppUpdateUser", "");
-        if (Objects.equals(ftp_up_user, "")) {
-            editor.putString("AppUpdateUser", getResources().getString(R.string.ftp_update_user));
-            editor.commit();
-        }
-
-        String ftp_up_pass = settings.getString("AppUpdatePass", "");
-        if (Objects.equals(ftp_up_pass, "")) {
-            editor.putString("AppUpdatePass", getResources().getString(R.string.ftp_update_pass));
-            editor.commit();
-        }
-
-        String sql_server = settings.getString("UpdateSrv", "");
-        if (Objects.equals(sql_server, "")) {
-            editor.putString("UpdateSrv", getResources().getString(R.string.ftp_server));
-            editor.commit();
-        }
-
-        String sql_port = settings.getString("sqlPort", "");
-        if (Objects.equals(sql_port, "")) {
-            editor.putString("sqlPort", getResources().getString(R.string.sql_port));
-            editor.commit();
-        }
-
-        String sql_db = settings.getString("sqlDB", "");
-        if (Objects.equals(sql_db, "")) {
-            editor.putString("sqlDB", getResources().getString(R.string.sql_db));
-            editor.commit();
-        }
-
-        String sql_loging = settings.getString("sqlLogin", "");
-        if (Objects.equals(sql_loging, "")) {
-            editor.putString("sqlLogin", getResources().getString(R.string.sql_user));
-            editor.commit();
-        }
-
-        String sql_pass = settings.getString("sqlPass", "");
-        if (Objects.equals(sql_pass, "")) {
-            editor.putString("sqlPass", getResources().getString(R.string.sql_pass));
-            editor.commit();
-        }
 
         if (globalVariable.db == null) {
             globalVariable.db = new DBHepler(getApplicationContext());
@@ -210,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_FULL_IDX ON ZAKAZY(ROWID, DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, STATUS);");
             globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_DT_FULL_IDX ON ZAKAZY_DT(ROWID, ZAKAZ_ID, NOM_ID);");
 
-        } catch (SQLiteException ignored) {
+        } catch (SQLiteException e) {
+            e.printStackTrace();
         }
 
 
@@ -243,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         // Initializing Toolbar and setting it as the actionbar
         initToolbar();
         initNavigationView();
-        //Initializing NavigationView
+        // Initializing NavigationView
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
@@ -251,15 +209,15 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                //Checking if the item is in checked state or not, if not make it in checked state
+                // Checking if the item is in checked state or not, if not make it in checked state
                 menuItem.setChecked(!menuItem.isChecked());
 
-                //Closing drawer on item click
+                // Closing drawer on item click
                 drawerLayout.closeDrawers();
 
-                //Check to see which item was being clicked and perform appropriate action
+                // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-                    //Replacing the main content with ContentFragment Which is our Inbox View;
+                    // Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_update_data:
                         DisplayFragment(new UpdateDataFragment(), "frag_update_data");
                         setToolbarTitle(menuItem.getTitle());
@@ -321,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                 }
-
             }
         });
 
@@ -421,27 +378,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client.connect();
-//        String manufacturer = Build.MANUFACTURER;
-//        String model = Build.MODEL;
-//        String brand = Build.BRAND;
-//        System.out.println(model + " " + manufacturer + " " + brand);
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        Notification.Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Main Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.amber.armtp/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     @Override
@@ -476,6 +412,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+
         String version = String.valueOf(pInfo.versionCode);
         String versionName = String.valueOf(pInfo.versionName);
         tvAppVer = findViewById(R.id.tvAppVersion);
@@ -550,132 +487,50 @@ public class MainActivity extends AppCompatActivity {
             } catch (SQLiteException ignored) {
             }
 
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE CONTRS ADD COLUMN INFO TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
+            class SQLData {
+                public final String tableName;
+                public final String column;
+                public final String defaultValue;
+
+                public SQLData(String tableName, String column, String defaultValue) {
+                    this.tableName = tableName;
+                    this.column = column;
+                    this.defaultValue = defaultValue;
+                }
             }
 
-            //Создаем таблицу с привязкой номенклатуры к торговому представителю
+            SQLData[] sqlData = new SQLData[]{
+                    new SQLData("CONTRS", "INFO", "''"),
+                    new SQLData("DEBET", "FIRMA", "''"),
+                    new SQLData("TMP_DEBET", "FIRMA", "''"),
+                    new SQLData("TMP_DEBET", "P1D", "0"),
+                    new SQLData("TMP_DEBET", "P2D", "0"),
+                    new SQLData("CONTRS", "c", "''"),
+                    new SQLData("Nomen", "TOVCATID", "''"),
+                    new SQLData("Nomen", "FUNCID", "''"),
+                    new SQLData("Nomen", "BRANDID", "''"),
+                    new SQLData("Nomen", "WCID", "''"),
+                    new SQLData("Nomen", "PRODID", "''"),
+                    new SQLData("Nomen", "FOCUSID", "''"),
+                    new SQLData("BRAND", "LOWDESCR", "''"),
+                    new SQLData("FOCUS", "LOWDESCR", "''"),
+                    new SQLData("FOCUS", "LOWLONG_DESCR", "''"),
+                    new SQLData("FUNC", "LOWDESCR", "''"),
+                    new SQLData("GRUPS", "LOWDESCR", "''"),
+                    new SQLData("PROD", "LOWDESCR", "''"),
+                    new SQLData("TOVCAT", "LOWDESCR", "''"),
+                    new SQLData("WC", "LOWDESCR", "''"),
+                    new SQLData("sgi", "LOWDESCR", "''"),
+                    new SQLData("Nomen", "FOCUSID", "''"),
+                    new SQLData("Nomen", "MODELID", "''"),
+                    new SQLData("Nomen", "SIZEID", "''"),
+                    new SQLData("Nomen", "COLORID", "''"),
+            };
 
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE DEBET ADD COLUMN FIRMA TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE TMP_DEBET ADD COLUMN FIRMA TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE TMP_DEBET ADD COLUMN P1D NUMERIC DEFAULT 0");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE TMP_DEBET ADD COLUMN P2D NUMERIC DEFAULT 0");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE CONTRS ADD COLUMN CRT_DATE TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN TOVCATID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN FUNCID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN BRANDID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN WCID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN PRODID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN FOCUSID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-            // Обновление от 21-04-2020
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE BRAND ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE FOCUS ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE FOCUS ADD COLUMN LOWLONG_DESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE FUNC ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE GRUPS ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE PROD ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE TOVCAT ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE WC ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE sgi ADD COLUMN LOWDESCR TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            // Конец Обновление от 21-04-2020
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN FOCUSID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN MODELID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN SIZEID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("ALTER TABLE Nomen ADD COLUMN COLORID TEXT DEFAULT ''");
-            } catch (SQLiteException ignored) {
+            for (SQLData i : sqlData) {
+                try {
+                    UpdateSchemaDB.execSQL("ALTER TABLE " + i.tableName + " ADD COLUMN " + i.column + " TEXT DEFAULT " + i.defaultValue);
+                } catch (SQLiteException ignored) {}
             }
 
             try {
@@ -698,21 +553,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Main Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.amber.armtp/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.end(client, viewAction);
-//        client.disconnect();
     }
 }
-

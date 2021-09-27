@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Панель админа
@@ -82,7 +83,7 @@ public class AdminFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
@@ -98,7 +99,7 @@ public class AdminFragment extends Fragment {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
-        TabHost tabs = getActivity().findViewById(R.id.tabHost);
+        TabHost tabs = Objects.requireNonNull(getActivity()).findViewById(R.id.tabHost);
 
         tabs.setup();
 
@@ -219,53 +220,18 @@ public class AdminFragment extends Fragment {
         initButtons(false);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private static class ButtonClearValue {
+        public final String tableName;
+        public final Button button;
 
-        if (!isSelectPath) {
-            login = new Dialog(getActivity());
-            login.setContentView(R.layout.login_dialog);
-            login.setTitle("Авторизация");
-            login.setCancelable(false);
-            login.setCanceledOnTouchOutside(false);
-            btnLogin = login.findViewById(R.id.btnLogin);
-            btnCancel = login.findViewById(R.id.btnCancel);
-            etPass = login.findViewById(R.id.etPassword);
-
-            btnLogin.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (etPass.getText().toString().equals("01072019")) {
-                        login.dismiss();
-                        initButtons(true);
-                    }
-                }
-            });
-
-            etPass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        btnLogin.performClick();
-                    }
-                    return true;
-                }
-            });
-
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    login.dismiss();
-                }
-            });
-            login.show();
+        public ButtonClearValue(String tableName, Button button) {
+            this.tableName = tableName;
+            this.button = button;
         }
+    }
 
-        int CenTypeRowid = glbVars.db.GetCenTypeRowID(CenTypeID);
-        SetSelectedCenType(CenTypeRowid);
-
-        btClearSgi.setOnClickListener(new View.OnClickListener() {
+    private void buttonSetOnClickListener(final ButtonClearValue bel) {
+        bel.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -278,7 +244,7 @@ public class AdminFragment extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM sgi; DELETE FROM sqlite_sequence WHERE name = 'sgi';");
+                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM " + bel.tableName + "; DELETE FROM sqlite_sequence WHERE name = '" + bel.tableName + "';");
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -289,190 +255,32 @@ public class AdminFragment extends Fragment {
                 }).start();
             }
         });
+    }
 
-        btClearGroups.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы товарных групп");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM GRUPS; DELETE FROM sqlite_sequence WHERE name = 'GRUPS';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+    @Override
+    public void onResume() {
+        super.onResume();
 
-        btClearNomen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы номенклатуры");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM Nomen; DELETE FROM sqlite_sequence WHERE name = 'Nomen';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+        initButtons(true);
+        int CenTypeRowid = glbVars.db.GetCenTypeRowID(CenTypeID);
+        SetSelectedCenType(CenTypeRowid);
 
-        btClearContrs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы контрагентов");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM CONTRS; DELETE FROM sqlite_sequence WHERE name = 'CONTRS';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+        ButtonClearValue[] buttonClearValue = new ButtonClearValue[] {
+                new ButtonClearValue("sgi", btClearSgi),
+                new ButtonClearValue("GRUPS", btClearGroups),
+                new ButtonClearValue("Nomen", btClearNomen),
+                new ButtonClearValue("CONTRS", btClearContrs),
+                new ButtonClearValue("ADDRS", btClearAddrs),
+                new ButtonClearValue("TORG_PRED", btClearTP),
+                new ButtonClearValue("DEBET", btClearDebet),
+                new ButtonClearValue("ZAKAZY", btClearZakazy),
+                new ButtonClearValue("ZAKAZY_DT", btClearZakazyDt),
+                new ButtonClearValue("ZAKAZY_DT", btClearZakazyDt),
+        };
 
-        btClearAddrs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы адресов");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ADDRS; DELETE FROM sqlite_sequence WHERE name = 'ADDRS';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btClearTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы торговых представителей");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM TORG_PRED; DELETE FROM sqlite_sequence WHERE name = 'TORG_PRED';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-
-            }
-        });
-
-        btClearDebet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы дебиторки");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET; DELETE FROM sqlite_sequence WHERE name = 'DEBET';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btClearAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблиц");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM sgi; DELETE FROM sqlite_sequence WHERE name = 'sgi';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM GRUPS; DELETE FROM sqlite_sequence WHERE name = 'GRUPS';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM Nomen; DELETE FROM sqlite_sequence WHERE name = 'Nomen';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM CONTRS; DELETE FROM sqlite_sequence WHERE name = 'CONTRS';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM ADDRS; DELETE FROM sqlite_sequence WHERE name = 'ADDRS';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM TORG_PRED; DELETE FROM sqlite_sequence WHERE name = 'TORG_PRED';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET; DELETE FROM sqlite_sequence WHERE name = 'DEBET';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY; DELETE FROM sqlite_sequence WHERE name = 'ZAKAZY';");
-                                glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT; DELETE FROM sqlite_sequence WHERE name = 'ZAKAZY_DT';");
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+        for (ButtonClearValue i: buttonClearValue) {
+            buttonSetOnClickListener(i);
+        }
 
         btCompactDb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -512,7 +320,7 @@ public class AdminFragment extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final Boolean result;
+                        final boolean result;
                         result = glbVars.db.getWritableDatabase().isDatabaseIntegrityOk();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -569,56 +377,6 @@ public class AdminFragment extends Fragment {
             }
         });
 
-        btClearZakazy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы заказов");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY; DELETE FROM sqlite_sequence WHERE name = 'ZAKAZY';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btClearZakazyDt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы заказов (табличная часть)");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT; DELETE FROM sqlite_sequence WHERE name = 'ZAKAZY_DT';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
         btDeleteCanceledZakaz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -662,17 +420,10 @@ public class AdminFragment extends Fragment {
         });
 
         swTestLoadPhoto.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    settingPathEditor.putBoolean("TestingLoad", true);
-                    settingPathEditor.commit();
-                } else {
-                    settingPathEditor.putBoolean("TestingLoad", false);
-                    settingPathEditor.commit();
-                }
-
+                settingPathEditor.putBoolean("TestingLoad", isChecked);
+                settingPathEditor.commit();
             }
         });
 

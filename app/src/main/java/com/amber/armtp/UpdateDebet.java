@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+
 public class UpdateDebet extends IntentService {
     final String sql_server = "91.208.84.67";
     final String sql_port = "1439";
@@ -73,7 +74,7 @@ public class UpdateDebet extends IntentService {
         Statement stmt;
         ResultSet reset = null;
         Cursor c;
-        if (glbVars.isNetworkAvailable() == true) {
+        if (glbVars.isNetworkAvailable()) {
             if (glbVars.db == null) {
                 glbVars.db = new DBHepler(this.getApplicationContext());
             }
@@ -138,7 +139,6 @@ public class UpdateDebet extends IntentService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
             }
 
             glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET;");
@@ -194,8 +194,6 @@ public class UpdateDebet extends IntentService {
 
             connString = "jdb" + "c:jtds:sqlserver://" + sql_server + ":" + sql_port + ";instance=MSSQLSERVER;databaseName=" + sql_db + ";user=" + sql_loging + ";password=" + sql_pass;
             conn = DriverManager.getConnection(connString, sql_loging, sql_pass);
-            if (conn != null) {
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

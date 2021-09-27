@@ -14,6 +14,9 @@ import com.linuxense.javadbf.DBFException;
 
 import java.util.Objects;
 
+/**
+ * Фрагмент для отправки заказа(ов) на ftp-сервер
+ */
 public class SendOrdersFragment extends Fragment {
     public SendOrdersFragment() {
     }

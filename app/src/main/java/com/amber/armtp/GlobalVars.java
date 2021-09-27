@@ -1,5 +1,6 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -323,10 +324,7 @@ public class GlobalVars extends Application {
                     });
 //          Конец отработки выборка нескольких позиций
                 }
-
             }
-
-
         }
     };
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
@@ -357,6 +355,7 @@ public class GlobalVars extends Application {
             }
 
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
@@ -379,7 +378,6 @@ public class GlobalVars extends Application {
                                 } else {
                                     Toast.makeText(CurAc, "Группа, к которой принадлежит данная карточка не прописана СГИ!", Toast.LENGTH_LONG).show();
                                 }
-
                             }
                             LoadNom(Grup);
                             return true;
@@ -424,7 +422,6 @@ public class GlobalVars extends Application {
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
-            return;
         }
     };
     public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
@@ -440,14 +437,13 @@ public class GlobalVars extends Application {
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
-            return;
         }
     };
     public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
 
-            if ((ordStatus.equals("Отправлен") || ordStatus.equals("Удален")) && ordStatus != null) {
+            if (ordStatus.equals("Отправлен") || ordStatus.equals("Удален")) {
                 Toast.makeText(CurAc, "Данный заказ уже отправлен или удаен и не может быть изменен", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -575,15 +571,13 @@ public class GlobalVars extends Application {
                     switch (menuItem.getItemId()) {
                         case R.id.goToGroup:
                             fragment = new FormOrderFragment();
-                            if (fragment != null) {
-                                fragmentTransaction = fragManager.beginTransaction();
+                            fragmentTransaction = fragManager.beginTransaction();
 
-                                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                                fragmentTransaction.commit();
-                                toolbar.setTitle("Формирование заказа");
-                                frSgi = Sgi;
-                                frGroup = Grup;
-                            }
+                            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                            fragmentTransaction.commit();
+                            toolbar.setTitle("Формирование заказа");
+                            frSgi = Sgi;
+                            frGroup = Grup;
                             return true;
                         case R.id.showPhoto:
                             isSecondPhoto = false;
@@ -657,7 +651,6 @@ public class GlobalVars extends Application {
     }
 
     public void setView(View view) {
-        view = view;
     }
 
     public Context getContext() {
@@ -673,7 +666,6 @@ public class GlobalVars extends Application {
     }
 
     public void setToolbar(android.support.v7.widget.Toolbar toolbar) {
-        toolbar = toolbar;
     }
 
     public void LoadSgi() {
@@ -1051,11 +1043,10 @@ public class GlobalVars extends Application {
         } else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
             switch (activeNetworkInfo.getSubtype()) {
                 case TelephonyManager.NETWORK_TYPE_1xRTT:
+                case TelephonyManager.NETWORK_TYPE_EDGE:
                     return false; // ~ 50-100 kbps
                 case TelephonyManager.NETWORK_TYPE_CDMA:
                     return false; // ~ 14-64 kbps
-                case TelephonyManager.NETWORK_TYPE_EDGE:
-                    return false; // ~ 50-100 kbps
                 case TelephonyManager.NETWORK_TYPE_EVDO_0:
                     return true; // ~ 400-1000 kbps
                 case TelephonyManager.NETWORK_TYPE_EVDO_A:

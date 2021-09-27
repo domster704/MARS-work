@@ -1,5 +1,6 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -32,7 +33,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
+
+/**
+ * Фрагмент "Шапка заказа"
+ */
 public class OrderHeadFragment extends Fragment {
     SQLiteDatabase InsDB = null;
     Menu mainMenu;
@@ -52,7 +58,7 @@ public class OrderHeadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.order_head_fragment, container, false);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
         glbVars.view = rootView;
         return rootView;
@@ -62,16 +68,10 @@ public class OrderHeadFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class OrderHeadFragment extends Fragment {
         glbVars.setSaleIcon(mainMenu, 0, glbVars.db.CheckForSales() > 0);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -108,12 +109,10 @@ public class OrderHeadFragment extends Fragment {
                 return true;
             case R.id.ViewOrder:
                 fragment = new ViewOrderFragment();
-                if (fragment != null) {
-                    fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
-                    fragmentTransaction.commit();
-                    toolbar.setTitle("Просмотр заказа");
-                }
+                fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
+                fragmentTransaction.commit();
+                toolbar.setTitle("Просмотр заказа");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
