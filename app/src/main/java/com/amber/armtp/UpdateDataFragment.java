@@ -811,7 +811,7 @@ public class UpdateDataFragment extends Fragment {
 //                if (chkContrs.isChecked()) {
                 reset = null;
 //                    progressStatusContr = 0;
-                sql = "INSERT INTO CONTRS(ID, DESCR, lowDESCR, CODE, INSTOP, DOLG, DYNAMO, TP, INFO, CRT_DATE)  VALUES (?,?,?,?,?,?,?,?,?,?);";
+                sql = "INSERT INTO CONTRS(ID, DESCR, lowDESCR, CODE, INSTOP, DOLG, DYNAMO, TP, INFO)  VALUES (?,?,?,?,?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntContrs = 0;
                 try {
@@ -840,7 +840,6 @@ public class UpdateDataFragment extends Fragment {
                         Dynamo = reset.getInt(6);
                         TP = reset.getString(7);
                         contrInfo = reset.getString(8);
-                        Crt_date = reset.getString(9);
 
                         statement.clearBindings();
                         statement.bindString(1, ID);
@@ -852,7 +851,6 @@ public class UpdateDataFragment extends Fragment {
                         statement.bindLong(7, Dynamo);
                         statement.bindString(8, TP);
                         statement.bindString(9, contrInfo);
-                        statement.bindString(10, Crt_date);
 
                         statement.executeInsert();
                         statement.clearBindings();
