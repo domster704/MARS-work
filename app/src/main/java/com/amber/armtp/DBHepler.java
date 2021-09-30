@@ -10,7 +10,6 @@ public class DBHepler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "armtp.db";
     private static final String ROW_ID = "_id";
     private static final String TB_SGI = "sgi";
-    private static final String TB_GRUPS = "GRUPS";
     private static final String TB_NOMEN = "Nomen";
     private static final String TB_ORDER = "ORDERS";
     private static final String KEY_SGI_ID = "ID";
@@ -715,86 +714,6 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public String GetDeliveryTime() {
-        Cursor c = null;
-        String DeliveryTime = "";
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT ROWID AS _id, DELIV_TIME FROM ORDERS", null);
-            if (c.moveToFirst()) {
-                DeliveryTime = c.getString(1);
-            }
-            return DeliveryTime;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    public Boolean GetMoney() {
-        Cursor c = null;
-        Boolean isGetMoney = false;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT ROWID AS _id, GETMONEY FROM ORDERS", null);
-            if (c.moveToFirst()) {
-                if (c.getInt(1) == 1) {
-                    isGetMoney = true;
-                }
-            }
-            return isGetMoney;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    public Boolean GetBackward() {
-        Cursor c = null;
-        Boolean isGetBackward = false;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT ROWID AS _id, GETBACKWARD FROM ORDERS", null);
-            if (c.moveToFirst()) {
-                if (c.getInt(1) == 1) {
-                    isGetBackward = true;
-                }
-            }
-            return isGetBackward;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    public Integer GetBackwardType() {
-        Cursor c = null;
-        Integer isGetBackwardType = 0;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT ROWID AS _id, BACKTYPE FROM ORDERS", null);
-            if (c.moveToFirst()) {
-                isGetBackwardType = c.getInt(1);
-            }
-            return isGetBackwardType;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
     public Boolean ClearOrderHeader() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
@@ -975,7 +894,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
             db.setTransactionSuccessful();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
         }

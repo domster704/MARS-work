@@ -38,9 +38,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.PopupMenu;
@@ -81,6 +79,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -117,15 +116,12 @@ public class GlobalVars extends Application {
 
     public Spinner spSgi, spGrup;
     public Spinner spTovcat, spFunc, spBrand, spWC, spProd, spFSgi, spFGroup, spFocus, spModel, spColors;
-    public AutoCompleteTextView autoUniFilter;
     public Spinner spUniFilterResult;
     public EditText txtUniFilter;
     public File appDBFolder = new File(GetSDCardpath() + "ARMTP_DB");
     public File appPhotoFolder = new File(GetSDCardpath() + "ARM_PHOTO");
     public File appUpdatesFolder = new File(GetSDCardpath() + "ARM_UPDATES");
     public String DBFolder = "ARMTP_DB";
-    public String PhotoFolder = "ARM_PHOTO";
-    public String UpdatesFolder = "ARM_UPDATES";
     public String AsyncFileName;
     public SubsamplingScaleImageView imageView;
     public AlertDialog alertPhoto = null;
@@ -134,15 +130,16 @@ public class GlobalVars extends Application {
     public int UpdateWorking = 0;
     public String OrderID = "";
     public String DebetContr;
-    public Cursor TP, TPLogin, CenTypes;
+    public Cursor TP, CenTypes;
     public String CurrentTp, CurrentCenType, CurrentDebTP;
     public Cursor Contr;
     public Cursor Addr;
-    public Spinner spnBackwardType, spinContr, spinAddr, TPList, spinCenTypes, spinDebTP;
-    public Button btSave, btClear, btDebet, btResetTime;
-    public CheckBox chkGetMoney, chkGetBackward;
+    public Spinner spinContr, spinAddr, TPList, spinCenTypes;
+    public Button btSave, btClear;
     public Calendar DeliveryDate, DeliveryTime;
-    public EditText txtDate, txtTime, edContrFilter, txtComment;
+    public EditText txtDate;
+    public EditText edContrFilter;
+    public EditText txtComment;
     public TextView spTp, spContr, spAddr;
     public TextView tvContr, tvTP;
     public ViewFlipper viewFlipper;
@@ -206,18 +203,12 @@ public class GlobalVars extends Application {
                 final String ID = c.getText().toString();
 
                 final TextView c1 = myView.findViewById(R.id.ColNomZakaz);
-                String Qty = c1.getText().toString();
 
                 TextView c2 = myView.findViewById(R.id.ColNomOst);
-                final int Ost = Integer.parseInt(c2.getText().toString());
 
                 TextView c3 = myView.findViewById(R.id.ColNomCod);
-                String Code = c3.getText().toString();
 
                 TextView c4 = myView.findViewById(R.id.ColNomDescr);
-                String Descr = c4.getText().toString();
-
-                TextView c5 = myView.findViewById(R.id.ColNomPrice);
 
                 LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
                 View promptView;
@@ -235,7 +226,6 @@ public class GlobalVars extends Application {
 
                 } else {
 //          Если режим выбора нескольких позиций выключен
-
                     promptView = layoutInflater.inflate(R.layout.change_qty, null);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(frContext);
                     alertDialogBuilder.setView(promptView);
@@ -290,29 +280,8 @@ public class GlobalVars extends Application {
                             String OrderSum = db.getOrderSum();
                             toolbar.setSubtitle(ToolBarContr + OrderSum);
                             alertD.dismiss();
-//                        if (Integer.parseInt(input.getText().toString()) <= Ost) {
-//                            db.updateQty(ID, Integer.parseInt(input.getText().toString()));
-//                            c1.setText(input.getText());
-//                            myNom.requery();
-//                            wantToCloseDialog = true;
-//                            toolbar = (android.support.v7.widget.Toolbar) CurAc.findViewById(R.id.toolbar);
-//                            String ToolBarContr = db.GetToolbarContr();
-//                            String OrderSum = db.getOrderSum();
-//                            toolbar.setSubtitle(ToolBarContr + OrderSum);
-//                        } else {
-//                            input.selectAll();
-//                            input.requestFocus();
-//                            input.performClick();
-//                            input.setPressed(true);
-//                            input.invalidate();
-//                            Toast.makeText(CurContext, "На остатках всего " + Ost + "шт. Вы заказываете " + input.getText().toString() + " шт.", Toast.LENGTH_LONG).show();
-//                        }
-
-//                        if (wantToCloseDialog)
-//                            alertD.dismiss();
                         }
                     });
-
                     input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                         @Override
                         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -322,7 +291,6 @@ public class GlobalVars extends Application {
                             return true;
                         }
                     });
-//          Конец отработки выборка нескольких позиций
                 }
             }
         }
@@ -452,13 +420,10 @@ public class GlobalVars extends Application {
             final String ID = c.getText().toString();
 
             final TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
-            String Qty = c1.getText().toString();
 
             TextView c3 = myView.findViewById(R.id.ColOrdDtCod);
-            String Code = c3.getText().toString();
 
             TextView c4 = myView.findViewById(R.id.ColOrdDtDescr);
-            String Descr = c4.getText().toString();
 
             TextView c5 = myView.findViewById(R.id.ColOrdDtPrice);
 
@@ -650,9 +615,6 @@ public class GlobalVars extends Application {
         return view;
     }
 
-    public void setView(View view) {
-    }
-
     public Context getContext() {
         return glbContext;
     }
@@ -663,9 +625,6 @@ public class GlobalVars extends Application {
 
     public android.support.v7.widget.Toolbar getToolbar() {
         return toolbar;
-    }
-
-    public void setToolbar(android.support.v7.widget.Toolbar toolbar) {
     }
 
     public void LoadSgi() {
@@ -697,7 +656,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.tovcat_layout, curTovcat, new String[]{"ID", "DESCR"}, new int[]{R.id.ColTovcatID, R.id.ColTovcatDescr});
         spTovcat.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersFunc(View vw) {
@@ -706,7 +664,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.func_layout, curFunc, new String[]{"ID", "DESCR"}, new int[]{R.id.ColFuncID, R.id.ColFuncDescr});
         spFunc.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersBrand(View vw) {
@@ -715,7 +672,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.brand_layout, curBrand, new String[]{"ID", "DESCR"}, new int[]{R.id.ColBrandID, R.id.ColBrandDescr});
         spBrand.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersWC(View vw) {
@@ -724,7 +680,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"ID", "DESCR"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
         spWC.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersProd(View vw) {
@@ -733,7 +688,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.prod_layout, curProd, new String[]{"ID", "DESCR"}, new int[]{R.id.ColProdID, R.id.ColProdDescr});
         spProd.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersFocus(View vw) {
@@ -742,7 +696,6 @@ public class GlobalVars extends Application {
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"ID", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr});
         spFocus.setAdapter(adapter);
-//        spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
     public void LoadFiltersModels(View vw) {
@@ -792,7 +745,6 @@ public class GlobalVars extends Application {
     }
 
     public void LoadNomByFilters(String SgiID, String GrupID, String TovcatID, String FuncID, String BrandID, String WCID, String ProdID, String FocusID, String ModelID, String ColorID) {
-//        System.out.println("GrupID: " + GrupID);
         myNom = db.getNomByFilters(SgiID, GrupID, TovcatID, FuncID, BrandID, WCID, ProdID, FocusID, ModelID, ColorID);
         nomenList.setAdapter(null);
         NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
@@ -1021,9 +973,8 @@ public class GlobalVars extends Application {
 
     public String GetStoragePath2019() {
 
-        String sdpath = "";
-//            sdpath= Environment.getExternalStorageDirectory().toString() + "/";
-        sdpath = getExternalFilesDir(null).toString() + "/";
+        String sdpath;
+        sdpath = Objects.requireNonNull(getExternalFilesDir(null)).toString() + "/";
 
         return sdpath;
 
@@ -1039,7 +990,7 @@ public class GlobalVars extends Application {
             return false;
         }
         if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+            return activeNetworkInfo.isConnectedOrConnecting();
         } else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
             switch (activeNetworkInfo.getSubtype()) {
                 case TelephonyManager.NETWORK_TYPE_1xRTT:
@@ -1106,9 +1057,8 @@ public class GlobalVars extends Application {
                 ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
                 ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
-                FTPClient ftpClient = null;
+                FTPClient ftpClient;
                 ftpClient = new FTPClient();
-                Boolean FileExists = false;
                 final String photoDir = getPhotoDir();
                 try {
                     ftpClient.connect(ftp_server);
@@ -1365,19 +1315,13 @@ public class GlobalVars extends Application {
         }
     }
 
-    public Integer getSDKVer() {
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        return currentapiVersion;
-    }
-
     public String FormDBFForZakaz(String ID) throws DBFException {
-        SQLiteDatabase InsDB = null;
         String DBF_FIleForSend;
         String DBF_FileName;
         Cursor c;
 
-        String TP, CONTR, ADDR, DOCNO, COMMENT = "", CODE, TIME = "";
-        java.util.Date DELIVERY = null, DOCDATE = null;
+        String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
+        java.util.Date DELIVERY, DOCDATE;
         Double QTY, PRICE;
         Double getMoney, getBackward, getBacktype;
 
@@ -1387,9 +1331,6 @@ public class GlobalVars extends Application {
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
-
-//        String FileName = GetSDCardpath()+"ARMTP_DB/orders_"+curdate.toString()+".dbf";
-//        DBF_FileName = "orders_"+curdate.toString()+".dbf";
 
         c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.DOCNO='" + ID + "'", null);
         if (c.getCount() == 0) {
@@ -1564,14 +1505,13 @@ public class GlobalVars extends Application {
         OrderID = "";
         Cursor c;
         String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
-        java.util.Date DELIVERY = null, DOCDATE = null;
+        java.util.Date DELIVERY, DOCDATE;
         Double QTY, PRICE;
         Double getMoney, getBackward, getBacktype;
         DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
         String curdate = df.format(Calendar.getInstance().getTime());
 
-//        String FileName = GetSDCardpath()+"ARMTP_DB/orders_"+curdate.toString()+".dbf";
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
 
@@ -1827,14 +1767,9 @@ public class GlobalVars extends Application {
         settings = CurAc.getSharedPreferences("apk_version", 0);
         editor = settings.edit();
 
-        FTPClient ftpClient = null;
+        FTPClient ftpClient;
         ftpClient = new FTPClient();
-//        String FileName = GetSDCardpath()+UpdatesFolder+"/ver.txt";
         String FileName = CurAc.getFilesDir() + "/ver.txt";
-//        System.out.println("Download path: " + CurAc.getFilesDir().toString());
-
-        File appFile = new File(FileName);
-        String response = "";
         String version = "", versionName = "";
 
         try {
@@ -1866,9 +1801,6 @@ public class GlobalVars extends Application {
 
     private String[] convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-
-        String line = null;
         String version = "", versionName = "";
         try {
             version = reader.readLine();
@@ -1886,7 +1818,7 @@ public class GlobalVars extends Application {
     }
 
     public void DownloadApp(String FtpServer) {
-        FTPClient ftpClient = null;
+        FTPClient ftpClient;
         ftpClient = new FTPClient();
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/app-debug.apk";
         File appFile = new File(CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/app-debug.apk");
@@ -1899,7 +1831,6 @@ public class GlobalVars extends Application {
         }
 
         try {
-//            ftpClient.connect(settings.getString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server)));
             ftpClient.connect(FtpServer);
             reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -1914,7 +1845,6 @@ public class GlobalVars extends Application {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
             FileOutputStream fos = new FileOutputStream(FileName);
-//            FileOutputStream fos = new FileOutputStream(appFile);
             ftpClient.retrieveFile("app-debug.apk", fos);
             fos.close();
 
@@ -1930,58 +1860,12 @@ public class GlobalVars extends Application {
         }
 
         if (appFile.length() == 0) {
-//            System.out.println("File not downloaded. Start downloading from local server ");
             DownloadApp("192.168.10.24");
-        }
-//        else {
-//            System.out.println("File downloaded");
-//        }
-    }
-
-    public void DownloadAppLocal() {
-//        System.out.println("Startting download from local ftp server");
-        FTPClient ftpClient = null;
-        ftpClient = new FTPClient();
-//        String FileName = GetSDCardpath()+UpdatesFolder+"/app-debug.apk";
-//        String FileName = Environment.getExternalStorageDirectory()+"/"+UpdatesFolder+"/ver.txt";
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/app-debug.apk";
-        File appFile = new File(CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/app-debug.apk");
-        SharedPreferences settings;
-        settings = CurAc.getSharedPreferences("apk_version", 0);
-
-
-        if (appFile.exists()) {
-            appFile.delete();
-        }
-
-        try {
-            ftpClient.connect("192.168.10.24");
-            ftpClient.login(settings.getString("AppUpdateUser", getResources().getString(R.string.ftp_update_user)), settings.getString("AppUpdatePass", getResources().getString(R.string.ftp_update_pass)));
-
-            ftpClient.changeWorkingDirectory("ARM_TP");
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-            FileOutputStream fos = new FileOutputStream(FileName);
-//            FileOutputStream fos = new FileOutputStream(appFile);
-            ftpClient.retrieveFile("app-debug.apk", fos);
-            fos.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                ftpClient.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     public void LoadSms(String Bdate, String Edate) {
         smsList.setAdapter(null);
-//        cur_sms = SmsDB.rawQuery("SELECT ROW AS _id, MSG_HEAD, MESSAGE, MSG_DATE, MSG_TIME, IS_NEW FROM MSGS"+
         cur_sms = SmsDB.rawQuery("SELECT ROW_ID AS _id, MSG_HEAD, MESSAGE, MSG_DATE, MSG_TIME, IS_NEW FROM MSGS" +
                         " WHERE\n" +
                         " IS_NEW = 1 OR \n" +
@@ -1996,8 +1880,6 @@ public class GlobalVars extends Application {
 
     public Integer getSMSCount() {
         String count = "";
-//        Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT(ROW) IS NULL THEN '0' ELSE COUNT(ROW) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
-//        Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT(ROW_ID) IS NULL THEN '0' ELSE COUNT(ROW) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
         Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT(ROW_ID) IS NULL THEN '0' ELSE COUNT(ROW_ID) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
         if (cur_sms.moveToNext()) {
             count = cur_sms.getString(cur_sms.getColumnIndex("CNT"));
@@ -2052,17 +1934,15 @@ public class GlobalVars extends Application {
     }
 
     public void getNewSMS() {
-        int Rowid = 0;
+        int Rowid;
         int msgRow;
         String TP_ID, TP_IDS, MSG_HEAD, MSG, MSG_DATE, MSG_TIME;
         Statement stmt;
         ResultSet reset = null;
-        Cursor c;
 
-        if (isNetworkAvailable() == true) {
+        if (isNetworkAvailable()) {
 
             if (SmsDB == null) {
-//                SmsDB = openOrCreateDatabase(GetSDCardpath() + DBFolder + "/armtp_msg.db", MODE_MULTI_PROCESS, null);
                 SmsDB = openOrCreateDatabase(GetStoragePath2019() + DBFolder + "/armtp_msg.db", MODE_WORLD_WRITEABLE, null);
             }
 
@@ -2125,10 +2005,8 @@ public class GlobalVars extends Application {
                 cur_sms.close();
             }
 
-//Отключено 18-08-2016 для проверки работы на Android SDK 24/6
-
+            // Отключено 18-08-2016 для проверки работы на Android SDK 24/6
             ShortcutBadger.applyCount(getApplicationContext(), count.equals("") ? 0 : Integer.parseInt(count));
-
             try {
                 if (reset != null) {
                     reset.close();
@@ -2271,31 +2149,12 @@ public class GlobalVars extends Application {
     }
 
     public String getPhotoDir() {
-        String photo_dir = "";
-//        File[] file = getExternalMediaDirs();
+        String photo_dir;
         File file = CurAc.getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        File extPhoto = null, arm_photo = null;
-
-//        System.out.println("File 0: " + file[0].toString());
-//        System.out.println("File 1: " + file[1].toString());
-//        System.out.println("File 2: " + file[2].toString());
-//        System.out.println("File 3: " + file[2].toString());
-
-//        System.out.println("file.length: " + file.length);
-
-//        if (file.length==2){
-//            if (file[1]!=null){
-//                extPhoto = new File(file[1].toString());
-//            } else {
-//                extPhoto = new File(file[0].toString());
-//            }
-//        } else {
-//            extPhoto = new File(file[0].toString());
-//        }
+        File extPhoto, arm_photo = null;
         extPhoto = new File(file.toString());
 
         if (extPhoto.canWrite()) {
-//            arm_photo = new File(extPhoto.toString()+"/"+PhotoFolder);
             arm_photo = new File(extPhoto.toString());
             if (!arm_photo.exists()) {
                 arm_photo.mkdir();
@@ -2306,25 +2165,13 @@ public class GlobalVars extends Application {
     }
 
     public File getPhotoDirFile() {
-        File photo_dir = null;
-//        File[] file = getExternalMediaDirs();
+        File photo_dir;
         File file = CurAc.getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        File extPhoto = null, arm_photo = null;
-
-//        if (file.length==2){
-//            if (file[1]!=null){
-//                extPhoto = new File(file[1].toString());
-//            } else {
-//                extPhoto = new File(file[0].toString());
-//            }
-//        } else {
-//            extPhoto = new File(file[0].toString());
-//        }
+        File extPhoto, arm_photo = null;
 
         extPhoto = new File(file.toString());
 
         if (extPhoto.canWrite()) {
-//            arm_photo = new File(extPhoto.toString()+"/"+PhotoFolder);
             arm_photo = new File(extPhoto.toString());
             if (!arm_photo.exists()) {
                 arm_photo.mkdir();
@@ -2336,8 +2183,6 @@ public class GlobalVars extends Application {
 
     public void checkPhotoInDB(String FileName) {
         Cursor cur;
-
-//        System.out.println("FileName: "+FileName);
         String isDownloaded = FilenameUtils.removeExtension(FileName);
         String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
         String Sql;
@@ -2345,24 +2190,16 @@ public class GlobalVars extends Application {
         if (tmpName.equals("_2")) {
             Sql = "SELECT P2D From Nomen WHERE COD='" + isDownloaded.replace(tmpName, "") + "'";
             cur = db.getWritableDatabase().rawQuery(Sql, null);
-//            System.out.println("Sql: " + Sql);
-//            System.out.println("This is second photo: ");
         } else {
             Sql = "SELECT P1D From Nomen WHERE COD='" + isDownloaded + "'";
             cur = db.getWritableDatabase().rawQuery(Sql, null);
-//            System.out.println("Sql: " + Sql);
-//            System.out.println("This is first photo: ");
         }
 
         if (cur.moveToFirst()) {
-//            System.out.println("cur.getInt(0): " + cur.getInt(0));
             if (cur.getInt(0) == 0) {
-//                System.out.println("Db not updated: ");
                 if (tmpName.equals("_2")) {
-//                    System.out.println("Updating P2D");
                     db.getWritableDatabase().execSQL("UPDATE Nomen SET P2D=1 WHERE COD='" + isDownloaded.replace(tmpName, "") + "'");
                 } else {
-//                    System.out.println("Updating P1D");
                     db.getWritableDatabase().execSQL("UPDATE Nomen SET P1D=1 WHERE COD='" + isDownloaded + "'");
                 }
             }
@@ -2424,7 +2261,6 @@ public class GlobalVars extends Application {
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            String Status = "", Instop = " / ЗАПРЕТ ОТГРУЗОК", Dolg = " / ДОЛЖНИК", Dynamo = " / ДИНАМЩИК";
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
 
             String contrInfo = cursor.getString(6);
@@ -2441,21 +2277,6 @@ public class GlobalVars extends Application {
             }
 
             tvDescr.setText(resDescr);
-//            tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
-//
-//            if (cursor.getInt(4) > 0) {
-//                tvDescr.setText(cursor.getString(2) + Dolg);
-//                tvDescr.setTextColor(Color.rgb(83, 51, 190));
-//            } else if (cursor.getInt(5) > 0) {
-//                tvDescr.setText(cursor.getString(2) + Dynamo);
-//                tvDescr.setTextColor(Color.rgb(255, 151, 0));
-//            } else if (cursor.getInt(3) > 0) {
-//                tvDescr.setText(cursor.getString(2) + Instop);
-//                tvDescr.setTextColor(Color.rgb(181, 38, 29));
-//            } else {
-//                tvDescr.setText(cursor.getString(2));
-//                tvDescr.setTextColor(Color.rgb(0, 0, 0));
-//            }
             return view;
         }
     }
@@ -2468,15 +2289,7 @@ public class GlobalVars extends Application {
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
 
-            final Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            TextView tvUniTypeID = view.findViewById(R.id.tvUniTypeID);
-            TextView tvUniTypeDescr = view.findViewById(R.id.tvUniTypeDescr);
-            TextView tvUniID = view.findViewById(R.id.tvUniID);
-            TextView tvUniDescr = view.findViewById(R.id.tvUniDescr);
-//        view.setBackgroundColor(Color.rgb(255, 255, 255));
-//        tvUniTypeDescr.setTextColor(Color.rgb(0, 0, 0));
-//        tvUniDescr.setTextColor(Color.rgb(0, 0, 0));
             return view;
         }
     }
@@ -2637,31 +2450,6 @@ public class GlobalVars extends Application {
                 tvPhoto.setText(builder);
             }
 
-//            if (tvPhoto!=null && !cursor.getString(9).equals("")){
-//                photo = new File(photoDir+"/"+cursor.getString(9));
-////                photo = new File(GetSDCardpath()+PhotoFolder+"/"+cursor.getString(9));
-//                if (photo.exists()) {
-//                    if (!cursor.getString(10).equals("")){
-////                        photo2 = new File(GetSDCardpath()+PhotoFolder+"/"+cursor.getString(10));
-//                        photo2 = new File(photoDir+"/"+cursor.getString(10));
-//                        if (photo2.exists()) {
-//                            resID = glbContext.getResources().getIdentifier("photo_blue", "drawable", glbContext.getPackageName());
-//                        } else {
-//                            resID = glbContext.getResources().getIdentifier("photo_green_blue", "drawable", glbContext.getPackageName());
-//                        }
-//                    } else {
-//                        resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-//                    }
-//                } else {
-//                    resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
-//                }
-//
-//                SpannableStringBuilder builder = new SpannableStringBuilder();
-//                builder.append(" ").append(" ");
-//                builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
-//                builder.append(" ");
-//                tvPhoto.setText(builder);
-//            }
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
@@ -2689,7 +2477,6 @@ public class GlobalVars extends Application {
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            String Status = "", Instop = " / ЗАПРЕТ ОТГРУЗОК", Dolg = " / ДОЛЖНИК", Dynamo = " / ДИНАМЩИК";
             String contrInfo = cursor.getString(6);
             String resDescr = cursor.getString(2);
 
@@ -2699,32 +2486,6 @@ public class GlobalVars extends Application {
             } else {
                 tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
             }
-
-//            if (cursor.getInt(4) > 0) {
-//                tvDescr.setTextColor(Color.rgb(83, 51, 190));
-//            } else if (cursor.getInt(5) > 0) {
-//                tvDescr.setTextColor(Color.rgb(255, 151, 0));
-//            } else if (cursor.getInt(3) > 0) {
-//                tvDescr.setTextColor(Color.rgb(181, 38, 29));
-//            } else {
-////                tvDescr.setText(cursor.getString(2));
-//                tvDescr.setTextColor(Color.rgb(0, 0, 0));
-//            }
-
-//            if (cursor.getInt(4) > 0) {
-//                resDescr = resDescr + Dolg;
-//            }
-//
-//            if (cursor.getInt(5) > 0) {
-//                resDescr = resDescr + Dynamo;
-//            }
-//
-//            if (cursor.getInt(3) > 0) {
-//                resDescr = resDescr + Instop;
-//            }
-
-//            System.out.println("From cursor:" + cursor.getString(6));
-//            System.out.println("contrInfo: " + contrInfo);
 
             if (!contrInfo.equals("")) {
                 resDescr += " (" + contrInfo + ")";

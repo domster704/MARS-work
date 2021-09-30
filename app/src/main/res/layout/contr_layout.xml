@@ -16,15 +16,15 @@
         android:visibility="invisible"></TextView>
 
     <TextView
-        android:id="@+id/ColContrDescr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/ColContrID"
-        android:gravity="center_vertical"
-        android:paddingLeft="5sp"
-        android:paddingTop="10sp"
-        android:paddingBottom="10sp"
-        android:textColor="#000000"
-        android:textSize="15dp"></TextView>
+            android:id="@+id/ColContrDescr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/ColContrID"
+            android:gravity="center_vertical"
+            android:paddingLeft="5sp"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
+            android:textColor="#000000"
+            android:textSize="15dp"></TextView>
 
 </RelativeLayout>

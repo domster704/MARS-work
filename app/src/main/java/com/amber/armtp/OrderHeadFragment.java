@@ -40,10 +40,8 @@ import java.util.Objects;
  * Фрагмент "Шапка заказа"
  */
 public class OrderHeadFragment extends Fragment {
-    SQLiteDatabase InsDB = null;
     Menu mainMenu;
     SharedPreferences settings;
-    SharedPreferences APKsettings;
     SharedPreferences.Editor editor;
 
     public OrderHeadFragment() {
@@ -98,10 +96,8 @@ public class OrderHeadFragment extends Fragment {
                 try {
                     if (!glbVars.OrderID.equals("")) {
                         SaveEditOrder(glbVars.OrderID);
-//                        glbVars.db.resetContrSales();
                     } else {
                         SaveOrder();
-//                        glbVars.db.resetContrSales();
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -124,21 +120,18 @@ public class OrderHeadFragment extends Fragment {
         super.onStart();
     }
 
+    @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
-        glbVars.spnBackwardType = getActivity().findViewById(R.id.spinBackwardType);
         glbVars.edContrFilter = getActivity().findViewById(R.id.txtContrFilter);
         glbVars.txtComment = getActivity().findViewById(R.id.txtComment);
         glbVars.btSave = getActivity().findViewById(R.id.btSaveHeader);
         glbVars.btClear = getActivity().findViewById(R.id.btClearOrder);
-        glbVars.btDebet = getActivity().findViewById(R.id.btContrDebet);
-        glbVars.btResetTime = getActivity().findViewById(R.id.btResetTime);
-        glbVars.chkGetMoney = getActivity().findViewById(R.id.chkGetMoney);
-        glbVars.chkGetBackward = getActivity().findViewById(R.id.chkGetBackward);
+
         glbVars.spinContr = getActivity().findViewById(R.id.SpinContr);
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
@@ -148,9 +141,6 @@ public class OrderHeadFragment extends Fragment {
 
         glbVars.LoadTpList();
         glbVars.LoadContrList();
-        setBackwardTypeData();
-
-        glbVars.spnBackwardType.setEnabled(false);
 
         settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         editor = settings.edit();
@@ -172,25 +162,10 @@ public class OrderHeadFragment extends Fragment {
             }
         });
 
-        glbVars.chkGetBackward.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    glbVars.spnBackwardType.setEnabled(true);
-                    glbVars.spnBackwardType.setSelection(0);
-                } else {
-                    glbVars.spnBackwardType.setEnabled(false);
-                    glbVars.spnBackwardType.setSelection(0);
-                }
-
-            }
-        });
-
         glbVars.DeliveryDate = Calendar.getInstance();
         glbVars.DeliveryTime = Calendar.getInstance();
 
         glbVars.txtDate = getActivity().findViewById(R.id.txtDelivDate);
-        glbVars.txtTime = getActivity().findViewById(R.id.txtDelivTime);
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -207,19 +182,6 @@ public class OrderHeadFragment extends Fragment {
 
         };
 
-        final TimePickerDialog.OnTimeSetListener time = new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                // TODO Auto-generated method stub
-                glbVars.DeliveryTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                glbVars.DeliveryTime.set(Calendar.MINUTE, minute);
-                String myFormat = "HH:mm"; //In which you need put here
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
-                glbVars.txtTime.setText(sdf.format(glbVars.DeliveryTime.getTime()));
-            }
-
-        };
-
         glbVars.txtDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,34 +189,6 @@ public class OrderHeadFragment extends Fragment {
                 new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-
-        glbVars.txtTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new TimePickerDialog(getActivity(), time, glbVars.DeliveryTime.get(Calendar.HOUR), glbVars.DeliveryTime.get(Calendar.MINUTE), true).show();
-            }
-        });
-
-        glbVars.spnBackwardType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-//        glbVars.TPList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                System.out.println("TP rowid:" + position);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//            }
-//        });
 
         glbVars.btSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -281,48 +215,10 @@ public class OrderHeadFragment extends Fragment {
                 }
 
                 String DeliveryDate = glbVars.txtDate.getText().toString();
-                String DelivTime = glbVars.txtTime.getText().toString();
                 String Comment = glbVars.txtComment.getText().toString();
-
-
-                Long BackwardType = glbVars.spnBackwardType.getSelectedItemId();
-                String StrBackwardType = glbVars.spnBackwardType.getSelectedItem().toString();
-
-                switch (StrBackwardType) {
-                    case "Брак":
-                        BackwardType = Long.parseLong("1");
-                        break;
-                    case "Просроченный товар":
-                        BackwardType = Long.parseLong("2");
-                        break;
-                    case "Пересортица":
-                        BackwardType = Long.parseLong("3");
-                        break;
-                    case "Недовоз (склад)":
-                        BackwardType = Long.parseLong("4");
-                        break;
-                    case "Не заказывали":
-                        BackwardType = Long.parseLong("9");
-                        break;
-                    case "Неоплата товара":
-                        BackwardType = Long.parseLong("19");
-                        break;
-                    default:
-                        BackwardType = Long.parseLong("0");
-                        break;
-                }
-
-                Integer ordMoney = glbVars.chkGetMoney.isChecked() ? 1 : 0;
-                Integer ordBackward = glbVars.chkGetBackward.isChecked() ? 1 : 0;
-                Long ordBackwardType = glbVars.chkGetBackward.isChecked() ? BackwardType : 0;
 
                 if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
                     Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                if (ordBackward == 1 && ordBackwardType == 0) {
-                    Toast.makeText(getActivity(), "Необходимо выбрать причину возврата товара", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -334,15 +230,13 @@ public class OrderHeadFragment extends Fragment {
                     editor.commit();
                 }
 
-                if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, DelivTime, ordMoney, ordBackward, ordBackwardType)) {
+                if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
                     Toast.makeText(getActivity(), "Шапка заказа успешно сохранена", Toast.LENGTH_LONG).show();
-//                    editor.putString("TP_ID", TP_ID);
-//                    editor.commit();
                     glbVars.db.resetContrSales();
                     glbVars.setSaleIcon(mainMenu, 0, false);
                     setContrAndSum();
                 } else {
-                    if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, DelivTime, ordMoney, ordBackward, ordBackwardType)) {
+                    if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
                         glbVars.db.resetContrSales();
                         glbVars.setSaleIcon(mainMenu, 0, false);
                         setContrAndSum();
@@ -363,11 +257,6 @@ public class OrderHeadFragment extends Fragment {
                     glbVars.txtComment.setText("");
                     glbVars.txtDate.setText("");
                     glbVars.edContrFilter.setText("");
-                    glbVars.txtTime.setText("");
-                    glbVars.chkGetMoney.setChecked(false);
-                    glbVars.chkGetBackward.setChecked(false);
-                    glbVars.spnBackwardType.setEnabled(false);
-                    glbVars.spnBackwardType.setSelection(0);
                     glbVars.db.resetContrSales();
                     glbVars.setSaleIcon(mainMenu, 0, false);
                     setContrAndSum();
@@ -378,43 +267,15 @@ public class OrderHeadFragment extends Fragment {
             }
         });
 
-        glbVars.btResetTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                glbVars.txtTime.setText("");
-            }
-        });
-
-        glbVars.btDebet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                glbVars.tvContr = getActivity().findViewById(R.id.ColContrID);
-                String DebetContr = glbVars.tvContr.getText().toString();
-                if (!DebetContr.equals("0")) {
-                    fragment = new DebetFragment();
-                    if (fragment != null) {
-                        glbVars.DebetContr = DebetContr;
-                        fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.frame, fragment, "frag_debet");
-                        fragmentTransaction.commit();
-                        toolbar.setTitle("Дебиторская задолженность");
-                    }
-                }
-            }
-        });
-
 
         int ContRowid = glbVars.db.GetContrRowID();
         SetSelectedContr(ContRowid);
 
         String stTP_ID = settings.getString("TP_ID", "0");
 
-//        System.out.println("CurrentTp:" + glbVars.CurrentTp);
-
         int TPRowid = glbVars.db.GetTPRowID();
         int TPDefaultRowid = glbVars.db.GetTPByID(stTP_ID);
 
-//        System.out.println("TPDefaultRowid: " + TPDefaultRowid);
         if (glbVars.CheckTPLock()) {
             glbVars.TPList.setSelection(TPDefaultRowid);
         } else {
@@ -431,58 +292,14 @@ public class OrderHeadFragment extends Fragment {
 
         String Comment = glbVars.db.GetComment();
         String DelivDate = glbVars.db.GetDeliveryDate();
-        String DelivTime = glbVars.db.GetDeliveryTime();
-        Boolean GetMoney = glbVars.db.GetMoney();
-        Boolean GetBackward = glbVars.db.GetBackward();
-        Integer BackwardType = glbVars.db.GetBackwardType();
-        if (Comment != "") {
+        if (!Comment.equals("")) {
             glbVars.txtComment.setText(Comment, TextView.BufferType.EDITABLE);
         }
 
-        if (DelivDate != "") {
+        if (!DelivDate.equals("")) {
             glbVars.txtDate.setText(DelivDate, TextView.BufferType.EDITABLE);
         }
 
-        if (DelivTime != "") {
-            glbVars.txtTime.setText(DelivTime, TextView.BufferType.EDITABLE);
-        }
-
-        glbVars.chkGetMoney.setChecked(GetMoney);
-
-        if (GetBackward) {
-            glbVars.chkGetBackward.setChecked(true);
-            glbVars.spnBackwardType.setEnabled(true);
-//            spnBackwardType.setSelection(BackwardType);
-            String StrBack = "";
-            switch (BackwardType) {
-                case 1:
-                    StrBack = "Брак";
-                    break;
-                case 2:
-                    StrBack = "Просроченный товар";
-                    break;
-                case 3:
-                    StrBack = "Пересортица";
-                    break;
-                case 4:
-                    StrBack = "Недовоз (склад)";
-                    break;
-                case 9:
-                    StrBack = "Не заказывали";
-                    break;
-                case 19:
-                    StrBack = "Неоплата товара";
-                    break;
-                default:
-                    StrBack = "Выберите тип возврата";
-                    break;
-            }
-
-            glbVars.spnBackwardType.setSelection(((ArrayAdapter) glbVars.spnBackwardType.getAdapter()).getPosition(StrBack));
-        } else {
-            glbVars.chkGetBackward.setChecked(false);
-            glbVars.spnBackwardType.setEnabled(false);
-        }
         setContrAndSum();
 
     }
@@ -570,11 +387,7 @@ public class OrderHeadFragment extends Fragment {
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
-                        glbVars.txtTime.setText("");
-                        glbVars.chkGetMoney.setChecked(false);
-                        glbVars.chkGetBackward.setChecked(false);
-                        glbVars.spnBackwardType.setEnabled(false);
-                        glbVars.spnBackwardType.setSelection(0);
+//                        glbVars.chkGetBackward.setChecked(false);
                         toolbar.setSubtitle("");
                     }
                 });
@@ -594,21 +407,18 @@ public class OrderHeadFragment extends Fragment {
             @Override
             public void run() {
                 Cursor c, c2, c1;
-                String TP, TP_ID;
-                String Contr, Contr_ID;
-                String Addr, Addr_ID;
+                String TP_ID;
+                String Contr_ID;
+                String Addr_ID;
                 String Data, Time;
                 String Comment;
                 String IDDOC;
 
 
                 String sql;
-                SQLiteStatement stmt, stmt2;
+                SQLiteStatement stmt;
 
-                String Code;
-                Double Qty;
                 int getMoney, getBackward, getBacktype;
-                Double Price;
 
                 SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 String curdate = df.format(Calendar.getInstance().getTime());
@@ -645,9 +455,6 @@ public class OrderHeadFragment extends Fragment {
                 });
 
                 c.moveToFirst();
-                TP = c.getString(0);
-                Contr = c.getString(1);
-                Addr = c.getString(2);
                 Data = c.getString(3);
                 Time = c.getString(8);
                 getMoney = c.getInt(9);
@@ -660,7 +467,6 @@ public class OrderHeadFragment extends Fragment {
                 Addr_ID = c.getString(7);
 
                 c.close();
-                c = null;
 
                 int Docno = glbVars.db.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
@@ -702,7 +508,6 @@ public class OrderHeadFragment extends Fragment {
                     glbVars.db.getWritableDatabase().endTransaction();
                     glbVars.db.ClearOrderHeader();
                     glbVars.db.ResetNomen();
-//
                 }
 
 
@@ -716,11 +521,6 @@ public class OrderHeadFragment extends Fragment {
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
-                        glbVars.txtTime.setText("");
-                        glbVars.chkGetMoney.setChecked(false);
-                        glbVars.chkGetBackward.setChecked(false);
-                        glbVars.spnBackwardType.setEnabled(false);
-                        glbVars.spnBackwardType.setSelection(0);
                         toolbar.setSubtitle("");
                         glbVars.setSaleIcon(mainMenu, 0, false);
                     }
@@ -728,11 +528,6 @@ public class OrderHeadFragment extends Fragment {
 
             }
         }).start();
-    }
-
-    private void setBackwardTypeData() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.spin_backtypes_items));
-        glbVars.spnBackwardType.setAdapter(adapter);
     }
 
     private void setContrAndSum() {
