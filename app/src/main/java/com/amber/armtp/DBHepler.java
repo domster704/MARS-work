@@ -8,20 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHepler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "armtp.db";
-    private static final String ROW_ID = "_id";
-    private static final String TB_SGI = "sgi";
     private static final String TB_NOMEN = "Nomen";
     private static final String TB_ORDER = "ORDERS";
-    private static final String KEY_SGI_ID = "ID";
-    private static final String KEY_SGI_DESCR = "DESCR";
-    private static final String KEY_GRUP_ID = "ID";
-    private static final String KEY_GRUP_DESCR = "DESCR";
-    private static final String KEY_GRUP_SGIID = "SGIID";
-    private static final String KEY_TP_ID = "ID";
-    private static final String KEY_TP_DESCR = "DESCR";
-    private static final String KEY_NOM_ID = "ID";
-    private static final String KEY_NOM_DESCR = "DESCR";
-    private static final String KEY_NOM_GRUPID = "GRUPID";
     private static final String KEY_ZAKAZ = "ZAKAZ";
     private static final String KEY_ORD_TP_ID = "TP_ID";
     private static final String KEY_ORD_CONTR_ID = "CONTR_ID";
@@ -32,7 +20,6 @@ public class DBHepler extends SQLiteOpenHelper {
     private static final String KEY_ORD_GETMONEY = "GETMONEY";
     private static final String KEY_ORD_GETBACKWARD = "GETBACKWARD";
     private static final String KEY_ORD_BACKWARD_TYPE = "BACKTYPE";
-    public static String DBFolder = "ARMTP_DB";
 
     public DBHepler(Context context) {
         super(context, DATABASE_NAME, null, 1);

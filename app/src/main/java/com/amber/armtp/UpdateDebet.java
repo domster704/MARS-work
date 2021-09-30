@@ -50,27 +50,14 @@ public class UpdateDebet extends IntentService {
             Intent i = new Intent("DebetUpdating");
             i.putExtra("DebetUpdateFinished", "2");
             sendBroadcast(i);
-//            NOTIFICATION_ID = 1;
-//            builder =
-//                    new NotificationCompat.Builder(this)
-//                            .setSmallIcon(R.drawable.logo2)
-//                            .setContentTitle("НЬЮ АРМ")
-//                            .setSound(soundUri)
-//                            .setContentText("Запущено фоновое обновление дебиторки");
         }
-
-//        Intent targetIntent = new Intent(this, MainActivity.class);
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        builder.setContentIntent(contentIntent);
-//        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        nManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String ID, TP_ID, TP_IDS = "";
-        int Rowid, Kredit, Limit, Nekontr = 0;
-        Float Saldo, a7, a14, a21, a28 = 0.0f, a35 = 0.0f, a42 = 0.0f, a49 = 0.0f, a56 = 0.0f, a63 = 0.0f, a64 = 0.0f, otg30 = 0.0f, opl30 = 0.0f;
+        String ID, TP_ID, TP_IDS;
+        int Rowid, Kredit, Limit, Nekontr;
+        Float Saldo, a7, a14, a21, a28, a35, a42, a49, a56, a63, a64, otg30, opl30;
         Statement stmt;
         ResultSet reset = null;
         Cursor c;
@@ -163,19 +150,7 @@ public class UpdateDebet extends IntentService {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-//                        NOTIFICATION_ID = 2;
-//                        NotificationCompat.Builder builder =
-//                                new NotificationCompat.Builder(this)
-//                                        .setSmallIcon(R.drawable.logo2)
-//                                        .setContentTitle("НЬЮ АРМ")
-//                                        .setSound(soundUri)
-//                                        .setContentText("Фоновое обновление дебиторки завершено");
-//
-//                        Intent targetIntent = new Intent(this, MainActivity.class);
-//                        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//                        builder.setContentIntent(contentIntent);
-//                        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//                        nManager.notify(NOTIFICATION_ID, builder.build());
+
             Intent i = new Intent("DebetUpdating");
             i.putExtra("DebetUpdateFinished", "1");
             sendBroadcast(i);

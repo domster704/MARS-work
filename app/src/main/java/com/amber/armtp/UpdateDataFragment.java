@@ -1,13 +1,11 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,7 +30,6 @@ import java.sql.Statement;
 
 public class UpdateDataFragment extends Fragment {
     public GlobalVars glbVars;
-    private android.support.v7.widget.Toolbar toolbar;
     Connection conn = null;
     String sql_server;
     String sql_port;
@@ -47,7 +44,6 @@ public class UpdateDataFragment extends Fragment {
     CheckBox chkUniMx;
 
     private String DebetIsFinished = "0";
-    SQLiteDatabase UpdateDB;
 
     private ProgressBar pgUpSgi, pgUpGroups, pgUpNomen, pgUpContrs, pgUpAddress, pgUpTp, pgUpDebet, pgUpStatus, pgUpOuted, pgUpSales, pgUpGrupAccess, pgUpFuncs, pgUpTovcat, pgUpBrand, pgUpWC, pgUpProd, pgUpFocus;
     private ProgressBar pgUpUniMX;
@@ -57,7 +53,6 @@ public class UpdateDataFragment extends Fragment {
     private TextView tvUpSgiPerc, tvUpGroupsPerc, tvUpNomenPerc, tvUpContrsPerc, tvUpAddressPerc, tvUpTpPerc, tvUpDebetPerc, tvUpStatusPerc, tvUpOutedPerc, tvUpSalesPerc, tvUpGrupAccessPerc, tvUpFuncsPerc, tvUpTovcatPerc, tvUpBrandPerc, tvUpWCPerc, tvUpProdPerc, tvUpFocusPerc;
 
     Button btUpdate;
-    private final int progressStatus = 0;
     private int progressStatusSGI = 0;
     private int progressStatusGrup = 0;
     private int progressStatusNom = 0;
@@ -69,12 +64,6 @@ public class UpdateDataFragment extends Fragment {
     private int progressStatusOuted = 0;
     private int progressStatusSales = 0;
     private int progressStatusAccess = 0;
-    private final int progressStatusFuncs = 0;
-    private final int progressStatusTovcat = 0;
-    private final int progressStatusBrand = 0;
-    private final int progressStatusWC = 0;
-    private final int progressStatusProd = 0;
-    private final int progressStatusFocus = 0;
     private int progressStatusUniMX = 0;
 
     private final Handler handler = new Handler();
@@ -89,38 +78,13 @@ public class UpdateDataFragment extends Fragment {
     private final Handler handlerOut = new Handler();
     private final Handler handlerSales = new Handler();
     private final Handler handlerGrupAccess = new Handler();
-    private final Handler handlerFuncs = new Handler();
-    private final Handler handlerTovcat = new Handler();
-    private final Handler handlerBrand = new Handler();
-    private final Handler handlerWC = new Handler();
-    private final Handler handlerProd = new Handler();
-    private final Handler handlerFocus = new Handler();
     private final Handler handlerUniMX = new Handler();
 
     String TP_ID;
     Boolean TP_LOCK;
 
-    String sql_update;
-    String sql_insert;
-    String query, sqlView;
-
-    int finalCount = 0;
-    int perc = 0;
-    int cntNomen = 0;
-
-    String ID = "", PARENTID = "", Cod5 = "", Code = "", Descr = "", SgiID = "", Photo1 = "", Photo2 = "", MP = "";
-    int Ost = 0, Vkorob = 0, ISNEW = 0, IS7DAY = 0, IS28DAY = 0, IS_PERM = 0;
-    Float Price = 0.0f;
-    Cursor c;
-
-    String sql = "";
-    SQLiteStatement statement;
-    SQLiteStatement statement2;
-
-    private int Region = 0;
-
     SharedPreferences settings, PriceSettings, tp_setting;
-    SharedPreferences.Editor editor, tp_editor;
+    SharedPreferences.Editor editor;
 
     @Nullable
     @Override
@@ -129,12 +93,6 @@ public class UpdateDataFragment extends Fragment {
         v.setKeepScreenOn(true);
         glbVars.view = v;
         return v;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
     }
 
     @Override
@@ -152,7 +110,7 @@ public class UpdateDataFragment extends Fragment {
         super.onResume();
         try {
             getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
-        } catch (Exception E) {
+        } catch (Exception ignored) {
         }
 
     }
@@ -162,7 +120,7 @@ public class UpdateDataFragment extends Fragment {
         super.onPause();
         try {
             getActivity().unregisterReceiver(UpdateDebetWorking);
-        } catch (Exception E) {
+        } catch (Exception ignored) {
         }
 
     }
@@ -181,18 +139,13 @@ public class UpdateDataFragment extends Fragment {
         TP_ID = tp_setting.getString("TP_ID", "0");
         TP_LOCK = tp_setting.getBoolean("TP_LOCK", false);
 
-//        System.out.println("TP_ID: " + TP_ID);
-//        System.out.println("TP_LOCK: " + TP_LOCK);
-
-//        sql_server = getResources().getString(R.string.sql_server);
-
         sql_server = settings.getString("UpdateSrv", getResources().getString(R.string.sql_server));
         sql_port = settings.getString("sqlPort", getResources().getString(R.string.sql_port));
         sql_db = settings.getString("sqlDB", getResources().getString(R.string.sql_db));
         sql_loging = settings.getString("sqlLogin", getResources().getString(R.string.sql_user));
         sql_pass = settings.getString("sqlPass", getResources().getString(R.string.sql_pass));
         glbVars.CurrentCenType = settings.getString("usr_centype", "");
-        Region = PriceSettings.getInt("Region", 0);
+        int region = PriceSettings.getInt("Region", 0);
         editor = settings.edit();
 
 
@@ -214,12 +167,6 @@ public class UpdateDataFragment extends Fragment {
         pgUpSales = getActivity().findViewById(R.id.pgSales);
         pgUpGrupAccess = getActivity().findViewById(R.id.pgGrupAccess);
         pgUpUniMX = getActivity().findViewById(R.id.pgUniMX);
-//        pgUpFuncs = getActivity().findViewById(R.id.pgFuncs);
-//        pgUpTovcat = getActivity().findViewById(R.id.pgTovcat);
-//        pgUpBrand = getActivity().findViewById(R.id.pgBrand);
-//        pgUpWC = getActivity().findViewById(R.id.pgWC);
-//        pgUpProd = getActivity().findViewById(R.id.pgProd);
-//        pgUpFocus = getActivity().findViewById(R.id.pgFocus);
 
         tvUpSgi = getActivity().findViewById(R.id.tvSgiCount);
         tvUpSgiPerc = getActivity().findViewById(R.id.tvSgiPerc);
@@ -257,24 +204,6 @@ public class UpdateDataFragment extends Fragment {
         tvUpUniMX = getActivity().findViewById(R.id.tvUniMXCount);
         tvUpUniMXPerc = getActivity().findViewById(R.id.tvUniMXPerc);
 
-//        tvUpFuncs = getActivity().findViewById(R.id.tvFuncsCount);
-//        tvUpFuncsPerc = getActivity().findViewById(R.id.tvFuncsPerc);
-//
-//        tvUpTovcat = getActivity().findViewById(R.id.tvTovcatCount);
-//        tvUpTovcatPerc = getActivity().findViewById(R.id.tvTovcatPerc);
-//
-//        tvUpBrand = getActivity().findViewById(R.id.tvBrandCount);
-//        tvUpBrandPerc = getActivity().findViewById(R.id.tvBrandPerc);
-//
-//        tvUpWC = getActivity().findViewById(R.id.tvWCCount);
-//        tvUpWCPerc = getActivity().findViewById(R.id.tvWCPerc);
-//
-//        tvUpProd = getActivity().findViewById(R.id.tvProdCount);
-//        tvUpProdPerc = getActivity().findViewById(R.id.tvProdPerc);
-//
-//        tvUpFocus = getActivity().findViewById(R.id.tvFocusCount);
-//        tvUpFocusPerc = getActivity().findViewById(R.id.tvFocusPerc);
-
         chkSgi = getActivity().findViewById(R.id.chkSGI);
         chkGrup = getActivity().findViewById(R.id.chkGroups);
         chkNomen = getActivity().findViewById(R.id.chkNomen);
@@ -287,12 +216,6 @@ public class UpdateDataFragment extends Fragment {
         chkSales = getActivity().findViewById(R.id.chkSales);
         chkGrupAccess = getActivity().findViewById(R.id.chkGrupAccess);
         chkUniMx = getActivity().findViewById(R.id.chkUniMX);
-//        chkFuncs = getActivity().findViewById(R.id.chkFuncs);
-//        chkTovcat = getActivity().findViewById(R.id.chkTovcat);
-//        chkBrand = getActivity().findViewById(R.id.chkBrand);
-//        chkWC = getActivity().findViewById(R.id.chkWC);
-//        chkProd = getActivity().findViewById(R.id.chkProd);
-//        chkFocus = getActivity().findViewById(R.id.chkFocus);
 
         btUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -351,12 +274,6 @@ public class UpdateDataFragment extends Fragment {
         pgUpSales.setProgress(0);
         pgUpGrupAccess.setProgress(0);
         pgUpUniMX.setProgress(0);
-//        pgUpFuncs.setProgress(0);
-//        pgUpTovcat.setProgress(0);
-//        pgUpBrand.setProgress(0);
-//        pgUpWC.setProgress(0);
-//        pgUpProd.setProgress(0);
-//        pgUpFocus.setProgress(0);
 
         tvUpSgi.setText("0/0");
         tvUpSgiPerc.setText("0%");
@@ -394,24 +311,6 @@ public class UpdateDataFragment extends Fragment {
         tvUpUniMX.setText("0/0");
         tvUpUniMXPerc.setText("0%");
 
-//        tvUpFuncs.setText("0/0");
-//        tvUpFuncsPerc.setText("0%");
-//
-//        tvUpTovcat.setText("0/0");
-//        tvUpTovcatPerc.setText("0%");
-//
-//        tvUpBrand.setText("0/0");
-//        tvUpBrandPerc.setText("0%");
-//
-//        tvUpWC.setText("0/0");
-//        tvUpWCPerc.setText("0%");
-//
-//        tvUpProd.setText("0/0");
-//        tvUpProdPerc.setText("0%");
-//
-//        tvUpFocus.setText("0/0");
-//        tvUpFocusPerc.setText("0%");
-
         chkSgi.setChecked(false);
         chkGrup.setChecked(false);
         chkNomen.setChecked(false);
@@ -424,12 +323,6 @@ public class UpdateDataFragment extends Fragment {
         chkSales.setChecked(false);
         chkGrupAccess.setChecked(false);
         chkUniMx.setChecked(false);
-//        chkFuncs.setChecked(false);
-//        chkTovcat.setChecked(false);
-//        chkBrand.setChecked(false);
-//        chkWC.setChecked(false);
-//        chkProd.setChecked(false);
-//        chkFocus.setChecked(false);
 
         chkSgi.setTextColor(Color.rgb(0, 0, 0));
         chkGrup.setTextColor(Color.rgb(0, 0, 0));
@@ -443,12 +336,6 @@ public class UpdateDataFragment extends Fragment {
         chkSales.setTextColor(Color.rgb(0, 0, 0));
         chkGrupAccess.setTextColor(Color.rgb(0, 0, 0));
         chkUniMx.setTextColor(Color.rgb(0, 0, 0));
-//        chkFuncs.setTextColor(Color.rgb(0, 0, 0));
-//        chkTovcat.setTextColor(Color.rgb(0, 0, 0));
-//        chkBrand.setTextColor(Color.rgb(0, 0, 0));
-//        chkWC.setTextColor(Color.rgb(0, 0, 0));
-//        chkProd.setTextColor(Color.rgb(0, 0, 0));
-//        chkFocus.setTextColor(Color.rgb(0, 0, 0));
 
         if (conn == null) {
             ConnectToSql();
@@ -466,12 +353,6 @@ public class UpdateDataFragment extends Fragment {
         progressStatusSales = 0;
         progressStatusAccess = 0;
         progressStatusUniMX = 0;
-//        progressStatusFuncs = 0;
-//        progressStatusTovcat = 0;
-//        progressStatusBrand = 0;
-//        progressStatusWC = 0;
-//        progressStatusProd = 0;
-//        progressStatusFocus = 0;
 
 
         thUpdateData = new Thread(new Runnable() {
@@ -479,7 +360,6 @@ public class UpdateDataFragment extends Fragment {
 //              Обновляем список СГИ
                 String sql = "";
                 SQLiteStatement statement;
-//                if (chkSgi.isChecked()){
                 sql = "INSERT INTO sgi(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntSgi = 0;
@@ -540,12 +420,8 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
 //              Конец обновления списка СГИ
-
-//                Обновляем список типов цен
                 reset = null;
-//                    progressStatusContr = 0;
                 sql = "INSERT INTO CEN_TYPES(ROW_ID, CEN_ID, DESCR)  VALUES (?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 try {
@@ -581,11 +457,7 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
 //                Конец обновления типов цен
-
-//              Обновляем список товарных групп
-//                if (chkGrup.isChecked()) {
                 reset = null;
-//                    progressStatusGrup = 0;
                 sql = "INSERT INTO GRUPS(ID, SGIID, DESCR, LOWDESCR)  VALUES (?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntGrups = 0;
@@ -647,14 +519,8 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
 //              Конец обновления списка товарных групп
-
-//              Обновляем список номенклатуры
-//                if (chkNomen.isChecked()) {
-
                 reset = null;
-//                    progressStatusNom = 0;
                 String sql_update = "UPDATE Nomen SET GRUPID=?, COD=?, DESCR=?, OST=?, PRICE=?, lowDESCR=?, SGIID=?, CODE=?, PHOTO1=?, PHOTO2=?, VKOROB=?, ISUPDATED=1, ISNEW=?, IS7DAY=?, IS28DAY=?, MP=?, IS_PERM=?, TOVCATID=?, FUNCID=?, BRANDID=?, WCID=?, PRODID=?, FOCUSID=?, MODELID=?, SIZEID=?, COLORID=? WHERE ID=?";
                 String sql_insert = "INSERT INTO Nomen(ID, GRUPID, COD, DESCR, OST, PRICE, lowDESCR, SGIID, CODE, PHOTO1, PHOTO2, VKOROB, ISUPDATED, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, TOVCATID, FUNCID, BRANDID, WCID, PRODID, FOCUSID, MODELID, SIZEID, COLORID)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                 SQLiteStatement statement2 = glbVars.db.getWritableDatabase().compileStatement(sql_update);
@@ -802,15 +668,10 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-
-
-//                }
 //              Конец обновления списка номенклатуры
 
 //              Обновляем список контрагентов
-//                if (chkContrs.isChecked()) {
                 reset = null;
-//                    progressStatusContr = 0;
                 sql = "INSERT INTO CONTRS(ID, DESCR, lowDESCR, CODE, INSTOP, DOLG, DYNAMO, TP, INFO)  VALUES (?,?,?,?,?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntContrs = 0;
@@ -877,12 +738,6 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//              Конец обновления списка контрагентов
-
-//              Обновляем список адресов
-//                if (chkAddrr.isChecked()) {
-//                    progressStatusAddr = 0;
                 sql = "INSERT INTO ADDRS(ID, PARENTEXT, DESCR, CODE, DOP_INFO)  VALUES (?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntAddrs = 0;
@@ -1400,384 +1255,6 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
 //                Конец обновления универсальной матрицы 23-04-2020
-
-////              Обновляем список Функциональных групп
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO FUNC(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntFunc = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID, DESCR, LOWDESCR FROM V_FUNC ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntFunc = reset.getRow();
-//                    pgUpFuncs.setMax(cntFunc);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM FUNC; DELETE FROM sqlite_sequence WHERE name = 'FUNC';");
-//                    String ID = "", Descr = "", LowDescr = "";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//                        Descr = Descr.replaceAll("'", "''");
-//                        LowDescr = reset.getString(3);
-//                        LowDescr = LowDescr.replaceAll("'", "''");
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusFuncs += 1;
-//                        pgUpFuncs.setProgress(progressStatusFuncs);
-//                        final int finalCount = cntFunc;
-//                        final int perc = progressStatusFuncs*100/cntFunc;
-//                        handlerFuncs.post(new Runnable() {
-//                            public void run() {
-//                                tvUpFuncs.setText(String.valueOf(progressStatusFuncs)+"/"+String.valueOf(finalCount));
-//                                tvUpFuncsPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerFuncs.post(new Runnable() {
-//                        public void run() {
-//                            chkFuncs.setChecked(true);
-//                            chkFuncs.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка Функциональных групп
-//
-////              Обновляем список Товарных категорий
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO TOVCAT(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntTovcat = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID, DESCR, LOWDESCR FROM V_TOVCAT ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntTovcat = reset.getRow();
-//                    pgUpTovcat.setMax(cntTovcat);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM TOVCAT; DELETE FROM sqlite_sequence WHERE name = 'TOVCAT';");
-//                    String ID = "", Descr = "", LowDescr = "";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//                        Descr = Descr.replaceAll("'", "''");
-//                        LowDescr = reset.getString(3);
-//                        LowDescr = LowDescr.replaceAll("'", "''");
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusTovcat += 1;
-//                        pgUpTovcat.setProgress(progressStatusTovcat);
-//                        final int finalCount = cntTovcat;
-//                        final int perc = progressStatusTovcat*100/cntTovcat;
-//                        handlerTovcat.post(new Runnable() {
-//                            public void run() {
-//                                tvUpTovcat.setText(String.valueOf(progressStatusTovcat)+"/"+String.valueOf(finalCount));
-//                                tvUpTovcatPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerTovcat.post(new Runnable() {
-//                        public void run() {
-//                            chkTovcat.setChecked(true);
-//                            chkTovcat.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка Товарных категорий
-//
-////              Обновляем список Брэндов
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO BRAND(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntBrand = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID, DESCR, LOWDESCR FROM V_BRAND ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntBrand = reset.getRow();
-//                    pgUpBrand.setMax(cntBrand);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM BRAND; DELETE FROM sqlite_sequence WHERE name = 'BRAND';");
-//                    String ID = "", Descr = "", LowDescr = "";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//                        Descr = Descr.replaceAll("'", "''");
-//                        LowDescr = reset.getString(3);
-//                        LowDescr = LowDescr.replaceAll("'", "''");
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusBrand += 1;
-//                        pgUpBrand.setProgress(progressStatusBrand);
-//                        final int finalCount = cntBrand;
-//                        final int perc = progressStatusBrand*100/cntBrand;
-//                        handlerBrand.post(new Runnable() {
-//                            public void run() {
-//                                tvUpBrand.setText(String.valueOf(progressStatusBrand)+"/"+String.valueOf(finalCount));
-//                                tvUpBrandPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerBrand.post(new Runnable() {
-//                        public void run() {
-//                            chkBrand.setChecked(true);
-//                            chkBrand.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка Брэндов
-//
-//
-////              Обновляем список демографических признаков
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO WC(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntWC = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID, DESCR, LOWDESCR FROM V_WC ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntWC = reset.getRow();
-//                    pgUpWC.setMax(cntWC);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM WC; DELETE FROM sqlite_sequence WHERE name = 'WC';");
-//                    String ID = "", Descr = "", LowDescr = "";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//                        Descr = Descr.replaceAll("'", "''");
-//                        LowDescr = reset.getString(3);
-//                        LowDescr = LowDescr.replaceAll("'", "''");
-//
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusWC += 1;
-//                        pgUpWC.setProgress(progressStatusWC);
-//                        final int finalCount = cntWC;
-//                        final int perc = progressStatusWC*100/cntWC;
-//                        handlerWC.post(new Runnable() {
-//                            public void run() {
-//                                tvUpWC.setText(String.valueOf(progressStatusWC)+"/"+String.valueOf(finalCount));
-//                                tvUpWCPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerWC.post(new Runnable() {
-//                        public void run() {
-//                            chkWC.setChecked(true);
-//                            chkWC.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка демографических признаков
-//
-//                //Обновляем список производителей/импортеров
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO PROD(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntProd = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID, DESCR, LOWDESCR FROM V_PROD ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntProd = reset.getRow();
-//                    pgUpProd.setMax(cntProd);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM PROD; DELETE FROM sqlite_sequence WHERE name = 'PROD';");
-//                    String ID = "", Descr = "", LowDescr = "";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//                        Descr = Descr.replaceAll("'", "''");
-//
-//                        LowDescr = reset.getString(3);
-//                        LowDescr = LowDescr.replaceAll("'", "''");
-//
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusProd += 1;
-//                        pgUpProd.setProgress(progressStatusProd);
-//                        final int finalCount = cntProd;
-//                        final int perc = progressStatusProd*100/cntProd;
-//                        handlerProd.post(new Runnable() {
-//                            public void run() {
-//                                tvUpProd.setText(String.valueOf(progressStatusProd)+"/"+String.valueOf(finalCount));
-//                                tvUpProdPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerProd.post(new Runnable() {
-//                        public void run() {
-//                            chkProd.setChecked(true);
-//                            chkProd.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка производителей/импортеров
-//
-//                //Обновляем список Фокусов
-////                if (chkSgi.isChecked()){
-//                sql = "INSERT INTO FOCUS(ID, DESCR, LONG_DESCR, BDATE, EDATE, LOWDESCR)  VALUES (?,?,?,?,?,?);";
-//                statement = glbVars.db.getWritableDatabase().compileStatement(sql);
-//                int cntFocus = 0;
-//                try {
-//
-//                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-//                    String SqlSel = "";
-//                    SqlSel = "SELECT ID ,DESCR, LONG_DESCR, BDATE, EDATE, LOWLONG_DESCR FROM V_FOCUS ORDER BY 2";
-//
-//                    reset = stmt.executeQuery(SqlSel);
-//                    reset.last();
-//                    cntFocus = reset.getRow();
-//                    pgUpFocus.setMax(cntFocus);
-//                    reset.beforeFirst();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM FOCUS; DELETE FROM sqlite_sequence WHERE name = 'FOCUS';");
-//                    String ID = "", Descr = "", Long_Descr = "", BDATE = "", EDATE = "", LowDescr ="";
-//                    while (reset.next()) {
-//                        ID = reset.getString(1);
-//                        Descr = reset.getString(2);
-//
-//                        Descr = Descr.replaceAll("'", "''");
-//                        Long_Descr = reset.getString(3);
-//                        Long_Descr = Long_Descr.replaceAll("'", "''");
-//                        BDATE = reset.getString(4);
-//                        EDATE = reset.getString(5);
-//                        LowDescr = reset.getString(6);
-//                        statement.clearBindings();
-//                        statement.bindString(1, ID);
-//                        statement.bindString(2, Descr);
-//                        statement.bindString(3, Long_Descr);
-//                        statement.bindString(4, BDATE);
-//                        statement.bindString(5, EDATE);
-//                        statement.bindString(6, LowDescr);
-//                        statement.executeInsert();
-//                        statement.clearBindings();
-//                        progressStatusFocus += 1;
-//                        pgUpFocus.setProgress(progressStatusFocus);
-//                        final int finalCount = cntFocus;
-//                        final int perc = progressStatusFocus*100/cntFocus;
-//                        handlerFocus.post(new Runnable() {
-//                            public void run() {
-//                                tvUpFocus.setText(String.valueOf(progressStatusFocus)+"/"+String.valueOf(finalCount));
-//                                tvUpFocusPerc.setText(String.valueOf(perc)+"%");
-//                            }
-//                        });
-//                    }
-//                    handlerFocus.post(new Runnable() {
-//                        public void run() {
-//                            chkFocus.setChecked(true);
-//                            chkFocus.setTextColor(Color.rgb(3, 103, 0));
-//                        }
-//                    });
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-////                }
-////              Конец обновления списка фокусов
-
                 glbVars.UpdateWorking = 0;
                 handler.post(new Runnable() {
                     public void run() {

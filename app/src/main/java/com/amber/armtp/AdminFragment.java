@@ -61,13 +61,11 @@ public class AdminFragment extends Fragment {
             btLockTP,
             btSaveUpdateSrv;
     Button btSetPhotoPath, btSetSDPath;
-    Button btnLogin, btnCancel;
     TextView tvPhotoPath, tvSDPath, tbPublicPhoto;
     Switch swTestLoadPhoto;
-    EditText etPass, etUpdateSrv, etSqlPort, etSqlLogin, etSqlPass, etSqlDB;
+    EditText etUpdateSrv, etSqlPort, etSqlLogin, etSqlPass, etSqlDB;
     EditText etFtpPhoto, etFtpPhotoUser, etFtpPhotoPass;
     EditText etFtpUpdate, etFtpUpdateUser, etFtpUpdatePass;
-    Dialog login;
     Boolean isSelectPath = false;
     String CenTypeID;
 
@@ -497,7 +495,6 @@ public class AdminFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (resultCode == Activity.RESULT_OK && resultData != null) {
-            Uri uri = resultData.getData();
             DocumentFile pickedDir = DocumentFile.fromTreeUri(getActivity(), resultData.getData());
             if (requestCode == LOCATION_PHOTO_PATH) {
                 settingPathEditor.putString("PhotoPath", resultData.getDataString());

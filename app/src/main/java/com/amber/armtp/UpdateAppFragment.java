@@ -89,7 +89,6 @@ public class UpdateAppFragment extends Fragment {
                     Float CurBuild = Float.parseFloat(CurVer[1]);
 
                     tvLastVer.setText(LastVersion + " ( сборка " + (LastBuild == 0 ? "?" : LastBuild) + ")");
-//                    if (Integer.parseInt(result[0])>=Integer.parseInt(CurVer[0]) && Float.parseFloat(result[1]) >= Float.parseFloat(CurVer[1])) {
                     if (LastVersion >= CurVersion && LastBuild >= CurBuild) {
                         txtNotify.setText("Доступна новая версия программы НЬЮ АРМ v." + LastVersion + " ( сборка " + (LastBuild == 0 ? "?" : LastBuild) + ").");
                         btUpdateApp.setVisibility(View.VISIBLE);
@@ -109,19 +108,13 @@ public class UpdateAppFragment extends Fragment {
                         glbVars.DownloadApp(settings.getString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server)));
 
                         Intent intent = new Intent(Intent.ACTION_VIEW);
-//                        intent.setDataAndType(Uri.fromFile(new File(glbVars.GetSDCardpath() + glbVars.UpdatesFolder + "/app-debug.apk")), "application/vnd.android.package-archive");
                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        intent.setDataAndType(Uri.fromFile(new File(getActivity().getFilesDir()+"/app-debug.apk")), "application/vnd.android.package-archive");
                         intent.setDataAndType(Uri.fromFile(new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/app-debug.apk")), "application/vnd.android.package-archive");
-
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
                         startActivityForResult(intent, 1);
-
                     } else {
                         Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
                     }
-
                 } else {
                     Toast.makeText(getActivity(), "У вас имеются неотправленные заказы. Перед обновлением их необходимо отправить.", Toast.LENGTH_LONG).show();
                 }

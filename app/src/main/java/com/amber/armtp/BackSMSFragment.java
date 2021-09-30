@@ -35,7 +35,6 @@ public class BackSMSFragment extends Fragment {
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
-        Spinner spTp = getActivity().findViewById(R.id.SpinTP);
     }
 
     @Override

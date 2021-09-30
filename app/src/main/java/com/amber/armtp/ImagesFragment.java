@@ -1,6 +1,5 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -58,12 +57,6 @@ public class ImagesFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
@@ -72,18 +65,6 @@ public class ImagesFragment extends Fragment {
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
     }
-
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-//        if (requestCode == LOCATION_CHOOSER_REQ_CODE && resultCode == Activity.RESULT_OK) {
-//            if (resultData != null) {
-//                Uri uri = resultData.getData();  // Use this URI to access files
-//                DocumentFile file = DocumentFile.fromTreeUri(getActivity(), uri);
-//                file.createDirectory("TEST_FOLDER");
-//            }
-//        }
-//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -115,7 +96,6 @@ public class ImagesFragment extends Fragment {
         btStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(getActivity(), glbVars.getPhotoDir(), Toast.LENGTH_LONG).show();
                 tvCount.setText("0 / 0");
                 tvPerc.setText("0%");
                 pbFiles.setProgress(0);
@@ -135,7 +115,6 @@ public class ImagesFragment extends Fragment {
                         Toast.makeText(getActivity(), "Уже идет загрузка файлов", Toast.LENGTH_LONG).show();
                     }
                 } else {
-//                    if (isConnectedViaWifi()) {
                     if (thDownloadPhoto == null) {
                         btStop.setEnabled(true);
                         btStart.setEnabled(false);
@@ -146,19 +125,9 @@ public class ImagesFragment extends Fragment {
                         } else {
                             DownloadNomenPhotos();
                         }
-//                            if (megabytesAvailable(SDCard.getAbsoluteFile())<1000){
-//                                Toast.makeText(getActivity(), "Очень мало доступного свободного места", Toast.LENGTH_LONG).show();
-//                                btStop.performClick();
-//                            } else {
-//                                DownloadNomenPhotos();
-//                            }
-
                     } else {
                         Toast.makeText(getActivity(), "Уже идет загрузка файлов", Toast.LENGTH_LONG).show();
                     }
-//                    } else {
-//                        Toast.makeText(getActivity(), "Нет доступного инетернет соединения через сеть Wi-Fi", Toast.LENGTH_LONG).show();
-//                    }
                 }
             }
         });
@@ -184,10 +153,8 @@ public class ImagesFragment extends Fragment {
     }
 
     private void DownloadNomenPhotos() {
-//        final String SdPhotoDir = glbVars.getPhotoDir();
         final String SdPhotoDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_DCIM).toString();
 
-//        Toast.makeText(getActivity(), SdPhotoDir, Toast.LENGTH_LONG).show();
         try {
             ftpClient.connect(ftp_server);
             ftpClient.login(ftp_user, ftp_pass);
@@ -211,7 +178,6 @@ public class ImagesFragment extends Fragment {
                 } else {
                     Sql = "SELECT PHOTO1 AS PHOTO, ID, '' AS ISSEC FROM NOMEN WHERE PHOTO1!='' UNION  ALL SELECT PHOTO2 AS PHOTO, ID, substr(PHOTO2, -6, 6) AS ISSEC FROM NOMEN WHERE PHOTO2!='' ORDER BY ID";
                 }
-//                Cursor cur = glbVars.db.getWritableDatabase().rawQuery("SELECT PHOTO1 AS PHOTO, ID, '' AS ISSEC FROM NOMEN WHERE PHOTO1!='' UNION  ALL SELECT PHOTO2 AS PHOTO, ID, substr(PHOTO2, -6, 6) AS ISSEC FROM NOMEN WHERE PHOTO2!='' ORDER BY ID", null);
                 Cursor cur = glbVars.db.getWritableDatabase().rawQuery(Sql, null);
 
                 if (cur.moveToNext()) {
@@ -287,7 +253,6 @@ public class ImagesFragment extends Fragment {
                                     tvPerc.setText(finalPerc + "%");
                                 }
                             });
-                            continue;
                         }
                     }
                 }
@@ -304,12 +269,6 @@ public class ImagesFragment extends Fragment {
             }
         });
         thDownloadPhoto.start();
-    }
-
-    private boolean isConnectedViaWifi() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(getActivity().CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return mWifi.isConnected();
     }
 
     public static float megabytesAvailable(File f) {

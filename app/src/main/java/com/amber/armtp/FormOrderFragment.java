@@ -269,7 +269,6 @@ public class FormOrderFragment extends Fragment {
                     alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Boolean wantToCloseDialog = false;
                             glbVars.isMultiSelect = true;
                             glbVars.MultiQty = Integer.parseInt(input.getText().toString());
                             item.setIcon(getActivity().getResources().getDrawable(R.drawable.checkbox_marked));
@@ -418,7 +417,6 @@ public class FormOrderFragment extends Fragment {
                         editor.putString("ColColorID", FilterColor_ID.getText().toString());
 
                         editor.commit();
-//                            System.out.print("FilterProd_ID: " + FilterProd_ID.getText().toString());
                         glbVars.LoadNomByFilters(FilterSgi_ID.getText().toString(), FilterGroup_ID.getText().toString(), FilterTovcat_ID.getText().toString(), FilterFunc_ID.getText().toString(), FilterBrand_ID.getText().toString(), FilterWC_ID.getText().toString(), FilterProd_ID.getText().toString(), FilterFocus_ID.getText().toString(), FilterModel_ID.getText().toString(), FilterColor_ID.getText().toString());
                         alertD.dismiss();
                     }
@@ -439,18 +437,6 @@ public class FormOrderFragment extends Fragment {
                         glbVars.SetSelectedFilterColor("0");
                     }
                 });
-
-//                    input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                        @Override
-//                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                            if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                                alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-//                            }
-//                            return true;
-//                        }
-//                    });
-
-
                 return true;
 
             case R.id.NomenUniFilters:
@@ -473,12 +459,7 @@ public class FormOrderFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
-                        })
-//                        .setNeutralButton("Сбросить фильтры", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int id) {
-//                            }
-//                        })
-                ;
+                        });
 
                 final AlertDialog alertD1 = alertDialogBuilder1.create();
                 alertD1.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -502,22 +483,6 @@ public class FormOrderFragment extends Fragment {
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                     }
                 });
-//                glbVars.LoadFiltersGroups(promptView);
-//                glbVars.LoadFiltersTovcat(promptView);
-//                glbVars.LoadFiltersFunc(promptView);
-//                glbVars.LoadFiltersBrand(promptView);
-//                glbVars.LoadFiltersWC(promptView);
-//                glbVars.LoadFiltersProd(promptView);
-//                glbVars.LoadFiltersFocus(promptView);
-//
-//                String SgiFID = settings.getString("ColSgiFID", "0");
-//                String GrupFID = settings.getString("ColGrupFID", "0");
-//                String TovcatID = settings.getString("ColTovcatID", "0");
-//                String FuncID = settings.getString("ColFuncID", "0");
-//                String BrandID = settings.getString("ColBrandID", "0");
-//                String WCID = settings.getString("ColWCID", "0");
-//                String ProdID = settings.getString("ColProdID", "0");
-//                String FocusID = settings.getString("ColFocusID", "0");
 
                 alertD1.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -525,35 +490,10 @@ public class FormOrderFragment extends Fragment {
                         UnIFilterTypeID = promptView1.findViewById(R.id.tvUniTypeID);
                         UniFilterID = promptView1.findViewById(R.id.tvUniID);
 
-//                        editor.putString("ColSgiFID", FilterSgi_ID.getText().toString());
-//                        editor.putString("ColGrupFID", FilterGroup_ID.getText().toString());
-//                        editor.putString("ColTovcatID", FilterTovcat_ID.getText().toString());
-//                        editor.putString("ColFuncID", FilterFunc_ID.getText().toString());
-//                        editor.putString("ColBrandID", FilterBrand_ID.getText().toString());
-//                        editor.putString("ColWCID", FilterWC_ID.getText().toString());
-//                        editor.putString("ColProdID", FilterProd_ID.getText().toString());
-//                        editor.putString("ColFocusID", FilterFocus_ID.getText().toString());
-//
-//                        editor.commit();
-
                         glbVars.LoadNomByUniFilters(UnIFilterTypeID.getText().toString(), UniFilterID.getText().toString());
                         alertD1.dismiss();
                     }
                 });
-
-//                alertD.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        glbVars.SetSelectedFilterSgi("0");
-//                        glbVars.SetSelectedFilterGroup("0");
-//                        glbVars.SetSelectedFilterTovcat("0");
-//                        glbVars.SetSelectedFilterFunc("0");
-//                        glbVars.SetSelectedFilterBrand("0");
-//                        glbVars.SetSelectedFilterWC("0");
-//                        glbVars.SetSelectedFilterProd("0");
-//                        glbVars.SetSelectedFilterFocus("0");
-//                    }
-//                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -672,12 +612,6 @@ public class FormOrderFragment extends Fragment {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         toolbar.setSubtitle(ToolBarContr + OrderSum);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
     }
 
     private void setContrAndSum() {

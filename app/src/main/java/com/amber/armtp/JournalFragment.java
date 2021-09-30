@@ -95,7 +95,6 @@ public class JournalFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.journal_fragment, container, false);
-//        setHasOptionsMenu(true);
         glbVars.view = rootView;
         return rootView;
     }
@@ -120,12 +119,6 @@ public class JournalFragment extends Fragment {
     public void onResume() {
         super.onResume();
         btOrderFilter.performClick();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        // TODO Auto-generated method stub
-        super.onAttach(activity);
     }
 
     @Override
@@ -428,7 +421,7 @@ public class JournalFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cNom, cHead = null;
+                Cursor cNom, cHead;
                 glbVars.db.getWritableDatabase().beginTransaction();
                 cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID, CONTR_ID, ADDR_ID, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ZAKAZY WHERE DOCNO='" + OrderID + "'", null);
                 if (cHead.moveToNext()) {
@@ -481,7 +474,7 @@ public class JournalFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cursor = null;
+                Cursor cursor;
                 glbVars.db.getWritableDatabase().beginTransaction();
                 glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
                 cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
@@ -577,8 +570,6 @@ public class JournalFragment extends Fragment {
                         }
                         c.close();
                         progressStatus += 1;
-                        final int finalCount = cntOrders;
-                        final int perc = progressStatus * 100 / cntOrders;
                         handler.post(new Runnable() {
                             public void run() {
                                 progress.setProgress(progressStatus);

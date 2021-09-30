@@ -325,7 +325,7 @@ public class OrderHeadFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor cHead, c, c2 = null;
+                Cursor cHead, c, c2;
 
                 c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
@@ -387,7 +387,6 @@ public class OrderHeadFragment extends Fragment {
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
-//                        glbVars.chkGetBackward.setChecked(false);
                         toolbar.setSubtitle("");
                     }
                 });

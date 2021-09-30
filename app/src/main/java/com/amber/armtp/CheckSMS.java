@@ -20,15 +20,12 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 public class CheckSMS extends IntentService {
     public GlobalVars glbVars;
     Connection conn = null;
-    int NOTIFICATION_ID;
 
     String sql_server;
     String sql_port;
     String sql_db;
     String sql_loging;
     String sql_pass;
-
-    Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
     public CheckSMS() {
         super("CheckSMS");
