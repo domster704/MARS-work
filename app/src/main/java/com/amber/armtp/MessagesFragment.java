@@ -21,13 +21,13 @@ import java.util.Date;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MessagesFragment extends Fragment {
+    public GlobalVars glbVars;
     Button btMarkAsRead;
     Calendar CalBDate, CalEDate;
     EditText txtBDate, txtEDate;
     Button btOrderFilter, btUpdateSMS;
     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
     String currentDate = sdf.format(new Date());
-    public GlobalVars glbVars;
 
     public MessagesFragment() {
 

@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/ColOrdDocNo"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:textColor="#000000"
-        android:visibility="invisible" />
+            android:id="@+id/ColOrdDocNo"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000"
+            android:visibility="invisible" />
 
     <TextView
-        android:id="@+id/ColOrdStatus"
-        android:layout_width="120dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdStatus"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDocDate"
-        android:layout_width="120dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/ColOrdStatus"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDocDate"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/ColOrdStatus"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDeliveryDate"
-        android:layout_width="120dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/ColOrdDocDate"
-        android:layout_toRightOf="@+id/ColOrdDocDate"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDeliveryDate"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/ColOrdDocDate"
+            android:layout_toRightOf="@+id/ColOrdDocDate"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdContr"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/ColOrdDeliveryDate"
-        android:layout_toRightOf="@+id/ColOrdDeliveryDate"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdContr"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/ColOrdDeliveryDate"
+            android:layout_toRightOf="@+id/ColOrdDeliveryDate"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdAddr"
-        android:layout_width="400dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/ColOrdSum"
-        android:layout_toRightOf="@+id/ColOrdContr"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdAddr"
+            android:layout_width="400dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/ColOrdSum"
+            android:layout_toRightOf="@+id/ColOrdContr"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdSum"
-        android:layout_width="120dp"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdSum"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
 </RelativeLayout>

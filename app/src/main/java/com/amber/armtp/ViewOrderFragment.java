@@ -10,16 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ViewOrderFragment extends Fragment {
+    public GlobalVars glbVars;
     Menu mainMenu;
-    private android.support.v7.widget.Toolbar toolbar;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-    public GlobalVars glbVars;
+    View thisView;
+    private android.support.v7.widget.Toolbar toolbar;
 
     public ViewOrderFragment() {
     }
-
-    View thisView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

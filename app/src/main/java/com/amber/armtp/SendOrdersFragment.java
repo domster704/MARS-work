@@ -18,10 +18,10 @@ import java.util.Objects;
  * Фрагмент для отправки заказа(ов) на ftp-сервер
  */
 public class SendOrdersFragment extends Fragment {
+    public GlobalVars glbVars;
+
     public SendOrdersFragment() {
     }
-
-    public GlobalVars glbVars;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

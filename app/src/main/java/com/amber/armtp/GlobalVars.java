@@ -134,6 +134,19 @@ public class GlobalVars extends Application {
     public String CurrentTp, CurrentCenType, CurrentDebTP;
     public Cursor Contr;
     public Cursor Addr;
+    private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
+
+        @Override
+        public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
+            String ItemID = Contr.getString(Contr.getColumnIndex("ID"));
+            if (!ItemID.equals("0")) {
+                LoadContrAddr(ItemID);
+            }
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+        }
+    };
     public Spinner spinContr, spinAddr, TPList, spinCenTypes;
     public Button btSave, btClear;
     public Calendar DeliveryDate, DeliveryTime;
@@ -574,19 +587,6 @@ public class GlobalVars extends Application {
             return true;
         }
     };
-    private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
-
-        @Override
-        public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            String ItemID = Contr.getString(Contr.getColumnIndex("ID"));
-            if (!ItemID.equals("0")) {
-                LoadContrAddr(ItemID);
-            }
-        }
-
-        public void onNothingSelected(AdapterView<?> arg0) {
-        }
-    };
 
     public static String getCalculatedDate(String dateFormat, int days) {
         Calendar cal = Calendar.getInstance();
@@ -974,7 +974,7 @@ public class GlobalVars extends Application {
     public String GetStoragePath2019() {
 
         String sdpath;
-        sdpath = Objects.requireNonNull(getExternalFilesDir(null)).toString() + "/";
+        sdpath = Objects.requireNonNull(getExternalFilesDir(null)) + "/";
 
         return sdpath;
 

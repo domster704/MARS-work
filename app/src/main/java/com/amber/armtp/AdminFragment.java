@@ -2,12 +2,10 @@ package com.amber.armtp;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,11 +13,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -218,16 +214,6 @@ public class AdminFragment extends Fragment {
         initButtons(false);
     }
 
-    private static class ButtonClearValue {
-        public final String tableName;
-        public final Button button;
-
-        public ButtonClearValue(String tableName, Button button) {
-            this.tableName = tableName;
-            this.button = button;
-        }
-    }
-
     private void buttonSetOnClickListener(final ButtonClearValue bel) {
         bel.button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,7 +249,7 @@ public class AdminFragment extends Fragment {
         int CenTypeRowid = glbVars.db.GetCenTypeRowID(CenTypeID);
         SetSelectedCenType(CenTypeRowid);
 
-        ButtonClearValue[] buttonClearValue = new ButtonClearValue[] {
+        ButtonClearValue[] buttonClearValue = new ButtonClearValue[]{
                 new ButtonClearValue("sgi", btClearSgi),
                 new ButtonClearValue("GRUPS", btClearGroups),
                 new ButtonClearValue("Nomen", btClearNomen),
@@ -276,7 +262,7 @@ public class AdminFragment extends Fragment {
                 new ButtonClearValue("ZAKAZY_DT", btClearZakazyDt),
         };
 
-        for (ButtonClearValue i: buttonClearValue) {
+        for (ButtonClearValue i : buttonClearValue) {
             buttonSetOnClickListener(i);
         }
 
@@ -463,7 +449,6 @@ public class AdminFragment extends Fragment {
         });
     }
 
-
     private void initButtons(Boolean EnableButtons) {
         btClearSgi.setEnabled(EnableButtons);
         btClearGroups.setEnabled(EnableButtons);
@@ -520,6 +505,16 @@ public class AdminFragment extends Fragment {
                 glbVars.spinCenTypes.setSelection(i);
                 break;
             }
+        }
+    }
+
+    private static class ButtonClearValue {
+        public final String tableName;
+        public final Button button;
+
+        public ButtonClearValue(String tableName, Button button) {
+            this.tableName = tableName;
+            this.button = button;
         }
     }
 }

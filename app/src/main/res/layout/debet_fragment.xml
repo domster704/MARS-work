@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/debet_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:screenOrientation="landscape"
-    android:weightSum="1"><![CDATA[
+        android:id="@+id/debet_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:screenOrientation="landscape"
+        android:weightSum="1"><![CDATA[
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -15,284 +15,284 @@
     ]]>
 
     <Spinner
-        android:id="@+id/spTorgPred"
-        android:layout_width="400dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical" />
+            android:id="@+id/spTorgPred"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical" />
 
     <Spinner
-        android:id="@+id/spContr"
-        android:layout_width="400dp"
-        android:layout_height="50dp"
-        android:layout_alignBottom="@+id/spTorgPred"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/btFilterDebet"
-        android:layout_toEndOf="@+id/spTorgPred"
-        android:gravity="center_vertical" />
+            android:id="@+id/spContr"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/spTorgPred"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/btFilterDebet"
+            android:layout_toEndOf="@+id/spTorgPred"
+            android:gravity="center_vertical" />
 
     <Button
-        android:id="@+id/btClearDebetFilter"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:background="@android:drawable/btn_default_small"
-        android:text="@string/debetClearFilter" />
+            android:id="@+id/btClearDebetFilter"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:background="@android:drawable/btn_default_small"
+            android:text="@string/debetClearFilter" />
 
     <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
-        android:layout_width="fill_parent"
-        android:layout_height="200dp"
-        android:layout_below="@+id/spContr"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true">
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="fill_parent"
+            android:layout_height="200dp"
+            android:layout_below="@+id/spContr"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true">
 
         <RelativeLayout
-            android:layout_width="1326dp"
-            android:layout_height="match_parent">
+                android:layout_width="1326dp"
+                android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tvContr"
-                android:layout_width="250dp"
-                android:layout_height="25dp"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetContr"
-                android:textColor="#000000" />
+                    android:id="@+id/tvContr"
+                    android:layout_width="250dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetContr"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvFirma"
-                android:layout_width="70dp"
-                android:layout_height="25dp"
-                android:layout_toEndOf="@+id/tvContr"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetFirma"
-                android:textColor="#000000" />
+                    android:id="@+id/tvFirma"
+                    android:layout_width="70dp"
+                    android:layout_height="25dp"
+                    android:layout_toEndOf="@+id/tvContr"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetFirma"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvFirma"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetStatus"
-                android:textColor="#000000" />
+                    android:id="@+id/tvStatus"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvFirma"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetStatus"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvCredit"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvStatus"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetCredit"
-                android:textColor="#000000" />
+                    android:id="@+id/tvCredit"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvStatus"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetCredit"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvDogovor"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvCredit"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetDogovor"
-                android:textColor="#000000" />
+                    android:id="@+id/tvDogovor"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvCredit"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetDogovor"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA7"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvDogovor"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA7"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA7"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvDogovor"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA7"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA14"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvA7"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA14"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA14"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvA7"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA14"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA21"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvA14"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA21"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA21"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvA14"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA21"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA28"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvA21"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA28"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA28"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvA21"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA28"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA35"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/tvA28"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA35"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA35"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvA28"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA35"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA42"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA35"
-                android:layout_toEndOf="@+id/tvA35"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA42"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA42"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA35"
+                    android:layout_toEndOf="@+id/tvA35"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA42"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA49"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA42"
-                android:layout_toEndOf="@+id/tvA42"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA49"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA49"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA42"
+                    android:layout_toEndOf="@+id/tvA42"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA49"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA56"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA49"
-                android:layout_toEndOf="@+id/tvA49"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA56"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA56"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA49"
+                    android:layout_toEndOf="@+id/tvA49"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA56"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA63"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA56"
-                android:layout_toEndOf="@+id/tvA56"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA63"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA63"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA56"
+                    android:layout_toEndOf="@+id/tvA56"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA63"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvA64"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA63"
-                android:layout_toEndOf="@+id/tvA63"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetA64"
-                android:textColor="#000000" />
+                    android:id="@+id/tvA64"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA63"
+                    android:layout_toEndOf="@+id/tvA63"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetA64"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvDolg"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvA64"
-                android:layout_toEndOf="@+id/tvA64"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetDolg"
-                android:textColor="#000000" />
+                    android:id="@+id/tvDolg"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvA64"
+                    android:layout_toEndOf="@+id/tvA64"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetDolg"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvOTG30"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvDolg"
-                android:layout_toEndOf="@+id/tvDolg"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetOTG30"
-                android:textColor="#000000" />
+                    android:id="@+id/tvOTG30"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvDolg"
+                    android:layout_toEndOf="@+id/tvDolg"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetOTG30"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvOPL30"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvOTG30"
-                android:layout_toEndOf="@+id/tvOTG30"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetOPL30"
-                android:textColor="#000000" />
+                    android:id="@+id/tvOPL30"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvOTG30"
+                    android:layout_toEndOf="@+id/tvOTG30"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetOPL30"
+                    android:textColor="#000000" />
 
             <TextView
-                android:id="@+id/tvKOB"
-                android:layout_width="100dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/tvOPL30"
-                android:layout_toEndOf="@+id/tvOPL30"
-                android:background="@drawable/table_header"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/debetKOB"
-                android:textColor="#000000" />
+                    android:id="@+id/tvKOB"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_alignTop="@+id/tvOPL30"
+                    android:layout_toEndOf="@+id/tvOPL30"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetKOB"
+                    android:textColor="#000000" />
 
             <GridView
-                android:id="@+id/listContrs"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/tvContr"
-                android:layout_alignEnd="@+id/tvKOB"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="true"
-                android:clickable="true"
-                android:fastScrollAlwaysVisible="false"
-                android:fastScrollEnabled="false"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:longClickable="true"
-                android:nestedScrollingEnabled="false" />
+                    android:id="@+id/listContrs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/tvContr"
+                    android:layout_alignEnd="@+id/tvKOB"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:clickable="true"
+                    android:fastScrollAlwaysVisible="false"
+                    android:fastScrollEnabled="false"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:longClickable="true"
+                    android:nestedScrollingEnabled="false" />
         </RelativeLayout>
     </HorizontalScrollView>
 
     <Button
-        android:id="@+id/btFilterDebet"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginEnd="26dp"
-        android:layout_marginRight="25dp"
-        android:layout_toStartOf="@+id/btClearDebetFilter"
-        android:background="@android:drawable/btn_default_small"
-        android:paddingLeft="15dp"
-        android:paddingTop="0dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="0dp"
-        android:text="@string/debetFilter" />
+            android:id="@+id/btFilterDebet"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="26dp"
+            android:layout_marginRight="25dp"
+            android:layout_toStartOf="@+id/btClearDebetFilter"
+            android:background="@android:drawable/btn_default_small"
+            android:paddingLeft="15dp"
+            android:paddingTop="0dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="0dp"
+            android:text="@string/debetFilter" />
 
 </RelativeLayout>

@@ -29,43 +29,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UpdateDataFragment extends Fragment {
-    public GlobalVars glbVars;
-    Connection conn = null;
-    String sql_server;
-    String sql_port;
-    String sql_db;
-    String sql_loging;
-    String sql_pass;
-    Statement stmt;
-    ResultSet reset;
-    Thread thUpdateData;
-
-    CheckBox chkSgi, chkGrup, chkNomen, chkContrs, chkAddrr, chkTp, chkDebet, chkStatus, chkOuted, chkSales, chkGrupAccess, chkFuncs, chkTovcat, chkBrand, chkWC, chkProd, chkFocus;
-    CheckBox chkUniMx;
-
-    private String DebetIsFinished = "0";
-
-    private ProgressBar pgUpSgi, pgUpGroups, pgUpNomen, pgUpContrs, pgUpAddress, pgUpTp, pgUpDebet, pgUpStatus, pgUpOuted, pgUpSales, pgUpGrupAccess, pgUpFuncs, pgUpTovcat, pgUpBrand, pgUpWC, pgUpProd, pgUpFocus;
-    private ProgressBar pgUpUniMX;
-    private TextView tvUpUniMX, tvUpUniMXPerc;
-
-    private TextView tvUpSgi, tvUpGroups, tvUpNomen, tvUpContrs, tvUpAddress, tvUpTp, tvUpDebet, tvUpStatus, tvUpOuted, tvUpSales, tvUpGrupAccess, tvUpFuncs, tvUpTovcat, tvUpBrand, tvUpWC, tvUpProd, tvUpFocus;
-    private TextView tvUpSgiPerc, tvUpGroupsPerc, tvUpNomenPerc, tvUpContrsPerc, tvUpAddressPerc, tvUpTpPerc, tvUpDebetPerc, tvUpStatusPerc, tvUpOutedPerc, tvUpSalesPerc, tvUpGrupAccessPerc, tvUpFuncsPerc, tvUpTovcatPerc, tvUpBrandPerc, tvUpWCPerc, tvUpProdPerc, tvUpFocusPerc;
-
-    Button btUpdate;
-    private int progressStatusSGI = 0;
-    private int progressStatusGrup = 0;
-    private int progressStatusNom = 0;
-    private int progressStatusContr = 0;
-    private int progressStatusAddr = 0;
-    private int progressStatusTP = 0;
-    private int progressStatusDeb = 0;
-    private int progressStatusOrders = 0;
-    private int progressStatusOuted = 0;
-    private int progressStatusSales = 0;
-    private int progressStatusAccess = 0;
-    private int progressStatusUniMX = 0;
-
     private final Handler handler = new Handler();
     private final Handler handlerSgi = new Handler();
     private final Handler handlerGroups = new Handler();
@@ -79,12 +42,47 @@ public class UpdateDataFragment extends Fragment {
     private final Handler handlerSales = new Handler();
     private final Handler handlerGrupAccess = new Handler();
     private final Handler handlerUniMX = new Handler();
-
+    public GlobalVars glbVars;
+    Connection conn = null;
+    String sql_server;
+    String sql_port;
+    String sql_db;
+    String sql_loging;
+    String sql_pass;
+    Statement stmt;
+    ResultSet reset;
+    Thread thUpdateData;
+    CheckBox chkSgi, chkGrup, chkNomen, chkContrs, chkAddrr, chkTp, chkDebet, chkStatus, chkOuted, chkSales, chkGrupAccess, chkFuncs, chkTovcat, chkBrand, chkWC, chkProd, chkFocus;
+    CheckBox chkUniMx;
+    Button btUpdate;
     String TP_ID;
     Boolean TP_LOCK;
-
     SharedPreferences settings, PriceSettings, tp_setting;
     SharedPreferences.Editor editor;
+    private String DebetIsFinished = "0";
+    private final BroadcastReceiver UpdateDebetWorking = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            DebetIsFinished = intent.getExtras().getString("DebetUpdateFinished");
+        }
+    };
+    private ProgressBar pgUpSgi, pgUpGroups, pgUpNomen, pgUpContrs, pgUpAddress, pgUpTp, pgUpDebet, pgUpStatus, pgUpOuted, pgUpSales, pgUpGrupAccess, pgUpFuncs, pgUpTovcat, pgUpBrand, pgUpWC, pgUpProd, pgUpFocus;
+    private ProgressBar pgUpUniMX;
+    private TextView tvUpUniMX, tvUpUniMXPerc;
+    private TextView tvUpSgi, tvUpGroups, tvUpNomen, tvUpContrs, tvUpAddress, tvUpTp, tvUpDebet, tvUpStatus, tvUpOuted, tvUpSales, tvUpGrupAccess, tvUpFuncs, tvUpTovcat, tvUpBrand, tvUpWC, tvUpProd, tvUpFocus;
+    private TextView tvUpSgiPerc, tvUpGroupsPerc, tvUpNomenPerc, tvUpContrsPerc, tvUpAddressPerc, tvUpTpPerc, tvUpDebetPerc, tvUpStatusPerc, tvUpOutedPerc, tvUpSalesPerc, tvUpGrupAccessPerc, tvUpFuncsPerc, tvUpTovcatPerc, tvUpBrandPerc, tvUpWCPerc, tvUpProdPerc, tvUpFocusPerc;
+    private int progressStatusSGI = 0;
+    private int progressStatusGrup = 0;
+    private int progressStatusNom = 0;
+    private int progressStatusContr = 0;
+    private int progressStatusAddr = 0;
+    private int progressStatusTP = 0;
+    private int progressStatusDeb = 0;
+    private int progressStatusOrders = 0;
+    private int progressStatusOuted = 0;
+    private int progressStatusSales = 0;
+    private int progressStatusAccess = 0;
+    private int progressStatusUniMX = 0;
 
     @Nullable
     @Override
@@ -240,13 +238,6 @@ public class UpdateDataFragment extends Fragment {
         } catch (Exception E) {
         }
     }
-
-    private final BroadcastReceiver UpdateDebetWorking = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            DebetIsFinished = intent.getExtras().getString("DebetUpdateFinished");
-        }
-    };
 
     private void ConnectToSql() {
         String connString;

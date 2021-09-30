@@ -3,8 +3,6 @@ package com.amber.armtp;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,12 +28,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ImagesFragment extends Fragment {
-    private android.support.v7.widget.Toolbar toolbar;
+    private final Handler handler = new Handler();
+    public SQLiteDatabase DB = null;
+    public GlobalVars glbVars;
     SharedPreferences settings, pathSettings;
     SharedPreferences.Editor editor;
-    public SQLiteDatabase DB = null;
     Thread thDownloadPhoto = null;
-    private final Handler handler = new Handler();
+    File SDCard;
+    String ftp_server, ftp_user, ftp_pass;
+    private android.support.v7.widget.Toolbar toolbar;
     private int progressStatus = 1;
     private ProgressBar pbFiles;
     private TextView tvCount, tvPerc;
@@ -43,10 +44,12 @@ public class ImagesFragment extends Fragment {
     private Button btStart;
     private Button btStop;
     private CheckBox chkOnlyNew;
-    File SDCard;
-    public GlobalVars glbVars;
 
-    String ftp_server, ftp_user, ftp_pass;
+    public static float megabytesAvailable(File f) {
+        StatFs stat = new StatFs(f.getPath());
+        long bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
+        return bytesAvailable / (1024.f * 1024.f);
+    }
 
     @Nullable
     @Override
@@ -269,11 +272,5 @@ public class ImagesFragment extends Fragment {
             }
         });
         thDownloadPhoto.start();
-    }
-
-    public static float megabytesAvailable(File f) {
-        StatFs stat = new StatFs(f.getPath());
-        long bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
-        return bytesAvailable / (1024.f * 1024.f);
     }
 }

@@ -46,10 +46,15 @@ public class MainActivity extends AppCompatActivity {
     private static final long SMS_NOTIFY_INTERVAL = 30 * 60 * 1000; // интервал проверки обновления 5 минут
     private static final int LAYOUT = R.layout.activity_main;
     public TextView SmsMsg;
+    private final BroadcastReceiver uiUpdated = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SmsMsg.setText(Objects.requireNonNull(intent.getExtras()).getString("SmsCount"));
+        }
+    };
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
-
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -64,12 +69,6 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase UpdateSchemaDB;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private final BroadcastReceiver uiUpdated = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            SmsMsg.setText(Objects.requireNonNull(intent.getExtras()).getString("SmsCount"));
-        }
-    };
 
     @Override
     public void onBackPressed() {
@@ -530,7 +529,8 @@ public class MainActivity extends AppCompatActivity {
             for (SQLData i : sqlData) {
                 try {
                     UpdateSchemaDB.execSQL("ALTER TABLE " + i.tableName + " ADD COLUMN " + i.column + " TEXT DEFAULT " + i.defaultValue);
-                } catch (SQLiteException ignored) {}
+                } catch (SQLiteException ignored) {
+                }
             }
 
             try {

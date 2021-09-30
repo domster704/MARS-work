@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="20dp"
-    android:paddingTop="10dp"
-    android:paddingRight="10dp"
-    android:screenOrientation="landscape"
-    android:weightSum="1">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:screenOrientation="landscape"
+        android:weightSum="1">
 
     <requestFocus />
 
     <EditText
-        android:id="@+id/txtPercent"
-        android:layout_width="50dp"
-        android:layout_height="35dp"
-        android:layout_below="@+id/radioGroup"
-        android:layout_toEndOf="@+id/textView7"
-        android:layout_weight="0.07"
-        android:clickable="true"
-        android:digits="1234567890"
-        android:ems="4"
-        android:focusable="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:inputType="number|numberDecimal"
-        android:numeric="integer"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:text="0"
-        android:textColor="#000000"
-        android:textSize="16dp" />
+            android:id="@+id/txtPercent"
+            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/radioGroup"
+            android:layout_toEndOf="@+id/textView7"
+            android:layout_weight="0.07"
+            android:clickable="true"
+            android:digits="1234567890"
+            android:ems="4"
+            android:focusable="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:inputType="number|numberDecimal"
+            android:numeric="integer"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:text="0"
+            android:textColor="#000000"
+            android:textSize="16dp" />
 
     <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/txtPercent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/txtPercent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true">
 
         <RadioButton
-            android:id="@+id/rbSale"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Скидка" />
+                android:id="@+id/rbSale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Скидка" />
 
         <RadioButton
-            android:id="@+id/rbMarkup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Наценка" />
+                android:id="@+id/rbMarkup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Наценка" />
     </RadioGroup>
 
     <TextView
-        android:id="@+id/textView7"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/txtPercent"
-        android:layout_alignBottom="@+id/txtPercent"
-        android:layout_alignParentStart="true"
-        android:gravity="center_vertical"
-        android:paddingLeft="0dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:text="@string/nomenSaleMarkup"
-        android:textColor="#000000" />
+            android:id="@+id/textView7"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/txtPercent"
+            android:layout_alignBottom="@+id/txtPercent"
+            android:layout_alignParentStart="true"
+            android:gravity="center_vertical"
+            android:paddingLeft="0dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:text="@string/nomenSaleMarkup"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/txtInfo"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtPercent"
-        android:layout_alignEnd="@+id/txtPercent"
-        android:layout_alignParentStart="true"
-        android:text="Для сброса скидки/наценки просто в поле ввода введите 0 (ноль) и нажмите на кнопку ОК"
-        android:textColor="@android:color/black"
-        android:textSize="16sp" />
+            android:id="@+id/txtInfo"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtPercent"
+            android:layout_alignEnd="@+id/txtPercent"
+            android:layout_alignParentStart="true"
+            android:text="Для сброса скидки/наценки просто в поле ввода введите 0 (ноль) и нажмите на кнопку ОК"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
 
 </RelativeLayout>

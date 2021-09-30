@@ -22,16 +22,36 @@ public class DebetFragment extends Fragment {
     public GlobalVars glbVars;
 
     SearchView searchView;
+    private final SearchView.OnQueryTextListener searchTextListner =
+            new SearchView.OnQueryTextListener() {
+                boolean isSearchClicked = false;
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    if (!query.equals("")) {
+                        glbVars.SearchDebet(query);
+                        isSearchClicked = true;
+                        searchView.clearFocus();
+                        searchView.setIconified(true);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            };
     MenuItem searchItem;
     Menu mainMenu;
-
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     String DebTP_ID;
-
-    private android.support.v7.widget.Toolbar toolbar;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
+    private android.support.v7.widget.Toolbar toolbar;
 
     public DebetFragment() {
     }
@@ -54,7 +74,6 @@ public class DebetFragment extends Fragment {
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
     }
-
 
     @SuppressLint("CutPasteId")
     @Override
@@ -133,29 +152,6 @@ public class DebetFragment extends Fragment {
         searchView.setQueryHint("Поиск по дебиторке");
         searchView.setOnQueryTextListener(searchTextListner);
     }
-
-    private final SearchView.OnQueryTextListener searchTextListner =
-            new SearchView.OnQueryTextListener() {
-                boolean isSearchClicked = false;
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    if (!query.equals("")) {
-                        glbVars.SearchDebet(query);
-                        isSearchClicked = true;
-                        searchView.clearFocus();
-                        searchView.setIconified(true);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

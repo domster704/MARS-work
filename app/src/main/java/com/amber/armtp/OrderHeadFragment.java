@@ -1,14 +1,11 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,12 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.ParseException;
@@ -40,17 +33,15 @@ import java.util.Objects;
  * Фрагмент "Шапка заказа"
  */
 public class OrderHeadFragment extends Fragment {
+    public GlobalVars glbVars;
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
-
-    public OrderHeadFragment() {
-    }
-
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v7.widget.Toolbar toolbar;
-    public GlobalVars glbVars;
+    public OrderHeadFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

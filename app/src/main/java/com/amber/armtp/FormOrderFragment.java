@@ -1,6 +1,5 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -26,22 +25,70 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class FormOrderFragment extends Fragment {
+    public GlobalVars glbVars;
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences APKsettings;
     SharedPreferences.Editor editor;
     SearchView searchView;
+    private final SearchView.OnQueryTextListener searchTextListner =
+            new SearchView.OnQueryTextListener() {
+                boolean isSearchClicked = false;
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    String ItemID = "";
+                    if (glbVars.myGrups != null) {
+                        ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("ID"));
+                    }
+
+                    if (newText.equals("")) {
+                        if (!isSearchClicked) {
+                            glbVars.LoadNom(ItemID);
+                            searchView.clearFocus();
+                            searchView.setIconified(true);
+                        }
+                        return true;
+                    } else {
+                        if (newText.length() >= 1) {
+                            if (!ItemID.equals("0")) {
+                                glbVars.SearchNomInGroup(newText, ItemID);
+                                return true;
+                            } else {
+                                glbVars.LoadNom(ItemID);
+                                return true;
+                            }
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    if (!query.equals("")) {
+                        glbVars.SearchNom(query);
+                        glbVars.spSgi.setSelection(0);
+                        glbVars.spGrup.setAdapter(null);
+                        isSearchClicked = true;
+                        searchView.clearFocus();
+                        searchView.setIconified(true);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            };
     MenuItem searchItem;
     View thisView;
     TextView txtSgi, txtGroup, tvHeadCod, tvHeadDescr, tvHeadMP, tvHeadZakaz;
     TextView FilterSgi_ID, FilterGroup_ID, FilterTovcat_ID, FilterFunc_ID, FilterBrand_ID, FilterWC_ID, FilterProd_ID, FilterFocus_ID, FilterModel_ID, FilterColor_ID;
     TextView UnIFilterTypeID, UniFilterID;
     private android.support.v7.widget.Toolbar toolbar;
-    public GlobalVars glbVars;
+
 
     public FormOrderFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,7 +115,6 @@ public class FormOrderFragment extends Fragment {
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -499,55 +545,6 @@ public class FormOrderFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    private final SearchView.OnQueryTextListener searchTextListner =
-            new SearchView.OnQueryTextListener() {
-                boolean isSearchClicked = false;
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    String ItemID = "";
-                    if (glbVars.myGrups != null) {
-                        ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("ID"));
-                    }
-
-                    if (newText.equals("")) {
-                        if (!isSearchClicked) {
-                            glbVars.LoadNom(ItemID);
-                            searchView.clearFocus();
-                            searchView.setIconified(true);
-                        }
-                        return true;
-                    } else {
-                        if (newText.length() >= 1) {
-                            if (!ItemID.equals("0")) {
-                                glbVars.SearchNomInGroup(newText, ItemID);
-                                return true;
-                            } else {
-                                glbVars.LoadNom(ItemID);
-                                return true;
-                            }
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    if (!query.equals("")) {
-                        glbVars.SearchNom(query);
-                        glbVars.spSgi.setSelection(0);
-                        glbVars.spGrup.setAdapter(null);
-                        isSearchClicked = true;
-                        searchView.clearFocus();
-                        searchView.setIconified(true);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            };
 
     @Override
     public void onPause() {

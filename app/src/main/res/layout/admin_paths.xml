@@ -1,100 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/TabPaths"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:scrollbars="none">
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/TabPaths"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp"
-        android:paddingRight="10dp">
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp">
 
         <Button
-            android:id="@+id/btSetSDPath"
-            android:layout_width="400dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="@android:drawable/btn_default"
-            android:enabled="false"
-            android:text="@string/adm_set_SDPath" />
+                android:id="@+id/btSetSDPath"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@android:drawable/btn_default"
+                android:enabled="false"
+                android:text="@string/adm_set_SDPath" />
 
         <TextView
-            android:id="@+id/tvLblSDPath"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btSetSDPath"
-            android:layout_alignParentStart="true"
-            android:text="@string/adm_lbl_SDPath"
-            android:textColor="#000000" />
+                android:id="@+id/tvLblSDPath"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btSetSDPath"
+                android:layout_alignParentStart="true"
+                android:text="@string/adm_lbl_SDPath"
+                android:textColor="#000000" />
 
         <TextView
-            android:id="@+id/tvSDPath1"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_below="@+id/btSetSDPath"
-            android:layout_alignBottom="@+id/tvLblSDPath"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/tvLblSDPath"
-            android:paddingLeft="15dp"
-            android:textColor="#000000" />
+                android:id="@+id/tvSDPath1"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/btSetSDPath"
+                android:layout_alignBottom="@+id/tvLblSDPath"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/tvLblSDPath"
+                android:paddingLeft="15dp"
+                android:textColor="#000000" />
 
         <Button
-            android:id="@+id/btSetImagesPath"
-            android:layout_width="400dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvSDPath1"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="43dp"
-            android:background="@android:drawable/btn_default"
-            android:enabled="false"
-            android:text="@string/adm_set_ImagesPath" />
+                android:id="@+id/btSetImagesPath"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvSDPath1"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="43dp"
+                android:background="@android:drawable/btn_default"
+                android:enabled="false"
+                android:text="@string/adm_set_ImagesPath" />
 
         <TextView
-            android:id="@+id/tvPhotoPath"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_below="@+id/btSetImagesPath"
-            android:layout_alignBottom="@+id/tvLblPhotoPath"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/tvLblPhotoPath"
-            android:paddingLeft="15dp"
-            android:textColor="#000000" />
+                android:id="@+id/tvPhotoPath"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/btSetImagesPath"
+                android:layout_alignBottom="@+id/tvLblPhotoPath"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/tvLblPhotoPath"
+                android:paddingLeft="15dp"
+                android:textColor="#000000" />
 
         <TextView
-            android:id="@+id/tvLblPhotoPath"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btSetImagesPath"
-            android:layout_alignParentStart="true"
-            android:text="@string/adm_lbl_ImagesPath"
-            android:textColor="#000000" />
+                android:id="@+id/tvLblPhotoPath"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btSetImagesPath"
+                android:layout_alignParentStart="true"
+                android:text="@string/adm_lbl_ImagesPath"
+                android:textColor="#000000" />
 
         <Switch
-            android:id="@+id/swTestLoadPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvLblPhotoPath"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="35dp"
-            android:text="@string/adm_TestDownloadPhoto" />
+                android:id="@+id/swTestLoadPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvLblPhotoPath"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="35dp"
+                android:text="@string/adm_TestDownloadPhoto" />
 
         <TextView
-            android:id="@+id/tvPublicPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="TextView" />
+                android:id="@+id/tvPublicPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="TextView" />
 
 
     </RelativeLayout>

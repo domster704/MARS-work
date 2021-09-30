@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/ColOrdDtZakazID"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtZakazID"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtID"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtID"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtCod"
-        android:layout_width="100dp"
-        android:layout_height="35dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtCod"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtDescr"
-        android:layout_width="fill_parent"
-        android:layout_height="35dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/ColOrdDtQty"
-        android:layout_toRightOf="@+id/ColOrdDtCod"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtDescr"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/ColOrdDtQty"
+            android:layout_toRightOf="@+id/ColOrdDtCod"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtQty"
-        android:layout_width="100dp"
-        android:layout_height="35dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/ColOrdDtPrice"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtQty"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/ColOrdDtPrice"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtPrice"
-        android:layout_width="100dp"
-        android:layout_height="35dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/ColOrdDtSum"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtPrice"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/ColOrdDtSum"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdDtSum"
-        android:layout_width="100dp"
-        android:layout_height="35dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdDtSum"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 </RelativeLayout>

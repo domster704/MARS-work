@@ -1,6 +1,5 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -28,7 +27,6 @@ import android.widget.GridView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.linuxense.javadbf.DBFException;
 
@@ -50,6 +48,19 @@ import java.util.Date;
 import java.util.Locale;
 
 public class JournalFragment extends Fragment {
+    private final Handler handler = new Handler();
+    private final SearchView.OnQueryTextListener searchTextListner =
+            new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return !newText.equals("");
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+            };
     public GlobalVars glbVars;
     Menu mainMenu;
     SearchView searchView;
@@ -57,11 +68,22 @@ public class JournalFragment extends Fragment {
     Connection conn = null;
     Statement stmt;
     ResultSet reset;
-    private int progressStatus = 0;
-    private final Handler handler = new Handler();
-    private android.support.v7.widget.Toolbar toolbar;
     GridView orderList, orderdtList;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
+    private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
+            tvContr = myView.findViewById(R.id.ColOrdContr);
+            tvAddr = myView.findViewById(R.id.ColOrdAddr);
+            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
+            tvStatus = myView.findViewById(R.id.ColOrdStatus);
+            glbVars.ordStatus = tvStatus.getText().toString();
+            final String ID = tvOrder.getText().toString();
+            glbVars.LoadOrdersDetails(ID);
+            glbVars.viewFlipper.setDisplayedChild(1);
+        }
+    };
     EditText txtBDate, txtEDate;
     Button btOrderFilter, btUpdateStatus;
     Calendar CalBDate, CalEDate, c;
@@ -74,6 +96,96 @@ public class JournalFragment extends Fragment {
     Date newDate;
 
     ProgressDialog progress;
+    private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            tvOrder = view.findViewById(R.id.ColOrdDocNo);
+            tvStatus = view.findViewById(R.id.ColOrdStatus);
+            final String ID = tvOrder.getText().toString();
+            final String Status = tvStatus.getText().toString();
+            nomPopupMenu = new PopupMenu(getActivity(), view);
+            nomPopupMenu.getMenuInflater().inflate(R.menu.order_context_menu, nomPopupMenu.getMenu());
+            nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    String FileName = "";
+                    switch (menuItem.getItemId()) {
+                        case R.id.CtxOrdSend:
+                            try {
+                                FileName = glbVars.FormDBFForZakaz(ID);
+                            } catch (DBFException e) {
+                                e.printStackTrace();
+                            } finally {
+                                if (!FileName.equals("")) {
+                                    SendDBFFile(FileName);
+                                } else {
+                                    Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            return true;
+                        case R.id.CtxOrdEdit:
+                            glbVars.OrderID = ID;
+
+                            // Use the Builder class for convenient dialog construction
+                            builder = new AlertDialog.Builder(getActivity());
+                            builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
+                                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+
+                                        }
+                                    })
+                                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            EditOrder(ID);
+                                        }
+                                    })
+                            ;
+                            builder.create();
+                            builder.show();
+
+                            return true;
+                        case R.id.CtxOrdDelete:
+                            glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='" + ID + "'");
+                            glbVars.Orders.requery();
+                            glbVars.OrdersAdapter.notifyDataSetChanged();
+                            return true;
+                        case R.id.CtxOrdCopy:
+                            CopyOrder(ID);
+                            return true;
+                        default:
+                    }
+                    return true;
+                }
+            });
+
+            if (Status.equals("Удален") || Status.equals("Отменен")) {
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
+            }
+
+            if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
+            }
+
+            if (Status.equals("Отправлен")) {
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
+            }
+
+            if (Status.equals("Сохранен")) {
+                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
+            }
+            nomPopupMenu.show();
+            return true;
+        }
+
+    };
+    private int progressStatus = 0;
+    private android.support.v7.widget.Toolbar toolbar;
+
 
     public JournalFragment() {
 
@@ -98,7 +210,6 @@ public class JournalFragment extends Fragment {
         glbVars.view = rootView;
         return rootView;
     }
-
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
@@ -227,122 +338,6 @@ public class JournalFragment extends Fragment {
         });
 
     }
-
-    private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
-            tvContr = myView.findViewById(R.id.ColOrdContr);
-            tvAddr = myView.findViewById(R.id.ColOrdAddr);
-            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
-            tvStatus = myView.findViewById(R.id.ColOrdStatus);
-            glbVars.ordStatus = tvStatus.getText().toString();
-            final String ID = tvOrder.getText().toString();
-            glbVars.LoadOrdersDetails(ID);
-            glbVars.viewFlipper.setDisplayedChild(1);
-        }
-    };
-
-    private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            tvOrder = view.findViewById(R.id.ColOrdDocNo);
-            tvStatus = view.findViewById(R.id.ColOrdStatus);
-            final String ID = tvOrder.getText().toString();
-            final String Status = tvStatus.getText().toString();
-            nomPopupMenu = new PopupMenu(getActivity(), view);
-            nomPopupMenu.getMenuInflater().inflate(R.menu.order_context_menu, nomPopupMenu.getMenu());
-            nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    String FileName = "";
-                    switch (menuItem.getItemId()) {
-                        case R.id.CtxOrdSend:
-                            try {
-                                FileName = glbVars.FormDBFForZakaz(ID);
-                            } catch (DBFException e) {
-                                e.printStackTrace();
-                            } finally {
-                                if (!FileName.equals("")) {
-                                    SendDBFFile(FileName);
-                                } else {
-                                    Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            return true;
-                        case R.id.CtxOrdEdit:
-                            glbVars.OrderID = ID;
-
-                            // Use the Builder class for convenient dialog construction
-                            builder = new AlertDialog.Builder(getActivity());
-                            builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
-                                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-
-                                        }
-                                    })
-                                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            EditOrder(ID);
-                                        }
-                                    })
-                            ;
-                            builder.create();
-                            builder.show();
-
-                            return true;
-                        case R.id.CtxOrdDelete:
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='" + ID + "'");
-                            glbVars.Orders.requery();
-                            glbVars.OrdersAdapter.notifyDataSetChanged();
-                            return true;
-                        case R.id.CtxOrdCopy:
-                            CopyOrder(ID);
-                            return true;
-                        default:
-                    }
-                    return true;
-                }
-            });
-
-            if (Status.equals("Удален") || Status.equals("Отменен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
-            }
-
-            if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
-            }
-
-            if (Status.equals("Отправлен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
-            }
-
-            if (Status.equals("Сохранен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
-            }
-            nomPopupMenu.show();
-            return true;
-        }
-
-    };
-
-    private final SearchView.OnQueryTextListener searchTextListner =
-            new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return !newText.equals("");
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-            };
 
     private boolean SendDBFFile(String FileName) {
         progress = null;

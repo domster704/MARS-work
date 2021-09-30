@@ -1,6 +1,5 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,10 +10,10 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 public class DefaultFragment extends Fragment {
-    SharedPreferences settings;
-    SharedPreferences.Editor editor;
     public GlobalVars glbVars;
     public WebView webview;
+    SharedPreferences settings;
+    SharedPreferences.Editor editor;
 
     @Nullable
     @Override

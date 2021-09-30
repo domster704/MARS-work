@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clickable="false"
-    android:focusable="false"
-    android:focusableInTouchMode="false"
-    android:orientation="vertical"
-    android:padding="25dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:orientation="vertical"
+        android:padding="25dp">
 
     <TextView
-        android:id="@+id/textView39"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="15dp"
-        android:text="Торговый представитель"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#000000" />
+            android:id="@+id/textView39"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="15dp"
+            android:paddingTop="15dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="15dp"
+            android:text="Торговый представитель"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#000000" />
 
     <Spinner
-        android:id="@+id/spLoginTP"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView39"
-        android:layout_alignBottom="@+id/textView39"
-        android:layout_toEndOf="@+id/textView39" />
+            android:id="@+id/spLoginTP"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textView39"
+            android:layout_alignBottom="@+id/textView39"
+            android:layout_toEndOf="@+id/textView39" />
 
     <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView39"
-        android:layout_alignStart="@+id/textView39"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="15dp"
-        android:text="Пароль"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#000000" />
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView39"
+            android:layout_alignStart="@+id/textView39"
+            android:paddingLeft="15dp"
+            android:paddingTop="15dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="15dp"
+            android:text="Пароль"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#000000" />
 
     <EditText
-        android:id="@+id/edPassTP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/spLoginTP"
-        android:layout_alignEnd="@+id/spLoginTP"
-        android:layout_alignBottom="@+id/textView6"
-        android:ems="10"
-        android:inputType="textPassword" />
+            android:id="@+id/edPassTP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/spLoginTP"
+            android:layout_alignEnd="@+id/spLoginTP"
+            android:layout_alignBottom="@+id/textView6"
+            android:ems="10"
+            android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/btLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edPassTP"
-        android:layout_alignStart="@+id/textView6"
-        android:layout_alignEnd="@+id/edPassTP"
-        android:layout_marginTop="22dp"
-        android:background="@android:drawable/btn_default"
-        android:text="Авторизоваться" />
+            android:id="@+id/btLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edPassTP"
+            android:layout_alignStart="@+id/textView6"
+            android:layout_alignEnd="@+id/edPassTP"
+            android:layout_marginTop="22dp"
+            android:background="@android:drawable/btn_default"
+            android:text="Авторизоваться" />
 
     <Button
-        android:id="@+id/btUpdateTpList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btLogin"
-        android:layout_alignStart="@+id/textView6"
-        android:layout_alignEnd="@+id/btLogin"
-        android:layout_marginTop="25dp"
-        android:background="@android:drawable/btn_default"
-        android:text="Обновить список торговых представителей" />
+            android:id="@+id/btUpdateTpList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btLogin"
+            android:layout_alignStart="@+id/textView6"
+            android:layout_alignEnd="@+id/btLogin"
+            android:layout_marginTop="25dp"
+            android:background="@android:drawable/btn_default"
+            android:text="Обновить список торговых представителей" />
 
 </RelativeLayout>

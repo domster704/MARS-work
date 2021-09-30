@@ -18,12 +18,12 @@ import android.widget.Toast;
 import java.io.File;
 
 public class UpdateAppFragment extends Fragment {
-    private android.support.v7.widget.Toolbar toolbar;
+    public GlobalVars glbVars;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     Button btCheckUpdates, btUpdateApp;
     TextView tvCurVer, tvLastVer, txtNotify;
-    public GlobalVars glbVars;
+    private android.support.v7.widget.Toolbar toolbar;
 
     @Nullable
     @Override
