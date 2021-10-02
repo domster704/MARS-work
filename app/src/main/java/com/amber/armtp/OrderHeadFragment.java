@@ -388,12 +388,12 @@ public class OrderHeadFragment extends Fragment {
     }
 
     public void SaveOrder() throws ParseException {
-        final ProgressDialog progress;
-        progress = new ProgressDialog(getActivity());
-        progress.setIndeterminate(false);
-        progress.setCancelable(true);
-        progress.setCanceledOnTouchOutside(false);
-        progress.setMessage("Идет сохранение заказа...");
+//        final ProgressDialog progress;
+//        progress = new ProgressDialog(getActivity());
+//        progress.setIndeterminate(false);
+//        progress.setCancelable(true);
+//        progress.setCanceledOnTouchOutside(false);
+//        progress.setMessage("Идет сохранение заказа...");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -438,12 +438,12 @@ public class OrderHeadFragment extends Fragment {
                     return;
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.show();
-                    }
-                });
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        progress.show();
+//                    }
+//                });
 
                 c.moveToFirst();
                 Data = c.getString(3);
@@ -505,7 +505,7 @@ public class OrderHeadFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progress.dismiss();
+//                        progress.dismiss();
                         glbVars.spinContr.setSelection(0);
                         glbVars.spinAddr.setSelection(0);
                         glbVars.spinAddr.setAdapter(null);
