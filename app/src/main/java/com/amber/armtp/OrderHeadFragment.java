@@ -84,17 +84,17 @@ public class OrderHeadFragment extends Fragment {
                 }
                 setContrAndSum();
                 return true;
-            case R.id.SaveOrder:
-                try {
-                    if (!glbVars.OrderID.equals("")) {
-                        SaveEditOrder(glbVars.OrderID);
-                    } else {
-                        SaveOrder();
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                return true;
+//            case R.id.SaveOrder:
+//                try {
+//                    if (!glbVars.OrderID.equals("")) {
+//                        SaveEditOrder(glbVars.OrderID);
+//                    } else {
+//                        SaveOrder();
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                return true;
             case R.id.ViewOrder:
                 fragment = new ViewOrderFragment();
                 fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -380,140 +380,6 @@ public class OrderHeadFragment extends Fragment {
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
                         toolbar.setSubtitle("");
-                    }
-                });
-
-            }
-        }).start();
-    }
-
-    public void SaveOrder() throws ParseException {
-//        final ProgressDialog progress;
-//        progress = new ProgressDialog(getActivity());
-//        progress.setIndeterminate(false);
-//        progress.setCancelable(true);
-//        progress.setCanceledOnTouchOutside(false);
-//        progress.setMessage("Идет сохранение заказа...");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Cursor c, c2, c1;
-                String TP_ID;
-                String Contr_ID;
-                String Addr_ID;
-                String Data, Time;
-                String Comment;
-                String IDDOC;
-
-
-                String sql;
-                SQLiteStatement stmt;
-
-                int getMoney, getBackward, getBacktype;
-
-                SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-                String curdate = df.format(Calendar.getInstance().getTime());
-
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
-                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-                if (c.getCount() == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                    return;
-                }
-                c2.moveToFirst();
-
-                if (c2.getInt(1) == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return;
-                }
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        progress.show();
-//                    }
-//                });
-
-                c.moveToFirst();
-                Data = c.getString(3);
-                Time = c.getString(8);
-                getMoney = c.getInt(9);
-                getBackward = c.getInt(10);
-                getBacktype = c.getInt(11);
-
-                Comment = c.getString(4);
-                TP_ID = c.getString(5);
-                Contr_ID = c.getString(6);
-                Addr_ID = c.getString(7);
-
-                c.close();
-
-                int Docno = glbVars.db.GetDocNumber();
-                IDDOC = Integer.toString(Docno, 36).toUpperCase();
-                IDDOC += "." + TP_ID;
-
-                sql = "INSERT INTO ZAKAZY(DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
-                stmt = glbVars.db.getWritableDatabase().compileStatement(sql);
-                glbVars.db.getWritableDatabase().beginTransaction();
-                try {
-                    stmt.clearBindings();
-                    stmt.bindString(1, IDDOC);
-                    stmt.bindString(2, TP_ID);
-                    stmt.bindString(3, Contr_ID);
-                    stmt.bindString(4, Addr_ID);
-                    stmt.bindString(5, curdate);
-                    stmt.bindString(6, Data);
-                    stmt.bindString(7, Comment);
-                    stmt.bindString(8, Time);
-                    stmt.bindLong(9, getMoney);
-                    stmt.bindLong(10, getBackward);
-                    stmt.bindLong(11, getBacktype);
-                    stmt.executeInsert();
-                    stmt.clearBindings();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
-                }
-
-                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT ID, COD, DESCR, ZAKAZ, ROUND(PRICE,2) AS [CENA], CODE FROM Nomen where ZAKAZ<>0", null);
-                if (c1.getCount() == 0) {
-                    c1.close();
-                    return;
-                } else {
-                    glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + IDDOC + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
-                    glbVars.db.ClearOrderHeader();
-                    glbVars.db.ResetNomen();
-                }
-
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        progress.dismiss();
-                        glbVars.spinContr.setSelection(0);
-                        glbVars.spinAddr.setSelection(0);
-                        glbVars.spinAddr.setAdapter(null);
-                        glbVars.txtDate.setText("");
-                        glbVars.txtComment.setText("");
-                        glbVars.edContrFilter.setText("");
-                        toolbar.setSubtitle("");
-                        glbVars.setSaleIcon(mainMenu, 0, false);
                     }
                 });
 

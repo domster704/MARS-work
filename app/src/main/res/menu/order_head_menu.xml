@@ -8,10 +8,6 @@
             android:title="Просчитать сумму заказа и цены с учетом скидки/наценки"
             app:showAsAction="always" />
     <item
-            android:id="@+id/SaveOrder"
-            android:title="Сохранить заказ"
-            app:showAsAction="always" />
-    <item
             android:id="@+id/ViewOrder"
             android:title="Просмотр заказа"
             app:showAsAction="always" />
