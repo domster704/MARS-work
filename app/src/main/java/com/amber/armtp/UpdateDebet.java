@@ -71,7 +71,7 @@ public class UpdateDebet extends IntentService {
             if (conn == null) {
                 ConnectToSql();
             }
-            String sql_insert = "INSERT INTO TMP_DEBET(ROW, CONTR_ID, KREDIT, LIM, NEKONTR, SALDO, A7, A14, A21, A28, TP_ID, TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+            String sql_insert = "INSERT INTO TMP_DEBET([ROW], CONTR_ID, KREDIT, LIM, NEKONTR, SALDO, A7, A14, A21, A28, TP_ID, TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
             SQLiteStatement statement2 = glbVars.db.getWritableDatabase().compileStatement(sql_insert);
             glbVars.db.getWritableDatabase().beginTransactionNonExclusive();
 
@@ -130,7 +130,7 @@ public class UpdateDebet extends IntentService {
 
             glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET;");
             glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'DEBET';");
-            glbVars.db.getWritableDatabase().execSQL("INSERT INTO DEBET (ROW,CONTR_ID,KREDIT,LIM,NEKONTR,SALDO,A7,A14,A21,A28,TP_ID,TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30) SELECT ROW,CONTR_ID,KREDIT,LIM,NEKONTR,SALDO,A7,A14,A21,A28,TP_ID,TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30 FROM TMP_DEBET;");
+            glbVars.db.getWritableDatabase().execSQL("INSERT INTO DEBET ([ROW],CONTR_ID,KREDIT,LIM,NEKONTR,SALDO,A7,A14,A21,A28,TP_ID,TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30) SELECT [ROW],CONTR_ID,KREDIT,LIM,NEKONTR,SALDO,A7,A14,A21,A28,TP_ID,TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30 FROM TMP_DEBET;");
             glbVars.db.getWritableDatabase().execSQL("DELETE FROM TMP_DEBET;");
             glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'TMP_DEBET';");
             glbVars.db.getWritableDatabase().setTransactionSuccessful();

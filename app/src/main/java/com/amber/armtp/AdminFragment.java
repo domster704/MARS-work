@@ -338,9 +338,7 @@ public class AdminFragment extends Fragment {
                         File dir = FileUtils.getFile(glbVars.GetSDCardpath() + glbVars.DBFolder + "/");
                         File delFile;
                         for (String file : dir.list(new SuffixFileFilter(".dbf"))) {
-//                            delFile = new File(glbVars.GetSDCardpath()+glbVars.DBFolder+"/"+file);
                             delFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + file);
-                            //String FileName =  getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()+"/orders_"+curdate.toString()+".dbf";
                             FileUtils.deleteQuietly(delFile);
                             final File finalDelFile = delFile;
                             getActivity().runOnUiThread(new Runnable() {

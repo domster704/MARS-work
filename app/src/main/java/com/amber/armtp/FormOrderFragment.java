@@ -1,10 +1,12 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -23,6 +25,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 public class FormOrderFragment extends Fragment {
     public GlobalVars glbVars;
@@ -92,9 +96,8 @@ public class FormOrderFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.form_order_fragment, container, false);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
         thisView = rootView;
         glbVars.view = rootView;
@@ -105,14 +108,14 @@ public class FormOrderFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
     }
 
@@ -135,8 +138,31 @@ public class FormOrderFragment extends Fragment {
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListner);
+
+        if (glbVars.isSales) {
+            mainMenu.getItem(2).setEnabled(true);
+            glbVars.setSaleIcon(mainMenu, 1, false);
+        } else {
+            glbVars.setDiscountIcon(mainMenu, 2, false);
+            glbVars.setSaleIcon(mainMenu, 1, true);
+        }
+
+        glbVars.db.calcSales(glbVars.db.GetContrID());
+
+        if (glbVars.NomenAdapter != null) {
+            glbVars.myNom.requery();
+            glbVars.NomenAdapter.notifyDataSetChanged();
+        }
+        setContrAndSum();
+        if (glbVars.isDiscount) {
+            glbVars.isDiscount = false;
+            glbVars.Discount = 0;
+            mainMenu.getItem(2).setEnabled(false);
+            glbVars.setDiscountIcon(mainMenu, 2, false);
+        }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
@@ -248,7 +274,6 @@ public class FormOrderFragment extends Fragment {
                 glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
                 return true;
             case R.id.NomenSales:
-
                 if (glbVars.isSales) {
                     mainMenu.getItem(2).setEnabled(true);
                     glbVars.setSaleIcon(mainMenu, 1, false);
@@ -429,13 +454,7 @@ public class FormOrderFragment extends Fragment {
                 if (!ColorID.equals("0")) {
                     glbVars.SetSelectedFilterColor(ColorID);
                 }
-//                    input.requestFocus();
-//                    input.selectAll();
-//                    input.performClick();
-//                    input.setPressed(true);
-//                    input.invalidate();
-//                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-//                    imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+
 
                 alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override

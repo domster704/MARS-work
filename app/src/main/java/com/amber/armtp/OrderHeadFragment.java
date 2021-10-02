@@ -40,6 +40,7 @@ public class OrderHeadFragment extends Fragment {
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v7.widget.Toolbar toolbar;
+
     public OrderHeadFragment() {
     }
 
@@ -177,7 +178,7 @@ public class OrderHeadFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
+                new DatePickerDialog(Objects.requireNonNull(getActivity()), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
 
@@ -222,7 +223,6 @@ public class OrderHeadFragment extends Fragment {
                 }
 
                 if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
-                    Toast.makeText(getActivity(), "Шапка заказа успешно сохранена", Toast.LENGTH_LONG).show();
                     glbVars.db.resetContrSales();
                     glbVars.setSaleIcon(mainMenu, 0, false);
                     setContrAndSum();
@@ -231,11 +231,12 @@ public class OrderHeadFragment extends Fragment {
                         glbVars.db.resetContrSales();
                         glbVars.setSaleIcon(mainMenu, 0, false);
                         setContrAndSum();
-                        Toast.makeText(getActivity(), "Шапка заказа успешно сохранена", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
                     }
                 }
+
+                goToFormOrderFragment();
             }
         });
 
@@ -518,6 +519,13 @@ public class OrderHeadFragment extends Fragment {
 
             }
         }).start();
+    }
+
+    public void goToFormOrderFragment() {
+        Fragment fragment = new FormOrderFragment();
+        fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+        fragmentTransaction.commit();
     }
 
     private void setContrAndSum() {

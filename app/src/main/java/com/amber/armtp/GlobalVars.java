@@ -217,12 +217,6 @@ public class GlobalVars extends Application {
 
                 final TextView c1 = myView.findViewById(R.id.ColNomZakaz);
 
-                TextView c2 = myView.findViewById(R.id.ColNomOst);
-
-                TextView c3 = myView.findViewById(R.id.ColNomCod);
-
-                TextView c4 = myView.findViewById(R.id.ColNomDescr);
-
                 LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
                 View promptView;
 
@@ -1926,7 +1920,7 @@ public class GlobalVars extends Application {
 
     public Integer getLastSmsId() {
         Integer lastId = 0;
-        Cursor cursor = SmsDB.rawQuery("SELECT CASE WHEN MAX(ROW) IS NULL THEN 0 ELSE MAX(ROW) END AS ROW FROM MSGS", null);
+        Cursor cursor = SmsDB.rawQuery("SELECT CASE WHEN MAX([ROW]) IS NULL THEN 0 ELSE MAX([ROW]) END AS [ROW] FROM MSGS", null);
         if (cursor.moveToNext()) {
             lastId = cursor.getInt(cursor.getColumnIndex("ROW"));
         }
@@ -1946,7 +1940,7 @@ public class GlobalVars extends Application {
                 SmsDB = openOrCreateDatabase(GetStoragePath2019() + DBFolder + "/armtp_msg.db", MODE_WORLD_WRITEABLE, null);
             }
 
-            SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
+            SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
 
             Rowid = getLastSmsId();
 
@@ -1954,7 +1948,7 @@ public class GlobalVars extends Application {
                 ConnectToSql();
             }
 
-            String sql_insert = "INSERT INTO MSGS(ROW,TP_ID,TP_IDS,MSG_HEAD,MESSAGE,MSG_DATE,MSG_TIME) VALUES(?,?,?,?,?,?,?);";
+            String sql_insert = "INSERT INTO MSGS([ROW],TP_ID,TP_IDS,MSG_HEAD,MESSAGE,MSG_DATE,MSG_TIME) VALUES(?,?,?,?,?,?,?);";
             SQLiteStatement statement = SmsDB.compileStatement(sql_insert);
 
             SmsDB.beginTransactionNonExclusive();
@@ -1999,7 +1993,7 @@ public class GlobalVars extends Application {
             }
 
             String count = "";
-            Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT(ROW) IS NULL THEN '0' ELSE COUNT(ROW) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
+            Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT([ROW]) IS NULL THEN '0' ELSE COUNT([ROW]) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
             if (cur_sms.moveToNext()) {
                 count = cur_sms.getString(cur_sms.getColumnIndex("CNT"));
                 cur_sms.close();
