@@ -333,7 +333,7 @@ public class GlobalVars extends Application {
 
             PopupMenu nomPopupMenu = new PopupMenu(glbContext, myView);
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
+//            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             if (BeginPos != 0) {
                 nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
             }
@@ -369,31 +369,14 @@ public class GlobalVars extends Application {
                             }
                             LoadNom(Grup);
                             return true;
-                        case R.id.showPhoto:
-                            isSecondPhoto = false;
-                            String photoDir = getPhotoDir();
-                            String FileName = tvCod.getText().toString() + ".jpg";
-                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
-                            File imgFile = new File(photoDir + "/" + FileName);
-                            if (!imgFile.exists() || imgFile.length() == 0) {
-                                AsyncFileName = FileName;
-                                if (isNetworkAvailable()) {
-                                    DownloadPhoto(FileName);
-                                } else {
-                                    Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-                                }
-                                return false;
-                            } else {
-                                ShowNomenPhoto(FileName);
-                            }
                         default:
                     }
                     return true;
                 }
             });
-            if (Photo.equals("")) {
-                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
-            }
+//            if (Photo.equals("")) {
+//                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
+//            }
             nomPopupMenu.show();
             return true;
         }
@@ -550,7 +533,7 @@ public class GlobalVars extends Application {
 
             nomPopupMenu = new PopupMenu(CurAc, myView);
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
+//            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @SuppressLint("NonConstantResourceId")
                 @Override
@@ -565,33 +548,33 @@ public class GlobalVars extends Application {
                             frSgi = Sgi;
                             frGroup = Grup;
                             return true;
-                        case R.id.showPhoto:
-                            isSecondPhoto = false;
-                            String photoDir = getPhotoDir();
-                            tvCod = myView.findViewById(R.id.ColNomCod);
-                            String FileName = tvCod.getText().toString() + ".jpg";
-                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
-                            File imgFile = new File(photoDir + "/" + FileName);
-
-                            if (!imgFile.exists() || imgFile.length() == 0) {
-                                AsyncFileName = FileName;
-                                if (isNetworkAvailable()) {
-                                    DownloadPhoto(FileName);
-                                } else {
-                                    Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-                                }
-                                return false;
-                            } else {
-                                ShowNomenPhoto(FileName);
-                            }
+//                        case R.id.showPhoto:
+//                            isSecondPhoto = false;
+//                            String photoDir = getPhotoDir();
+//                            tvCod = myView.findViewById(R.id.ColNomCod);
+//                            String FileName = tvCod.getText().toString() + ".jpg";
+//                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
+//                            File imgFile = new File(photoDir + "/" + FileName);
+//
+//                            if (!imgFile.exists() || imgFile.length() == 0) {
+//                                AsyncFileName = FileName;
+//                                if (isNetworkAvailable()) {
+//                                    DownloadPhoto(FileName);
+//                                } else {
+//                                    Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
+//                                }
+//                                return false;
+//                            } else {
+//                                ShowNomenPhoto(FileName);
+//                            }
                         default:
                     }
                     return true;
                 }
             });
-            if (Photo.equals("")) {
-                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
-            }
+//            if (Photo.equals("")) {
+//                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
+//            }
             nomPopupMenu.show();
             return true;
         }
@@ -1046,15 +1029,6 @@ public class GlobalVars extends Application {
     }
 
     public boolean DownloadPhoto(final String FileName) {
-
-        final ProgressDialog progress;
-        progress = new ProgressDialog(CurAc);
-        progress.setIndeterminate(false);
-        progress.setCancelable(true);
-        progress.setCanceledOnTouchOutside(false);
-        progress.setMessage("Идет загрузка файла...");
-        progress.show();
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1104,7 +1078,6 @@ public class GlobalVars extends Application {
                 CurAc.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progress.dismiss();
                         if (!isSecondPhoto) {
                             ShowNomenPhoto(FileName);
                             imageView.invalidate();
@@ -1140,7 +1113,6 @@ public class GlobalVars extends Application {
         AlertDialog.Builder builder = new AlertDialog.Builder(CurAc);
         LayoutInflater inflater = CurAc.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.image_layout, null));
-        builder.setTitle(PhotoFileName);
         builder.setCancelable(true);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -1149,6 +1121,7 @@ public class GlobalVars extends Application {
         });
         alertPhoto = builder.create();
         alertPhoto.getWindow().setLayout(600, 400);
+        Log.d("xd", imFileName);
         alertPhoto.show();
 
         imageView = alertPhoto.findViewById(R.id.ivPhoto);
@@ -1185,7 +1158,6 @@ public class GlobalVars extends Application {
                     } else {
                         LoadingFile = imFileName;
                         imageView.setTag("Фото 1");
-                        alertPhoto.setTitle(imFileName);
                     }
                     imageView.setImage(ImageSource.uri(photoDir + "/" + LoadingFile));
                 }
@@ -2323,25 +2295,7 @@ public class GlobalVars extends Application {
             tvPhoto.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (viewId == R.id.ColNomPhoto) {
-//                        GlobalVars.isSecondPhoto = false;
-//                        String photoDir = getPhotoDir();
-//                        TextView tvCod = parent.findViewById(R.id.ColNomCod);
-//                        String FileName = tvCod.getText().toString() + ".jpg";
-//                        File imgFile = new File(photoDir + "/" + FileName);
-//                        if (!imgFile.exists() || imgFile.length() == 0) {
-//                            AsyncFileName = FileName;
-//                            if (isNetworkAvailable()) {
-//                                DownloadPhoto(FileName);
-//                            } else {
-//                                Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-//                            }
-//                        } else {
-//                            ShowNomenPhoto(FileName);
-//                        }
-//                    }
-//                    Log.d("xd1", String.valueOf(parent));
-                    ((GridView) parent).performItemClick(v, position, 1); // Let the event be handled in onItemClick()
+                    ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
                 }
             });
 
@@ -2478,6 +2432,7 @@ public class GlobalVars extends Application {
                 builder.append(" ").append(" ");
                 builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
                 builder.append(" ");
+                Log.d("xd1", String.valueOf(builder));
                 tvPhoto.setText(builder);
             }
 

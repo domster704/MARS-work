@@ -72,7 +72,6 @@ public class JournalFragment extends Fragment {
     Connection conn = null;
     Statement stmt;
     ResultSet reset;
-    GridView orderList, orderdtList;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -91,13 +90,10 @@ public class JournalFragment extends Fragment {
     EditText txtBDate, txtEDate;
     Button btOrderFilter, btUpdateStatus;
     Calendar CalBDate, CalEDate, c;
-    GridView gdOrders;
     SimpleDateFormat sdf, df;
     String myFormat = "dd.MM.yyyy";
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
-    Calendar calendar;
-    Date newDate;
 
     ProgressDialog progress;
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
@@ -132,7 +128,7 @@ public class JournalFragment extends Fragment {
                             glbVars.OrderID = ID;
                             // Use the Builder class for convenient dialog construction
                             builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
-                            builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
+                            builder.setMessage("Вы уверены?")
                                     .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
 

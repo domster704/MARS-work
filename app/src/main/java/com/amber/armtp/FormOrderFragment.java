@@ -38,11 +38,10 @@ public class FormOrderFragment extends Fragment {
     public GlobalVars glbVars;
     Menu mainMenu;
     SharedPreferences settings;
-    SharedPreferences APKsettings;
     SharedPreferences.Editor editor;
     SearchView searchView;
 
-    private final SearchView.OnQueryTextListener searchTextListner =
+    private final SearchView.OnQueryTextListener searchTextListener =
             new SearchView.OnQueryTextListener() {
                 boolean isSearchClicked = false;
 
@@ -64,11 +63,10 @@ public class FormOrderFragment extends Fragment {
                         if (newText.length() >= 1) {
                             if (!ItemID.equals("0")) {
                                 glbVars.SearchNomInGroup(newText, ItemID);
-                                return true;
                             } else {
                                 glbVars.LoadNom(ItemID);
-                                return true;
                             }
+                            return true;
                         } else {
                             return false;
                         }
@@ -137,7 +135,7 @@ public class FormOrderFragment extends Fragment {
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
-        searchView.setOnQueryTextListener(searchTextListner);
+        searchView.setOnQueryTextListener(searchTextListener);
 
         glbVars.db.calcSales(glbVars.db.GetContrID());
 
@@ -165,7 +163,6 @@ public class FormOrderFragment extends Fragment {
                 String Data, Time;
                 String Comment;
                 String IDDOC;
-
 
                 String sql;
                 SQLiteStatement stmt;
