@@ -229,10 +229,6 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new FormOrderFragment(), "frag_form_order");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_view_order:
-                        DisplayFragment(new ViewOrderFragment(), "frag_view_order");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
                     case R.id.nav_order_header:
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());

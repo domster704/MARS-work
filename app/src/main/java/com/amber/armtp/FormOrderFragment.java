@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
@@ -131,28 +132,12 @@ public class FormOrderFragment extends Fragment {
         mainMenu = menu;
 
         // Включение учёта скидки торгового представителя (значок "%" станет зелёным)
-        if (glbVars.db.CheckForSales() > 0) {
-            mainMenu.getItem(2).setEnabled(false);
-            glbVars.setSaleIcon(mainMenu, 1, true);
-        } else {
-            mainMenu.getItem(2).setEnabled(true);
-            glbVars.setSaleIcon(mainMenu, 1, false);
-        }
-
         glbVars.setDiscountIcon(mainMenu, 2, glbVars.isDiscount);
 
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListner);
-
-        if (glbVars.isSales) {
-            mainMenu.getItem(2).setEnabled(true);
-            glbVars.setSaleIcon(mainMenu, 2, false);
-        } else {
-            glbVars.setDiscountIcon(mainMenu, 2, false);
-            glbVars.setSaleIcon(mainMenu, 2, true);
-        }
 
         glbVars.db.calcSales(glbVars.db.GetContrID());
 
@@ -340,9 +325,12 @@ public class FormOrderFragment extends Fragment {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
-                        glbVars.spinContr.setSelection(0);
-                        glbVars.spinAddr.setSelection(0);
-                        glbVars.spinAddr.setAdapter(null);
+                        try {
+                            glbVars.spinContr.setSelection(0);
+                            glbVars.spinAddr.setSelection(0);
+                            glbVars.spinAddr.setAdapter(null);
+                        } catch (Exception ignored) {
+                        }
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
@@ -357,6 +345,12 @@ public class FormOrderFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.ViewOrderId:
+                Fragment fragment = new ViewOrderFragment();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
+                fragmentTransaction.commit();
+                return true;
             case R.id.NomenSave:
                 try {
                     if (!glbVars.OrderID.equals("")) {
@@ -475,30 +469,6 @@ public class FormOrderFragment extends Fragment {
             case R.id.NomenGotoEnd:
                 glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
                 return true;
-            case R.id.NomenSales:
-                if (glbVars.isSales) {
-                    mainMenu.getItem(2).setEnabled(true);
-                    glbVars.setSaleIcon(mainMenu, 2, false);
-                } else {
-                    glbVars.setDiscountIcon(mainMenu, 2, false);
-                    glbVars.setSaleIcon(mainMenu, 2, true);
-                }
-
-                glbVars.db.calcSales(glbVars.db.GetContrID());
-
-                if (glbVars.NomenAdapter != null) {
-                    glbVars.myNom.requery();
-                    glbVars.NomenAdapter.notifyDataSetChanged();
-                }
-                setContrAndSum();
-                if (glbVars.isDiscount) {
-                    glbVars.isDiscount = false;
-                    glbVars.Discount = 0;
-                    mainMenu.getItem(2).setEnabled(false);
-                    glbVars.setDiscountIcon(mainMenu, 2, false);
-                }
-                return true;
-
             case R.id.NomenDiscount:
                 glbVars.CalculatePercentSale(mainMenu, 0);
                 return true;
@@ -769,7 +739,6 @@ public class FormOrderFragment extends Fragment {
 
     @Override
     public void onPause() {
-
         super.onPause();
         txtGroup = getActivity().findViewById(R.id.ColGrupID);
         txtSgi = getActivity().findViewById(R.id.ColSgiID);
@@ -786,7 +755,6 @@ public class FormOrderFragment extends Fragment {
 
     @Override
     public void onResume() {
-
         super.onResume();
         String SgiID = settings.getString("ColSgiID", "0");
         String GrupID = settings.getString("ColGrupID", "0");

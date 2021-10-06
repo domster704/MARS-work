@@ -1,5 +1,6 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
@@ -25,6 +27,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public class JournalFragment extends Fragment {
     private final Handler handler = new Handler();
@@ -98,7 +102,7 @@ public class JournalFragment extends Fragment {
     ProgressDialog progress;
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, long id) {
             tvOrder = view.findViewById(R.id.ColOrdDocNo);
             tvStatus = view.findViewById(R.id.ColOrdStatus);
             final String ID = tvOrder.getText().toString();
@@ -106,6 +110,7 @@ public class JournalFragment extends Fragment {
             nomPopupMenu = new PopupMenu(getActivity(), view);
             nomPopupMenu.getMenuInflater().inflate(R.menu.order_context_menu, nomPopupMenu.getMenu());
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     String FileName = "";
@@ -125,9 +130,8 @@ public class JournalFragment extends Fragment {
                             return true;
                         case R.id.CtxOrdEdit:
                             glbVars.OrderID = ID;
-
                             // Use the Builder class for convenient dialog construction
-                            builder = new AlertDialog.Builder(getActivity());
+                            builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                             builder.setMessage("При редактировании заказа текущая шапка заказа и текущий подбор товара будут полностью очищены. Вы уверены?")
                                     .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
@@ -137,12 +141,14 @@ public class JournalFragment extends Fragment {
                                     .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             EditOrder(ID);
+                                            Fragment fragment = new FormOrderFragment();
+                                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+                                            fragmentTransaction.commit();
                                         }
-                                    })
-                            ;
+                                    });
                             builder.create();
                             builder.show();
-
                             return true;
                         case R.id.CtxOrdDelete:
                             glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='" + ID + "'");
@@ -188,20 +194,6 @@ public class JournalFragment extends Fragment {
 
 
     public JournalFragment() {
-
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            int Lay = glbVars.viewFlipper.getDisplayedChild();
-            if (Lay == 1) {
-                glbVars.ordStatus = null;
-                glbVars.viewFlipper.setDisplayedChild(0);
-            } else {
-                return false;
-            }
-        }
-        return super.getActivity().onKeyDown(keyCode, event);
     }
 
     @Override

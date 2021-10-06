@@ -7,6 +7,11 @@
             android:title="Просчитать цены с учетом скидки/наценки"
             app:showAsAction="always" />
     <item
+            android:id="@+id/FormOrderID"
+            android:icon="@drawable/form_order_vector_white"
+            android:title="@string/form_order"
+            app:showAsAction="always" />
+    <item
             android:id="@+id/NomenDiscount"
             android:icon="@drawable/sale"
             android:title="Скидка/наценка в процентах"

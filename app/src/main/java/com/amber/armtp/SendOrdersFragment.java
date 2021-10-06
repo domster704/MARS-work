@@ -73,5 +73,4 @@ public class SendOrdersFragment extends Fragment {
         glbVars.orderList = getActivity().findViewById(R.id.listSMS);
         glbVars.LoadOrdersForSend();
     }
-
 }

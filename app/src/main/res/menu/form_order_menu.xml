@@ -15,10 +15,10 @@
             android:title="Сохранить заказ"
             app:showAsAction="always" />
     <item
-            android:id="@+id/NomenSales"
-            android:icon="@drawable/percent_sale"
-            android:title="Просчитать цены с учетом скидки/наценки"
-            app:showAsAction="always" />
+            android:id="@+id/ViewOrderId"
+            android:icon="@drawable/view_order_vector"
+            android:title="@string/view_order"
+            app:showAsAction="always"/>
     <item
             android:id="@+id/NomenDiscount"
             android:icon="@drawable/sale"

@@ -16,10 +16,10 @@
                         android:id="@+id/nav_form_order"
                         android:icon="@drawable/form_order_vector"
                         android:title="@string/form_order" />
-                <item
-                        android:id="@+id/nav_view_order"
-                        android:icon="@drawable/view_order_vector"
-                        android:title="@string/view_order" />
+<!--                <item-->
+<!--                        android:id="@+id/nav_view_order"-->
+<!--                        android:icon="@drawable/view_order_vector"-->
+<!--                        android:title="@string/view_order" />-->
                 <item
                         android:id="@+id/nav_send_orders"
                         android:icon="@drawable/send_orders_vector"

@@ -5,20 +5,20 @@
             android:id="@+id/CtxOrdCopy"
             android:title="Копировать заказ"
             android:visible="true"
-            app:showAsAction="always"></item>
+            app:showAsAction="always"/>
     <item
             android:id="@+id/CtxOrdDelete"
             android:title="Удалить заказ"
             android:visible="true"
-            app:showAsAction="always"></item>
+            app:showAsAction="always"/>
     <item
             android:id="@+id/CtxOrdEdit"
             android:title="Редактировать"
             android:visible="true"
-            app:showAsAction="always"></item>
+            app:showAsAction="always"/>
     <item
             android:id="@+id/CtxOrdSend"
             android:title="Отправить повторно"
             android:visible="true"
-            app:showAsAction="always"></item>
+            app:showAsAction="always"/>
 </menu>

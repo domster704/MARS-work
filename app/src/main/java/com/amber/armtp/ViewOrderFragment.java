@@ -2,6 +2,7 @@ package com.amber.armtp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,13 +67,18 @@ public class ViewOrderFragment extends Fragment {
         }
 
         glbVars.setSaleIcon(mainMenu, 1, glbVars.isDiscount);
-
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar actions click
         switch (item.getItemId()) {
+            case R.id.FormOrderID:
+                Fragment fragment = new FormOrderFragment();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+                fragmentTransaction.commit();
+                return true;
             case R.id.GoToOrderHead:
                 fragment = new OrderHeadFragment();
                 if (fragment != null) {
