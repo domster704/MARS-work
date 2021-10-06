@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/save/baseline_save_24.xml" />
+                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/photo_size_select_actual/baseline_photo_size_select_actual_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_baseline_save_24" />
+                            <entry key="outputName" value="ic_photo_24" />
                             <entry key="sourceFile" value="C:\Users\isupo\GoogleDisk\Programming\Java\AndroidStudioProjects\MARS" />
                           </map>
                         </option>

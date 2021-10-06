@@ -40,6 +40,7 @@ public class FormOrderFragment extends Fragment {
     SharedPreferences APKsettings;
     SharedPreferences.Editor editor;
     SearchView searchView;
+
     private final SearchView.OnQueryTextListener searchTextListner =
             new SearchView.OnQueryTextListener() {
                 boolean isSearchClicked = false;
@@ -129,6 +130,7 @@ public class FormOrderFragment extends Fragment {
         inflater.inflate(R.menu.form_order_menu, menu);
         mainMenu = menu;
 
+        // Включение учёта скидки торгового представителя (значок "%" станет зелёным)
         if (glbVars.db.CheckForSales() > 0) {
             mainMenu.getItem(2).setEnabled(false);
             glbVars.setSaleIcon(mainMenu, 1, true);
@@ -168,12 +170,6 @@ public class FormOrderFragment extends Fragment {
     }
 
     public void SaveOrder() throws ParseException {
-//        final ProgressDialog progress;
-//        progress = new ProgressDialog(getActivity());
-//        progress.setIndeterminate(false);
-//        progress.setCancelable(true);
-//        progress.setCanceledOnTouchOutside(false);
-//        progress.setMessage("Идет сохранение заказа...");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -217,13 +213,6 @@ public class FormOrderFragment extends Fragment {
                     });
                     return;
                 }
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        progress.show();
-//                    }
-//                });
 
                 c.moveToFirst();
                 Data = c.getString(3);
@@ -281,20 +270,85 @@ public class FormOrderFragment extends Fragment {
                     glbVars.db.ResetNomen();
                 }
 
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-////                        progress.dismiss();
-//                        glbVars.spinContr.setSelection(0);
-//                        glbVars.spinAddr.setSelection(0);
-//                        glbVars.spinAddr.setAdapter(null);
-//                        glbVars.txtDate.setText("");
-//                        glbVars.txtComment.setText("");
-//                        glbVars.edContrFilter.setText("");
-//                        toolbar.setSubtitle("");
-//                        glbVars.setSaleIcon(mainMenu, 0, false);
-//                    }
-//                });
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
+                        glbVars.spinContr.setSelection(0);
+                        glbVars.spinAddr.setSelection(0);
+                        glbVars.spinAddr.setAdapter(null);
+                        glbVars.txtDate.setText("");
+                        glbVars.txtComment.setText("");
+                        glbVars.edContrFilter.setText("");
+                        toolbar.setSubtitle("");
+                    }
+                });
+            }
+        }).start();
+    }
+
+    public void SaveEditOrder(final String OrderID) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Cursor cHead, c, c2;
+
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
+                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                if (c.getCount() == 0) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return;
+                }
+
+                c2.moveToFirst();
+
+                if (c2.getInt(1) == 0) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return;
+                }
+                glbVars.db.getWritableDatabase().beginTransaction();
+                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ORDERS", null);
+                if (cHead.moveToNext()) {
+                    try {
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP_ID = '" + cHead.getString(0) + "', CONTR_ID = '" + cHead.getString(1) + "',ADDR_ID = '" + cHead.getString(2) + "', DELIVERY_DATE = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4) + "', DELIV_TIME = '" + cHead.getString(5) + "', GETMONEY = " + cHead.getInt(6) + ", GETBACKWARD = " + cHead.getInt(7) + ", BACKTYPE = " + cHead.getInt(8) + " WHERE DOCNO='" + OrderID + "'");
+                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + OrderID + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    cHead.close();
+                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.db.getWritableDatabase().endTransaction();
+                    glbVars.db.ClearOrderHeader();
+                    glbVars.db.ResetNomen();
+                    glbVars.OrderID = "";
+                }
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
+                        glbVars.spinContr.setSelection(0);
+                        glbVars.spinAddr.setSelection(0);
+                        glbVars.spinAddr.setAdapter(null);
+                        glbVars.txtDate.setText("");
+                        glbVars.txtComment.setText("");
+                        glbVars.edContrFilter.setText("");
+                        toolbar.setSubtitle("");
+                    }
+                });
             }
         }).start();
     }
@@ -304,10 +358,9 @@ public class FormOrderFragment extends Fragment {
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.NomenSave:
-                OrderHeadFragment orderHeadFragment = new OrderHeadFragment();
                 try {
                     if (!glbVars.OrderID.equals("")) {
-                        orderHeadFragment.SaveEditOrder(glbVars.OrderID);
+                        SaveEditOrder(glbVars.OrderID);
                     } else {
                         SaveOrder();
                     }

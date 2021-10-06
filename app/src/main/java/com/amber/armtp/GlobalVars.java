@@ -27,6 +27,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -177,10 +178,27 @@ public class GlobalVars extends Application {
 
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-
             long viewId = myView.getId();
 
-            if (viewId == R.id.btPlus) {
+            if (viewId == R.id.ColNomPhoto) {
+                isSecondPhoto = false;
+                String photoDir = getPhotoDir();
+                long ID = myAdapter.getItemIdAtPosition(position);
+                int cod = db.GetCod(ID);
+
+                String FileName = cod + ".jpg";
+                File imgFile = new File(photoDir + "/" + FileName);
+                if (!imgFile.exists() || imgFile.length() == 0) {
+                    AsyncFileName = FileName;
+                    if (isNetworkAvailable()) {
+                        DownloadPhoto(FileName);
+                    } else {
+                        Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    ShowNomenPhoto(FileName);
+                }
+            } else if (viewId == R.id.btPlus) {
                 long ID = myAdapter.getItemIdAtPosition(position);
                 db.PlusQty(ID);
                 myNom.requery();
@@ -194,7 +212,6 @@ public class GlobalVars extends Application {
                 if (PreviewZakazAdapter != null) {
                     PreviewZakazAdapter.notifyDataSetChanged();
                 }
-
             } else if (viewId == R.id.btMinus) {
                 long ID = myAdapter.getItemIdAtPosition(position);
                 db.MinusQty(ID);
@@ -210,8 +227,6 @@ public class GlobalVars extends Application {
                     PreviewZakazAdapter.notifyDataSetChanged();
                 }
             } else {
-
-
                 TextView c = myView.findViewById(R.id.ColNomID);
                 final String ID = c.getText().toString();
 
@@ -221,7 +236,6 @@ public class GlobalVars extends Application {
                 View promptView;
 
                 if (isMultiSelect) {
-
                     db.updateQty(ID, MultiQty);
                     myNom.requery();
                     NomenAdapter.notifyDataSetChanged();
@@ -229,10 +243,8 @@ public class GlobalVars extends Application {
                     String ToolBarContr = db.GetToolbarContr();
                     String OrderSum = db.getOrderSum();
                     toolbar.setSubtitle(ToolBarContr + OrderSum);
-
-
                 } else {
-//          Если режим выбора нескольких позиций выключен
+                    // Если режим выбора нескольких позиций выключен
                     promptView = layoutInflater.inflate(R.layout.change_qty, null);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(frContext);
                     alertDialogBuilder.setView(promptView);
@@ -302,6 +314,7 @@ public class GlobalVars extends Application {
             }
         }
     };
+
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, final int position, long arg3) {
@@ -310,7 +323,7 @@ public class GlobalVars extends Application {
             final String curSgi;
 
             TextView txtSgi = getView().findViewById(R.id.ColSgiID);
-            final TextView tvPhoto = myView.findViewById(R.id.ColNomCod);
+            final TextView tvCod = myView.findViewById(R.id.ColNomCod);
             curSgi = txtSgi.getText().toString();
 
             Cursor c = myNom;
@@ -359,7 +372,8 @@ public class GlobalVars extends Application {
                         case R.id.showPhoto:
                             isSecondPhoto = false;
                             String photoDir = getPhotoDir();
-                            String FileName = tvPhoto.getText().toString() + ".jpg";
+                            String FileName = tvCod.getText().toString() + ".jpg";
+                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
                             File imgFile = new File(photoDir + "/" + FileName);
                             if (!imgFile.exists() || imgFile.length() == 0) {
                                 AsyncFileName = FileName;
@@ -514,7 +528,7 @@ public class GlobalVars extends Application {
             });
         }
     };
-    TextView grupID, sgiID, tvPhoto;
+    TextView grupID, sgiID, tvCod;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v4.app.FragmentManager fragManager;
@@ -538,13 +552,13 @@ public class GlobalVars extends Application {
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
             nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.goToGroup:
                             fragment = new FormOrderFragment();
                             fragmentTransaction = fragManager.beginTransaction();
-
                             fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
                             fragmentTransaction.commit();
                             toolbar.setTitle("Формирование заказа");
@@ -554,8 +568,9 @@ public class GlobalVars extends Application {
                         case R.id.showPhoto:
                             isSecondPhoto = false;
                             String photoDir = getPhotoDir();
-                            tvPhoto = myView.findViewById(R.id.ColNomCod);
-                            String FileName = tvPhoto.getText().toString() + ".jpg";
+                            tvCod = myView.findViewById(R.id.ColNomCod);
+                            String FileName = tvCod.getText().toString() + ".jpg";
+                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
                             File imgFile = new File(photoDir + "/" + FileName);
 
                             if (!imgFile.exists() || imgFile.length() == 0) {
@@ -1143,7 +1158,6 @@ public class GlobalVars extends Application {
         if (imgFile.exists()) {
             imageView.setImage(ImageSource.uri(photoDir + "/" + PhotoFileName));
             imageView.setTag("Фото 1");
-
             imageView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     checkPhotoInDB(PhotoFileName);
@@ -1174,10 +1188,8 @@ public class GlobalVars extends Application {
                         alertPhoto.setTitle(imFileName);
                     }
                     imageView.setImage(ImageSource.uri(photoDir + "/" + LoadingFile));
-
                 }
             });
-
         } else {
             DownloadPhoto(PhotoFileName);
             if (imgFile.length() != 0) {
@@ -2295,18 +2307,43 @@ public class GlobalVars extends Application {
 
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
-            int resID = glbContext.getResources().getIdentifier("photo_free", "drawable", glbContext.getPackageName());
+            int resID;
 
             final Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
             TextView tvMH = view.findViewById(R.id.ColNomMH);
             TextView tvPrice = view.findViewById(R.id.ColNomPrice);
             TextView tvPosition = view.findViewById(R.id.ColNomPosition);
 
+            final TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
             final Button btPlus = view.findViewById(R.id.btPlus);
             final Button btMinus = view.findViewById(R.id.btMinus);
+
+            tvPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    if (viewId == R.id.ColNomPhoto) {
+//                        GlobalVars.isSecondPhoto = false;
+//                        String photoDir = getPhotoDir();
+//                        TextView tvCod = parent.findViewById(R.id.ColNomCod);
+//                        String FileName = tvCod.getText().toString() + ".jpg";
+//                        File imgFile = new File(photoDir + "/" + FileName);
+//                        if (!imgFile.exists() || imgFile.length() == 0) {
+//                            AsyncFileName = FileName;
+//                            if (isNetworkAvailable()) {
+//                                DownloadPhoto(FileName);
+//                            } else {
+//                                Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
+//                            }
+//                        } else {
+//                            ShowNomenPhoto(FileName);
+//                        }
+//                    }
+//                    Log.d("xd1", String.valueOf(parent));
+                    ((GridView) parent).performItemClick(v, position, 1); // Let the event be handled in onItemClick()
+                }
+            });
 
             btPlus.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -2326,7 +2363,7 @@ public class GlobalVars extends Application {
                 tvPrice.setText(String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100));
             }
 
-            if (tvPhoto != null && !cursor.getString(9).equals("")) {
+            if (!cursor.getString(9).equals("")) {
                 if (cursor.getInt(18) == 1) {
                     if (!cursor.getString(10).equals("")) {
                         if (cursor.getInt(19) == 1) {
@@ -2414,11 +2451,11 @@ public class GlobalVars extends Application {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, final ViewGroup parent) {
             int resID = glbContext.getResources().getIdentifier("photo_free", "drawable", glbContext.getPackageName());
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
+            final TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
             TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
 

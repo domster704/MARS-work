@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DBHepler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "armtp.db";
@@ -413,6 +415,28 @@ public class DBHepler extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    public int GetCod(Long RowID) {
+        SQLiteDatabase db;
+        Cursor cursor;
+        db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            cursor = db.rawQuery("SELECT COD FROM Nomen WHERE rowid=" + RowID, null);
+            int x = 0;
+            if (cursor.moveToNext()) {
+                x = cursor.getInt(cursor.getColumnIndex("COD"));
+                cursor.close();
+            }
+            return x;
+        } catch (SQLiteException e) {
+            Log.d("xd", String.valueOf(e));
+        } finally {
+            db.endTransaction();
+        }
+
+        return -1;
     }
 
     public Boolean PlusQty(Long RowID) {

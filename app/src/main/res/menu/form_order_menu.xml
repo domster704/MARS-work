@@ -36,17 +36,16 @@
             android:icon="@drawable/checkbox_free"
             android:title="Множественное выделение"
             app:showAsAction="always" />
-
     <item
             android:id="@+id/NomenGotoBegin"
             android:icon="@drawable/to_top"
             android:title="В начало списка"
-            app:showAsAction="always" />
+            app:showAsAction="ifRoom" />
     <item
             android:id="@+id/NomenGotoEnd"
             android:icon="@drawable/to_end"
             android:title="В конец списка"
-            app:showAsAction="always" />
+            app:showAsAction="ifRoom" />
     <item
             android:id="@+id/NomenFilters"
             android:icon="@drawable/filter"
