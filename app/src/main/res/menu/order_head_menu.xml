@@ -1,14 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item  android:id="@+id/SaveOrder" android:title="Сохранить заказ" android:icon="@android:drawable/ic_menu_save" android:showAsAction="always"/>-->
-    <item
-            android:id="@+id/OrdSumWithSales"
-            android:icon="@drawable/percent_sale"
-            android:title="Просчитать сумму заказа и цены с учетом скидки/наценки"
-            app:showAsAction="always" />
-    <item
-            android:id="@+id/ViewOrder"
-            android:title="Просмотр заказа"
-            app:showAsAction="always" />
-</menu>
+        xmlns:app="http://schemas.android.com/apk/res-auto"/>

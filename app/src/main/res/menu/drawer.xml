@@ -49,22 +49,9 @@
             </menu>
         </item>
     </group>
-    <group
-            android:id="@+id/down_images"
-            android:checkableBehavior="single">
-        <item
-                android:id="@+id/nav_downloadimages"
-                android:icon="@drawable/download_photos_vector"
-                android:title="@string/download_img" />
-    </group>
     <group android:checkableBehavior="single">
         <item android:title="@string/info">
             <menu>
-                <item
-                        android:id="@+id/nav_messages"
-                        android:icon="@drawable/sms_vector"
-                        android:title="@string/tp_messages"
-                        app:actionViewClass="android.widget.TextView" />
                 <item
                         android:id="@+id/nav_back_messages"
                         android:icon="@drawable/sms_vector"
@@ -76,10 +63,6 @@
                         android:id="@+id/nav_start_page"
                         android:icon="@drawable/info_app_vector"
                         android:title="@string/info_app" />
-                <item
-                        android:id="@+id/nav_help"
-                        android:icon="@drawable/help_app_vector"
-                        android:title="@string/help_app" />
             </menu>
         </item>
     </group>

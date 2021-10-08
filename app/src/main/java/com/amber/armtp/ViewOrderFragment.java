@@ -1,5 +1,6 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,13 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Objects;
+
 public class ViewOrderFragment extends Fragment {
     public GlobalVars glbVars;
     Menu mainMenu;
-    android.support.v4.app.Fragment fragment = null;
-    android.support.v4.app.FragmentTransaction fragmentTransaction;
     View thisView;
-    private android.support.v7.widget.Toolbar toolbar;
 
     public ViewOrderFragment() {
     }
@@ -34,21 +34,23 @@ public class ViewOrderFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
     }
 
+    @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        toolbar = getActivity().findViewById(R.id.toolbar);
+        android.support.v7.widget.Toolbar toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum);
+        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.PreviewZakaz();
         glbVars.fragManager = getActivity().getSupportFragmentManager();
@@ -58,76 +60,18 @@ public class ViewOrderFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.view_order_menu, menu);
         mainMenu = menu;
-        if (glbVars.db.CheckForSales() > 0) {
-            mainMenu.getItem(1).setEnabled(false);
-            glbVars.setSaleIcon(mainMenu, 0, true);
-        } else {
-            mainMenu.getItem(1).setEnabled(true);
-            glbVars.setSaleIcon(mainMenu, 0, false);
-        }
-
-        glbVars.setSaleIcon(mainMenu, 1, glbVars.isDiscount);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar actions click
-        switch (item.getItemId()) {
-            case R.id.FormOrderID:
-                Fragment fragment = new FormOrderFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
-                fragmentTransaction.commit();
-                return true;
-            case R.id.GoToOrderHead:
-                fragment = new OrderHeadFragment();
-                if (fragment != null) {
-                    fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                    fragmentTransaction.commit();
-                    toolbar.setTitle("Шапка заказа");
-                }
-                return true;
-            case R.id.ClearOrderTB:
-                glbVars.db.ClearOrderTb();
-                glbVars.nomenList.setAdapter(null);
-                setContrAndSum();
-                return true;
-            case R.id.OrderNomenSales:
-
-                if (glbVars.isSales) {
-                    mainMenu.getItem(1).setEnabled(true);
-                    glbVars.setSaleIcon(mainMenu, 0, false);
-                } else {
-                    glbVars.setDiscountIcon(mainMenu, 1, false);
-                    glbVars.setSaleIcon(mainMenu, 0, true);
-                }
-
-                glbVars.db.calcSales(glbVars.db.GetContrID());
-                if (glbVars.PreviewZakazAdapter != null) {
-                    glbVars.myNom.requery();
-                    glbVars.PreviewZakazAdapter.notifyDataSetChanged();
-                }
-                setContrAndSum();
-
-                if (glbVars.isDiscount) {
-                    glbVars.isDiscount = false;
-                    glbVars.Discount = 0;
-                    mainMenu.getItem(2).setEnabled(false);
-                    glbVars.setDiscountIcon(mainMenu, 2, false);
-                }
-                return true;
-            case R.id.NomenDiscount:
-                glbVars.CalculatePercentSale(mainMenu, 1);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.FormOrderID) {
+            Fragment fragment = new FormOrderFragment();
+            FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+            fragmentTransaction.commit();
+            return true;
         }
-    }
-
-    private void setContrAndSum() {
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum);
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -15,6 +15,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -765,12 +766,13 @@ public class FormOrderFragment extends Fragment {
         }
     }
 
+    @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
-        toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
 
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
@@ -800,6 +802,6 @@ public class FormOrderFragment extends Fragment {
     private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum);
+        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
     }
 }

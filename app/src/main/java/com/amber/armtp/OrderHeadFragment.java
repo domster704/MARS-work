@@ -2,11 +2,9 @@ package com.amber.armtp;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -14,15 +12,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -37,7 +32,6 @@ public class OrderHeadFragment extends Fragment {
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
-    android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v7.widget.Toolbar toolbar;
 
@@ -62,38 +56,6 @@ public class OrderHeadFragment extends Fragment {
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.order_head_menu, menu);
-        mainMenu = menu;
-        glbVars.setSaleIcon(mainMenu, 0, glbVars.db.CheckForSales() > 0);
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.OrdSumWithSales:
-                glbVars.setSaleIcon(mainMenu, 0, !glbVars.isSales);
-                glbVars.db.calcSales(glbVars.db.GetContrID());
-                if (glbVars.NomenAdapter != null) {
-                    glbVars.myNom.requery();
-                    glbVars.NomenAdapter.notifyDataSetChanged();
-                }
-                setContrAndSum();
-                return true;
-            case R.id.ViewOrder:
-                fragment = new ViewOrderFragment();
-                fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
-                fragmentTransaction.commit();
-                toolbar.setTitle("Просмотр заказа");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -213,12 +175,10 @@ public class OrderHeadFragment extends Fragment {
 
                 if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
                     glbVars.db.resetContrSales();
-                    glbVars.setSaleIcon(mainMenu, 0, false);
                     setContrAndSum();
                 } else {
                     if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
                         glbVars.db.resetContrSales();
-                        glbVars.setSaleIcon(mainMenu, 0, false);
                         setContrAndSum();
                     } else {
                         Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
@@ -239,7 +199,6 @@ public class OrderHeadFragment extends Fragment {
                     glbVars.txtDate.setText("");
                     glbVars.edContrFilter.setText("");
                     glbVars.db.resetContrSales();
-                    glbVars.setSaleIcon(mainMenu, 0, false);
                     setContrAndSum();
                     Toast.makeText(getActivity(), "Шапка заказа успешно очищена", Toast.LENGTH_LONG).show();
                 } else {
@@ -260,6 +219,7 @@ public class OrderHeadFragment extends Fragment {
         if (glbVars.CheckTPLock()) {
             glbVars.TPList.setSelection(TPDefaultRowid);
         } else {
+            assert stTP_ID != null;
             if (stTP_ID.equals("0")) {
                 glbVars.TPList.setSelection(TPRowid);
             } else {
@@ -306,6 +266,6 @@ public class OrderHeadFragment extends Fragment {
     private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum);
+        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
     }
 }

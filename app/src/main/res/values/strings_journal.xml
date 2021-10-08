@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="journStatus">Статус</string>
-    <string name="journZakazDate">Дата заказа</string>
-    <string name="journDeliveryDate">Дата доставки</string>
+    <string name="journZakazDate">Заказ</string>
+    <string name="journDeliveryDate">Доставка</string>
     <string name="journContr">Контрагент</string>
     <string name="journAddr">Адрес доставки</string>
     <string name="journSum">Сумма</string>

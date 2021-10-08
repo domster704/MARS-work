@@ -13,19 +13,16 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,13 +42,6 @@ public class MainActivity extends AppCompatActivity {
     //Defining Variables
     private static final long SMS_NOTIFY_INTERVAL = 30 * 60 * 1000; // интервал проверки обновления 5 минут
     private static final int LAYOUT = R.layout.activity_main;
-    public TextView SmsMsg;
-    private final BroadcastReceiver uiUpdated = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            SmsMsg.setText(Objects.requireNonNull(intent.getExtras()).getString("SmsCount"));
-        }
-    };
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
@@ -245,24 +235,12 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new DebetFragment(), "frag_debet");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_downloadimages:
-                        DisplayFragment(new ImagesFragment(), "frag_images");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_messages:
-                        DisplayFragment(new MessagesFragment(), "frag_messages");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
                     case R.id.nav_back_messages:
                         DisplayFragment(new BackSMSFragment(), "frag_back_messages");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_admin:
                         DisplayFragment(new AdminFragment(), "frag_admin");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_help:
-                        DisplayFragment(new HelpFragment(), "frag_help");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_exit:
@@ -277,8 +255,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        SmsMsg = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_messages));
-        initSMSCountDrawer();
         // Initializing Drawer Layout and ActionBarToggle
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
@@ -291,7 +267,6 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
                 super.onDrawerOpened(drawerView);
-                initSMSCountDrawer();
                 initVersion();
                 initLastUpdate();
             }
@@ -330,15 +305,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    private void initSMSCountDrawer() {
-        Integer count = globalVariable.getSMSCount();
-        ShortcutBadger.applyCount(getApplicationContext(), count);
-        SmsMsg.setGravity(Gravity.CENTER_VERTICAL);
-        SmsMsg.setTypeface(null, Typeface.BOLD);
-        SmsMsg.setTextColor(getResources().getColor(R.color.colorAccent));
-        SmsMsg.setText(count.toString());
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -349,14 +315,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(uiUpdated, new IntentFilter("SMS_COUNT"));
         ShortcutBadger.applyCount(this, 10);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(uiUpdated);
         Integer count = globalVariable.getSMSCount();
         ShortcutBadger.applyCount(getApplicationContext(), count);
     }

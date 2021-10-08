@@ -188,7 +188,6 @@ public class JournalFragment extends Fragment {
     private int progressStatus = 0;
     private android.support.v7.widget.Toolbar toolbar;
 
-
     public JournalFragment() {
     }
 

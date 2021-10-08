@@ -78,6 +78,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
@@ -204,7 +205,7 @@ public class GlobalVars extends Application {
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
-                toolbar.setSubtitle(ToolBarContr + OrderSum);
+                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
                 if (NomenAdapter != null) {
                     NomenAdapter.notifyDataSetChanged();
                 }
@@ -218,7 +219,7 @@ public class GlobalVars extends Application {
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
-                toolbar.setSubtitle(ToolBarContr + OrderSum);
+                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
                 if (NomenAdapter != null) {
                     NomenAdapter.notifyDataSetChanged();
                 }
@@ -1121,7 +1122,6 @@ public class GlobalVars extends Application {
         });
         alertPhoto = builder.create();
         alertPhoto.getWindow().setLayout(600, 400);
-        Log.d("xd", imFileName);
         alertPhoto.show();
 
         imageView = alertPhoto.findViewById(R.id.ivPhoto);
@@ -2432,7 +2432,6 @@ public class GlobalVars extends Application {
                 builder.append(" ").append(" ");
                 builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
                 builder.append(" ");
-                Log.d("xd1", String.valueOf(builder));
                 tvPhoto.setText(builder);
             }
 
@@ -2530,7 +2529,6 @@ public class GlobalVars extends Application {
             FTPClient ftpClient = new FTPClient();
 
             try {
-
                 ftpClient.connect(server, 21);
                 ftpClient.login(username, password);
                 ftpClient.enterLocalPassiveMode();
@@ -2544,8 +2542,8 @@ public class GlobalVars extends Application {
                 inputStream = new FileInputStream(secondLocalFile);
 
                 OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
-                byte[] bytesIn = new byte[4096];
-                int read = 0;
+                byte[] bytesIn = new byte[65536];
+                int read;
 
                 while ((read = inputStream.read(bytesIn)) != -1) {
                     outputStream.write(bytesIn, 0, read);
@@ -2558,11 +2556,9 @@ public class GlobalVars extends Application {
                 if (completed) {
                     ret_completed = true;
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             return null;
         }
 
