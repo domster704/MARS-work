@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".JournalFragment">
+    <item
+            android:id="@+id/DeleteOrders"
+            android:title="@string/deleteOrders"
+            android:icon="@drawable/ic_trashcan"
+            app:showAsAction="always"/>
+    <item
+            android:id="@+id/UpdateStatus"
+            android:icon="@drawable/update_data_vector_white"
+            android:title="@string/journUpdateStatus"
+            app:showAsAction="always" />
+</menu>

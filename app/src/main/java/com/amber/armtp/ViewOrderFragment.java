@@ -15,7 +15,6 @@ import java.util.Objects;
 
 public class ViewOrderFragment extends Fragment {
     public GlobalVars glbVars;
-    Menu mainMenu;
     View thisView;
 
     public ViewOrderFragment() {
@@ -50,7 +49,10 @@ public class ViewOrderFragment extends Fragment {
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        try {
+            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        } catch (Exception ignored) {
+        }
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.PreviewZakaz();
         glbVars.fragManager = getActivity().getSupportFragmentManager();
@@ -59,7 +61,6 @@ public class ViewOrderFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.view_order_menu, menu);
-        mainMenu = menu;
     }
 
     @Override

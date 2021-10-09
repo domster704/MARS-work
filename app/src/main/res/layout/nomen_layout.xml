@@ -207,7 +207,7 @@
     <Button
             android:id="@+id/btPlus"
             android:layout_width="40dp"
-            android:layout_height="22dp"
+            android:layout_height="30dp"
             android:layout_below="@+id/ColNomZakaz"
             android:layout_alignParentEnd="true"
             android:background="@android:drawable/btn_default_small"
@@ -222,7 +222,7 @@
     <Button
             android:id="@+id/btMinus"
             android:layout_width="40dp"
-            android:layout_height="22dp"
+            android:layout_height="30dp"
             android:layout_below="@+id/ColNomZakaz"
             android:layout_toEndOf="@+id/ColNomPrice"
             android:background="@android:drawable/btn_default_small"

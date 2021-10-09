@@ -1,20 +1,17 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SearchView;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,12 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,30 +37,26 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * Created by Linker4 on 27.09.2021
+ */
 public class JournalFragment extends Fragment {
-    private final Handler handler = new Handler();
-    private final SearchView.OnQueryTextListener searchTextListner =
-            new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return !newText.equals("");
-                }
+    private static final int ID_GOBACK = 101;
+    private static final int ID_AGREE = 102;
+    private static final int ID_CLEARALL = 103;
 
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-            };
-    public GlobalVars glbVars;
+    private boolean choseMod = false;
+    private ArrayList<Long> chosenOrders = new ArrayList<>();
+
+
+    private final int[] itemsList = new int[]{R.id.DeleteOrders, R.id.UpdateStatus, ID_GOBACK, ID_AGREE, ID_CLEARALL};
+
     Menu mainMenu;
-    SearchView searchView;
-    MenuItem searchItem;
+    private final Handler handler = new Handler();
+    public GlobalVars glbVars;
     Connection conn = null;
     Statement stmt;
     ResultSet reset;
@@ -76,6 +64,15 @@ public class JournalFragment extends Fragment {
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+        if (choseMod) {
+            chosenOrders.add(myAdapter.getItemIdAtPosition(position));
+            myView.setBackgroundColor(Color.rgb(60,152,255));
+        } else {
+            ClearAllMenuItems();
+            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
+                    .setIcon(R.drawable.back_arrow)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
             tvOrder = myView.findViewById(R.id.ColOrdDocNo);
             tvContr = myView.findViewById(R.id.ColOrdContr);
             tvAddr = myView.findViewById(R.id.ColOrdAddr);
@@ -86,12 +83,8 @@ public class JournalFragment extends Fragment {
             glbVars.LoadOrdersDetails(ID);
             glbVars.viewFlipper.setDisplayedChild(1);
         }
+        }
     };
-    EditText txtBDate, txtEDate;
-    Button btOrderFilter, btUpdateStatus;
-    Calendar CalBDate, CalEDate, c;
-    SimpleDateFormat sdf, df;
-    String myFormat = "dd.MM.yyyy";
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
 
@@ -195,6 +188,7 @@ public class JournalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.journal_fragment, container, false);
         glbVars.view = rootView;
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -204,19 +198,8 @@ public class JournalFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.form_order_menu, menu);
-        mainMenu = menu;
-        searchItem = menu.findItem(R.id.menu_search);
-        searchView = (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setQueryHint("Поиск по журналу");
-        searchView.setOnQueryTextListener(searchTextListner);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        btOrderFilter.performClick();
     }
 
     @Override
@@ -229,104 +212,25 @@ public class JournalFragment extends Fragment {
         glbVars.CurAc = getActivity();
     }
 
+    @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle("");
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
-
-        c = Calendar.getInstance();
-        df = new SimpleDateFormat(myFormat);
-        String formattedDate = df.format(c.getTime());
-
-        SimpleDateFormat s = new SimpleDateFormat(formattedDate);
-
-        CalBDate = Calendar.getInstance();
-        CalEDate = Calendar.getInstance();
-
-        txtBDate = getActivity().findViewById(R.id.txtBDate);
-        txtEDate = getActivity().findViewById(R.id.txtEDate);
-        txtBDate.setText(GlobalVars.getCalculatedDate(myFormat, -10));
-        txtEDate.setText(formattedDate);
-
-        btOrderFilter = getActivity().findViewById(R.id.btShowOrders);
-        btUpdateStatus = getActivity().findViewById(R.id.btUpdateStatus);
         glbVars.gdOrders = getActivity().findViewById(R.id.listSMS);
         glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
-        sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
-        final DatePickerDialog.OnDateSetListener Bdate = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // TODO Auto-generated method stub
-                CalBDate.set(Calendar.YEAR, year);
-                CalBDate.set(Calendar.MONTH, monthOfYear);
-                CalBDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                txtBDate.setText(sdf.format(CalBDate.getTime()));
-            }
-        };
+        glbVars.LoadOrders();
+        glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
+        glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
-
-        txtBDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(getActivity(), Bdate, CalBDate.get(Calendar.YEAR), CalBDate.get(Calendar.MONTH), CalBDate.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-        final DatePickerDialog.OnDateSetListener Edate = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // TODO Auto-generated method stub
-                CalEDate.set(Calendar.YEAR, year);
-                CalEDate.set(Calendar.MONTH, monthOfYear);
-                CalEDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                txtEDate.setText(sdf.format(CalEDate.getTime()));
-            }
-
-        };
-
-        txtEDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(getActivity(), Edate, CalEDate.get(Calendar.YEAR), CalEDate.get(Calendar.MONTH), CalEDate.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-        btOrderFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String BDate = txtBDate.getText().toString(), EDate = txtEDate.getText().toString();
-                if (!BDate.equals("") && !EDate.equals("")) {
-                    glbVars.LoadOrders(BDate, EDate);
-                    glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
-                    glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
-                } else {
-                    Toast.makeText(getActivity(), "Обязательно необходимо указать период", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        btUpdateStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (glbVars.isNetworkAvailable() == true) {
-                    UpdateStatus();
-                } else {
-                    Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-
+        toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
     }
 
-    private boolean SendDBFFile(String FileName) {
+    private void SendDBFFile(String FileName) {
         progress = null;
         progress = new ProgressDialog(getActivity());
         progress.setIndeterminate(false);
@@ -342,7 +246,6 @@ public class JournalFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 String server = getResources().getString(R.string.ftp_server);
                 String username = getResources().getString(R.string.ftp_user);
                 String password = getResources().getString(R.string.ftp_pass);
@@ -357,8 +260,6 @@ public class JournalFragment extends Fragment {
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
                     InputStream inputStream;
-
-//                    File secondLocalFile = new File(glbVars.GetSDCardpath()+glbVars.DBFolder+"/"+tmp_filename);
                     File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
 
                     String secondRemoteFile = tmp_filename;
@@ -366,7 +267,7 @@ public class JournalFragment extends Fragment {
 
                     OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
                     byte[] bytesIn = new byte[4096];
-                    int read = 0;
+                    int read;
 
                     while ((read = inputStream.read(bytesIn)) != -1) {
                         outputStream.write(bytesIn, 0, read);
@@ -387,7 +288,6 @@ public class JournalFragment extends Fragment {
                 });
             }
         }).start();
-        return true;
     }
 
     private void EditOrder(final String OrderID) {
@@ -532,8 +432,8 @@ public class JournalFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String ID = "", CONTR = "", TP = "";
-                    int STATUS = 1;
+                    String ID, CONTR, TP;
+                    int STATUS;
                     Cursor c;
                     while (reset.next()) {
                         ID = reset.getString(1);
@@ -564,7 +464,7 @@ public class JournalFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления списка номенклатуры
+                // Конец обновления списка номенклатуры
                 handler.post(new Runnable() {
                     public void run() {
                         progress.dismiss();
@@ -575,5 +475,81 @@ public class JournalFragment extends Fragment {
             }
         });
         thUpdateStatus.start();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.journal_menu, menu);
+        mainMenu = menu;
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.UpdateStatus:
+                if (glbVars.isNetworkAvailable()) {
+                    UpdateStatus();
+                } else {
+                    Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            case ID_GOBACK:
+                Fragment fragment = new JournalFragment();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
+                fragmentTransaction.commit();
+                return true;
+            case R.id.DeleteOrders:
+                choseMod = true;
+                ClearAllMenuItems();
+
+                mainMenu.add(Menu.NONE, ID_AGREE, Menu.NONE, "Удалить")
+                        .setIcon(R.drawable.ic_baseline_check_24)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                mainMenu.add(Menu.NONE, ID_CLEARALL, Menu.NONE, "Очистить выбранное")
+                        .setIcon(R.drawable.ic_baseline_clear_24)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                return true;
+            case ID_CLEARALL:
+                choseMod = false;
+                ClearAllMenuItems();
+                mainMenu.add(Menu.NONE, R.id.DeleteOrders, Menu.NONE, R.string.deleteOrders)
+                        .setIcon(R.drawable.ic_trashcan)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                mainMenu.add(Menu.NONE, R.id.UpdateStatus, Menu.NONE, R.string.journUpdateStatus)
+                        .setIcon(R.drawable.update_data_vector_white)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                glbVars.LoadOrders();
+            case ID_AGREE:
+                choseMod = false;
+
+                for (long i: chosenOrders) {
+                    glbVars.db.DeleteOrderByID(i);
+                }
+
+                ClearAllMenuItems();
+                mainMenu.add(Menu.NONE, R.id.DeleteOrders, Menu.NONE, R.string.deleteOrders)
+                        .setIcon(R.drawable.ic_trashcan)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                mainMenu.add(Menu.NONE, R.id.UpdateStatus, Menu.NONE, R.string.journUpdateStatus)
+                        .setIcon(R.drawable.update_data_vector_white)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                glbVars.LoadOrders();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void ClearAllMenuItems() {
+        for (int i : itemsList) {
+            mainMenu.removeItem(i);
+        }
     }
 }

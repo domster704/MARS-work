@@ -15,7 +15,7 @@
             android:id="@+id/ColOrdStatus"
             android:layout_width="120dp"
             android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -26,7 +26,7 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/ColOrdStatus"
+            android:layout_toEndOf="@+id/ColOrdStatus"
             android:gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000" />
@@ -37,7 +37,6 @@
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/ColOrdDocDate"
-            android:layout_toRightOf="@+id/ColOrdDocDate"
             android:gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000" />
@@ -48,7 +47,6 @@
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/ColOrdDeliveryDate"
-            android:layout_toRightOf="@+id/ColOrdDeliveryDate"
             android:gravity="left|center_vertical"
             android:paddingLeft="15dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -59,8 +57,8 @@
             android:layout_width="400dp"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/ColOrdSum"
-            android:layout_toRightOf="@+id/ColOrdContr"
+            android:layout_toStartOf="@+id/ColOrdSum"
+            android:layout_toEndOf="@+id/ColOrdContr"
             android:gravity="left|center_vertical"
             android:paddingLeft="15dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -71,9 +69,8 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:gravity="center_vertical|center_horizontal"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000" />
-
 </RelativeLayout>

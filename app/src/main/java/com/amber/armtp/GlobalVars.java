@@ -87,6 +87,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 /**
  * Created by filimonov on 22-08-2016.
+ * Updated by Linker4 on 27.09.2021
  */
 public class GlobalVars extends Application {
 
@@ -334,7 +335,6 @@ public class GlobalVars extends Application {
 
             PopupMenu nomPopupMenu = new PopupMenu(glbContext, myView);
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-//            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             if (BeginPos != 0) {
                 nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
             }
@@ -375,9 +375,6 @@ public class GlobalVars extends Application {
                     return true;
                 }
             });
-//            if (Photo.equals("")) {
-//                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
-//            }
             nomPopupMenu.show();
             return true;
         }
@@ -521,7 +518,6 @@ public class GlobalVars extends Application {
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
             final String Grup;
             final String Sgi;
-            final String curSgi;
 
             grupID = myView.findViewById(R.id.ColNomGRUPID);
             sgiID = myView.findViewById(R.id.ColNomSGIID);
@@ -530,63 +526,29 @@ public class GlobalVars extends Application {
             Grup = c.getString(7);
             Sgi = c.getString(8);
 
-            String Photo = c.getString(9);
-
             nomPopupMenu = new PopupMenu(CurAc, myView);
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-//            nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(true);
             nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    switch (menuItem.getItemId()) {
-                        case R.id.goToGroup:
-                            fragment = new FormOrderFragment();
-                            fragmentTransaction = fragManager.beginTransaction();
-                            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                            fragmentTransaction.commit();
-                            toolbar.setTitle("Формирование заказа");
-                            frSgi = Sgi;
-                            frGroup = Grup;
-                            return true;
-//                        case R.id.showPhoto:
-//                            isSecondPhoto = false;
-//                            String photoDir = getPhotoDir();
-//                            tvCod = myView.findViewById(R.id.ColNomCod);
-//                            String FileName = tvCod.getText().toString() + ".jpg";
-//                            Toast.makeText(getContext(), FileName, Toast.LENGTH_LONG).show();
-//                            File imgFile = new File(photoDir + "/" + FileName);
-//
-//                            if (!imgFile.exists() || imgFile.length() == 0) {
-//                                AsyncFileName = FileName;
-//                                if (isNetworkAvailable()) {
-//                                    DownloadPhoto(FileName);
-//                                } else {
-//                                    Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-//                                }
-//                                return false;
-//                            } else {
-//                                ShowNomenPhoto(FileName);
-//                            }
-                        default:
+                    if (menuItem.getItemId() == R.id.goToGroup) {
+                        fragment = new FormOrderFragment();
+                        fragmentTransaction = fragManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                        fragmentTransaction.commit();
+                        toolbar.setTitle("Формирование заказа");
+                        frSgi = Sgi;
+                        frGroup = Grup;
+                        return true;
                     }
                     return true;
                 }
             });
-//            if (Photo.equals("")) {
-//                nomPopupMenu.getMenu().findItem(R.id.showPhoto).setEnabled(false);
-//            }
             nomPopupMenu.show();
             return true;
         }
     };
-
-    public static String getCalculatedDate(String dateFormat, int days) {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat s = new SimpleDateFormat(dateFormat);
-        cal.add(Calendar.DAY_OF_YEAR, days);
-        return s.format(new Date(cal.getTimeInMillis()));
-    }
 
     public static java.util.Date StrToDbfDate(String Date) {
         java.util.Date return_date = null;
@@ -1449,9 +1411,9 @@ public class GlobalVars extends Application {
         return DBF_FileName;
     }
 
-    public void LoadOrders(String Bdate, String Edate) {
+    public void LoadOrders() {
         gdOrders.setAdapter(null);
-        Orders = db.getZakazy(Bdate, Edate);
+        Orders = db.getZakazy();
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCNO", "STATUS", "DOC_DATE", "CONTR", "ADDR", "SUM", "DELIVERY_DATE"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum, R.id.ColOrdDeliveryDate}, 0);
         gdOrders.setAdapter(OrdersAdapter);
     }
@@ -2065,30 +2027,17 @@ public class GlobalVars extends Application {
                 .setCancelable(true)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        RadioGroup radiogroup = SaleMarkupView.findViewById(R.id.radioGroup);
-                        int selectedId = radiogroup.getCheckedRadioButtonId();
-                        RadioButton radioButton = SaleMarkupView.findViewById(selectedId);
-                        String perc = "0";
-
-                        if (radioButton.getText().equals("Скидка")) {
-                            perc = edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString();
-                            Discount = Integer.valueOf(perc);
-                        } else if (radioButton.getText().equals("Наценка")) {
-                            perc = "-" + (edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString());
-                            Discount = Integer.valueOf(perc);
-                            isDiscount = true;
-                        } else {
-                            Discount = 0;
-                            isDiscount = false;
-                        }
+                        String perc;
+                        perc = edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString();
+                        Discount = Integer.parseInt(perc);
 
                         if (WhichView == 0) {
                             if (Integer.parseInt(perc) == 0) {
                                 isDiscount = false;
-                                setDiscountIcon(menu, 2, false);
+                                setDiscountIcon(menu, 3, false);
                             } else {
                                 isDiscount = true;
-                                setDiscountIcon(menu, 2, true);
+                                setDiscountIcon(menu, 3, true);
                             }
 
                             if (NomenAdapter != null) {
@@ -2139,23 +2088,6 @@ public class GlobalVars extends Application {
             }
         }
         photo_dir = arm_photo.toString();
-        return photo_dir;
-    }
-
-    public File getPhotoDirFile() {
-        File photo_dir;
-        File file = CurAc.getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        File extPhoto, arm_photo = null;
-
-        extPhoto = new File(file.toString());
-
-        if (extPhoto.canWrite()) {
-            arm_photo = new File(extPhoto.toString());
-            if (!arm_photo.exists()) {
-                arm_photo.mkdir();
-            }
-        }
-        photo_dir = arm_photo;
         return photo_dir;
     }
 
@@ -2383,7 +2315,6 @@ public class GlobalVars extends Application {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             View view = super.getView(position, convertView, parent);
 
             if (Orders.getString(4).equals("Удален")) {

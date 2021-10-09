@@ -109,6 +109,7 @@
             android:layout_toEndOf="@+id/tvPosition"
             android:background="@drawable/table_header"
             android:gravity="center_vertical|center_horizontal"
+            android:text="@string/nomenPhoto"
             android:textColor="#000000" />
 
     <TextView
@@ -138,7 +139,7 @@
 
     <TextView
             android:id="@+id/textView8"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="35dp"
             android:layout_above="@+id/listContrs"
             android:layout_below="@+id/SpinSgi"

@@ -35,6 +35,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
 
+
+/**
+ * Created by Linker4 on 27.09.2021
+ */
 public class FormOrderFragment extends Fragment {
     public GlobalVars glbVars;
     Menu mainMenu;
@@ -130,14 +134,11 @@ public class FormOrderFragment extends Fragment {
         inflater.inflate(R.menu.form_order_menu, menu);
         mainMenu = menu;
 
-        // Включение учёта скидки торгового представителя (значок "%" станет зелёным)
-        glbVars.setDiscountIcon(mainMenu, 2, glbVars.isDiscount);
-
+        // Включение учёта скидки торгового представителя (значок "%" станет зелёным (Этой иконки уже нет, но думаю вы поймёте))
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
-
         glbVars.db.calcSales(glbVars.db.GetContrID());
 
         if (glbVars.NomenAdapter != null) {
@@ -148,8 +149,6 @@ public class FormOrderFragment extends Fragment {
         if (glbVars.isDiscount) {
             glbVars.isDiscount = false;
             glbVars.Discount = 0;
-            mainMenu.getItem(2).setEnabled(false);
-            glbVars.setDiscountIcon(mainMenu, 2, false);
         }
     }
 
@@ -339,6 +338,8 @@ public class FormOrderFragment extends Fragment {
         }).start();
     }
 
+    private boolean isListFromTheEnd = false;
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -461,11 +462,16 @@ public class FormOrderFragment extends Fragment {
                 });
 
                 return true;
-            case R.id.NomenGotoBegin:
-                glbVars.nomenList.setSelection(0);
-                return true;
-            case R.id.NomenGotoEnd:
-                glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
+            case R.id.NomenSort:
+                if (isListFromTheEnd) {
+                    item.setIcon(R.drawable.to_top);
+                    glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
+                    isListFromTheEnd = false;
+                } else {
+                    item.setIcon(R.drawable.to_end);
+                    glbVars.nomenList.setSelection(0);
+                    isListFromTheEnd = true;
+                }
                 return true;
             case R.id.NomenDiscount:
                 glbVars.CalculatePercentSale(mainMenu, 0);
@@ -533,7 +539,6 @@ public class FormOrderFragment extends Fragment {
                 }
 
                 return true;
-
             case R.id.NomenFilters:
                 LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
                 final View promptView;
@@ -673,63 +678,62 @@ public class FormOrderFragment extends Fragment {
                     }
                 });
                 return true;
-
-            case R.id.NomenUniFilters:
-                LayoutInflater layoutInflater1 = LayoutInflater.from(getActivity());
-                final View promptView1;
-
-                promptView1 = layoutInflater1.inflate(R.layout.nomen_unifilter_layout, null);
-                AlertDialog.Builder alertDialogBuilder1 = new AlertDialog.Builder(getActivity());
-                alertDialogBuilder1.setView(promptView1);
-                glbVars.SetSelectedSgi("0", "0");
-                glbVars.SetSelectedGrup("0");
-
-                alertDialogBuilder1
-                        .setCancelable(true)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                            }
-                        })
-                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                final AlertDialog alertD1 = alertDialogBuilder1.create();
-                alertD1.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                alertD1.show();
-                glbVars.LoadUniFilters(promptView1, "");
-                glbVars.txtUniFilter = promptView1.findViewById(R.id.txtUniFilter);
-
-                glbVars.txtUniFilter.addTextChangedListener(new TextWatcher() {
-                    public void afterTextChanged(Editable s) {
-                        String Filter = glbVars.txtUniFilter.getText().toString();
-                        if (Filter.length() != 0) {
-                            glbVars.LoadUniFilters(promptView1, Filter);
-                        } else {
-                            glbVars.LoadUniFilters(promptView1, "");
-                        }
-                    }
-
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
-
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
-                });
-
-                alertD1.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        UnIFilterTypeID = promptView1.findViewById(R.id.tvUniTypeID);
-                        UniFilterID = promptView1.findViewById(R.id.tvUniID);
-
-                        glbVars.LoadNomByUniFilters(UnIFilterTypeID.getText().toString(), UniFilterID.getText().toString());
-                        alertD1.dismiss();
-                    }
-                });
-                return true;
+//            case R.id.NomenUniFilters:
+//                LayoutInflater layoutInflater1 = LayoutInflater.from(getActivity());
+//                final View promptView1;
+//
+//                promptView1 = layoutInflater1.inflate(R.layout.nomen_unifilter_layout, null);
+//                AlertDialog.Builder alertDialogBuilder1 = new AlertDialog.Builder(getActivity());
+//                alertDialogBuilder1.setView(promptView1);
+//                glbVars.SetSelectedSgi("0", "0");
+//                glbVars.SetSelectedGrup("0");
+//
+//                alertDialogBuilder1
+//                        .setCancelable(true)
+//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//                            }
+//                        })
+//                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//                                dialog.cancel();
+//                            }
+//                        });
+//
+//                final AlertDialog alertD1 = alertDialogBuilder1.create();
+//                alertD1.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+//                alertD1.show();
+//                glbVars.LoadUniFilters(promptView1, "");
+//                glbVars.txtUniFilter = promptView1.findViewById(R.id.txtUniFilter);
+//
+//                glbVars.txtUniFilter.addTextChangedListener(new TextWatcher() {
+//                    public void afterTextChanged(Editable s) {
+//                        String Filter = glbVars.txtUniFilter.getText().toString();
+//                        if (Filter.length() != 0) {
+//                            glbVars.LoadUniFilters(promptView1, Filter);
+//                        } else {
+//                            glbVars.LoadUniFilters(promptView1, "");
+//                        }
+//                    }
+//
+//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                    }
+//
+//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                    }
+//                });
+//
+//                alertD1.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        UnIFilterTypeID = promptView1.findViewById(R.id.tvUniTypeID);
+//                        UniFilterID = promptView1.findViewById(R.id.tvUniID);
+//
+//                        glbVars.LoadNomByUniFilters(UnIFilterTypeID.getText().toString(), UniFilterID.getText().toString());
+//                        alertD1.dismiss();
+//                    }
+//                });
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -802,6 +806,9 @@ public class FormOrderFragment extends Fragment {
     private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        try {
+            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        } catch (Exception ignored) {
+        }
     }
 }

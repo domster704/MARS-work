@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item  android:id="@+id/ActSearchNom" android:title="Поиск номенклатуры" android:icon="@android:drawable/ic_menu_search" android:showAsAction="always"/>-->
-
     <item
             android:id="@+id/menu_search"
             android:actionLayout="@layout/search_layout"
@@ -36,25 +34,32 @@
             android:icon="@drawable/checkbox_free"
             android:title="Множественное выделение"
             app:showAsAction="always" />
+
     <item
-            android:id="@+id/NomenGotoBegin"
-            android:icon="@drawable/to_top"
-            android:title="В начало списка"
-            app:showAsAction="ifRoom" />
-    <item
-            android:id="@+id/NomenGotoEnd"
+            android:id="@+id/NomenSort"
             android:icon="@drawable/to_end"
-            android:title="В конец списка"
-            app:showAsAction="ifRoom" />
+            android:title="В начало/конец списка"
+            app:showAsAction="always" />
+
+<!--    <item-->
+<!--            android:id="@+id/NomenGotoBegin"-->
+<!--            android:icon="@drawable/to_top"-->
+<!--            android:title="В начало списка"-->
+<!--            app:showAsAction="ifRoom" />-->
+<!--    <item-->
+<!--            android:id="@+id/NomenGotoEnd"-->
+<!--            android:icon="@drawable/to_end"-->
+<!--            android:title="В конец списка"-->
+<!--            app:showAsAction="ifRoom" />-->
     <item
             android:id="@+id/NomenFilters"
             android:icon="@drawable/filter"
             android:title="Фильтр по матрице"
             app:showAsAction="always" />
-    <item
-            android:id="@+id/NomenUniFilters"
-            android:icon="@drawable/filter_variant"
-            android:title="Универсальный фильтр"
-            app:showAsAction="always" />
+<!--    <item-->
+<!--            android:id="@+id/NomenUniFilters"-->
+<!--            android:icon="@drawable/filter_variant"-->
+<!--            android:title="Универсальный фильтр"-->
+<!--            app:showAsAction="always" />-->
     <!--<item android:title="Сохранить изменения в заказе" android:id="@+id/menu_save_changes" app:showAsAction="always"></item>-->
 </menu>

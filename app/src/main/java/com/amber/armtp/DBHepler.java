@@ -7,7 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
+/**
+ * Updated by Linker4 on 27.09.2021
+ */
 public class DBHepler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "armtp.db";
     private static final String TB_NOMEN = "Nomen";
@@ -725,6 +729,19 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
+    public boolean DeleteOrderByID(long id) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            db.execSQL("DELETE FROM ZAKAZY WHERE rowid=" + id);
+            db.execSQL("DELETE FROM ZAKAZY_DT WHERE rowid=" + id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
     public Boolean ClearOrderHeader() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
@@ -795,7 +812,7 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor getZakazy(String Bdate, String Edate) {
+    public Cursor getZakazy() {
         Cursor cursor;
         try {
             SQLiteDatabase db;
@@ -814,10 +831,8 @@ public class DBHepler extends SQLiteOpenHelper {
                     "  JOIN CONTRS ON ZAKAZY.CONTR_ID=CONTRS.ID\n" +
                     "  JOIN ADDRS ON ZAKAZY.ADDR_ID=ADDRS.ID\n" +
                     "WHERE\n" +
-                    "  DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))\n" +
-                    "  BETWEEN DATE(substr('" + Bdate + "', 7, 4) || '-' || substr('" + Bdate + "', 4, 2) || '-' || substr('" + Bdate + "', 1, 2)) AND DATE(substr('" + Edate + "', 7, 4) || '-' || substr('" + Edate + "', 4, 2) || '-' || substr('" + Edate + "', 1, 2)) ORDER BY ZAKAZY.ROWID", null);
+                    "  DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))\n", null);
             return cursor;
-
         } catch (Exception e) {
             return null;
         }

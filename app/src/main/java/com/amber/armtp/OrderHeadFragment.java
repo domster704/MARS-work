@@ -266,6 +266,9 @@ public class OrderHeadFragment extends Fragment {
     private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        try {
+            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+        } catch (Exception ignored) {
+        }
     }
 }
