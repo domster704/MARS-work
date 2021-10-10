@@ -64,6 +64,7 @@ public class JournalFragment extends Fragment {
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+        Toast.makeText(getContext(), String.valueOf((int) myAdapter.getItemIdAtPosition(position)), Toast.LENGTH_SHORT).show();
         if (choseMod) {
             chosenOrders.add(myAdapter.getItemIdAtPosition(position));
             myView.setBackgroundColor(Color.rgb(60,152,255));
@@ -215,7 +216,6 @@ public class JournalFragment extends Fragment {
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         glbVars.gdOrders = getActivity().findViewById(R.id.listSMS);
         glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
@@ -224,8 +224,13 @@ public class JournalFragment extends Fragment {
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
+        // Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
+        if (glbVars.gdOrders.getCount() > 100) {
+            glbVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
+        }
+
         toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+        toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из возможных 100");
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
     }
@@ -541,6 +546,8 @@ public class JournalFragment extends Fragment {
                         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                 glbVars.LoadOrders();
+                toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+                toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

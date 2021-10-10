@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Updated by Linker4 on 27.09.2021
@@ -729,15 +728,21 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public boolean DeleteOrderByID(long id) {
+    public void DeleteOrderByID(long id) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            db.execSQL("DELETE FROM ZAKAZY WHERE rowid=" + id);
-            db.execSQL("DELETE FROM ZAKAZY_DT WHERE rowid=" + id);
-            return true;
-        } catch (Exception e) {
-            return false;
+            Log.d("xd", String.valueOf(id));
+            Cursor cursor = db.rawQuery("SELECT DOCNO FROM ZAKAZY WHERE ROWID=" + id, null);
+            String data = "0";
+            if (cursor.moveToFirst()) {
+                data = cursor.getString(0);
+            }
+            Log.d("xd", data);
+
+            db.execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID=\"" + data + "\"");
+            db.execSQL("DELETE FROM ZAKAZY WHERE ROWID=" + id);
+        } catch (Exception ignored) {
         }
 
     }

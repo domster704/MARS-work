@@ -630,7 +630,6 @@ public class FormOrderFragment extends Fragment {
                     glbVars.SetSelectedFilterColor(ColorID);
                 }
 
-
                 alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -78,6 +78,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,6 +91,8 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  * Updated by Linker4 on 27.09.2021
  */
 public class GlobalVars extends Application {
+
+    public ArrayList<View> allOrders = new ArrayList<>();
 
     public Context glbContext;
     public Context frContext;
@@ -325,11 +328,9 @@ public class GlobalVars extends Application {
             final String curSgi;
 
             TextView txtSgi = getView().findViewById(R.id.ColSgiID);
-            final TextView tvCod = myView.findViewById(R.id.ColNomCod);
             curSgi = txtSgi.getText().toString();
 
             Cursor c = myNom;
-            String Photo = c.getString(9);
             Grup = c.getString(7);
             Sgi = c.getString(8);
 
@@ -2316,6 +2317,7 @@ public class GlobalVars extends Application {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+            allOrders.add(view);
 
             if (Orders.getString(4).equals("Удален")) {
                 view.setBackgroundColor(Color.rgb(253, 210, 210));
