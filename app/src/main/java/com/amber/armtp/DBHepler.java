@@ -732,13 +732,11 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            Log.d("xd", String.valueOf(id));
             Cursor cursor = db.rawQuery("SELECT DOCNO FROM ZAKAZY WHERE ROWID=" + id, null);
             String data = "0";
             if (cursor.moveToFirst()) {
                 data = cursor.getString(0);
             }
-            Log.d("xd", data);
 
             db.execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID=\"" + data + "\"");
             db.execSQL("DELETE FROM ZAKAZY WHERE ROWID=" + id);

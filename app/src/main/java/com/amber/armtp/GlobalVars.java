@@ -92,7 +92,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  */
 public class GlobalVars extends Application {
 
-    public ArrayList<View> allOrders = new ArrayList<>();
+    public static ArrayList<JournalAdapter.ViewData> allOrders = new ArrayList<>();
 
     public Context glbContext;
     public Context frContext;
@@ -2309,6 +2309,18 @@ public class GlobalVars extends Application {
     public class JournalAdapter extends SimpleCursorAdapter {
         Cursor cursor;
 
+        class ViewData {
+            public int position;
+            public View view;
+            public AdapterView<?> parent;
+
+            public ViewData(int position, View view, ViewGroup parent) {
+                this.position = position;
+                this.view = view;
+                this.parent = (AdapterView<?>) parent;
+            }
+        }
+
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
             cursor = c;
@@ -2317,7 +2329,7 @@ public class GlobalVars extends Application {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
-            allOrders.add(view);
+            GlobalVars.allOrders.add(new ViewData(position, convertView, parent));
 
             if (Orders.getString(4).equals("Удален")) {
                 view.setBackgroundColor(Color.rgb(253, 210, 210));

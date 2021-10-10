@@ -97,7 +97,6 @@ public class FormOrderFragment extends Fragment {
     View thisView;
     TextView txtSgi, txtGroup, tvHeadCod, tvHeadDescr, tvHeadMP, tvHeadZakaz;
     TextView FilterSgi_ID, FilterGroup_ID, FilterTovcat_ID, FilterFunc_ID, FilterBrand_ID, FilterWC_ID, FilterProd_ID, FilterFocus_ID, FilterModel_ID, FilterColor_ID;
-    TextView UnIFilterTypeID, UniFilterID;
     private android.support.v7.widget.Toolbar toolbar;
 
 
@@ -806,7 +805,11 @@ public class FormOrderFragment extends Fragment {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         try {
-            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+            if (ToolBarContr.trim().equals("")) {
+                toolbar.setSubtitle("Заказ на сумму " + OrderSum.substring(2) + " руб.");
+            } else {
+                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+            }
         } catch (Exception ignored) {
         }
     }

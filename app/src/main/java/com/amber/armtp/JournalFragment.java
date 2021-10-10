@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -224,9 +225,13 @@ public class JournalFragment extends Fragment {
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
-        // Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
+        // Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов myAdapter.getItemIdAtPosition(position)
         if (glbVars.gdOrders.getCount() > 100) {
-            glbVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
+            for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
+                long id = GlobalVars.allOrders.get(i).parent.getItemIdAtPosition(GlobalVars.allOrders.get(0).position);
+                glbVars.db.DeleteOrderByID(id);
+            }
+            GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
         }
 
         toolbar = getActivity().findViewById(R.id.toolbar);

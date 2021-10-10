@@ -29,7 +29,6 @@ import java.util.Objects;
  */
 public class OrderHeadFragment extends Fragment {
     public GlobalVars glbVars;
-    Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
@@ -40,7 +39,6 @@ public class OrderHeadFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.order_head_fragment, container, false);
         Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
@@ -267,7 +265,11 @@ public class OrderHeadFragment extends Fragment {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         try {
-            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+            if (ToolBarContr.trim().equals("")) {
+                toolbar.setSubtitle("Заказ на сумму " + OrderSum.substring(2) + " руб.");
+            } else {
+                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+            }
         } catch (Exception ignored) {
         }
     }
