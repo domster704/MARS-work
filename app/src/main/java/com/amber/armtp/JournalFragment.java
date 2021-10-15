@@ -50,7 +50,7 @@ public class JournalFragment extends Fragment {
     private static final int ID_CLEARALL = 103;
 
     private boolean choseMod = false;
-    private ArrayList<Long> chosenOrders = new ArrayList<>();
+    private final ArrayList<Long> chosenOrders = new ArrayList<>();
 
 
     private final int[] itemsList = new int[]{R.id.DeleteOrders, R.id.UpdateStatus, ID_GOBACK, ID_AGREE, ID_CLEARALL};
@@ -65,26 +65,25 @@ public class JournalFragment extends Fragment {
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-        Toast.makeText(getContext(), String.valueOf((int) myAdapter.getItemIdAtPosition(position)), Toast.LENGTH_SHORT).show();
-        if (choseMod) {
-            chosenOrders.add(myAdapter.getItemIdAtPosition(position));
-            myView.setBackgroundColor(Color.rgb(60,152,255));
-        } else {
-            ClearAllMenuItems();
-            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
-                    .setIcon(R.drawable.back_arrow)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (choseMod) {
+                chosenOrders.add(myAdapter.getItemIdAtPosition(position));
+                myView.setBackgroundColor(Color.rgb(60, 152, 255));
+            } else {
+                ClearAllMenuItems();
+                mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
+                        .setIcon(R.drawable.back_arrow)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
-            tvContr = myView.findViewById(R.id.ColOrdContr);
-            tvAddr = myView.findViewById(R.id.ColOrdAddr);
-            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
-            tvStatus = myView.findViewById(R.id.ColOrdStatus);
-            glbVars.ordStatus = tvStatus.getText().toString();
-            final String ID = tvOrder.getText().toString();
-            glbVars.LoadOrdersDetails(ID);
-            glbVars.viewFlipper.setDisplayedChild(1);
-        }
+                tvOrder = myView.findViewById(R.id.ColOrdDocNo);
+                tvContr = myView.findViewById(R.id.ColOrdContr);
+                tvAddr = myView.findViewById(R.id.ColOrdAddr);
+                tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
+                tvStatus = myView.findViewById(R.id.ColOrdStatus);
+                glbVars.ordStatus = tvStatus.getText().toString();
+                final String ID = tvOrder.getText().toString();
+                glbVars.LoadOrdersDetails(ID);
+                glbVars.viewFlipper.setDisplayedChild(1);
+            }
         }
     };
     PopupMenu nomPopupMenu;
@@ -202,13 +201,20 @@ public class JournalFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        deleteExtraOrders();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        deleteExtraOrders();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
+        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
@@ -218,14 +224,22 @@ public class JournalFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        glbVars.gdOrders = getActivity().findViewById(R.id.listSMS);
+        glbVars.gdOrders = Objects.requireNonNull(getActivity()).findViewById(R.id.listSMS);
         glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
 
         glbVars.LoadOrders();
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
-        // Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов myAdapter.getItemIdAtPosition(position)
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
+    }
+
+    /**
+     * Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
+     */
+    public void deleteExtraOrders() {
+        Log.d("xd", String.valueOf(GlobalVars.allOrders));
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
                 long id = GlobalVars.allOrders.get(i).parent.getItemIdAtPosition(GlobalVars.allOrders.get(0).position);
@@ -233,11 +247,10 @@ public class JournalFragment extends Fragment {
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
         }
+        glbVars.LoadOrders();
 
-        toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из возможных 100");
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
     }
 
     private void SendDBFFile(String FileName) {
@@ -506,13 +519,14 @@ public class JournalFragment extends Fragment {
                 return true;
             case ID_GOBACK:
                 Fragment fragment = new JournalFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
                 fragmentTransaction.commit();
                 return true;
             case R.id.DeleteOrders:
                 choseMod = true;
                 ClearAllMenuItems();
+                chosenOrders.clear();
 
                 mainMenu.add(Menu.NONE, ID_AGREE, Menu.NONE, "Удалить")
                         .setIcon(R.drawable.ic_baseline_check_24)
@@ -537,9 +551,10 @@ public class JournalFragment extends Fragment {
             case ID_AGREE:
                 choseMod = false;
 
-                for (long i: chosenOrders) {
+                for (long i : chosenOrders) {
                     glbVars.db.DeleteOrderByID(i);
                 }
+                chosenOrders.clear();
 
                 ClearAllMenuItems();
                 mainMenu.add(Menu.NONE, R.id.DeleteOrders, Menu.NONE, R.string.deleteOrders)

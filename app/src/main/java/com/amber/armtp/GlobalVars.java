@@ -223,7 +223,11 @@ public class GlobalVars extends Application {
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
-                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                if (OrderSum.length() > 0) {
+                    toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                } else {
+                    toolbar.setSubtitle(ToolBarContr);
+                }
                 if (NomenAdapter != null) {
                     NomenAdapter.notifyDataSetChanged();
                 }

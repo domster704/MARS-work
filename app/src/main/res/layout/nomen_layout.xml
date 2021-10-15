@@ -206,33 +206,28 @@
 
     <Button
             android:id="@+id/btPlus"
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="30dp"
             android:layout_below="@+id/ColNomZakaz"
             android:layout_alignParentEnd="true"
-            android:background="@android:drawable/btn_default_small"
-            android:backgroundTint="@android:color/holo_green_dark"
+            android:background="@drawable/ic_add"
             android:focusable="false"
             android:minWidth="30dp"
             android:minHeight="30dp"
             android:textColor="@android:color/black"
-            android:textSize="8sp"
             android:theme="@android:style/Widget.Holo.Light.Button" />
 
     <Button
             android:id="@+id/btMinus"
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="30dp"
             android:layout_below="@+id/ColNomZakaz"
             android:layout_toEndOf="@+id/ColNomPrice"
-            android:background="@android:drawable/btn_default_small"
-            android:backgroundTint="@android:color/holo_red_dark"
+            android:background="@drawable/ic_remove"
             android:focusable="false"
             android:minWidth="30dp"
             android:minHeight="30dp"
-            android:textAlignment="center"
             android:textColor="@android:color/black"
-            android:textSize="8sp"
             android:theme="@android:style/Widget.Holo.Light.Button" />
 
 </RelativeLayout>

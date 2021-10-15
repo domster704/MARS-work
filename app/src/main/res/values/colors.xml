@@ -12,5 +12,7 @@
     <color name="colorLightPrimary">#B2EBF2</color>
     <color name="alphaShade">#99000000</color>
     <color name="nvBackground">#bfd2d9</color>
+    <color name="yellow">#ffff00</color>
+    <color name="blue">#ffff00</color>
 
 </resources>
