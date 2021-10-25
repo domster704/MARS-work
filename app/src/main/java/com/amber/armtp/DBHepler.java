@@ -1006,8 +1006,8 @@ public class DBHepler extends SQLiteOpenHelper {
                     " printf('%.2f', DEBET.OTG30) AS OTG30, \n" +
                     " printf('%.2f', DEBET.OPL30) AS OPL30, \n" +
                     " printf('%.2f', DEBET.OTG30/DEBET.SALDO) AS KOB, \n" +
-                    "DEBET.FIRMA, \n" +
-                    "CONTRS.CRT_DATE \n" +
+                    " DEBET.FIRMA, \n" +
+                    " CONTRS.CRT_DATE \n" +
                     " FROM DEBET JOIN CONTRS ON RTRIM(DEBET.CONTR_ID)=CONTRS.ID" + Sql + " ORDER BY CONTRS.DESCR", null);
             System.out.println("Sql query:" + "SELECT DISTINCT\n" +
                     "DEBET.ROWID AS _id ,\n" +

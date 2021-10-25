@@ -9,13 +9,14 @@
     <string name="nomenPrice">Цена</string>
     <string name="nomenZakaz">Заказ</string>
     <string name="nomenSum">Сумма</string>
-    <string name="nomenSetQty">Введите количество</string>
+    <string name="nomenSetQty">Заказ</string>
+    <string name="nomenTitle">Заполнить колонку Заказ</string>
     <string name="nomenMP">Метка</string>
     <string name="nomenMH">МХ</string>
     <string name="nomenGroup">Товарная группа</string>
     <string name="nomenMultiQty">По сколько будем добавлять?</string>
     <string name="nomenSaleMarkup">Скидка:</string>
     <string name="nomenPP">NN</string>
-    <string name="nomenBeginPP">Начальный № п/п</string>
-    <string name="nomenEndPP">Конечный № п/п</string>
+    <string name="nomenBeginPP">Начальный NN</string>
+    <string name="nomenEndPP">Конечный NN</string>
 </resources>

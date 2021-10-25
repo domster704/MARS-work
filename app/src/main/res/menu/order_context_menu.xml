@@ -7,11 +7,6 @@
             android:visible="true"
             app:showAsAction="always"/>
     <item
-            android:id="@+id/CtxOrdDelete"
-            android:title="Удалить заказ"
-            android:visible="true"
-            app:showAsAction="always"/>
-    <item
             android:id="@+id/CtxOrdEdit"
             android:title="Редактировать"
             android:visible="true"

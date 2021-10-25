@@ -6,9 +6,5 @@
             android:actionLayout="@layout/search_layout"
             android:title="Поиск"
             app:actionViewClass="android.support.v7.widget.SearchView"
-            app:showAsAction="always"></item>
-    <item
-            android:id="@+id/returnToOrderHead"
-            android:title="Шапка заказа"
             app:showAsAction="always" />
 </menu>

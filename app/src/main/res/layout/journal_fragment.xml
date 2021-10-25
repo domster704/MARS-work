@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:screenOrientation="landscape"
         android:weightSum="1">
+
+    <LinearLayout
+            android:id="@+id/checkboxLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="31dp"
+            android:orientation="vertical"
+            />
 
     <ViewFlipper
             android:id="@+id/viewflipper"
@@ -13,20 +22,22 @@
             android:layout_height="fill_parent"
             android:layout_margin="6dp">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/orders_journal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:longClickable="false"
                 android:orientation="horizontal"
                 android:screenOrientation="landscape"
-                android:weightSum="1">
+                android:weightSum="1"
+                tools:ignore="RedundantNamespace">
 
             <TextView
                     android:id="@+id/textView18"
                     android:layout_width="120dp"
                     android:layout_height="25dp"
-                    android:layout_toRightOf="@+id/textView19"
+                    android:layout_toEndOf="@+id/textView19"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/journZakazDate"
@@ -182,4 +193,4 @@
         </RelativeLayout>
 
     </ViewFlipper>
-</RelativeLayout>
+</LinearLayout>

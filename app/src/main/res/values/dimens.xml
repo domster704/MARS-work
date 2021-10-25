@@ -6,4 +6,11 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="headOrderFontSize">16sp</dimen>
+    <dimen name="mainFontSize">14sp</dimen>
+
+    <dimen name="tvWidthOrderFragment">210dp</dimen>
+    <!-- на 5dp должно быть меньше чем tvWidthOrderFragment  -->
+    <dimen name="editTextParentWidth">205dp</dimen>
 </resources>

@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
+import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.Log;
@@ -40,11 +41,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,7 +81,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
@@ -110,9 +111,11 @@ public class GlobalVars extends Application {
     public android.support.v7.widget.Toolbar toolbar;
     public String SelectGroup = null;
 
+    public LinearLayout layout;
+
     public boolean isSales = false;
     public boolean isDiscount = false;
-    public int Discount = 0;
+    public float Discount = 0;
 
     public int MultiQty = 0;
     public boolean isMultiSelect = false;
@@ -154,7 +157,7 @@ public class GlobalVars extends Application {
         }
     };
     public Spinner spinContr, spinAddr, TPList, spinCenTypes;
-    public Button btSave, btClear;
+    public Button btSave;
     public Calendar DeliveryDate, DeliveryTime;
     public EditText txtDate;
     public EditText edContrFilter;
@@ -390,6 +393,23 @@ public class GlobalVars extends Application {
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = myGrups.getString(myGrups.getColumnIndex("ID"));
             if (!ItemID.equals("0")) {
+                SharedPreferences settings = getSharedPreferences("form_order", 0);;
+                SharedPreferences.Editor editor = settings.edit();;
+
+                editor.putString("ColSgiFID", "");
+                editor.putString("ColGrupFID", "");
+                editor.putString("ColTovcatID", "");
+                editor.putString("ColFuncID", "");
+                editor.putString("ColBrandID", "");
+                editor.putString("ColWCID", "");
+                editor.putString("ColProdID", "");
+                editor.putString("ColFocusID", "");
+                editor.putString("ColModelID", "");
+                editor.putString("ColColorID", "");
+
+                editor.apply();
+
+                FormOrderFragment.filter.setImageResource(R.drawable.filter);
                 LoadNom(ItemID);
             } else {
                 nomenList.setAdapter(null);
@@ -404,6 +424,22 @@ public class GlobalVars extends Application {
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = mySgi.getString(mySgi.getColumnIndex("ID"));
             if (!ItemID.equals("0")) {
+                SharedPreferences settings = getSharedPreferences("form_order", 0);;
+                SharedPreferences.Editor editor = settings.edit();;
+
+                editor.putString("ColSgiFID", "");
+                editor.putString("ColGrupFID", "");
+                editor.putString("ColTovcatID", "");
+                editor.putString("ColFuncID", "");
+                editor.putString("ColBrandID", "");
+                editor.putString("ColWCID", "");
+                editor.putString("ColProdID", "");
+                editor.putString("ColFocusID", "");
+                editor.putString("ColModelID", "");
+                editor.putString("ColColorID", "");
+
+                editor.apply();
+                FormOrderFragment.filter.setImageResource(R.drawable.filter);
                 LoadGroups(ItemID);
                 if (SelectGroup != null) {
                     SetSelectedGrup(SelectGroup);
@@ -1417,6 +1453,8 @@ public class GlobalVars extends Application {
     }
 
     public void LoadOrders() {
+        GlobalVars.allOrders.clear();
+        layout.removeAllViews();
         gdOrders.setAdapter(null);
         Orders = db.getZakazy();
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCNO", "STATUS", "DOC_DATE", "CONTR", "ADDR", "SUM", "DELIVERY_DATE"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum, R.id.ColOrdDeliveryDate}, 0);
@@ -2027,17 +2065,18 @@ public class GlobalVars extends Application {
         SaleDlg.setView(SaleMarkupView);
 
         final EditText edPercent = SaleMarkupView.findViewById(R.id.txtPercent);
+        edPercent.setText(String.valueOf(Discount));
 
-        SaleDlg
-                .setCancelable(true)
+        SaleDlg.setCancelable(true)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         String perc;
                         perc = edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString();
-                        Discount = Integer.parseInt(perc);
+                        Discount = Float.parseFloat(perc);
+                        Log.d("xd", String.valueOf(Discount));
 
                         if (WhichView == 0) {
-                            if (Integer.parseInt(perc) == 0) {
+                            if (Discount == 0) {
                                 isDiscount = false;
                                 setDiscountIcon(menu, 3, false);
                             } else {
@@ -2052,7 +2091,7 @@ public class GlobalVars extends Application {
                         }
 
                         if (WhichView == 1) {
-                            if (Integer.parseInt(perc) == 0) {
+                            if (Discount == 0) {
                                 isDiscount = false;
                                 setDiscountIcon(menu, 1, false);
                             } else {
@@ -2138,7 +2177,8 @@ public class GlobalVars extends Application {
             TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
 
             if (!cursor.getString(3).equals("")) {
-                tvDescr.setText(cursor.getString(2) + " / " + cursor.getString(3));
+                String text = cursor.getString(2) + " / " + cursor.getString(3);
+                tvDescr.setText(text);
             } else {
                 tvDescr.setText(cursor.getString(2));
             }
@@ -2251,7 +2291,8 @@ public class GlobalVars extends Application {
             });
 
             if (isDiscount && Discount != 0) {
-                tvPrice.setText(String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100));
+                String text = String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100);
+                tvPrice.setText(text);
             }
 
             if (!cursor.getString(9).equals("")) {
@@ -2317,11 +2358,13 @@ public class GlobalVars extends Application {
             public int position;
             public View view;
             public AdapterView<?> parent;
+            public CheckBox checkBox;
 
-            public ViewData(int position, View view, ViewGroup parent) {
+            public ViewData(int position, View view, ViewGroup parent, CheckBox checkBox) {
                 this.position = position;
                 this.view = view;
                 this.parent = (AdapterView<?>) parent;
+                this.checkBox = checkBox;
             }
         }
 
@@ -2333,16 +2376,18 @@ public class GlobalVars extends Application {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
-            GlobalVars.allOrders.add(new ViewData(position, convertView, parent));
 
-            if (Orders.getString(4).equals("Удален")) {
-                view.setBackgroundColor(Color.rgb(253, 210, 210));
+            if (convertView != null) {
+                CheckBox checkBox = new CheckBox(layout.getContext());
+                checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, convertView.getHeight()));
+                layout.addView(checkBox);
+                GlobalVars.allOrders.add(new ViewData((int) ((AdapterView) parent).getItemIdAtPosition(position), convertView, parent, checkBox));
+            }
+
+            if (position % 2 == 0) {
+                view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
-                if (position % 2 == 0) {
-                    view.setBackgroundColor(Color.rgb(201, 235, 255));
-                } else {
-                    view.setBackgroundColor(Color.rgb(255, 255, 255));
-                }
+                view.setBackgroundColor(Color.rgb(255, 255, 255));
             }
             return view;
         }

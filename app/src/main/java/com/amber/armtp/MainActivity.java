@@ -455,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
                     new SQLData("TMP_DEBET", "FIRMA", "''"),
                     new SQLData("TMP_DEBET", "P1D", "0"),
                     new SQLData("TMP_DEBET", "P2D", "0"),
-                    new SQLData("CONTRS", "c", "''"),
+                    new SQLData("CONTRS", "CRT_DATE", "''"),
                     new SQLData("Nomen", "TOVCATID", "''"),
                     new SQLData("Nomen", "FUNCID", "''"),
                     new SQLData("Nomen", "BRANDID", "''"),

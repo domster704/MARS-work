@@ -41,11 +41,11 @@
             android:title="В начало/конец списка"
             app:showAsAction="always" />
 
-    <item
-            android:id="@+id/NomenFilters"
-            android:icon="@drawable/filter"
-            android:title="Фильтр по матрице"
-            app:showAsAction="always" />
+<!--    <item-->
+<!--            android:id="@+id/NomenFilters"-->
+<!--            android:icon="@drawable/filter"-->
+<!--            android:title="Фильтр по матрице"-->
+<!--            app:showAsAction="always" />-->
 <!--    <item-->
 <!--            android:id="@+id/NomenUniFilters"-->
 <!--            android:icon="@drawable/filter_variant"-->

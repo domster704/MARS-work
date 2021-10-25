@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteStatement;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,9 +33,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -46,44 +41,48 @@ import java.util.Objects;
  */
 public class JournalFragment extends Fragment {
     private static final int ID_GOBACK = 101;
-    private static final int ID_AGREE = 102;
+    private static final int ID_DELETE = 102;
     private static final int ID_CLEARALL = 103;
 
-    private boolean choseMod = false;
-    private final ArrayList<Long> chosenOrders = new ArrayList<>();
+    private boolean deleteMode = false;
+
+    private static class ChosenData {
+        public long position;
+        public CheckBox checkBox;
+
+        public ChosenData(long position, CheckBox checkBox) {
+            this.position = position;
+            this.checkBox = checkBox;
+        }
+    }
+
+    private final ArrayList<ChosenData> chosenOrders = new ArrayList<>();
 
 
-    private final int[] itemsList = new int[]{R.id.DeleteOrders, R.id.UpdateStatus, ID_GOBACK, ID_AGREE, ID_CLEARALL};
+    private final int[] itemsList = new int[]{R.id.DeleteOrders, ID_GOBACK};
 
     Menu mainMenu;
-    private final Handler handler = new Handler();
     public GlobalVars glbVars;
     Connection conn = null;
-    Statement stmt;
-    ResultSet reset;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-            if (choseMod) {
-                chosenOrders.add(myAdapter.getItemIdAtPosition(position));
-                myView.setBackgroundColor(Color.rgb(60, 152, 255));
-            } else {
-                ClearAllMenuItems();
-                mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
-                        .setIcon(R.drawable.back_arrow)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            glbVars.layout.setVisibility(View.GONE);
+            ClearAllMenuItems();
+            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
+                    .setIcon(R.drawable.back_arrow)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-                tvOrder = myView.findViewById(R.id.ColOrdDocNo);
-                tvContr = myView.findViewById(R.id.ColOrdContr);
-                tvAddr = myView.findViewById(R.id.ColOrdAddr);
-                tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
-                tvStatus = myView.findViewById(R.id.ColOrdStatus);
-                glbVars.ordStatus = tvStatus.getText().toString();
-                final String ID = tvOrder.getText().toString();
-                glbVars.LoadOrdersDetails(ID);
-                glbVars.viewFlipper.setDisplayedChild(1);
-            }
+            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
+            tvContr = myView.findViewById(R.id.ColOrdContr);
+            tvAddr = myView.findViewById(R.id.ColOrdAddr);
+            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
+            tvStatus = myView.findViewById(R.id.ColOrdStatus);
+            glbVars.ordStatus = tvStatus.getText().toString();
+            final String ID = tvOrder.getText().toString();
+            glbVars.LoadOrdersDetails(ID);
+            glbVars.viewFlipper.setDisplayedChild(1);
         }
     };
     PopupMenu nomPopupMenu;
@@ -140,11 +139,6 @@ public class JournalFragment extends Fragment {
                             builder.create();
                             builder.show();
                             return true;
-                        case R.id.CtxOrdDelete:
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS=99 WHERE DOCNO='" + ID + "'");
-                            glbVars.Orders.requery();
-                            glbVars.OrdersAdapter.notifyDataSetChanged();
-                            return true;
                         case R.id.CtxOrdCopy:
                             CopyOrder(ID);
                             return true;
@@ -157,29 +151,26 @@ public class JournalFragment extends Fragment {
             if (Status.equals("Удален") || Status.equals("Отменен")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
             }
 
             if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
             }
 
             if (Status.equals("Отправлен")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdDelete).setEnabled(false);
             }
 
             if (Status.equals("Сохранен")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
             }
+
             nomPopupMenu.show();
             return true;
         }
 
     };
-    private int progressStatus = 0;
     private android.support.v7.widget.Toolbar toolbar;
 
     public JournalFragment() {
@@ -227,7 +218,9 @@ public class JournalFragment extends Fragment {
         glbVars.gdOrders = Objects.requireNonNull(getActivity()).findViewById(R.id.listSMS);
         glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
 
+        glbVars.layout = getActivity().findViewById(R.id.checkboxLayout);
         glbVars.LoadOrders();
+
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
@@ -239,10 +232,10 @@ public class JournalFragment extends Fragment {
      * Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
      */
     public void deleteExtraOrders() {
-        Log.d("xd", String.valueOf(GlobalVars.allOrders));
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
-                long id = GlobalVars.allOrders.get(i).parent.getItemIdAtPosition(GlobalVars.allOrders.get(0).position);
+//                long id = GlobalVars.allOrders.get(i).parent.getItemIdAtPosition(GlobalVars.allOrders.get(i).position);
+                int id = GlobalVars.allOrders.get(i).position;
                 glbVars.db.DeleteOrderByID(id);
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
@@ -421,85 +414,6 @@ public class JournalFragment extends Fragment {
         }
     }
 
-    private void UpdateStatus() {
-        Thread thUpdateStatus;
-        progress = null;
-        progress = new ProgressDialog(getActivity());
-        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progress.setIndeterminate(false);
-        progress.setCancelable(true);
-        progress.setCanceledOnTouchOutside(false);
-        progress.show();
-
-        if (conn == null) {
-            ConnectToSql();
-        }
-
-        thUpdateStatus = new Thread(new Runnable() {
-            public void run() {
-                SQLiteStatement statement;
-
-                String sql_update = "UPDATE ZAKAZY SET STATUS=? WHERE DOCNO=? AND TP_ID=? AND CONTR_ID=?";
-                statement = glbVars.db.getWritableDatabase().compileStatement(sql_update);
-                int cntOrders = 0;
-                try {
-                    stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    reset = stmt.executeQuery("SELECT BASEDOC, CONTR ,TP, ORD_STATUS FROM V_ORDER_STATUS ORDER BY BASEDOC");
-                    reset.last();
-                    cntOrders = reset.getRow();
-                    progress.setMax(cntOrders);
-                    reset.beforeFirst();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    glbVars.db.getWritableDatabase().beginTransaction();
-                    String ID, CONTR, TP;
-                    int STATUS;
-                    Cursor c;
-                    while (reset.next()) {
-                        ID = reset.getString(1);
-                        CONTR = reset.getString(2);
-                        TP = reset.getString(3);
-                        STATUS = reset.getInt(4);
-                        c = glbVars.db.getWritableDatabase().rawQuery("SELECT DOCNO FROM ZAKAZY WHERE DOCNO='" + ID + "' AND TP_ID='" + TP + "' AND CONTR_ID='" + CONTR + "'", null);
-                        if (c.moveToFirst()) {
-                            statement.clearBindings();
-                            statement.bindLong(1, STATUS);
-                            statement.bindString(2, ID);
-                            statement.bindString(3, TP);
-                            statement.bindString(4, CONTR);
-                            statement.executeUpdateDelete();
-                            statement.clearBindings();
-                        }
-                        c.close();
-                        progressStatus += 1;
-                        handler.post(new Runnable() {
-                            public void run() {
-                                progress.setProgress(progressStatus);
-                            }
-                        });
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } finally {
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
-                }
-                // Конец обновления списка номенклатуры
-                handler.post(new Runnable() {
-                    public void run() {
-                        progress.dismiss();
-                        glbVars.Orders.requery();
-                        glbVars.OrdersAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        });
-        thUpdateStatus.start();
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.journal_menu, menu);
@@ -510,64 +424,65 @@ public class JournalFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.UpdateStatus:
-                if (glbVars.isNetworkAvailable()) {
-                    UpdateStatus();
-                } else {
-                    Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
-                }
-                return true;
             case ID_GOBACK:
                 Fragment fragment = new JournalFragment();
                 FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
                 fragmentTransaction.commit();
+                glbVars.layout.setVisibility(View.VISIBLE);
                 return true;
             case R.id.DeleteOrders:
-                choseMod = true;
-                ClearAllMenuItems();
-                chosenOrders.clear();
+//                boolean flag = chosenOrders.size() == 0;
+//                if (!flag) {
+//                    for (ChosenData i : chosenOrders) {
+//                        if (i.checkBox.isChecked()) {
+//                            flag = true;
+//                        }
+//                    }
+//                }
+//                if (flag) {
+//                    Toast.makeText(getActivity(), "Не выбран заказ", Toast.LENGTH_LONG).show();
+//                    return true;
+//                }
 
-                mainMenu.add(Menu.NONE, ID_AGREE, Menu.NONE, "Удалить")
-                        .setIcon(R.drawable.ic_baseline_check_24)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                builder.setMessage("Удалить заказы?")
+                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        })
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                checkCB();
+                                deleteMode = false;
 
-                mainMenu.add(Menu.NONE, ID_CLEARALL, Menu.NONE, "Очистить выбранное")
-                        .setIcon(R.drawable.ic_baseline_clear_24)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                return true;
-            case ID_CLEARALL:
-                choseMod = false;
-                ClearAllMenuItems();
-                mainMenu.add(Menu.NONE, R.id.DeleteOrders, Menu.NONE, R.string.deleteOrders)
-                        .setIcon(R.drawable.ic_trashcan)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                                for (ChosenData data : chosenOrders) {
+                                    glbVars.db.DeleteOrderByID(data.position);
+                                }
 
-                mainMenu.add(Menu.NONE, R.id.UpdateStatus, Menu.NONE, R.string.journUpdateStatus)
-                        .setIcon(R.drawable.update_data_vector_white)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                                glbVars.LoadOrders();
+                                toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+                                toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+                            }
+                        })
+                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                checkCB();
+                                for (ChosenData data: chosenOrders) {
+                                    if (data.checkBox.isChecked()) {
+                                        data.checkBox.setChecked(false);
+                                    }
+                                }
+                            }
+                        });
 
-                glbVars.LoadOrders();
-            case ID_AGREE:
-                choseMod = false;
+                AlertDialog alertDlg = builder.create();
+                alertDlg.show();
 
-                for (long i : chosenOrders) {
-                    glbVars.db.DeleteOrderByID(i);
-                }
-                chosenOrders.clear();
-
-                ClearAllMenuItems();
-                mainMenu.add(Menu.NONE, R.id.DeleteOrders, Menu.NONE, R.string.deleteOrders)
-                        .setIcon(R.drawable.ic_trashcan)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                mainMenu.add(Menu.NONE, R.id.UpdateStatus, Menu.NONE, R.string.journUpdateStatus)
-                        .setIcon(R.drawable.update_data_vector_white)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                glbVars.LoadOrders();
-                toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-                toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -577,6 +492,19 @@ public class JournalFragment extends Fragment {
     private void ClearAllMenuItems() {
         for (int i : itemsList) {
             mainMenu.removeItem(i);
+        }
+    }
+
+    /**
+     * Смортит какие позиции были выбраны для удаления
+     */
+    private void checkCB() {
+        chosenOrders.clear();
+        for (GlobalVars.JournalAdapter.ViewData i : GlobalVars.allOrders) {
+            Log.d("xd", String.valueOf(i.position));
+            if (i.checkBox.isChecked()) {
+                chosenOrders.add(new ChosenData(i.position, i.checkBox));
+            }
         }
     }
 }

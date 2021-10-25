@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
 public class UpdateDataFragment extends Fragment {
     private final Handler handler = new Handler();
@@ -52,7 +53,7 @@ public class UpdateDataFragment extends Fragment {
     Statement stmt;
     ResultSet reset;
     Thread thUpdateData;
-    CheckBox chkSgi, chkGrup, chkNomen, chkContrs, chkAddrr, chkTp, chkDebet, chkStatus, chkOuted, chkSales, chkGrupAccess, chkFuncs, chkTovcat, chkBrand, chkWC, chkProd, chkFocus;
+    CheckBox chkSgi, chkGrup, chkNomen, chkContrs, chkAddrr, chkTp, chkDebet, chkStatus, chkOuted, chkSales, chkGrupAccess;
     CheckBox chkUniMx;
     Button btUpdate;
     String TP_ID;
@@ -63,14 +64,14 @@ public class UpdateDataFragment extends Fragment {
     private final BroadcastReceiver UpdateDebetWorking = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            DebetIsFinished = intent.getExtras().getString("DebetUpdateFinished");
+            DebetIsFinished = Objects.requireNonNull(intent.getExtras()).getString("DebetUpdateFinished");
         }
     };
-    private ProgressBar pgUpSgi, pgUpGroups, pgUpNomen, pgUpContrs, pgUpAddress, pgUpTp, pgUpDebet, pgUpStatus, pgUpOuted, pgUpSales, pgUpGrupAccess, pgUpFuncs, pgUpTovcat, pgUpBrand, pgUpWC, pgUpProd, pgUpFocus;
+    private ProgressBar pgUpSgi, pgUpGroups, pgUpNomen, pgUpContrs, pgUpAddress, pgUpTp, pgUpDebet, pgUpStatus, pgUpOuted, pgUpSales, pgUpGrupAccess;
     private ProgressBar pgUpUniMX;
     private TextView tvUpUniMX, tvUpUniMXPerc;
-    private TextView tvUpSgi, tvUpGroups, tvUpNomen, tvUpContrs, tvUpAddress, tvUpTp, tvUpDebet, tvUpStatus, tvUpOuted, tvUpSales, tvUpGrupAccess, tvUpFuncs, tvUpTovcat, tvUpBrand, tvUpWC, tvUpProd, tvUpFocus;
-    private TextView tvUpSgiPerc, tvUpGroupsPerc, tvUpNomenPerc, tvUpContrsPerc, tvUpAddressPerc, tvUpTpPerc, tvUpDebetPerc, tvUpStatusPerc, tvUpOutedPerc, tvUpSalesPerc, tvUpGrupAccessPerc, tvUpFuncsPerc, tvUpTovcatPerc, tvUpBrandPerc, tvUpWCPerc, tvUpProdPerc, tvUpFocusPerc;
+    private TextView tvUpSgi, tvUpGroups, tvUpNomen, tvUpContrs, tvUpAddress, tvUpTp, tvUpDebet, tvUpStatus, tvUpOuted, tvUpSales, tvUpGrupAccess;
+    private TextView tvUpSgiPerc, tvUpGroupsPerc, tvUpNomenPerc, tvUpContrsPerc, tvUpAddressPerc, tvUpTpPerc, tvUpDebetPerc, tvUpStatusPerc, tvUpOutedPerc, tvUpSalesPerc, tvUpGrupAccessPerc;
     private int progressStatusSGI = 0;
     private int progressStatusGrup = 0;
     private int progressStatusNom = 0;
@@ -221,7 +222,7 @@ public class UpdateDataFragment extends Fragment {
                 conn = null;
                 reset = null;
                 if (DebetIsFinished.equals("1") || DebetIsFinished.equals("0")) {
-                    if (glbVars.isNetworkAvailable() == true) {
+                    if (glbVars.isNetworkAvailable()) {
                         glbVars.UpdateWorking = 1;
                         btUpdate.setEnabled(false);
                         UpdateData();
@@ -235,7 +236,7 @@ public class UpdateDataFragment extends Fragment {
 
         try {
             getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
-        } catch (Exception E) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -348,7 +349,7 @@ public class UpdateDataFragment extends Fragment {
 
         thUpdateData = new Thread(new Runnable() {
             public void run() {
-//              Обновляем список СГИ
+                // Обновляем список СГИ
                 String sql = "";
                 SQLiteStatement statement;
                 sql = "INSERT INTO sgi(ID, DESCR, LOWDESCR)  VALUES (?,?,?);";
@@ -374,8 +375,9 @@ public class UpdateDataFragment extends Fragment {
                 }
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sgi; DELETE FROM sqlite_sequence WHERE name = 'sgi';");
-                    String ID = "", Descr = "", LowDescr = "";
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sgi");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'sgi';");
+                    String ID, Descr, LowDescr;
                     while (reset.next()) {
                         ID = reset.getString(1);
                         Descr = reset.getString(2);
@@ -411,7 +413,7 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления списка СГИ
+                // Конец обновления списка СГИ
                 reset = null;
                 sql = "INSERT INTO CEN_TYPES(ROW_ID, CEN_ID, DESCR)  VALUES (?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
@@ -425,7 +427,8 @@ public class UpdateDataFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM CEN_TYPES; DELETE FROM sqlite_sequence WHERE name = 'CEN_TYPES';");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM CEN_TYPES;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'CEN_TYPES';");
                     String ID = "", Descr = "";
                     int ROW_ID = 0;
                     while (reset.next()) {
@@ -447,14 +450,14 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                Конец обновления типов цен
+                // Конец обновления типов цен
                 reset = null;
                 sql = "INSERT INTO GRUPS(ID, SGIID, DESCR, LOWDESCR)  VALUES (?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntGrups = 0;
                 try {
                     stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    String SqlSel = "";
+                    String SqlSel;
                     if (TP_LOCK) {
                         SqlSel = "SELECT ID, V_GRUPS_MOBILE_ARM.SGI_ID, DESCR, CODE, LOWDESCR FROM V_GRUPS_MOBILE_ARM JOIN V_TP_GRUP_ACCESS ON V_GRUPS_MOBILE_ARM.ID=V_TP_GRUP_ACCESS.GRUP_ID WHERE V_TP_GRUP_ACCESS.TP_ID='" + TP_ID + "' ORDER BY 3";
                     } else {
@@ -471,8 +474,9 @@ public class UpdateDataFragment extends Fragment {
                 }
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM GRUPS; DELETE FROM sqlite_sequence WHERE name = 'GRUPS';");
-                    String ID = "", SGIID = "", Descr = "", LowDescr = "";
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM GRUPS;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'GRUPS';");
+                    String ID, SGIID, Descr, LowDescr;
                     while (reset.next()) {
                         ID = reset.getString(1);
                         SGIID = reset.getString(2);
@@ -510,7 +514,7 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления списка товарных групп
+                // Конец обновления списка товарных групп
                 reset = null;
                 String sql_update = "UPDATE Nomen SET GRUPID=?, COD=?, DESCR=?, OST=?, PRICE=?, lowDESCR=?, SGIID=?, CODE=?, PHOTO1=?, PHOTO2=?, VKOROB=?, ISUPDATED=1, ISNEW=?, IS7DAY=?, IS28DAY=?, MP=?, IS_PERM=?, TOVCATID=?, FUNCID=?, BRANDID=?, WCID=?, PRODID=?, FOCUSID=?, MODELID=?, SIZEID=?, COLORID=? WHERE ID=?";
                 String sql_insert = "INSERT INTO Nomen(ID, GRUPID, COD, DESCR, OST, PRICE, lowDESCR, SGIID, CODE, PHOTO1, PHOTO2, VKOROB, ISUPDATED, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, TOVCATID, FUNCID, BRANDID, WCID, PRODID, FOCUSID, MODELID, SIZEID, COLORID)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
@@ -537,9 +541,9 @@ public class UpdateDataFragment extends Fragment {
                 try {
                     glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ISUPDATED=0, ISNEW=0, IS7DAY=0, IS28DAY=0");
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String ID = "", PARENTID = "", Cod5 = "", Code = "", Descr = "", SgiID = "", Photo1 = "", Photo2 = "", MP = "", TOVCAT = "", FUNC = "", BRAND = "", WC = "", PROD = "", FOCUS = "", MODEL = "", COLOR = "", SIZE = "";
-                    int Ost = 0, Vkorob = 0, ISNEW = 0, IS7DAY = 0, IS28DAY = 0, IS_PERM = 0;
-                    Float Price = 0.0f;
+                    String ID, PARENTID, Cod5, Code, Descr, SgiID, Photo1, Photo2, MP, TOVCAT, FUNC, BRAND, WC, PROD, FOCUS, MODEL, COLOR, SIZE;
+                    int Ost, Vkorob, ISNEW, IS7DAY, IS28DAY, IS_PERM;
+                    Float Price;
                     Cursor c;
                     while (reset.next()) {
                         ID = reset.getString(1);
@@ -659,11 +663,11 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления списка номенклатуры
+                // Конец обновления списка номенклатуры
 
-//              Обновляем список контрагентов
+                // Обновляем список контрагентов
                 reset = null;
-                sql = "INSERT INTO CONTRS(ID, DESCR, lowDESCR, CODE, INSTOP, DOLG, DYNAMO, TP, INFO)  VALUES (?,?,?,?,?,?,?,?,?);";
+                sql = "INSERT INTO CONTRS(ID, DESCR, lowDESCR, CODE, INSTOP, DOLG, DYNAMO, TP, INFO, CRT_DATE)  VALUES (?,?,?,?,?,?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntContrs = 0;
                 try {
@@ -679,9 +683,10 @@ public class UpdateDataFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM CONTRS; DELETE FROM sqlite_sequence WHERE name = 'CONTRS';");
-                    String ID = "", Descr = "", Code = "", TP = "", contrInfo = "", Crt_date = "";
-                    int Instop = 0, Dolg = 0, Dynamo = 0;
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM CONTRS;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'CONTRS';");
+                    String ID, Descr, Code, TP, contrInfo, Crt_date;
+                    int Instop, Dolg, Dynamo;
                     while (reset.next()) {
                         ID = reset.getString(1);
                         Code = reset.getString(3);
@@ -692,6 +697,7 @@ public class UpdateDataFragment extends Fragment {
                         Dynamo = reset.getInt(6);
                         TP = reset.getString(7);
                         contrInfo = reset.getString(8);
+                        Crt_date = reset.getString(9);
 
                         statement.clearBindings();
                         statement.bindString(1, ID);
@@ -703,6 +709,7 @@ public class UpdateDataFragment extends Fragment {
                         statement.bindLong(7, Dynamo);
                         statement.bindString(8, TP);
                         statement.bindString(9, contrInfo);
+                        statement.bindString(10, Crt_date);
 
                         statement.executeInsert();
                         statement.clearBindings();
@@ -745,8 +752,9 @@ public class UpdateDataFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM ADDRS; DELETE FROM sqlite_sequence WHERE name = 'ADDRS';");
-                    String ID = "", PARENTID = "", Descr = "", Code = "", Dop_Info = "";
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM ADDRS;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'ADDRS';");
+                    String ID, PARENTID, Descr, Code, Dop_Info;
                     while (reset.next()) {
                         ID = reset.getString(1);
                         PARENTID = reset.getString(2);
@@ -785,12 +793,9 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//              Конец обновления списка адресов
+                //  Конец обновления списка адресов
 
-//              Обновляем список торговых представителей
-//                if (chkTp.isChecked()) {
-//                    progressStatusTP = 0;
+                //  Обновляем список торговых представителей
                 sql = "INSERT INTO TORG_PRED(ID, DESCR, CODE, TP_PASS)  VALUES (?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntTP = 0;
@@ -806,9 +811,10 @@ public class UpdateDataFragment extends Fragment {
                 }
 
                 try {
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM TORG_PRED; DELETE FROM sqlite_sequence WHERE name = 'TORG_PRED';");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM TORG_PRED;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'TORG_PRED';");
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String ID = "", Descr = "", Code = "", TP_PASS = "";
+                    String ID, Descr, Code, TP_PASS;
                     while (reset.next()) {
                         ID = reset.getString(1);
                         Descr = reset.getString(2);
@@ -844,13 +850,8 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//              Конец обновления списка торговых представителей
 
-//              Обновляем дебиторку
-//                if (chkDebet.isChecked()) {
-//                    progressStatusDeb = 0;
-                sql = "INSERT INTO DEBET(ROW, CONTR_ID, KREDIT, LIM, NEKONTR, SALDO, A7, A14, A21, A28, TP_ID, TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30, FIRMA)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                sql = "INSERT INTO DEBET([ROW], CONTR_ID, KREDIT, LIM, NEKONTR, SALDO, A7, A14, A21, A28, TP_ID, TP_IDS, A35, A42, A49, A56, A63, A64, OTG30, OPL30, FIRMA)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntDeb = 0;
                 try {
@@ -866,10 +867,11 @@ public class UpdateDataFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET; DELETE FROM sqlite_sequence WHERE name = 'DEBET';");
-                    String ID = "", TP_ID = "", TP_IDS = "", FIRMA = "";
-                    int Rowid = 0, Kredit = 0, Limit = 0, Nekontr = 0;
-                    Float Saldo = 0.0f, a7 = 0.0f, a14 = 0.0f, a21 = 0.0f, a28 = 0.0f, a35 = 0.0f, a42 = 0.0f, a49 = 0.0f, a56 = 0.0f, a63 = 0.0f, a64 = 0.0f, otg30 = 0.0f, opl30 = 0.0f;
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM DEBET;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'DEBET';");
+                    String ID, TP_ID, TP_IDS, FIRMA;
+                    int Rowid, Kredit, Limit, Nekontr;
+                    float Saldo, a7, a14, a21, a28, a35, a42, a49, a56, a63, a64, otg30, opl30;
                     while (reset.next()) {
                         Rowid = reset.getInt(1);
                         ID = reset.getString(2);
@@ -940,11 +942,9 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//                Конец обновления дебиторки
+                // Конец обновления дебиторки
 
-//                Обновляем статусы заказов
-//                progressStatusOrders = 0;
+                // Обновляем статусы заказов
                 sql = "UPDATE ZAKAZY SET STATUS=? WHERE DOCNO=? AND TP_ID=? AND CONTR_ID=?";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntOrders = 0;
@@ -961,8 +961,8 @@ public class UpdateDataFragment extends Fragment {
 
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String ID = "", CONTR = "", TP = "";
-                    int STATUS = 1;
+                    String ID, CONTR, TP;
+                    int STATUS;
                     Cursor c;
                     while (reset.next()) {
                         ID = reset.getString(1);
@@ -1003,10 +1003,9 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления статусов заказов
+                // Конец обновления статусов заказов
 
-//              Обновляем вычерки
-//                progressStatusOuted = 0;
+                // Обновляем вычерки
                 sql = "UPDATE ZAKAZY_DT SET IS_OUTED=?, OUT_QTY=? WHERE ZAKAZ_ID=? AND NOM_ID=?";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntOuted = 0;
@@ -1065,11 +1064,9 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//              Конец обновления вычерков
+                // Конец обновления вычерков
 
-//              Обновляем скидки
-//                if (chkSales.isChecked()) {
-//                progressStatusSales = 0;
+                // Обновляем скидки
                 sql = "INSERT INTO SALES(CONTR_ID, GRUP_ID, SALE)  VALUES (?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntSales = 0;
@@ -1085,10 +1082,11 @@ public class UpdateDataFragment extends Fragment {
                 }
 
                 try {
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM SALES; DELETE FROM sqlite_sequence WHERE name = 'SALES';");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM SALES;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'SALES';");
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String CONTR_ID = "", GRUP_ID = "";
-                    Float SALE = 0.0f;
+                    String CONTR_ID, GRUP_ID ;
+                    float SALE;
                     while (reset.next()) {
                         CONTR_ID = reset.getString(1);
                         GRUP_ID = reset.getString(2);
@@ -1122,12 +1120,7 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//              Конец обновления скидок
 
-//              Обновляем ограничения товарных групп
-//                if (chkSales.isChecked()) {
-//                progressStatusAccess = 0;
                 sql = "INSERT INTO TP_GRUP_ACCESS(TP_ID, SGI_ID, GRUP_ID)  VALUES (?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntGrupAccess = 0;
@@ -1136,7 +1129,6 @@ public class UpdateDataFragment extends Fragment {
                     reset = stmt.executeQuery("SELECT TP_ID, SGI_ID, GRUP_ID FROM V_TP_GRUP_ACCESS ORDER BY 1, 3, 2");
                     reset.last();
                     cntGrupAccess = reset.getRow();
-//                    System.out.println("cntGrupAccess: " + cntGrupAccess);
                     pgUpGrupAccess.setMax(cntGrupAccess);
                     reset.beforeFirst();
                 } catch (Exception e) {
@@ -1144,9 +1136,10 @@ public class UpdateDataFragment extends Fragment {
                 }
 
                 try {
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM TP_GRUP_ACCESS; DELETE FROM sqlite_sequence WHERE name = 'TP_GRUP_ACCESS';");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM TP_GRUP_ACCESS;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'TP_GRUP_ACCESS';");
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    String TP_ID = "", GRUP_ID = "", SGI_ID = "";
+                    String TP_ID, GRUP_ID, SGI_ID;
                     while (reset.next()) {
                         TP_ID = reset.getString(1);
                         SGI_ID = reset.getString(2);
@@ -1180,17 +1173,15 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                }
-//              Конец обновления ограничений товарных групп
 
-//                Обновление универсальной матрицы 23-04-2020
+                // Обновление универсальной матрицы 23-04-2020
                 sql = "INSERT INTO UNI_MATRIX(TYPE_ID, TYPE_DESCR, ID, DESCR, LOWDESCR)  VALUES (?,?,?,?,?);";
                 statement = glbVars.db.getWritableDatabase().compileStatement(sql);
                 int cntUniMX = 0;
                 try {
 
                     stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    String SqlSel = "";
+                    String SqlSel;
                     SqlSel = "SELECT [TYPE_ID], [TYPE_DESCR], [ID], [DESCR], [LOWDESCR] FROM [V_UNI_MATRIX](NOLOCK) ORDER BY [TYPE_ID], [DESCR]";
 
                     reset = stmt.executeQuery(SqlSel);
@@ -1203,8 +1194,9 @@ public class UpdateDataFragment extends Fragment {
                 }
                 try {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM UNI_MATRIX; DELETE FROM sqlite_sequence WHERE name = 'UNI_MATRIX';");
-                    String Type_ID = "", Type_Descr = "", ID = "", Descr = "", LowDescr = "";
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM UNI_MATRIX;");
+                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM sqlite_sequence WHERE name = 'UNI_MATRIX';");
+                    String Type_ID, Type_Descr, ID, Descr, LowDescr;
                     while (reset.next()) {
                         Type_ID = reset.getString(1);
                         Type_Descr = reset.getString(2);
@@ -1245,7 +1237,8 @@ public class UpdateDataFragment extends Fragment {
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
-//                Конец обновления универсальной матрицы 23-04-2020
+
+                // Конец обновления универсальной матрицы 23-04-2020
                 glbVars.UpdateWorking = 0;
                 handler.post(new Runnable() {
                     public void run() {

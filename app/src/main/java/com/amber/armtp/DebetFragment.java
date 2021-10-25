@@ -155,14 +155,14 @@ public class DebetFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.returnToOrderHead) {
-            fragment = new OrderHeadFragment();
-            fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
-            fragmentTransaction.commit();
-            toolbar.setTitle("Шапка заказа");
-            return true;
-        }
+//        if (item.getItemId() == R.id.returnToOrderHead) {
+//            fragment = new OrderHeadFragment();
+//            fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+//            fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
+//            fragmentTransaction.commit();
+//            toolbar.setTitle("Шапка заказа");
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 

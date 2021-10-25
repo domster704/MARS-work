@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
             android:id="@+id/FormOrderID"
-            android:icon="@drawable/form_order_vector_white"
+            android:icon="@drawable/back_arrow"
             android:title="@string/form_order"
             app:showAsAction="always" />
 </menu>

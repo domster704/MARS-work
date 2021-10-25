@@ -71,7 +71,6 @@ public class OrderHeadFragment extends Fragment {
         glbVars.edContrFilter = getActivity().findViewById(R.id.txtContrFilter);
         glbVars.txtComment = getActivity().findViewById(R.id.txtComment);
         glbVars.btSave = getActivity().findViewById(R.id.btSaveHeader);
-        glbVars.btClear = getActivity().findViewById(R.id.btClearOrder);
 
         glbVars.spinContr = getActivity().findViewById(R.id.SpinContr);
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
@@ -187,25 +186,6 @@ public class OrderHeadFragment extends Fragment {
             }
         });
 
-        glbVars.btClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (glbVars.db.ClearOrderHeader()) {
-                    glbVars.spinContr.setSelection(0);
-                    glbVars.spinAddr.setAdapter(null);
-                    glbVars.txtComment.setText("");
-                    glbVars.txtDate.setText("");
-                    glbVars.edContrFilter.setText("");
-                    glbVars.db.resetContrSales();
-                    setContrAndSum();
-                    Toast.makeText(getActivity(), "Шапка заказа успешно очищена", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getActivity(), "Не удалось очистить шапку заказа", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
         int ContRowid = glbVars.db.GetContrRowID();
         SetSelectedContr(ContRowid);
 
@@ -255,6 +235,7 @@ public class OrderHeadFragment extends Fragment {
     }
 
     public void goToFormOrderFragment() {
+        toolbar.setTitle(R.string.form_order);
         Fragment fragment = new FormOrderFragment();
         fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
