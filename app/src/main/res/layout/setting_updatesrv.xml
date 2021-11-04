@@ -5,7 +5,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        tools:ignore="RtlCompat">
 
     <RelativeLayout
             android:layout_width="match_parent"
@@ -50,7 +51,7 @@
                 android:layout_alignStart="@+id/tvFtpUpdate"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="FTP пользователь"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -63,7 +64,7 @@
                 android:layout_alignStart="@+id/tvFtpUpdateUser"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="FTP пароль"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -89,6 +90,7 @@
                 android:layout_width="302dp"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/edUpdateServer"
+                android:background="@android:drawable/btn_default"
                 android:layout_marginStart="13dp"
                 android:layout_marginTop="0dp"
                 android:layout_toEndOf="@+id/edUpdateServer"
@@ -103,7 +105,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="19dp"
                 android:layout_marginTop="0sp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="@string/resUpdateServer"
                 android:textAlignment="center"
                 android:textSize="12sp"
@@ -117,7 +119,7 @@
                 android:layout_alignStart="@+id/tvServer"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="@string/resSqlLogin"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -130,7 +132,7 @@
                 android:layout_alignStart="@+id/tvServer"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="@string/resSqlPass"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -143,7 +145,7 @@
                 android:layout_alignStart="@+id/tvServer"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="@string/resSqlPort"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -198,7 +200,7 @@
                 android:layout_alignStart="@+id/tvServer"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="База данных"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -225,7 +227,7 @@
                 android:layout_alignStart="@+id/tvSqlDB"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="FTP сервер фотографий"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -238,7 +240,7 @@
                 android:layout_alignStart="@+id/tvFtpPhotoUser"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="FTP пароль"
                 android:textAlignment="center"
                 android:textSize="12sp" />
@@ -251,7 +253,7 @@
                 android:layout_alignStart="@+id/tvFtpPhoto"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:text="FTP пользователь"
                 android:textAlignment="center"
                 android:textSize="12sp" />
