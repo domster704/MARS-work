@@ -80,12 +80,12 @@
             android:gravity="left|center_vertical"
             android:lines="2"
             android:maxLines="2"
-            android:paddingLeft="5sp"
+            android:paddingStart="5sp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:scrollHorizontally="false"
             android:singleLine="false"
-            android:textColor="#000000" />
+            android:textColor="#000" />
 
     <TextView
             android:id="@+id/ColNomOst"

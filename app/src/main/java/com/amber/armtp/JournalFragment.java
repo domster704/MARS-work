@@ -198,7 +198,6 @@ public class JournalFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        deleteExtraOrders();
     }
 
     @Override
@@ -239,11 +238,11 @@ public class JournalFragment extends Fragment {
                 glbVars.db.DeleteOrderByID(id);
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
-        }
-        glbVars.LoadOrders();
+            glbVars.LoadOrders();
 
-        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-        toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из возможных 100");
+            toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из возможных 100");
+        }
     }
 
     private void SendDBFFile(String FileName) {
@@ -278,10 +277,9 @@ public class JournalFragment extends Fragment {
                     InputStream inputStream;
                     File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
 
-                    String secondRemoteFile = tmp_filename;
                     inputStream = new FileInputStream(secondLocalFile);
 
-                    OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
+                    OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
                     byte[] bytesIn = new byte[4096];
                     int read;
 
@@ -500,7 +498,7 @@ public class JournalFragment extends Fragment {
      */
     private void checkCB() {
         chosenOrders.clear();
-        for (GlobalVars.JournalAdapter.ViewData i : GlobalVars.allOrders) {
+        for (GlobalVars.CheckBoxData i : GlobalVars.allOrders) {
             Log.d("xd", String.valueOf(i.position));
             if (i.checkBox.isChecked()) {
                 chosenOrders.add(new ChosenData(i.position, i.checkBox));

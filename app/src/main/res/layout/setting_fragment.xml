@@ -18,22 +18,24 @@
                     android:id="@android:id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:showDividers="middle"></TabWidget>
+                    android:showDividers="middle" />
 
             <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                <include layout="@layout/admin_db" />
+                <include layout="@layout/setting_db" />
 
-                <include layout="@layout/admin_dbf" />
+                <include layout="@layout/setting_dbf" />
 
-                <include layout="@layout/admin_prices" />
+                <include layout="@layout/setting_prices" />
 
-                <include layout="@layout/admin_paths" />
+                <include layout="@layout/setting_paths" />
 
-                <include layout="@layout/admin_updatesrv" />
+                <include layout="@layout/setting_updatesrv" />
+
+                <include layout="@layout/setting_default" />
             </FrameLayout>
         </LinearLayout>
     </TabHost>

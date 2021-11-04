@@ -8,9 +8,13 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="headOrderFontSize">16sp</dimen>
-    <dimen name="mainFontSize">14sp</dimen>
+    <dimen name="mainFontSize">16sp</dimen>
 
-    <dimen name="tvWidthOrderFragment">210dp</dimen>
+    <dimen name="tvWidthOrderFragment">220dp</dimen>
     <!-- на 5dp должно быть меньше чем tvWidthOrderFragment  -->
-    <dimen name="editTextParentWidth">205dp</dimen>
+    <dimen name="editTextParentWidth">215dp</dimen>
+    <!-- padding в SettingFragment   -->
+    <dimen name="layoutPadding">10dp</dimen>
+
+    <dimen name="nomenDescrSize">14sp</dimen>
 </resources>

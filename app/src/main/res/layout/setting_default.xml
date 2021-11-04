@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/TabDefaultSetting"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layoutPadding">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Шрифт:"
+                android:textSize="@dimen/mainFontSize"
+                android:textColor="#000" />
+
+        <EditText
+                android:id="@+id/fontSize"
+                android:layout_width="wrap_content"
+                android:minWidth="35dp"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:textSize="@dimen/mainFontSize" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sp"
+                android:textSize="@dimen/mainFontSize"
+                android:textColor="#000"/>
+
+    </LinearLayout>
+
+    <Button
+            android:id="@+id/saveSettings"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="@dimen/layoutPadding"
+            android:layout_height="wrap_content"
+            android:text="Сохранить"
+            android:background="@android:drawable/btn_default"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

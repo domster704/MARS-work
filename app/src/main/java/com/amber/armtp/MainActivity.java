@@ -3,10 +3,7 @@ package com.amber.armtp;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
@@ -211,14 +208,14 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new UpdateDataFragment(), "frag_update_data");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_jounal:
+                    case R.id.nav_journal:
                         DisplayFragment(new JournalFragment(), "frag_journal");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_form_order:
-                        DisplayFragment(new FormOrderFragment(), "frag_form_order");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
+//                    case R.id.nav_form_order:
+//                        DisplayFragment(new FormOrderFragment(), "frag_form_order");
+//                        setToolbarTitle(menuItem.getTitle());
+//                        return true;
                     case R.id.nav_order_header:
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());
@@ -235,12 +232,12 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new DebetFragment(), "frag_debet");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_back_messages:
-                        DisplayFragment(new BackSMSFragment(), "frag_back_messages");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
+//                    case R.id.nav_back_messages:
+//                        DisplayFragment(new BackSMSFragment(), "frag_back_messages");
+//                        setToolbarTitle(menuItem.getTitle());
+//                        return true;
                     case R.id.nav_admin:
-                        DisplayFragment(new AdminFragment(), "frag_admin");
+                        DisplayFragment(new SettingFragment(), "frag_admin");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_exit:

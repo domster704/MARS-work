@@ -1,91 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:checkableBehavior="single">
-        <item android:title="@string/orderHeader">
-            <menu>
-                <item
-                        android:id="@+id/nav_jounal"
-                        android:icon="@drawable/journal_vector"
-                        android:title="@string/journal" />
-                <item
-                        android:id="@+id/nav_order_header"
-                        android:icon="@drawable/order_header_vector"
-                        android:title="@string/order_header" />
-                <item
-                        android:id="@+id/nav_form_order"
-                        android:icon="@drawable/form_order_vector"
-                        android:title="@string/form_order" />
-<!--                <item-->
-<!--                        android:id="@+id/nav_view_order"-->
-<!--                        android:icon="@drawable/view_order_vector"-->
-<!--                        android:title="@string/view_order" />-->
-                <item
-                        android:id="@+id/nav_send_orders"
-                        android:icon="@drawable/send_orders_vector"
-                        android:title="@string/send_orders" />
-            </menu>
-        </item>
-    </group>
     <group
-            android:id="@+id/group_debet"
-            android:checkableBehavior="single">
-        <item
-                android:id="@+id/nav_debet"
-                android:icon="@drawable/debet_vector"
-                android:title="@string/debet_dolg" />
+            android:checkableBehavior="single"
+            android:id="@+id/mainAction">
+            <item
+                    android:id="@+id/nav_journal"
+                    android:icon="@drawable/journal_vector"
+                    android:title="@string/journal" />
+            <item
+                    android:id="@+id/nav_order_header"
+                    android:icon="@drawable/order_header_vector"
+                    android:title="@string/order_header" />
+            <item
+                    android:id="@+id/nav_send_orders"
+                    android:icon="@drawable/send_orders_vector"
+                    android:title="@string/send_orders" />
+            <item
+                    android:id="@+id/nav_debet"
+                    android:icon="@drawable/debet_vector"
+                    android:title="@string/debet_dolg" />
     </group>
-    <group android:checkableBehavior="single">
-        <item android:title="@string/update_header">
-            <menu>
-                <item
-                        android:id="@+id/nav_update_data"
-                        android:icon="@drawable/update_data_vector"
-                        android:title="@string/update_data" />
-                <item
-                        android:id="@+id/nav_update_app"
-                        android:icon="@drawable/update_app_vector"
-                        android:title="@string/update_app" />
-            </menu>
-        </item>
-    </group>
-    <group android:checkableBehavior="single">
-        <item android:title="@string/info">
-            <menu>
-                <item
-                        android:id="@+id/nav_back_messages"
-                        android:icon="@drawable/sms_vector"
-                        android:title="@string/back_messages"
-                        android:visible="false"
-                        app:actionViewClass="android.widget.TextView" />
 
-                <item
-                        android:id="@+id/nav_start_page"
-                        android:icon="@drawable/info_app_vector"
-                        android:title="@string/info_app" />
-            </menu>
-        </item>
+    <group android:checkableBehavior="single">
+
+        <item
+                android:id="@+id/nav_update_data"
+                android:icon="@drawable/update_data_vector"
+                android:title="@string/update_data" />
+        <item
+                android:id="@+id/nav_update_app"
+                android:icon="@drawable/update_app_vector"
+                android:title="@string/update_app" />
+
     </group>
+
     <group
             android:id="@+id/group_admin"
             android:checkableBehavior="single">
+
         <item
                 android:id="@+id/nav_admin"
-                android:icon="@drawable/admin_vector"
+                android:icon="@drawable/setting_icon"
                 android:title="@string/app_admin" />
+
     </group>
-    <!--<group android:id="@+id/user_exit" android:checkableBehavior="single">-->
-    <!--<item-->
-    <!--android:id="@+id/nav_user_exit"-->
-    <!--android:icon="@drawable/user_exit"-->
-    <!--android:title="@string/exit_user" />-->
-    <!--</group>-->
-    <group
-            android:id="@+id/group_exit"
-            android:checkableBehavior="single">
+
+    <group android:checkableBehavior="single">
+        <item
+                android:id="@+id/nav_back_messages"
+                android:icon="@drawable/sms_vector"
+                android:title="@string/back_messages"
+                android:visible="false"
+                app:actionViewClass="android.widget.TextView" />
+
+        <item
+                android:id="@+id/nav_start_page"
+                android:icon="@drawable/info_app_vector"
+                android:title="@string/info_app" />
         <item
                 android:id="@+id/nav_exit"
                 android:icon="@drawable/exit_app_vector"
                 android:title="@string/exit_app" />
     </group>
+
 </menu>

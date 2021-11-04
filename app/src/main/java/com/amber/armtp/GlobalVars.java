@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
-import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.Log;
@@ -44,7 +43,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
@@ -93,7 +91,7 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  */
 public class GlobalVars extends Application {
 
-    public static ArrayList<JournalAdapter.ViewData> allOrders = new ArrayList<>();
+    public static ArrayList<CheckBoxData> allOrders = new ArrayList<CheckBoxData>();
 
     public Context glbContext;
     public Context frContext;
@@ -1452,11 +1450,29 @@ public class GlobalVars extends Application {
         return DBF_FileName;
     }
 
-    public void LoadOrders() {
+    private void putCheckBox(Cursor c) {
         GlobalVars.allOrders.clear();
         layout.removeAllViews();
+
+        if (c.getCount() == 0) {
+            return;
+        }
+
+        c.moveToFirst();
+        do {
+            int position = c.getInt(0);
+            CheckBox checkBox = new CheckBox(layout.getContext());
+            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
+            layout.addView(checkBox);
+            GlobalVars.allOrders.add(new CheckBoxData(position, checkBox));
+            Log.d("xd", c.getString(0));
+        } while (c.moveToNext());
+    }
+
+    public void LoadOrders() {
         gdOrders.setAdapter(null);
         Orders = db.getZakazy();
+        putCheckBox(Orders);
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCNO", "STATUS", "DOC_DATE", "CONTR", "ADDR", "SUM", "DELIVERY_DATE"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum, R.id.ColOrdDeliveryDate}, 0);
         gdOrders.setAdapter(OrdersAdapter);
     }
@@ -2269,6 +2285,9 @@ public class GlobalVars extends Application {
             final Button btPlus = view.findViewById(R.id.btPlus);
             final Button btMinus = view.findViewById(R.id.btMinus);
 
+
+            tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
+
             tvPhoto.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -2351,22 +2370,20 @@ public class GlobalVars extends Application {
         }
     }
 
+    public class CheckBoxData {
+        public int position;
+        public CheckBox checkBox;
+
+        public CheckBoxData(int position, CheckBox checkBox) {
+            this.position = position;
+            this.checkBox = checkBox;
+        }
+    }
+
     public class JournalAdapter extends SimpleCursorAdapter {
         Cursor cursor;
 
-        class ViewData {
-            public int position;
-            public View view;
-            public AdapterView<?> parent;
-            public CheckBox checkBox;
 
-            public ViewData(int position, View view, ViewGroup parent, CheckBox checkBox) {
-                this.position = position;
-                this.view = view;
-                this.parent = (AdapterView<?>) parent;
-                this.checkBox = checkBox;
-            }
-        }
 
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -2378,10 +2395,7 @@ public class GlobalVars extends Application {
             View view = super.getView(position, convertView, parent);
 
             if (convertView != null) {
-                CheckBox checkBox = new CheckBox(layout.getContext());
-                checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, convertView.getHeight()));
-                layout.addView(checkBox);
-                GlobalVars.allOrders.add(new ViewData((int) ((AdapterView) parent).getItemIdAtPosition(position), convertView, parent, checkBox));
+
             }
 
             if (position % 2 == 0) {

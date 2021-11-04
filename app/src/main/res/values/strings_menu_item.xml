@@ -2,7 +2,7 @@
 <resources>
     <string name="orderHeader">Работа с заказами</string>
     <string name="journal">Журнал</string>
-    <string name="order_header">Шапка</string>
+    <string name="order_header">Заказ</string>
     <string name="form_order">Формирование</string>
     <string name="view_order">Просмотр заказа</string>
     <string name="send_orders">Отправка</string>
@@ -21,7 +21,7 @@
 
     <string name="download_img">Загрузка фотографий</string>
 
-    <string name="app_admin">Администратор</string>
+    <string name="app_admin">Настройки</string>
     <string name="exit_user">Завершить сеанс пользователя</string>
     <string name="exit_app">Выход</string>
 </resources>

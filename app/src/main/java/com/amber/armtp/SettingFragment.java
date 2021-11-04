@@ -31,14 +31,17 @@ import java.io.File;
 import java.util.Objects;
 
 /**
- * Панель админа
+ * Панель настроек
  */
-public class AdminFragment extends Fragment {
+public class SettingFragment extends Fragment {
+
+    public static int nomenDescriptionFontSize = 14;
+
     private final int LOCATION_SDPATH = 1;
     private final int LOCATION_PHOTO_PATH = 2;
     public GlobalVars glbVars;
-    SharedPreferences settings, PriceSettings, settingPaths;
-    SharedPreferences.Editor editor, PriceEditor, settingPathEditor;
+    SharedPreferences serverSettings, PriceSettings, settingPaths, settings;
+    SharedPreferences.Editor editor, PriceEditor, settingPathEditor, settingsEditor;
     Button btClearSgi,
             btClearGroups,
             btClearNomen,
@@ -56,6 +59,10 @@ public class AdminFragment extends Fragment {
             btUnlockTP,
             btLockTP,
             btSaveUpdateSrv;
+
+    Button btSaveSettings;
+    EditText fontSize;
+
     Button btSetPhotoPath, btSetSDPath;
     TextView tvPhotoPath, tvSDPath, tbPublicPhoto;
     Switch swTestLoadPhoto;
@@ -68,7 +75,7 @@ public class AdminFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.admin_fragment, container, false);
+        View v = inflater.inflate(R.layout.setting_fragment, container, false);
         glbVars.view = v;
         return v;
     }
@@ -123,6 +130,11 @@ public class AdminFragment extends Fragment {
         spec.setIndicator("Сервера обновлений");
         tabs.addTab(spec);
 
+        spec = tabs.newTabSpec("tag5");
+        spec.setContent(R.id.TabDefaultSetting);
+        spec.setIndicator("Другое");
+        tabs.addTab(spec);
+
         tabs.setCurrentTab(0);
 
         glbVars.spinCenTypes = getActivity().findViewById(R.id.spnCentype);
@@ -131,8 +143,16 @@ public class AdminFragment extends Fragment {
         tvPhotoPath = getActivity().findViewById(R.id.tvPhotoPath);
         tvSDPath = getActivity().findViewById(R.id.tvSDPath1);
         tbPublicPhoto = getActivity().findViewById(R.id.tvPublicPhoto);
-        settings = getActivity().getSharedPreferences("apk_version", 0);
-        editor = settings.edit();
+        serverSettings = getActivity().getSharedPreferences("apk_version", 0);
+        editor = serverSettings.edit();
+
+        settings = getActivity().getSharedPreferences("settings", 0);
+        settingsEditor = settings.edit();
+
+        if (!settings.contains("fontSize")) {
+            settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
+            settingsEditor.apply();
+        }
 
         PriceSettings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -173,33 +193,39 @@ public class AdminFragment extends Fragment {
         etSqlPass = getActivity().findViewById(R.id.edSqlPass);
         etSqlDB = getActivity().findViewById(R.id.edSqlDB);
 
-        etUpdateSrv.setText(settings.getString("UpdateSrv", getResources().getString(R.string.sql_server)));
-        etSqlPort.setText(settings.getString("sqlPort", getResources().getString(R.string.sql_port)));
-        etSqlLogin.setText(settings.getString("sqlLogin", getResources().getString(R.string.sql_user)));
-        etSqlPass.setText(settings.getString("sqlPass", getResources().getString(R.string.sql_pass)));
-        etSqlDB.setText(settings.getString("sqlDB", getResources().getString(R.string.sql_db)));
+        etUpdateSrv.setText(serverSettings.getString("UpdateSrv", getResources().getString(R.string.sql_server)));
+        etSqlPort.setText(serverSettings.getString("sqlPort", getResources().getString(R.string.sql_port)));
+        etSqlLogin.setText(serverSettings.getString("sqlLogin", getResources().getString(R.string.sql_user)));
+        etSqlPass.setText(serverSettings.getString("sqlPass", getResources().getString(R.string.sql_pass)));
+        etSqlDB.setText(serverSettings.getString("sqlDB", getResources().getString(R.string.sql_db)));
 
         etFtpUpdate = getActivity().findViewById(R.id.edFtpUpdate);
         etFtpUpdatePass = getActivity().findViewById(R.id.edFtpUpdatePass);
         etFtpUpdateUser = getActivity().findViewById(R.id.edFtpUpdateUser);
 
-        etFtpUpdate.setText(settings.getString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server)));
-        etFtpUpdatePass.setText(settings.getString("AppUpdatePass", getResources().getString(R.string.ftp_update_pass)));
-        etFtpUpdateUser.setText(settings.getString("AppUpdateUser", getResources().getString(R.string.ftp_update_user)));
+        etFtpUpdate.setText(serverSettings.getString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server)));
+        etFtpUpdatePass.setText(serverSettings.getString("AppUpdatePass", getResources().getString(R.string.ftp_update_pass)));
+        etFtpUpdateUser.setText(serverSettings.getString("AppUpdateUser", getResources().getString(R.string.ftp_update_user)));
 
         etFtpPhoto = getActivity().findViewById(R.id.edFtpPhoto);
         etFtpPhotoPass = getActivity().findViewById(R.id.edFtpPhotoPass);
         etFtpPhotoUser = getActivity().findViewById(R.id.edFtpPhotoUser);
 
-        etFtpPhoto.setText(settings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server)));
-        etFtpPhotoPass.setText(settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_pass)));
-        etFtpPhotoUser.setText(settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_user)));
+        etFtpPhoto.setText(serverSettings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server)));
+        etFtpPhotoPass.setText(serverSettings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_pass)));
+        etFtpPhotoUser.setText(serverSettings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_user)));
 
-        CenTypeID = settings.getString("usr_centype", "");
+        CenTypeID = serverSettings.getString("usr_centype", "");
 
         boolean TestLoad = settingPaths.getBoolean("TestingLoad", false);
 
         swTestLoadPhoto.setChecked(TestLoad);
+
+        btSaveSettings = getActivity().findViewById(R.id.saveSettings);
+
+        nomenDescriptionFontSize = settings.getInt("fontSize", 14);
+        fontSize = getActivity().findViewById(R.id.fontSize);
+        fontSize.setText(String.valueOf(nomenDescriptionFontSize));
     }
 
     @Override
@@ -265,6 +291,22 @@ public class AdminFragment extends Fragment {
         for (ButtonClearValue i : buttonClearValue) {
             buttonSetOnClickListener(i);
         }
+
+        btSaveSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Integer.parseInt(fontSize.getText().toString()) > 24) {
+                    Toast.makeText(getActivity(), "Слишком большой размер шрифта", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                nomenDescriptionFontSize = Integer.parseInt(fontSize.getText().toString());
+                settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
+                settingsEditor.apply();
+
+                Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         btCompactDb.setOnClickListener(new View.OnClickListener() {
             @Override
