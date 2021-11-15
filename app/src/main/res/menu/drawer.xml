@@ -12,10 +12,10 @@
                     android:id="@+id/nav_order_header"
                     android:icon="@drawable/order_header_vector"
                     android:title="@string/order_header" />
-            <item
-                    android:id="@+id/nav_send_orders"
-                    android:icon="@drawable/send_orders_vector"
-                    android:title="@string/send_orders" />
+<!--            <item-->
+<!--                    android:id="@+id/nav_send_orders"-->
+<!--                    android:icon="@drawable/send_orders_vector"-->
+<!--                    android:title="@string/send_orders" />-->
             <item
                     android:id="@+id/nav_debet"
                     android:icon="@drawable/debet_vector"

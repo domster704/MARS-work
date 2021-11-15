@@ -7,10 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
- * Updated by Linker4 on 27.09.2021
+ * Updated by domster704 on 27.09.2021
  */
 public class DBHepler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "armtp.db";
@@ -746,7 +745,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
     }
 
-    public Boolean ClearOrderHeader() {
+    public void ClearOrderHeader() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.setLockingEnabled(false);
@@ -754,12 +753,9 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("DELETE FROM ORDERS");
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
-            return true;
         }
     }
 
@@ -799,20 +795,17 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public Boolean SetZakazStatus(int Status, int State) {
+    public void SetZakazStatus(int Status, int State, int id) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.setLockingEnabled(false);
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE ZAKAZY SET STATUS=" + Status + " WHERE STATUS=" + State);
+            db.execSQL("UPDATE ZAKAZY SET STATUS=" + Status + " WHERE STATUS=" + State + " AND ROWID=" + id);
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
-            return true;
         }
     }
 

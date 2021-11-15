@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 
 import java.util.Objects;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class ViewOrderFragment extends Fragment {
     public GlobalVars glbVars;
     View thisView;

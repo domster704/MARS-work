@@ -17,4 +17,6 @@
     <dimen name="layoutPadding">10dp</dimen>
 
     <dimen name="nomenDescrSize">14sp</dimen>
+
+    <dimen name="buttonWidth">400dp</dimen>
 </resources>

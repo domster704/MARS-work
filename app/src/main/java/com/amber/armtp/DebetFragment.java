@@ -18,6 +18,9 @@ import android.widget.AdapterView;
 
 import java.util.Objects;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class DebetFragment extends Fragment {
     public GlobalVars glbVars;
 

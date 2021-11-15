@@ -54,7 +54,7 @@
 
     <TextView
             android:id="@+id/ColOrdAddr"
-            android:layout_width="400dp"
+            android:layout_width="@dimen/buttonWidth"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/ColOrdSum"

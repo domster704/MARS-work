@@ -14,7 +14,9 @@ import java.sql.Statement;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
-
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class CheckSMS extends IntentService {
     public GlobalVars glbVars;
     Connection conn = null;

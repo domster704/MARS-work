@@ -79,6 +79,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
@@ -87,11 +88,11 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 /**
  * Created by filimonov on 22-08-2016.
- * Updated by Linker4 on 27.09.2021
+ * Updated by domster704 on 27.09.2021
  */
 public class GlobalVars extends Application {
 
-    public static ArrayList<CheckBoxData> allOrders = new ArrayList<CheckBoxData>();
+    public static ArrayList<CheckBoxData> allOrders = new ArrayList<>();
 
     public Context glbContext;
     public Context frContext;
@@ -1294,7 +1295,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public String FormDBFForZakaz(String ID) throws DBFException {
+    public String FormDBFForZakaz(int ID) throws DBFException {
         String DBF_FIleForSend;
         String DBF_FileName;
         Cursor c;
@@ -1311,7 +1312,7 @@ public class GlobalVars extends Application {
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
 
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.DOCNO='" + ID + "'", null);
+        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return "";
@@ -1443,7 +1444,8 @@ public class GlobalVars extends Application {
         Table.write();
         DBF_FIleForSend = FileName;
         if (isNetworkAvailable()) {
-            new UploadDBFFile().execute();
+            Integer[] data = new Integer[] {ID};
+            new UploadDBFFile().execute(data);
         } else {
             Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
         }
@@ -1458,14 +1460,23 @@ public class GlobalVars extends Application {
             return;
         }
 
+        int id;
+        String status;
+
         c.moveToFirst();
         do {
-            int position = c.getInt(0);
+            id = c.getInt(0);
+            status =  c.getString(4);
+
             CheckBox checkBox = new CheckBox(layout.getContext());
             checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
             layout.addView(checkBox);
-            GlobalVars.allOrders.add(new CheckBoxData(position, checkBox));
-            Log.d("xd", c.getString(0));
+
+            if (status.equals("Сохранен")) {
+                checkBox.setChecked(true);
+            }
+
+            GlobalVars.allOrders.add(new CheckBoxData(id, checkBox, status));
         } while (c.moveToNext());
     }
 
@@ -1500,13 +1511,14 @@ public class GlobalVars extends Application {
         orderList.setAdapter(adapter);
     }
 
-    public void SendOrders() throws DBFException {
+    public void SendOrders(int[] chosenOrdersID) throws DBFException {
         OrderID = "";
         Cursor c;
         String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
         java.util.Date DELIVERY, DOCDATE;
-        Double QTY, PRICE;
-        Double getMoney, getBackward, getBacktype;
+        double QTY, PRICE;
+        double getMoney, getBackward, getBacktype;
+        int ID;
         DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
         String curdate = df.format(Calendar.getInstance().getTime());
@@ -1514,7 +1526,7 @@ public class GlobalVars extends Application {
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
 
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
+        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE, ZAKAZY.ROWID FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return;
@@ -1605,6 +1617,12 @@ public class GlobalVars extends Application {
 
         try {
             while (c.moveToNext()) {
+                ID = c.getInt(16);
+
+                if (Arrays.binarySearch(chosenOrdersID, ID) < 0)
+                    continue;
+
+
                 TP = c.getString(0);
                 CONTR = c.getString(1);
                 ADDR = c.getString(2);
@@ -1644,7 +1662,11 @@ public class GlobalVars extends Application {
         Table.write();
         DBF_FIleForSend = FileName;
         if (isNetworkAvailable()) {
-            new UploadDBFFile().execute();
+            Integer[] data = new Integer[chosenOrdersID.length];
+            for (int i = 0; i < chosenOrdersID.length; i++) {
+                data[i] = chosenOrdersID[i];
+            }
+            new UploadDBFFile().execute(data);
         } else {
             Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
         }
@@ -2089,7 +2111,6 @@ public class GlobalVars extends Application {
                         String perc;
                         perc = edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString();
                         Discount = Float.parseFloat(perc);
-                        Log.d("xd", String.valueOf(Discount));
 
                         if (WhichView == 0) {
                             if (Discount == 0) {
@@ -2370,20 +2391,20 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class CheckBoxData {
-        public int position;
+    public static class CheckBoxData {
+        public int id;
         public CheckBox checkBox;
+        public String status;
 
-        public CheckBoxData(int position, CheckBox checkBox) {
-            this.position = position;
+        public CheckBoxData(int id, CheckBox checkBox, String status) {
+            this.id = id;
             this.checkBox = checkBox;
+            this.status = status;
         }
     }
 
     public class JournalAdapter extends SimpleCursorAdapter {
         Cursor cursor;
-
-
 
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -2511,7 +2532,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class UploadDBFFile extends AsyncTask<String, Integer, String> {
+    public class UploadDBFFile extends AsyncTask<Integer[], Integer, Integer[]> {
         boolean ret_completed;
         ProgressDialog progressDialog;
 
@@ -2526,7 +2547,7 @@ public class GlobalVars extends Application {
             progressDialog.show();
         }
 
-        protected String doInBackground(String... urls) {
+        protected Integer[] doInBackground(Integer[]... urls) {
             SharedPreferences settings;
             settings = CurAc.getSharedPreferences("apk_version", 0);
 
@@ -2536,22 +2557,22 @@ public class GlobalVars extends Application {
 
             FTPClient ftpClient = new FTPClient();
 
-            try {
-                ftpClient.connect(server, 21);
-                ftpClient.login(username, password);
-                ftpClient.enterLocalPassiveMode();
-                ftpClient.changeWorkingDirectory("newARM");
-                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+                try {
+                    ftpClient.connect(server, 21);
+                    ftpClient.login(username, password);
+                    ftpClient.enterLocalPassiveMode();
+                    ftpClient.changeWorkingDirectory("newARM");
+                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-                InputStream inputStream;
+                    InputStream inputStream;
 
-                File secondLocalFile = new File(DBF_FIleForSend);
-                String secondRemoteFile = DBF_FileName;
-                inputStream = new FileInputStream(secondLocalFile);
+                    File secondLocalFile = new File(DBF_FIleForSend);
+                    String secondRemoteFile = DBF_FileName;
+                    inputStream = new FileInputStream(secondLocalFile);
 
-                OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
-                byte[] bytesIn = new byte[65536];
-                int read;
+                    OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
+                    byte[] bytesIn = new byte[65536];
+                    int read;
 
                 while ((read = inputStream.read(bytesIn)) != -1) {
                     outputStream.write(bytesIn, 0, read);
@@ -2564,6 +2585,8 @@ public class GlobalVars extends Application {
                 if (completed) {
                     ret_completed = true;
                 }
+
+                return urls[0];
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -2575,13 +2598,17 @@ public class GlobalVars extends Application {
             progressDialog.setProgress(progress[0]);
         }
 
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Integer[] result) {
             progressDialog.dismiss();
             if (ret_completed) {
+                for (Integer id : result) {
+                    db.SetZakazStatus(1, 0, id);
+                }
+
                 Toast.makeText(CurAc, "Заказы успешно сформированы в файл и отправлены", Toast.LENGTH_LONG).show();
-                orderList.setAdapter(null);
-                db.SetZakazStatus(1, 0);
             }
+
+            LoadOrders();
         }
     }
 
@@ -2715,3 +2742,62 @@ public class GlobalVars extends Application {
         }
     }
 }
+
+//        class DBFieldData {
+//            public String name;
+//            public byte dataType;
+//
+//            // Использую не int, чтобы не париться с проверкой на равенство null ниже в коде
+//            public Integer length;
+//            public Integer decimalCount;
+//
+//            public DBFieldData(String name, byte dataType, Integer length) {
+//                this.name = name;
+//                this.dataType = dataType;
+//                this.length = length;
+//            }
+//
+//            public DBFieldData(String name, byte dataType) {
+//                this.name = name;
+//                this.dataType = dataType;
+//                this.length = 0;
+//            }
+//
+//            public DBFieldData(String name, byte dataType, Integer length, Integer decimalCount) {
+//                this.name = name;
+//                this.dataType = dataType;
+//                this.length = length;
+//                this.decimalCount = decimalCount;
+//                this.length = 0;
+//            }
+//        }
+//
+//
+//        DBFieldData[] dbFieldData = new DBFieldData[] {
+//            new DBFieldData("TP", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("CONTR", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("ADDR", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("DOCNO", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("DELIVERY", DBFField.FIELD_TYPE_D),
+//            new DBFieldData("DOCDATE", DBFField.FIELD_TYPE_D),
+//            new DBFieldData("COMMENT", DBFField.FIELD_TYPE_C, 255),
+//            new DBFieldData("CODE", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("QTY", DBFField.FIELD_TYPE_N, 13, 0),
+//            new DBFieldData("PRICE", DBFField.FIELD_TYPE_N, 12, 0),
+//            new DBFieldData("DELIV_TIME", DBFField.FIELD_TYPE_C, 13),
+//            new DBFieldData("GETMONEY", DBFField.FIELD_TYPE_N, 13, 0),
+//            new DBFieldData("GETBACK", DBFField.FIELD_TYPE_N, 13, 0),
+//            new DBFieldData("BACKTYPE", DBFField.FIELD_TYPE_N, 13, 0),
+//        };
+//
+//        for (int i = 0; i < 14; i++) {
+//            fields[i] = new DBFField();
+//            fields[i].setName(dbFieldData[i].name);
+//            fields[i].setDataType(dbFieldData[i].dataType);
+//            if (dbFieldData[i].length != null) {
+//                fields[i].setFieldLength(dbFieldData[i].length);
+//            }
+//            if (dbFieldData[i].decimalCount != null) {
+//                fields[i].setDecimalCount(dbFieldData[i].decimalCount);
+//            }
+//        }

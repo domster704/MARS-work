@@ -29,6 +29,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class UpdateDataFragment extends Fragment {
     private final Handler handler = new Handler();
     private final Handler handlerSgi = new Handler();

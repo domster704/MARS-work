@@ -32,6 +32,8 @@ import java.util.Objects;
 
 /**
  * Панель настроек
+ *
+ * Updated by domster704 on 27.09.2021
  */
 public class SettingFragment extends Fragment {
 

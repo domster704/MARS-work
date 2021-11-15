@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 /**
  * Класс для поддержания обратной связи;
  * отправка сообщений/комментарий на сервер
+ *
+ * Updated by domster704 on 27.09.2021
  */
 public class BackSMSFragment extends Fragment {
     public GlobalVars glbVars;

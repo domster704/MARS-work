@@ -8,6 +8,11 @@
             android:title="@string/deleteOrders"
             android:icon="@drawable/ic_trashcan"
             app:showAsAction="always"/>
+    <item
+        android:id="@+id/SendOrders"
+        android:title="@string/sendOrders"
+        android:icon="@drawable/ic_send"
+        app:showAsAction="always"/>
 <!--    <item-->
 <!--            android:id="@+id/UpdateStatus"-->
 <!--            android:icon="@drawable/update_data_vector_white"-->

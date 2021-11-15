@@ -15,6 +15,7 @@ import android.provider.Settings;
 
 /**
  * Created by filimonov on 24-03-2016.
+ * Updated by domster704 on 27.09.2021
  */
 public class GPSTracker extends Service implements LocationListener {
     // The minimum distance to change Updates in meters

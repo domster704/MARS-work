@@ -17,6 +17,9 @@ import android.widget.Toast;
 
 import java.io.File;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class UpdateAppFragment extends Fragment {
     public GlobalVars glbVars;
     SharedPreferences settings;

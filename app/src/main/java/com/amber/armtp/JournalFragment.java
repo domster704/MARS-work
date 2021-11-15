@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -17,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,39 +31,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * Created by Linker4 on 27.09.2021
+ * Updated by domster704 on 27.09.2021
  */
 public class JournalFragment extends Fragment {
     private static final int ID_GOBACK = 101;
-    private static final int ID_DELETE = 102;
-    private static final int ID_CLEARALL = 103;
 
-    private boolean deleteMode = false;
-
-    private static class ChosenData {
-        public long position;
-        public CheckBox checkBox;
-
-        public ChosenData(long position, CheckBox checkBox) {
-            this.position = position;
-            this.checkBox = checkBox;
-        }
-    }
-
-    private final ArrayList<ChosenData> chosenOrders = new ArrayList<>();
+    private final ArrayList<GlobalVars.CheckBoxData> chosenOrders = new ArrayList<>();
 
 
-    private final int[] itemsList = new int[]{R.id.DeleteOrders, ID_GOBACK};
+    private final int[] itemsList = new int[] {R.id.SendOrders, R.id.DeleteOrders, ID_GOBACK};
 
     Menu mainMenu;
     public GlobalVars glbVars;
-    Connection conn = null;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -102,21 +85,7 @@ public class JournalFragment extends Fragment {
                 @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    String FileName = "";
                     switch (menuItem.getItemId()) {
-                        case R.id.CtxOrdSend:
-                            try {
-                                FileName = glbVars.FormDBFForZakaz(ID);
-                            } catch (DBFException e) {
-                                e.printStackTrace();
-                            } finally {
-                                if (!FileName.equals("")) {
-                                    SendDBFFile(FileName);
-                                } else {
-                                    Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            return true;
                         case R.id.CtxOrdEdit:
                             glbVars.OrderID = ID;
                             // Use the Builder class for convenient dialog construction
@@ -149,21 +118,15 @@ public class JournalFragment extends Fragment {
             });
 
             if (Status.equals("Удален") || Status.equals("Отменен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
             }
 
             if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
             }
 
             if (Status.equals("Отправлен")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-            }
-
-            if (Status.equals("Сохранен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdSend).setEnabled(false);
             }
 
             nomPopupMenu.show();
@@ -185,7 +148,7 @@ public class JournalFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
     }
 
@@ -233,8 +196,7 @@ public class JournalFragment extends Fragment {
     public void deleteExtraOrders() {
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
-//                long id = GlobalVars.allOrders.get(i).parent.getItemIdAtPosition(GlobalVars.allOrders.get(i).position);
-                int id = GlobalVars.allOrders.get(i).position;
+                int id = GlobalVars.allOrders.get(i).id;
                 glbVars.db.DeleteOrderByID(id);
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
@@ -280,7 +242,7 @@ public class JournalFragment extends Fragment {
                     inputStream = new FileInputStream(secondLocalFile);
 
                     OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
-                    byte[] bytesIn = new byte[4096];
+                    byte[] bytesIn = new byte[65536];
                     int read;
 
                     while ((read = inputStream.read(bytesIn)) != -1) {
@@ -396,22 +358,6 @@ public class JournalFragment extends Fragment {
         }).start();
     }
 
-    private void ConnectToSql() {
-        String connString;
-        String sql_server = getResources().getString(R.string.sql_server);
-        String sql_port = getResources().getString(R.string.sql_port);
-        String sql_db = getResources().getString(R.string.sql_db);
-        String sql_loging = getResources().getString(R.string.sql_user);
-        String sql_pass = getResources().getString(R.string.sql_pass);
-        try {
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            connString = "jdbc:jtds:sqlserver://" + sql_server + ":" + sql_port + ";instance=MSSQLSERVER;databaseName=" + sql_db + ";user=" + sql_loging + ";password=" + sql_pass;
-            conn = DriverManager.getConnection(connString, sql_loging, sql_pass);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.journal_menu, menu);
@@ -422,26 +368,49 @@ public class JournalFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.SendOrders:
+                if (glbVars.isNetworkAvailable()) {
+                    if(isAtLeastOneSelectedOrder())
+                        return true;
+
+                    int countOfSentOrders = 0;
+                    for (GlobalVars.CheckBoxData i: chosenOrders) {
+                        if (i.status.equals("Отправлен")) {
+                            resendOrder(i.id);
+                            countOfSentOrders++;
+                        }
+                    }
+
+                    if (chosenOrders.size() - countOfSentOrders == 0) {
+                        glbVars.LoadOrders();
+                        return true;
+                    }
+
+                    int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
+                    for (int i = 0; i < chosenOrders.size(); i++) {
+                        if (!chosenOrders.get(i).status.equals("Отправлен"))
+                            chosenOrdersForSending[i] = chosenOrders.get(i).id;
+                    }
+
+                    try {
+                        glbVars.SendOrders(chosenOrdersForSending);
+                    } catch (DBFException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+                }
+                return true;
             case ID_GOBACK:
                 Fragment fragment = new JournalFragment();
-                FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
                 fragmentTransaction.commit();
                 glbVars.layout.setVisibility(View.VISIBLE);
                 return true;
             case R.id.DeleteOrders:
-//                boolean flag = chosenOrders.size() == 0;
-//                if (!flag) {
-//                    for (ChosenData i : chosenOrders) {
-//                        if (i.checkBox.isChecked()) {
-//                            flag = true;
-//                        }
-//                    }
-//                }
-//                if (flag) {
-//                    Toast.makeText(getActivity(), "Не выбран заказ", Toast.LENGTH_LONG).show();
-//                    return true;
-//                }
+                if(isAtLeastOneSelectedOrder())
+                    return true;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                 builder.setMessage("Удалить заказы?")
@@ -454,12 +423,10 @@ public class JournalFragment extends Fragment {
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                checkCB();
-                                deleteMode = false;
-
-                                for (ChosenData data : chosenOrders) {
-                                    glbVars.db.DeleteOrderByID(data.position);
+                                for (GlobalVars.CheckBoxData data : chosenOrders) {
+                                    glbVars.db.DeleteOrderByID(data.id);
                                 }
+                                chosenOrders.clear();
 
                                 glbVars.LoadOrders();
                                 toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
@@ -469,12 +436,12 @@ public class JournalFragment extends Fragment {
                         .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                checkCB();
-                                for (ChosenData data: chosenOrders) {
+                                for (GlobalVars.CheckBoxData data: chosenOrders) {
                                     if (data.checkBox.isChecked()) {
                                         data.checkBox.setChecked(false);
                                     }
                                 }
+                                chosenOrders.clear();
                             }
                         });
 
@@ -494,14 +461,48 @@ public class JournalFragment extends Fragment {
     }
 
     /**
-     * Смортит какие позиции были выбраны для удаления
+     * Записывает в chosenOrders какие заказы были выбраны
      */
     private void checkCB() {
         chosenOrders.clear();
         for (GlobalVars.CheckBoxData i : GlobalVars.allOrders) {
-            Log.d("xd", String.valueOf(i.position));
             if (i.checkBox.isChecked()) {
-                chosenOrders.add(new ChosenData(i.position, i.checkBox));
+                chosenOrders.add(new GlobalVars.CheckBoxData(i.id, i.checkBox, i.status));
+            }
+        }
+    }
+
+    /**
+     * Проверяет наличие хотя бы одного выбранного заказа
+     * @return true  - если не выбран
+     *         false - если выбран
+     */
+    private boolean isAtLeastOneSelectedOrder() {
+        checkCB();
+        if (chosenOrders.size() == 0) {
+            Toast.makeText(getActivity(), "Вы не выбрали заказ", Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Повторно отправляет заказ со статутосм "Отправлено" (логично)
+     * @param id - поле ROWID в таблице ZAKAZY
+     */
+    private void resendOrder(int id) {
+        String FileName = "";
+
+        try {
+            FileName = glbVars.FormDBFForZakaz(id);
+        } catch (DBFException e) {
+            e.printStackTrace();
+        } finally {
+            if (!FileName.equals("")) {
+                SendDBFFile(FileName);
+            } else {
+                Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -35,6 +35,9 @@ import java.util.Objects;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class MainActivity extends AppCompatActivity {
     //Defining Variables
     private static final long SMS_NOTIFY_INTERVAL = 30 * 60 * 1000; // интервал проверки обновления 5 минут
@@ -220,10 +223,10 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_send_orders:
-                        DisplayFragment(new SendOrdersFragment(), "frag_send_orders");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
+//                    case R.id.nav_send_orders:
+//                        DisplayFragment(new SendOrdersFragment(), "frag_send_orders");
+//                        setToolbarTitle(menuItem.getTitle());
+//                        return true;
                     case R.id.nav_update_app:
                         DisplayFragment(new UpdateAppFragment(), "frag_update_app");
                         setToolbarTitle(menuItem.getTitle());

@@ -15,7 +15,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class UpdateDebet extends IntentService {
     final String sql_server = "91.208.84.67";
     final String sql_port = "1439";

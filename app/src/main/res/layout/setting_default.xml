@@ -38,7 +38,7 @@
 
     <Button
             android:id="@+id/saveSettings"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/buttonWidth"
             android:paddingHorizontal="@dimen/layoutPadding"
             android:layout_height="wrap_content"
             android:text="Сохранить"

@@ -26,6 +26,8 @@ import java.util.Objects;
 
 /**
  * Фрагмент "Шапка заказа"
+ *
+ * Updated by domster704 on 27.09.2021
  */
 public class OrderHeadFragment extends Fragment {
     public GlobalVars glbVars;

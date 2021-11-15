@@ -19,7 +19,7 @@
 
         <Button
                 android:id="@+id/btClearSgi"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
@@ -30,7 +30,7 @@
 
         <Button
                 android:id="@+id/btClearGroups"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearSgi"
                 android:layout_alignParentStart="true"
@@ -41,7 +41,7 @@
 
         <Button
                 android:id="@+id/btClearNomen"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearGroups"
                 android:layout_alignParentStart="true"
@@ -52,7 +52,7 @@
 
         <Button
                 android:id="@+id/btClearContrs"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearNomen"
                 android:layout_alignParentStart="true"
@@ -63,7 +63,7 @@
 
         <Button
                 android:id="@+id/btClearAddrs"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearContrs"
                 android:layout_alignParentStart="true"
@@ -74,7 +74,7 @@
 
         <Button
                 android:id="@+id/btClearTP"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearAddrs"
                 android:layout_alignParentStart="true"
@@ -85,7 +85,7 @@
 
         <Button
                 android:id="@+id/btClearDebet"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearTP"
                 android:layout_alignParentStart="true"
@@ -96,7 +96,7 @@
 
         <Button
                 android:id="@+id/btCompactDB"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/btClearAddrs"
                 android:layout_alignParentEnd="true"
@@ -106,7 +106,7 @@
 
         <Button
                 android:id="@+id/btClearAll"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btClearDebet"
                 android:layout_alignParentStart="true"
@@ -116,7 +116,7 @@
 
         <Button
                 android:id="@+id/btCheckDB"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btCompactDB"
                 android:layout_alignParentEnd="true"
@@ -126,7 +126,7 @@
 
         <Button
                 android:id="@+id/btUnlockTP"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btCheckDB"
                 android:layout_alignParentEnd="true"
@@ -136,7 +136,7 @@
 
         <Button
                 android:id="@+id/btLockTp"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btUnlockTP"
                 android:layout_alignParentEnd="true"
@@ -146,7 +146,7 @@
 
         <Button
                 android:id="@+id/btClearZakazy"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/btClearNomen"
                 android:layout_alignParentEnd="true"
@@ -156,7 +156,7 @@
 
         <Button
                 android:id="@+id/btClearZakazyDt"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/btClearContrs"
                 android:layout_alignParentEnd="true"
@@ -166,7 +166,7 @@
 
         <Button
                 android:id="@+id/btDeleteCanceledZakaz"
-                android:layout_width="400dp"
+                android:layout_width="@dimen/buttonWidth"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/btClearGroups"
                 android:layout_alignParentEnd="true"

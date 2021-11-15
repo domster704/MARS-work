@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+/**
+ * Updated by domster704 on 27.09.2021
+ */
 public class DefaultFragment extends Fragment {
     public GlobalVars glbVars;
     public WebView webview;
