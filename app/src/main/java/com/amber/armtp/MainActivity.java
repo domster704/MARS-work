@@ -8,11 +8,14 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -20,11 +23,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.amber.armtp.ServerWork.Zip.ZipDownload;
+import com.amber.armtp.ServerWork.Zip.ZipUnpacking;
 
 import org.apache.commons.io.FileUtils;
 
@@ -39,6 +46,8 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  * Updated by domster704 on 27.09.2021
  */
 public class MainActivity extends AppCompatActivity {
+    public static String filesPath;
+
     //Defining Variables
     private static final long SMS_NOTIFY_INTERVAL = 30 * 60 * 1000; // интервал проверки обновления 5 минут
     private static final int LAYOUT = R.layout.activity_main;
@@ -73,14 +82,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String path = getFilesDir().getPath();
+        filesPath = path.substring(0, path.lastIndexOf("/")) + "/databases/";
+        Log.d("ftp", filesPath);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        // For ftp-server
+        String host = getResources().getString(R.string.host);
+        String dir = getResources().getString(R.string.fileDirectory);
+        String fileName = getResources().getString(R.string.fileName);
+        int port = getResources().getInteger(R.integer.port);
+
+        // It's singleton instance for future using
+        ServerDetails.getInstance(host, dir, port, filesPath + fileName);
 
         globalVariable = (GlobalVars) getApplicationContext();
 
@@ -113,16 +134,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
         if (globalVariable.db == null) {
             globalVariable.db = new DBHepler(getApplicationContext());
         }
 
-        File old_db = new File(globalVariable.GetSDCardpath() + "ARMTP_DB" + "/armtp.db");
+        File old_db = new File(globalVariable.GetSDCardpath() + "ARMTP_DB" + "/armtp3.db");
         if (old_db.exists()) {
             try {
                 FileUtils.copyFile(new File(old_db.toString()), new File(globalVariable.db.getWritableDatabase().getPath()));
-                File toName = new File(globalVariable.GetSDCardpath() + "ARMTP_DB/armtp.db_");
+                File toName = new File(globalVariable.GetSDCardpath() + "ARMTP_DB/armtp3.db_");
                 old_db.renameTo(toName);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -130,36 +150,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS sgi (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS Nomen (ID TEXT UNIQUE, GRUPID TEXT, COD TEXT, DESCR NUMERIC, OST INTEGER, PRICE NUMERIC, ZAKAZ INT DEFAULT 0, lowDESCR TEXT, SGIID TEXT, CODE TEXT, PHOTO1 TEXT, PHOTO2 TEXT, VKOROB INTEGER DEFAULT 0, ISUPDATED INTEGER DEFAULT 0, ISNEW INTEGER DEFAULT 0, IS7DAY INTEGER DEFAULT 0, IS28DAY INTEGER DEFAULT 0, MP TEXT DEFAULT '', IS_PERM INTEGER DEFAULT 0, SALE_PRICE NUMERIC DEFAULT 0, P1D NUMERIC DEFAULT 0, P2D NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT, DESCR TEXT, lowDESCR TEXT, CODE TEXT, INSTOP INTEGER, DOLG INTEGER, DYNAMO INTEGER, TP TEXT DEFAULT '', INFO TEXT DEFAULT '')");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,ID TEXT, PARENTEXT TEXT, DESCR TEXT,CODE TEXT, DOP_INFO TEXT DEFAULT '')");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (ID TEXT NOT NULL, DESCR TEXT NOT NULL, CODE TEXT, TP_PASS TEXT DEFAULT '')");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEBET (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, CONTR_ID TEXT, KREDIT INTEGER, LIM INTEGER, NEKONTR INTEGER, SALDO NUMERIC, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, TP_ID TEXT DEFAULT 0, TP_IDS TEXT DEFAULT 0, A35 NUMERIC DEFAULT 0, A42 NUMERIC DEFAULT 0, A49 NUMERIC DEFAULT 0, A56 NUMERIC DEFAULT 0, A63 NUMERIC DEFAULT 0, A64 NUMERIC DEFAULT 0, OTG30 NUMERIC DEFAULT 0, OPL30 NUMERIC DEFAULT 0, FIRMA TEXT DEFAULT '')");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TMP_DEBET (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, CONTR_ID TEXT, KREDIT INTEGER, LIM INTEGER, NEKONTR INTEGER, SALDO NUMERIC, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, TP_ID TEXT DEFAULT 0, TP_IDS TEXT DEFAULT 0, A35 NUMERIC DEFAULT 0, A42 NUMERIC DEFAULT 0, A49 NUMERIC DEFAULT 0, A56 NUMERIC DEFAULT 0, A63 NUMERIC DEFAULT 0, A64 NUMERIC DEFAULT 0, OTG30 NUMERIC DEFAULT 0, OPL30 NUMERIC DEFAULT 0, FIRMA TEXT DEFAULT '')");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCNO TEXT, TP_ID TEXT, CONTR_ID BLOB, ADDR_ID TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, DELIV_TIME TEXT DEFAULT '', GETMONEY NUMERIC DEFAULT 0, GETBACKWARD NUMERIC DEFAULT 0, BACKTYPE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOM_ID TEXT, CODE TEXT, COD5 TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP_ID TEXT, CONTR_ID TEXT, ADDR_ID TEXT, DATA TEXT, COMMENT TEXT, DELIV_TIME TEXT DEFAULT '', GETMONEY NUMERIC DEFAULT 0, GETBACKWARD NUMERIC DEFAULT 0, BACKTYPE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SALES (CONTR_ID TEXT, GRUP_ID TEXT, SALE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CEN_TYPES (ROW_ID INTEGER, CEN_ID TEXT, DESCR TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TP_GRUP_ACCESS (TP_ID TEXT, SGI_ID TEXT, GRUP_ID TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS sgi_FULL_IDX ON sgi(rowid, ID);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS GRUPS_FULL_IDX ON GRUPS(rowid, ID, SGIID);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS Nomen_FULL_IDX ON Nomen(ID, GRUPID, COD, DESCR, lowDESCR, ost, ZAKAZ, SGIID, ISUPDATED);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS CONTR_FULL_IDX ON CONTRS(ROWID, ID,  DESCR, lowDESCR);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS CONTRS_IDX ON CONTRS(ID);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS TP_IDX ON TORG_PRED(ID);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ADDRS_FULL_IDX ON ADDRS(rowid, ID, PARENTEXT);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS DEBET_FULL_IDX ON DEBET(ROWID, [ROW], CONTR_ID, TP_ID, TP_IDS);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ORDERS_FULL_IDX ON ORDERS(TP_ID, CONTR_ID, ADDR_ID, DATA);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_FULL_IDX ON ZAKAZY(ROWID, DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, STATUS);");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_DT_FULL_IDX ON ZAKAZY_DT(ROWID, ZAKAZ_ID, NOM_ID);");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SGI (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS NOMEN (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, SGI TEXT, GRUPPA TEXT, KOD5 TEXT, DESCR TEXT, DEMP TEXT, FOCUSID TEXT, GOFRA INTEGER, FOTO TEXT, POSTDATA DATE, OST INTEGER, PD NUMERIC DEFAULT 0, ZAKAZ NUMERIC DEFAULT 0, PRICE NUMERIC DEFAULT 0)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS PRICES (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, NOMENID TEXT, TIPCE TEXT, PRICE NUMERIC)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTRCODE TEXT, CODE TEXT, DESCR TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT, DESCR TEXT NOT NULL)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEBET (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTR TEXT, CONTR_ID TEXT, SCHET TEXT, STATUS TEXT, KREDIT TEXT, DOGOVOR DATE, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, A35 NUMERIC, A42 NUMERIC, A49 NUMERIC, A56 NUMERIC, A63 NUMERIC, A64 NUMERIC, DOLG NUMERIC, OTGR30 NUMERIC, OPL30 NUMERIC, K_OBOR NUMERIC, FIRMA TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS STATUS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VYCHERK (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, NOM TEXT, COL NUMERIC)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOCUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
 
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOM_ID TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
-
 
         if (globalVariable.SmsDB == null) {
             globalVariable.SmsDB = openOrCreateDatabase("armtp_msg.db", MODE_MULTI_PROCESS, null);
@@ -186,15 +195,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         cal = Calendar.getInstance();
-        UpdateDbSchema();
+//        UpdateDbSchema();
+
         // Initializing Toolbar and setting it as the actionbar
         initToolbar();
         initNavigationView();
+
         // Initializing NavigationView
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
             // This method will trigger on item Click of navigation menu
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -208,25 +219,20 @@ public class MainActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     // Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_update_data:
-                        DisplayFragment(new UpdateDataFragment(), "frag_update_data");
-                        setToolbarTitle(menuItem.getTitle());
+                        try {
+                            DownloadDB();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         return true;
                     case R.id.nav_journal:
                         DisplayFragment(new JournalFragment(), "frag_journal");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-//                    case R.id.nav_form_order:
-//                        DisplayFragment(new FormOrderFragment(), "frag_form_order");
-//                        setToolbarTitle(menuItem.getTitle());
-//                        return true;
                     case R.id.nav_order_header:
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-//                    case R.id.nav_send_orders:
-//                        DisplayFragment(new SendOrdersFragment(), "frag_send_orders");
-//                        setToolbarTitle(menuItem.getTitle());
-//                        return true;
                     case R.id.nav_update_app:
                         DisplayFragment(new UpdateAppFragment(), "frag_update_app");
                         setToolbarTitle(menuItem.getTitle());
@@ -235,10 +241,6 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new DebetFragment(), "frag_debet");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-//                    case R.id.nav_back_messages:
-//                        DisplayFragment(new BackSMSFragment(), "frag_back_messages");
-//                        setToolbarTitle(menuItem.getTitle());
-//                        return true;
                     case R.id.nav_admin:
                         DisplayFragment(new SettingFragment(), "frag_admin");
                         setToolbarTitle(menuItem.getTitle());
@@ -267,10 +269,12 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
                 super.onDrawerOpened(drawerView);
-                initVersion();
+//                initVersion();
                 initLastUpdate();
             }
         };
+
+        setPriceOnChosenNomen();
 
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
@@ -278,12 +282,11 @@ public class MainActivity extends AppCompatActivity {
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
 
-        fragment = new DefaultFragment();
+        fragment = new JournalFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame, fragment, "frag_default");
+        fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
         fragmentTransaction.commit();
-        setToolbarTitle("Общая информация");
-
+        setToolbarTitle("Журнал");
 
         if (!globalVariable.isServiceRunning(CheckSMS.class)) {
             SMSIntent = new Intent(this, CheckSMS.class);
@@ -294,6 +297,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    }
+
+    private void setPriceOnChosenNomen() {
+//        Cursor cursor;
+//        try {
+//            SQLiteDatabase db = globalVariable.db.getReadableDatabase();
+//
+//
+//            cursor = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
+//
+//            SQLiteDatabase db1 = globalVariable.db.getWritableDatabase();
+//            Cursor cursorSetPrices;
+//            for (int i = 0; i < cursor.getCount(); i++) {
+//                cursor.moveToNext();
+//                cursorSetPrices = db1.rawQuery("SELECT NOMEN, CENA FROM PRICES WHERE TIPCEN = '" + cursor.getString(1) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "')", null);
+//                Log.d("xd", cursorSetPrices.getCount() + "");
+//
+//
+//                for (int j = 0; j < cursorSetPrices.getCount(); j++) {
+//                    cursorSetPrices.moveToNext();
+//                    float price = Float.parseFloat(cursorSetPrices.getString(1)) * (1 - Float.parseFloat(cursor.getString(0)) / 100);
+//                    db1.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + cursorSetPrices.getString(0) + "'");
+//                }
+//            }
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void initNavigationView() {
@@ -362,13 +394,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
-        String version = String.valueOf(pInfo.versionCode);
-        String versionName = String.valueOf(pInfo.versionName);
-        tvAppVer = findViewById(R.id.tvAppVersion);
-        if (tvAppVer != null) {
-            tvAppVer.setText(version + " ( сборка " + versionName + ")");
-        }
     }
 
     private void initLastUpdate() {
@@ -378,131 +403,51 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void UpdateDbSchema() {
-        if (globalVariable.db == null) {
-            globalVariable.db = new DBHepler(getApplicationContext());
-            UpdateSchemaDB = globalVariable.db.getWritableDatabase();
-        } else {
-
-            UpdateSchemaDB = globalVariable.db.getWritableDatabase();
-
-            //Изменения от 28-06-2019
-            try {
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS sgi (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS Nomen (ID TEXT UNIQUE, GRUPID TEXT, COD TEXT, DESCR NUMERIC, OST INTEGER, PRICE NUMERIC, ZAKAZ INT DEFAULT 0, lowDESCR TEXT, SGIID TEXT, CODE TEXT, PHOTO1 TEXT, PHOTO2 TEXT, VKOROB INTEGER DEFAULT 0, ISUPDATED INTEGER DEFAULT 0, ISNEW INTEGER DEFAULT 0, IS7DAY INTEGER DEFAULT 0, IS28DAY INTEGER DEFAULT 0, MP TEXT DEFAULT '', IS_PERM INTEGER DEFAULT 0, SALE_PRICE NUMERIC DEFAULT 0, P1D NUMERIC DEFAULT 0, P2D NUMERIC DEFAULT 0)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS CONTRS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT, DESCR TEXT, lowDESCR TEXT, CODE TEXT, INSTOP INTEGER, DOLG INTEGER, DYNAMO INTEGER, TP TEXT DEFAULT '', INFO TEXT DEFAULT '')");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,ID TEXT, PARENTEXT TEXT, DESCR TEXT,CODE TEXT, DOP_INFO TEXT DEFAULT '')");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (ID TEXT NOT NULL, DESCR TEXT NOT NULL, CODE TEXT, TP_PASS TEXT DEFAULT '')");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS DEBET (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, CONTR_ID TEXT, KREDIT INTEGER, LIM INTEGER, NEKONTR INTEGER, SALDO NUMERIC, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, TP_ID TEXT DEFAULT 0, TP_IDS TEXT DEFAULT 0, A35 NUMERIC DEFAULT 0, A42 NUMERIC DEFAULT 0, A49 NUMERIC DEFAULT 0, A56 NUMERIC DEFAULT 0, A63 NUMERIC DEFAULT 0, A64 NUMERIC DEFAULT 0, OTG30 NUMERIC DEFAULT 0, OPL30 NUMERIC DEFAULT 0, FIRMA TEXT DEFAULT '')");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS TMP_DEBET (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, CONTR_ID TEXT, KREDIT INTEGER, LIM INTEGER, NEKONTR INTEGER, SALDO NUMERIC, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, TP_ID TEXT DEFAULT 0, TP_IDS TEXT DEFAULT 0, A35 NUMERIC DEFAULT 0, A42 NUMERIC DEFAULT 0, A49 NUMERIC DEFAULT 0, A56 NUMERIC DEFAULT 0, A63 NUMERIC DEFAULT 0, A64 NUMERIC DEFAULT 0, OTG30 NUMERIC DEFAULT 0, OPL30 NUMERIC DEFAULT 0, FIRMA TEXT DEFAULT '')");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCNO TEXT, TP_ID TEXT, CONTR_ID BLOB, ADDR_ID TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, DELIV_TIME TEXT DEFAULT '', GETMONEY NUMERIC DEFAULT 0, GETBACKWARD NUMERIC DEFAULT 0, BACKTYPE NUMERIC DEFAULT 0)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOM_ID TEXT, CODE TEXT, COD5 TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP_ID TEXT, CONTR_ID TEXT, ADDR_ID TEXT, DATA TEXT, COMMENT TEXT, DELIV_TIME TEXT DEFAULT '', GETMONEY NUMERIC DEFAULT 0, GETBACKWARD NUMERIC DEFAULT 0, BACKTYPE NUMERIC DEFAULT 0)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS SALES (CONTR_ID TEXT, GRUP_ID TEXT, SALE NUMERIC DEFAULT 0)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS CEN_TYPES (ROW_ID INTEGER, CEN_ID TEXT, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS TP_GRUP_ACCESS (TP_ID TEXT, SGI_ID TEXT, GRUP_ID TEXT)");
-                //Обновление от 17-04-2020. Создание таблиц матрицы. Товарная категория. Функциональная группа. Бренд. Демпризнак. Производитель/Импортер
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS FUNC (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS TOVCAT (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS BRAND (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS WC (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS PROD (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT)");
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS FOCUS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ID TEXT NOT NULL, DESCR TEXT, LONG_DESCR TEXT, BDATE TEXT, EDATE TEXT)");
-
-                UpdateSchemaDB.execSQL("CREATE TABLE IF NOT EXISTS UNI_MATRIX (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, TYPE_ID TEXT NOT NULL DEFAULT '', TYPE_DESCR TEXT NOT NULL DEFAULT '', ID TEXT NOT NULL, DESCR TEXT, LOWDESCR TEXT)");
-
-
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS sgi_FULL_IDX ON sgi(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS GRUPS_FULL_IDX ON GRUPS(rowid, ID, SGIID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS Nomen_FULL_IDX ON Nomen(ID, GRUPID, COD, DESCR, lowDESCR, ost, ZAKAZ, SGIID, ISUPDATED);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS CONTR_FULL_IDX ON CONTRS(ROWID, ID,  DESCR, lowDESCR);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS CONTRS_IDX ON CONTRS(ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS TP_IDX ON TORG_PRED(ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS ADDRS_FULL_IDX ON ADDRS(rowid, ID, PARENTEXT);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS DEBET_FULL_IDX ON DEBET(ROWID, [ROW], CONTR_ID, TP_ID, TP_IDS);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS ORDERS_FULL_IDX ON ORDERS(TP_ID, CONTR_ID, ADDR_ID, DATA);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_FULL_IDX ON ZAKAZY(ROWID, DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, STATUS);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS ZAKAZY_DT_FULL_IDX ON ZAKAZY_DT(ROWID, ZAKAZ_ID, NOM_ID);");
-
-                //Обновление от 17-04-2020. Создание индексов таблиц матрицы. Товарная категория. Функциональная группа. Бренд. Демпризнак. Производитель/Импортер
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS func_FULL_IDX ON FUNC(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS tovcat_FULL_IDX ON TOVCAT(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS brand_FULL_IDX ON BRAND(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS wc_FULL_IDX ON WC(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS prod_FULL_IDX ON PROD(rowid, ID);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS focus_FULL_IDX ON FOCUS(rowid, ID, BDATE, EDATE);");
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS uni_matrix_FULL_IDX ON UNI_MATRIX(rowid, TYPE_ID, ID, DESCR, LOWDESCR);");
-
-            } catch (SQLiteException ignored) {
-            }
-
-            class SQLData {
-                public final String tableName;
-                public final String column;
-                public final String defaultValue;
-
-                public SQLData(String tableName, String column, String defaultValue) {
-                    this.tableName = tableName;
-                    this.column = column;
-                    this.defaultValue = defaultValue;
-                }
-            }
-
-            SQLData[] sqlData = new SQLData[]{
-                    new SQLData("CONTRS", "INFO", "''"),
-                    new SQLData("DEBET", "FIRMA", "''"),
-                    new SQLData("TMP_DEBET", "FIRMA", "''"),
-                    new SQLData("TMP_DEBET", "P1D", "0"),
-                    new SQLData("TMP_DEBET", "P2D", "0"),
-                    new SQLData("CONTRS", "CRT_DATE", "''"),
-                    new SQLData("Nomen", "TOVCATID", "''"),
-                    new SQLData("Nomen", "FUNCID", "''"),
-                    new SQLData("Nomen", "BRANDID", "''"),
-                    new SQLData("Nomen", "WCID", "''"),
-                    new SQLData("Nomen", "PRODID", "''"),
-                    new SQLData("Nomen", "FOCUSID", "''"),
-                    new SQLData("BRAND", "LOWDESCR", "''"),
-                    new SQLData("FOCUS", "LOWDESCR", "''"),
-                    new SQLData("FOCUS", "LOWLONG_DESCR", "''"),
-                    new SQLData("FUNC", "LOWDESCR", "''"),
-                    new SQLData("GRUPS", "LOWDESCR", "''"),
-                    new SQLData("PROD", "LOWDESCR", "''"),
-                    new SQLData("TOVCAT", "LOWDESCR", "''"),
-                    new SQLData("WC", "LOWDESCR", "''"),
-                    new SQLData("sgi", "LOWDESCR", "''"),
-                    new SQLData("Nomen", "FOCUSID", "''"),
-                    new SQLData("Nomen", "MODELID", "''"),
-                    new SQLData("Nomen", "SIZEID", "''"),
-                    new SQLData("Nomen", "COLORID", "''"),
-            };
-
-            for (SQLData i : sqlData) {
-                try {
-                    UpdateSchemaDB.execSQL("ALTER TABLE " + i.tableName + " ADD COLUMN " + i.column + " TEXT DEFAULT " + i.defaultValue);
-                } catch (SQLiteException ignored) {
-                }
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS Nomen_MX_FULL_IDX ON Nomen(ID, GRUPID, SGIID, TOVCATID, FUNCID, BRANDID, WCID, PRODID);");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS Nomen_MX_FOCUS_FULL_IDX ON Nomen(ID, GRUPID, SGIID, TOVCATID, FUNCID, BRANDID, WCID, PRODID, FOCUSID);");
-            } catch (SQLiteException ignored) {
-            }
-
-            try {
-                UpdateSchemaDB.execSQL("CREATE INDEX IF NOT EXISTS Nomen_MX_MDL_SZ_CLR_FULL_IDX ON Nomen(ID, GRUPID, SGIID, TOVCATID, FUNCID, BRANDID, WCID, PRODID, FOCUSID, MODELID, SIZEID, COLORID);");
-            } catch (SQLiteException ignored) {
-            }
-        }
-    }
-
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+    private int countOfReturning = 0;
+
+    private void DownloadDB() throws IOException {
+        ZipDownload zipDownload;
+        try {
+            zipDownload = new ZipDownload(ServerDetails.getInstance());
+            zipDownload.downloadZip();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ZipUnpacking zipUnpacking;
+        try {
+            zipUnpacking = new ZipUnpacking(ServerDetails.getInstance());
+            zipUnpacking.doUnpacking();
+            Toast.makeText(getApplication(), "Загрузка завершена", Toast.LENGTH_SHORT).show();
+
+            if (getFileSizeKiloBytes(new File(filesPath + "armtp3.db")) < 100 && countOfReturning < 3) {
+                countOfReturning++;
+                Toast.makeText(getApplication(), "Попытка: " + countOfReturning, Toast.LENGTH_SHORT).show();
+                DownloadDB();
+            } else if (countOfReturning >= 3) {
+                Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
+            }
+
+            restart();
+        } catch (Exception e) {
+            Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+
+    }
+
+    public void restart() {
+        Intent intent = new Intent(this, MainActivity.class);
+        this.startActivity(intent);
+        System.exit(0);
+    }
+
+    private static double getFileSizeKiloBytes(File file) {
+        return (double) file.length() / 1024;
     }
 }

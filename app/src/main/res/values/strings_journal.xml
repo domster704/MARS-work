@@ -11,5 +11,6 @@
     <string name="journFilter">Показать</string>
     <string name="journUpdateStatus">Обновить статусы</string>
     <string name="deleteOrders">Удалить заказы</string>
+    <string name="selectAllOrders">Выбрать все заказы</string>
     <string name="sendOrders">Отправить заказы</string>
 </resources>

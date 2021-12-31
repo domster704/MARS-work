@@ -50,6 +50,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
     static ImageButton filter;
 
+    private boolean isSaved = false;
+
     private final SearchView.OnQueryTextListener searchTextListener =
             new SearchView.OnQueryTextListener() {
                 boolean isSearchClicked = false;
@@ -58,12 +60,17 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 public boolean onQueryTextChange(String newText) {
                     String ItemID = "";
                     if (glbVars.myGrups != null) {
-                        ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("ID"));
+                        ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("CODE"));
                     }
+
+                    final String curSgi = "";
+
+//                    TextView txtSgi = getView().findViewById(R.id.ColSgiID);
+//                    curSgi = txtSgi.getText().toString();
 
                     if (newText.equals("")) {
                         if (!isSearchClicked) {
-                            glbVars.LoadNom(ItemID);
+                            glbVars.LoadNom(ItemID, curSgi);
                             searchView.clearFocus();
                             searchView.setIconified(true);
                         }
@@ -73,7 +80,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                             if (!ItemID.equals("0")) {
                                 glbVars.SearchNomInGroup(newText, ItemID);
                             } else {
-                                glbVars.LoadNom(ItemID);
+                                glbVars.LoadNom(ItemID, curSgi);
                             }
                             return true;
                         } else {
@@ -134,7 +141,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             alertD.show();
             glbVars.LoadFiltersSgi(promptView);
             glbVars.LoadFiltersGroups(promptView);
-            glbVars.LoadFiltersTovcat(promptView);
+//            glbVars.LoadFiltersTovcat(promptView);
             glbVars.LoadFiltersFunc(promptView);
             glbVars.LoadFiltersBrand(promptView);
             glbVars.LoadFiltersWC(promptView);
@@ -145,7 +152,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
             String SgiFID = settings.getString("ColSgiFID", "0");
             String GrupFID = settings.getString("ColGrupFID", "0");
-            String TovcatID = settings.getString("ColTovcatID", "0");
+//            String TovcatID = settings.getString("ColTovcatID", "0");
             String FuncID = settings.getString("ColFuncID", "0");
             String BrandID = settings.getString("ColBrandID", "0");
             String WCID = settings.getString("ColWCID", "0");
@@ -162,9 +169,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 glbVars.SetSelectedFilterGroup(GrupFID);
             }
 
-            if (!TovcatID.equals("0")) {
-                glbVars.SetSelectedFilterTovcat(TovcatID);
-            }
+//            if (!TovcatID.equals("0")) {
+//                glbVars.SetSelectedFilterTovcat(TovcatID);
+//            }
 
             if (!FuncID.equals("0")) {
                 glbVars.SetSelectedFilterFunc(FuncID);
@@ -253,7 +260,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.form_order_fragment, container, false);
-        Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
         thisView = rootView;
         glbVars.view = rootView;
@@ -265,14 +272,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
+        glbVars = (GlobalVars) getActivity().getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
         glbVars.CurAc = getActivity();
-
     }
-
-
 
     @Override
     public void onSaveInstanceState(@NonNull final Bundle outState) {
@@ -289,17 +293,26 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
-        glbVars.db.calcSales(glbVars.db.GetContrID());
+//        glbVars.db.calcSales(glbVars.db.GetContrID());
 
         if (glbVars.NomenAdapter != null) {
-            glbVars.myNom.requery();
+//            glbVars.myNom.requery();
             glbVars.NomenAdapter.notifyDataSetChanged();
         }
+
         setContrAndSum();
         if (glbVars.isDiscount) {
             glbVars.isDiscount = false;
             glbVars.Discount = 0;
         }
+    }
+
+    private void clearChosenGroupSgi() {
+        editor.clear().apply();
+        glbVars.frSgi = "";
+        glbVars.frGroup = "";
+        txtSgi = null;
+        txtGroup = null;
     }
 
     public void SaveOrder() throws ParseException {
@@ -310,19 +323,18 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 String TP_ID;
                 String Contr_ID;
                 String Addr_ID;
-                String Data, Time;
+                String Data;
                 String Comment;
                 String IDDOC;
+                int Status = 0;
 
                 String sql;
                 SQLiteStatement stmt;
 
-                int getMoney, getBackward, getBacktype;
-
                 SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 String curdate = df.format(Calendar.getInstance().getTime());
 
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP_ID, ORDERS.DATA, ORDERS.COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
                 if (c.getCount() == 0) {
                     getActivity().runOnUiThread(new Runnable() {
@@ -346,25 +358,21 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     return;
                 }
 
+//               TP_ID, ORDERS.DATA, ORDERS.COMMENT, CONTR_ID, ADDR_ID
                 c.moveToFirst();
-                Data = c.getString(3);
-                Time = c.getString(8);
-                getMoney = c.getInt(9);
-                getBackward = c.getInt(10);
-                getBacktype = c.getInt(11);
-
-                Comment = c.getString(4);
-                TP_ID = c.getString(5);
-                Contr_ID = c.getString(6);
-                Addr_ID = c.getString(7);
-
+                TP_ID = c.getString(0);
+                Data = c.getString(1);
+                Comment = c.getString(2);
+                Contr_ID = c.getString(3);
+                Addr_ID = c.getString(4);
                 c.close();
 
                 int Docno = glbVars.db.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
                 IDDOC += "." + TP_ID;
+                Log.d("xd", IDDOC);
 
-                sql = "INSERT INTO ZAKAZY(DOCNO, TP_ID, CONTR_ID, ADDR_ID, DOC_DATE, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+                sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS)  VALUES (?,?,?,?,?,?,?,?);";
                 stmt = glbVars.db.getWritableDatabase().compileStatement(sql);
                 glbVars.db.getWritableDatabase().beginTransaction();
                 try {
@@ -376,10 +384,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     stmt.bindString(5, curdate);
                     stmt.bindString(6, Data);
                     stmt.bindString(7, Comment);
-                    stmt.bindString(8, Time);
-                    stmt.bindLong(9, getMoney);
-                    stmt.bindLong(10, getBackward);
-                    stmt.bindLong(11, getBacktype);
+                    stmt.bindLong(8, Status);
                     stmt.executeInsert();
                     stmt.clearBindings();
                 } catch (Exception e) {
@@ -389,13 +394,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.db.getWritableDatabase().endTransaction();
                 }
 
-                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT ID, COD, DESCR, ZAKAZ, ROUND(PRICE,2) AS [CENA], CODE FROM Nomen where ZAKAZ<>0", null);
+                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
                 if (c1.getCount() == 0) {
                     c1.close();
                     return;
                 } else {
                     glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + IDDOC + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
+                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) SELECT '" + IDDOC + "', KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                     glbVars.db.ClearOrderHeader();
@@ -412,6 +417,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
+                        clearChosenGroupSgi();
+
+                        editor.putString("ColSgiID", "0");
+                        editor.commit();
+
                         Fragment fragment = new JournalFragment();
                         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                         fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
@@ -429,7 +439,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             public void run() {
                 Cursor cHead, c, c2;
 
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.ID AS TP_ID, CONTRS.ID AS CONTR_ID, ADDRS.ID AS ADDR_ID, ORDERS.DELIV_TIME, ORDERS.GETMONEY, ORDERS.GETBACKWARD, ORDERS.BACKTYPE FROM ORDERS JOIN TORG_PRED ON ORDERS.TP_ID=TORG_PRED.ID JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID JOIN ADDRS ON ORDERS.ADDR_ID=ADDRS.ID", null);
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
                 if (c.getCount() == 0) {
                     getActivity().runOnUiThread(new Runnable() {
@@ -485,6 +495,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         glbVars.txtDate.setText("");
                         glbVars.txtComment.setText("");
                         glbVars.edContrFilter.setText("");
+
+                        clearChosenGroupSgi();
+                        Fragment fragment = new JournalFragment();
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
+                        fragmentTransaction.commit();
+                        toolbar.setTitle(R.string.journal);
                     }
                 });
             }
@@ -505,6 +522,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 return true;
             case R.id.NomenSave:
                 try {
+                    isSaved = true;
                     if (!glbVars.OrderID.equals("")) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
@@ -551,11 +569,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 if (glbVars.BeginPos != 0 && glbVars.EndPos != 0) {
                     edInput = edPPQty;
                 } else if (glbVars.BeginPos != 0) {
-                    if (glbVars.EndPos != 0) {
-                        edInput = edPPQty;
-                    } else {
-                        edInput = edEndPP;
-                    }
+                    edInput = edEndPP;
                 } else {
                     edInput = edBeginPP;
                 }
@@ -705,7 +719,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
         glbVars.isMultiSelect = false;
         glbVars.MultiQty = 0;
-        if (txtSgi != null && txtGroup != null) {
+        if (txtSgi != null && txtGroup != null && !isSaved) {
             editor.putString("ColSgiID", txtSgi.getText().toString());
             editor.putString("ColGrupID", txtGroup.getText().toString());
             editor.putInt("ColPosition", glbVars.nomenList.getFirstVisiblePosition());
@@ -721,11 +735,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         int VisiblePos = settings.getInt("ColPosition", 0);
         glbVars.nomenList.setSelection(VisiblePos);
 
+        assert SgiID != null;
         if (!SgiID.equals("0")) {
             glbVars.LoadGroups(SgiID);
             glbVars.SetSelectedSgi(SgiID, GrupID);
             glbVars.SetSelectedGrup(GrupID);
         }
+        setContrAndSum();
     }
 
     @SuppressLint("CutPasteId")
@@ -750,28 +766,29 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         editor = settings.edit();
 
         glbVars.LoadSgi();
-        if (glbVars.frSgi != "" && glbVars.frSgi != null) {
-            glbVars.SetSelectedSgi(glbVars.frSgi, glbVars.frGroup);
-            glbVars.LoadGroups(glbVars.frSgi);
-            glbVars.SetSelectedGrup(glbVars.frGroup);
-        }
-
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle(ToolBarContr + OrderSum);
+//        if (glbVars.frSgi != null && !glbVars.frSgi.equals("")) {
+//            glbVars.SetSelectedSgi(glbVars.frSgi, glbVars.frGroup);
+//            glbVars.LoadGroups(glbVars.frSgi);
+//            glbVars.SetSelectedGrup(glbVars.frGroup);
+//        }
 
         filter = getActivity().findViewById(R.id.NomenFilters);
         filter.setOnClickListener(this);
+        setContrAndSum();
     }
 
     private void setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         try {
-            if (ToolBarContr.trim().equals("")) {
-                toolbar.setSubtitle("Заказ на сумму " + OrderSum.substring(2) + " руб.");
+            if (!OrderSum.equals("")) {
+                if (ToolBarContr.trim().equals("")) {
+                    glbVars.toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
+                } else {
+                    glbVars.toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
+                }
             } else {
-                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                glbVars.toolbar.setSubtitle("");
             }
         } catch (Exception ignored) {
         }

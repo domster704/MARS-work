@@ -187,6 +187,9 @@ public class JournalFragment extends Fragment {
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+        glbVars.toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+        glbVars.toolbar.setTitle("Журнал");
+
         glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
     }
 
@@ -229,29 +232,31 @@ public class JournalFragment extends Fragment {
 
                 FTPClient ftpClient = new FTPClient();
                 try {
-
                     ftpClient.connect(server, 21);
                     ftpClient.login(username, password);
                     ftpClient.enterLocalPassiveMode();
-                    ftpClient.changeWorkingDirectory("newARM");
+                    ftpClient.changeWorkingDirectory("EXCHANGE/IN/MARS");
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
                     InputStream inputStream;
                     File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
+                    Log.d("xd1", secondLocalFile.getPath());
 
                     inputStream = new FileInputStream(secondLocalFile);
 
                     OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
-                    byte[] bytesIn = new byte[65536];
+                    byte[] bytesIn = new byte[4096];
                     int read;
 
-                    while ((read = inputStream.read(bytesIn)) != -1) {
-                        outputStream.write(bytesIn, 0, read);
+                    try {
+                        while ((read = inputStream.read(bytesIn)) != -1) {
+                            outputStream.write(bytesIn, 0, read);
+                        }
+                        outputStream.close();
+                    } catch (Exception ignored) {
                     }
 
                     inputStream.close();
-                    outputStream.close();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -281,13 +286,13 @@ public class JournalFragment extends Fragment {
             public void run() {
                 Cursor cNom, cHead;
                 glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID, CONTR_ID, ADDR_ID, DELIVERY_DATE, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ZAKAZY WHERE DOCNO='" + OrderID + "'", null);
+                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATA, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
                 if (cHead.moveToNext()) {
                     try {
                         if (glbVars.db.getCount() == 0) {
-                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE) VALUES ('" + cHead.getString(0) + "', '" + cHead.getString(1) + "', '" + cHead.getString(2) + "', '" + cHead.getString(3) + "', '" + cHead.getString(4) + "', '" + cHead.getString(5) + "', " + cHead.getInt(6) + ", " + cHead.getInt(7) + ", " + cHead.getInt(8) + ")");
+                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES ('" + cHead.getString(0) + "', '" + cHead.getString(1) + "', '" + cHead.getString(2) + "', '" + cHead.getString(3) + "', '" + cHead.getString(4) + ")");
                         } else {
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET TP_ID = '" + cHead.getString(0) + "', CONTR_ID = '" + cHead.getString(1) + "',ADDR_ID = '" + cHead.getString(2) + "',DATA = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4) + "', DELIV_TIME = '" + cHead.getString(5) + "', GETMONEY = " + cHead.getString(6) + ", GETBACKWARD = " + cHead.getString(7) + ", BACKTYPE = " + cHead.getString(8));
+                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET TP = '" + cHead.getString(0) + "', CONTR = '" + cHead.getString(1) + "',ADDR = '" + cHead.getString(2) + "', DOC_DATA = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -297,10 +302,10 @@ public class JournalFragment extends Fragment {
                 }
 
                 glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cNom = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                cNom = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cNom.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(0) + " WHERE ID='" + cNom.getString(1) + "'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(0) + " WHERE KOD5='" + cNom.getString(1) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -335,10 +340,10 @@ public class JournalFragment extends Fragment {
                 Cursor cursor;
                 glbVars.db.getWritableDatabase().beginTransaction();
                 glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOM_ID FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cursor.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(0) + " WHERE ID='" + cursor.getString(1) + "'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(0) + " WHERE KOD5='" + cursor.getString(1) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -368,6 +373,9 @@ public class JournalFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.SelectAllOrders:
+                selectAllOrders();
+                return true;
             case R.id.SendOrders:
                 if (glbVars.isNetworkAvailable()) {
                     if(isAtLeastOneSelectedOrder())
@@ -387,9 +395,13 @@ public class JournalFragment extends Fragment {
                     }
 
                     int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
+                    Log.d("xd", (chosenOrders.size() - countOfSentOrders) + " " + chosenOrders.size() + " " + countOfSentOrders);
+                    int index = 0;
                     for (int i = 0; i < chosenOrders.size(); i++) {
-                        if (!chosenOrders.get(i).status.equals("Отправлен"))
-                            chosenOrdersForSending[i] = chosenOrders.get(i).id;
+                        if (!chosenOrders.get(i).status.equals("Отправлен")) {
+                            chosenOrdersForSending[index] = chosenOrders.get(i).id;
+                            index++;
+                        }
                     }
 
                     try {
@@ -492,6 +504,7 @@ public class JournalFragment extends Fragment {
      * @param id - поле ROWID в таблице ZAKAZY
      */
     private void resendOrder(int id) {
+        Log.d("xd2", id + "");
         String FileName = "";
 
         try {
@@ -500,10 +513,22 @@ public class JournalFragment extends Fragment {
             e.printStackTrace();
         } finally {
             if (!FileName.equals("")) {
+                Log.d("xd2", FileName);
                 SendDBFFile(FileName);
             } else {
                 Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private boolean isChecked = false;
+
+    private void selectAllOrders() {
+        chosenOrders.clear();
+        for (int i = 0; i < GlobalVars.allOrders.size(); i++) {
+            GlobalVars.allOrders.get(i).checkBox.setChecked(!isChecked);
+            chosenOrders.add(GlobalVars.allOrders.get(i));
+        }
+        isChecked = !isChecked;
     }
 }

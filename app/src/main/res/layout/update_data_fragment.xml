@@ -62,78 +62,92 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Button
-                android:id="@+id/btUpdateData"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvUniMXCount"
-                android:layout_alignEnd="@+id/tvUniMXCount"
-                android:layout_alignParentBottom="false"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="0dp"
-                android:background="@android:drawable/btn_default"
-                android:text="@string/btUpdateData" />
+            android:id="@+id/btUpdateData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvUniMXCount"
+            android:layout_alignEnd="@+id/tvUniMXCount"
+            android:layout_alignParentBottom="false"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="0dp"
+            android:background="@android:drawable/btn_default"
+            android:text="@string/btUpdateData" />
 
         <CheckBox
-                android:id="@+id/chkSGI"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/chkGroups"
-                android:layout_alignLeft="@+id/chkGroups"
-                android:layout_alignTop="@+id/pgSgi"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkSGi" />
+            android:id="@+id/chkSGI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/chkGroups"
+            android:layout_alignLeft="@+id/chkGroups"
+            android:layout_alignTop="@+id/pgSgi"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkSGi" />
 
         <CheckBox
-                android:id="@+id/chkGroups"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvSgiPerc"
-                android:layout_alignStart="@+id/chkNomen"
-                android:layout_alignLeft="@+id/chkNomen"
-                android:layout_marginStart="0dp"
-                android:layout_marginLeft="0dp"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkGroups" />
+            android:id="@+id/chkGroups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvSgiPerc"
+            android:layout_alignStart="@+id/chkNomen"
+            android:layout_alignLeft="@+id/chkNomen"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkGroups" />
 
         <CheckBox
-                android:id="@+id/chkNomen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvGrupPerc"
-                android:layout_alignStart="@+id/chkContrs"
-                android:layout_alignLeft="@+id/chkContrs"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkNomen" />
+            android:id="@+id/chkContrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chkPrice"
+            android:layout_alignStart="@+id/chkAddrs"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingEnd="10dp"
+            android:text="@string/chkContrs" />
 
         <CheckBox
-                android:id="@+id/chkContrs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvNomenPerc"
-                android:layout_alignStart="@+id/chkAddrs"
-                android:layout_alignLeft="@+id/chkAddrs"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkContrs" />
+            android:id="@+id/chkNomen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvGrupPerc"
+            android:layout_alignStart="@+id/chkContrs"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingEnd="10dp"
+            android:text="@string/chkNomen" />
+
+        <CheckBox
+            android:id="@+id/chkPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chkNomen"
+            android:layout_alignStart="@+id/chkNomen"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingEnd="10dp"
+            android:text="@string/chkPrice" />
+
+
 
         <CheckBox
                 android:id="@+id/chkAddrs"
@@ -181,49 +195,63 @@
                 android:text="@string/chkDebet" />
 
         <ProgressBar
-                android:id="@+id/pgNomen"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="700dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvGrupPerc"
-                android:layout_alignStart="@+id/pgAddress"
-                android:layout_alignLeft="@+id/pgAddress"
-                android:layout_alignEnd="@+id/tvNomenCount"
-                android:layout_toEndOf="@+id/tvGrupPerc"
-                android:paddingRight="10dp" />
+            android:id="@+id/pgNomen"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvGrupPerc"
+            android:layout_alignStart="@+id/pgAddress"
+            android:layout_alignEnd="@+id/tvNomenCount"
+            android:layout_toEndOf="@+id/tvGrupPerc"
+            android:paddingEnd="10dp" />
 
         <ProgressBar
-                android:id="@+id/pgGroups"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="700dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvSgiPerc"
-                android:layout_alignStart="@+id/pgAddress"
-                android:layout_alignLeft="@+id/pgAddress"
-                android:layout_alignEnd="@+id/tvGrupCount"
-                android:paddingRight="10dp" />
+            android:id="@+id/pgGroups"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvSgiPerc"
+            android:layout_alignStart="@+id/pgAddress"
+            android:layout_alignLeft="@+id/pgAddress"
+            android:layout_alignEnd="@+id/tvGrupCount"
+            android:paddingRight="10dp" />
 
         <ProgressBar
-                android:id="@+id/pgContrs"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="700dp"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/pgOrdStatus"
-                android:layout_alignLeft="@+id/pgOrdStatus"
-                android:layout_alignTop="@+id/chkContrs"
-                android:layout_alignEnd="@+id/tvContrCount"
-                android:paddingRight="10dp" />
+            android:id="@+id/pgContrs"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/pgOrdStatus"
+            android:layout_alignLeft="@+id/pgOrdStatus"
+            android:layout_alignTop="@+id/chkContrs"
+            android:layout_alignEnd="@+id/tvContrCount"
+            android:layout_marginStart="-1dp"
+            android:layout_marginLeft="-1dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="1dp"
+            android:paddingRight="10dp" />
 
         <ProgressBar
-                android:id="@+id/pgAddress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="700dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvContrPerc"
-                android:layout_alignStart="@+id/tvContrPerc"
-                android:layout_alignLeft="@+id/tvContrPerc"
-                android:layout_alignEnd="@+id/tvAddrCount"
-                android:paddingRight="10dp" />
+            android:id="@+id/pgPrice"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvNomenPerc"
+            android:layout_alignStart="@+id/pgGroups"
+            android:layout_alignEnd="@+id/tvPriceCount"
+            android:layout_toEndOf="@+id/tvNomenPerc"
+            android:paddingEnd="10dp" />
+
+        <ProgressBar
+            android:id="@+id/pgAddress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvContrPerc"
+            android:layout_alignStart="@+id/tvContrPerc"
+            android:layout_alignLeft="@+id/tvContrPerc"
+            android:layout_alignEnd="@+id/tvAddrCount"
+            android:paddingRight="10dp" />
 
         <ProgressBar
                 android:id="@+id/pgTP"
@@ -268,14 +296,14 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-                android:id="@+id/tvGrupPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pgGroups"
-                android:layout_alignStart="@+id/pgGroups"
-                android:layout_alignLeft="@+id/pgGroups"
-                android:text="0%"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:id="@+id/tvGrupPerc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgGroups"
+            android:layout_alignStart="@+id/pgGroups"
+            android:layout_alignLeft="@+id/pgGroups"
+            android:text="0%"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
                 android:id="@+id/tvGrupCount"
@@ -290,35 +318,52 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-                android:id="@+id/tvNomenPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pgNomen"
-                android:layout_alignStart="@+id/pgNomen"
-                android:layout_alignLeft="@+id/pgNomen"
-                android:text="0%"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:id="@+id/tvNomenPerc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgNomen"
+            android:layout_alignStart="@+id/pgNomen"
+            android:text="0%"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-                android:id="@+id/tvNomenCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pgNomen"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:paddingRight="10dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:id="@+id/tvPricePerc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgNomen"
+            android:layout_alignStart="@+id/pgNomen"
+            android:text="0%"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-                android:id="@+id/tvContrPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pgContrs"
-                android:layout_alignStart="@+id/pgContrs"
-                android:layout_alignLeft="@+id/pgContrs"
-                android:text="0%"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:id="@+id/tvNomenCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgNomen"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:paddingRight="10dp"
+            android:text="0/0"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/tvPriceCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgPrice"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="10dp"
+            android:text="0/0"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/tvContrPerc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pgContrs"
+            android:layout_alignStart="@+id/pgContrs"
+            android:text="0%"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
                 android:id="@+id/tvContrCount"
@@ -395,17 +440,17 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <CheckBox
-                android:id="@+id/chkOrdStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvDebPerc"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkStatus" />
+            android:id="@+id/chkOrdStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDebPerc"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkStatus" />
 
         <ProgressBar
                 android:id="@+id/pgOrdStatus"
@@ -469,18 +514,18 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <CheckBox
-                android:id="@+id/chkSales"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvOutedPerc"
-                android:layout_alignParentStart="true"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkSales" />
+            android:id="@+id/chkSales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvOutedPerc"
+            android:layout_alignParentStart="true"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkSales" />
 
         <ProgressBar
                 android:id="@+id/pgSales"
@@ -512,18 +557,18 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <CheckBox
-                android:id="@+id/chkGrupAccess"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvSalesPerc"
-                android:layout_alignParentStart="true"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkGrupAccess" />
+            android:id="@+id/chkGrupAccess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvSalesPerc"
+            android:layout_alignParentStart="true"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkGrupAccess" />
 
         <ProgressBar
                 android:id="@+id/pgGrupAccess"
@@ -556,28 +601,28 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <CheckBox
-                android:id="@+id/chkOuted"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvStatusPerc"
-                android:layout_alignParentStart="true"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkOuted" />
+            android:id="@+id/chkOuted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvStatusPerc"
+            android:layout_alignParentStart="true"
+            android:checked="false"
+            android:clickable="false"
+            android:enabled="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingRight="10dp"
+            android:text="@string/chkOuted" />
 
         <ProgressBar
-                android:id="@+id/pgSgi"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="700dp"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/pgGroups"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:paddingRight="10dp" />
+            android:id="@+id/pgSgi"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="700dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/pgGroups"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:paddingRight="10dp" />
 
     </RelativeLayout>
 

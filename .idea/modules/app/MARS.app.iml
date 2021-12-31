@@ -50,6 +50,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-annotations:28.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.linuxense:javadbf:0.4.0" level="project" />
     <orderEntry type="library" name="Gradle: net.sourceforge.jtds:jtds:1.3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.jamel.dbf:dbf-reader:0.3.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.davemorrissey.labs:subsampling-scale-image-view:3.10.0@aar" level="project" />

@@ -19,4 +19,9 @@
     <dimen name="nomenDescrSize">14sp</dimen>
 
     <dimen name="buttonWidth">400dp</dimen>
+
+    <dimen name="updateChkWidth">330dp</dimen>
+
+    <dimen name="pgWidth">600dp</dimen>
+    <dimen name="percWidth">50dp</dimen>
 </resources>

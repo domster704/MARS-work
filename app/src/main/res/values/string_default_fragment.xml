@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="companyName">ГП «Янтарь+»</string>
+    <string name="appVersion">Версия программы: 2.00</string>
+    <string name="askQuestion">Все вопросы по улучшению программы направляйте на адрес: </string>
+    <string name="email"><b>postmaster@amber.udm18.net</b></string>
+</resources>

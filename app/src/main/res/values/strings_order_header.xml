@@ -14,5 +14,4 @@
     <string name="OrdHeaderSave">Сохранить шапку заказа</string>
     <string name="OrdHeaderDebet">Дебиторка</string>
     <string name="NecessaryFields">Поля помеченные * обязательны для заполнения</string>
-
 </resources>

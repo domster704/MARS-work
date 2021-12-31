@@ -146,7 +146,7 @@ public class GlobalVars extends Application {
 
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            String ItemID = Contr.getString(Contr.getColumnIndex("ID"));
+            String ItemID = Contr.getString(Contr.getColumnIndex("CODE"));
             if (!ItemID.equals("0")) {
                 LoadContrAddr(ItemID);
             }
@@ -191,9 +191,10 @@ public class GlobalVars extends Application {
                 isSecondPhoto = false;
                 String photoDir = getPhotoDir();
                 long ID = myAdapter.getItemIdAtPosition(position);
-                int cod = db.GetCod(ID);
+                String cod = db.GetCod(ID);
 
-                String FileName = cod + ".jpg";
+//                String FileName = cod + ".jpg";
+                String FileName = cod;
                 File imgFile = new File(photoDir + "/" + FileName);
                 if (!imgFile.exists() || imgFile.length() == 0) {
                     AsyncFileName = FileName;
@@ -203,7 +204,11 @@ public class GlobalVars extends Application {
                         Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    ShowNomenPhoto(FileName);
+                    try {
+                        ShowNomenPhoto(FileName);
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Не получилось открыть фото", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else if (viewId == R.id.btPlus) {
                 long ID = myAdapter.getItemIdAtPosition(position);
@@ -211,11 +216,14 @@ public class GlobalVars extends Application {
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
-                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                if (OrderSum.length() > 0) {
+                    toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
+                } else {
+                    toolbar.setSubtitle(ToolBarContr);
+                }
                 if (NomenAdapter != null) {
                     NomenAdapter.notifyDataSetChanged();
                 }
-
                 if (PreviewZakazAdapter != null) {
                     PreviewZakazAdapter.notifyDataSetChanged();
                 }
@@ -226,7 +234,7 @@ public class GlobalVars extends Application {
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
                 if (OrderSum.length() > 0) {
-                    toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                    toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
                 } else {
                     toolbar.setSubtitle(ToolBarContr);
                 }
@@ -247,7 +255,7 @@ public class GlobalVars extends Application {
                 View promptView;
 
                 if (isMultiSelect) {
-                    db.updateQty(ID, MultiQty);
+                    db.UpdateQty(ID, MultiQty);
                     myNom.requery();
                     NomenAdapter.notifyDataSetChanged();
                     c1.setText(String.valueOf(MultiQty));
@@ -270,7 +278,7 @@ public class GlobalVars extends Application {
                     txtCod.setText(myNom.getString(2));
                     txtDescr.setText(myNom.getString(3));
                     txtOst.setText(myNom.getString(4));
-                    txtGrup.setText(myNom.getString(17));
+//                    txtGrup.setText(myNom.getString(17));
 
                     alertDialogBuilder
                             .setCancelable(true)
@@ -303,7 +311,7 @@ public class GlobalVars extends Application {
                     alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            db.updateQty(ID, Integer.parseInt(input.getText().toString()));
+                            db.UpdateQty(ID, Integer.parseInt(input.getText().toString()));
                             c1.setText(input.getText());
                             myNom.requery();
                             String ToolBarContr = db.GetToolbarContr();
@@ -375,7 +383,7 @@ public class GlobalVars extends Application {
                                     Toast.makeText(CurAc, "Группа, к которой принадлежит данная карточка не прописана СГИ!", Toast.LENGTH_LONG).show();
                                 }
                             }
-                            LoadNom(Grup);
+                            LoadNom(Grup, curSgi);
                             return true;
                         default:
                     }
@@ -390,10 +398,12 @@ public class GlobalVars extends Application {
 
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            String ItemID = myGrups.getString(myGrups.getColumnIndex("ID"));
+            String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
             if (!ItemID.equals("0")) {
-                SharedPreferences settings = getSharedPreferences("form_order", 0);;
-                SharedPreferences.Editor editor = settings.edit();;
+                SharedPreferences settings = getSharedPreferences("form_order", 0);
+                ;
+                SharedPreferences.Editor editor = settings.edit();
+                ;
 
                 editor.putString("ColSgiFID", "");
                 editor.putString("ColGrupFID", "");
@@ -408,8 +418,13 @@ public class GlobalVars extends Application {
 
                 editor.apply();
 
+                final String curSgi;
+
+                TextView txtSgi = getView().findViewById(R.id.ColSgiID);
+                curSgi = txtSgi.getText().toString();
+
                 FormOrderFragment.filter.setImageResource(R.drawable.filter);
-                LoadNom(ItemID);
+                LoadNom(ItemID, curSgi);
             } else {
                 nomenList.setAdapter(null);
             }
@@ -421,10 +436,12 @@ public class GlobalVars extends Application {
     public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            String ItemID = mySgi.getString(mySgi.getColumnIndex("ID"));
+            String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
             if (!ItemID.equals("0")) {
-                SharedPreferences settings = getSharedPreferences("form_order", 0);;
-                SharedPreferences.Editor editor = settings.edit();;
+                SharedPreferences settings = getSharedPreferences("form_order", 0);
+                ;
+                SharedPreferences.Editor editor = settings.edit();
+                ;
 
                 editor.putString("ColSgiFID", "");
                 editor.putString("ColGrupFID", "");
@@ -521,7 +538,7 @@ public class GlobalVars extends Application {
                 public void onClick(View v) {
                     Boolean wantToCloseDialog = false;
                     if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
-                        db.updateOrderQty(Zakaz_id, ID, Integer.parseInt(input.getText().toString()));
+                        db.UpdateOrderQty(Zakaz_id, ID, Integer.parseInt(input.getText().toString()));
                         c1.setText(input.getText());
                         OrdersDt.requery();
                         wantToCloseDialog = true;
@@ -596,6 +613,10 @@ public class GlobalVars extends Application {
         Year = Date.substring(6, 10);
         Mon = Date.substring(3, 5);
         Day = Date.substring(0, 2);
+//        String[] data = Date.split("\\.");
+//        Year = data[2];
+//        Mon = data[1];
+//        Day = data[0];
         String date = Year + Mon + Day;
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
@@ -627,7 +648,7 @@ public class GlobalVars extends Application {
         spSgi = view.findViewById(R.id.SpinSgi);
 
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"ID", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr});
         spSgi.setAdapter(adapter);
         spSgi.post(new Runnable() {
             public void run() {
@@ -638,9 +659,10 @@ public class GlobalVars extends Application {
 
     public void LoadGroups(String SgiID) {
         myGrups = db.getGrupBySgi(SgiID);
+//        Log.d("xd", String.valueOf(myGrups.getString(2)));
         spGrup = view.findViewById(R.id.SpinGrups);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"ID", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr});
         spGrup.setAdapter(adapter);
         spGrup.setOnItemSelectedListener(SelectedGroup);
     }
@@ -713,7 +735,7 @@ public class GlobalVars extends Application {
         curFSgi = db.getFilterSgi();
         spFSgi = vw.findViewById(R.id.spinSGI);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgif_layout, curFSgi, new String[]{"ID", "DESCR"}, new int[]{R.id.ColSgiFID, R.id.ColSgiFDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgif_layout, curFSgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiFID, R.id.ColSgiFDescr});
         spFSgi.setAdapter(adapter);
     }
 
@@ -721,14 +743,14 @@ public class GlobalVars extends Application {
         curFGroup = db.getGroups();
         spFGroup = vw.findViewById(R.id.spinGroup);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.groupf_layout, curFGroup, new String[]{"ID", "DESCR"}, new int[]{R.id.ColGroupFID, R.id.ColGroupFDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.groupf_layout, curFGroup, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGroupFID, R.id.ColGroupFDescr});
         spFGroup.setAdapter(adapter);
     }
 
-    public void LoadNom(String GrupID) {
-        myNom = db.getNomByGroup(GrupID);
+    public void LoadNom(String GrupID, String SgiID) {
+        myNom = db.getNomByGroup(GrupID, SgiID);
         nomenList.setAdapter(null);
-        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "FOTO"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto}, 0);
         nomenList.post(new Runnable() {
             public void run() {
                 nomenList.setAdapter(NomenAdapter);
@@ -742,7 +764,7 @@ public class GlobalVars extends Application {
     public void LoadNomByFilters(String SgiID, String GrupID, String TovcatID, String FuncID, String BrandID, String WCID, String ProdID, String FocusID, String ModelID, String ColorID) {
         myNom = db.getNomByFilters(SgiID, GrupID, TovcatID, FuncID, BrandID, WCID, ProdID, FocusID, ModelID, ColorID);
         nomenList.setAdapter(null);
-        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
         nomenList.post(new Runnable() {
             public void run() {
                 nomenList.setAdapter(NomenAdapter);
@@ -753,28 +775,27 @@ public class GlobalVars extends Application {
 
     }
 
-    public void LoadNomByUniFilters(String TypeID, String ID) {
-        myNom = db.getNomByUniFilters(TypeID, ID);
-        nomenList.setAdapter(null);
-        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
-        nomenList.post(new Runnable() {
-            public void run() {
-                nomenList.setAdapter(NomenAdapter);
-            }
-        });
-        nomenList.setOnItemClickListener(GridNomenClick);
-        nomenList.setOnItemLongClickListener(GridNomenLongClick);
-
-    }
-
-    public void LoadUniFilters(View vw, String Descr) {
-        curUniFilter = db.getUniFilters(Descr);
-        spUniFilterResult = vw.findViewById(R.id.spinFilterResult);
-        UniFilterAdatper adapter;
-        adapter = new UniFilterAdatper(glbContext, R.layout.unifilter_layout, curUniFilter, new String[]{"TYPE_ID", "TYPE_DESCR", "ID", "LOWDESCR"}, new int[]{R.id.tvUniTypeID, R.id.tvUniTypeDescr, R.id.tvUniID, R.id.tvUniDescr}, 0);
-        spUniFilterResult.setAdapter(adapter);
-
-    }
+//    public void LoadNomByUniFilters(String TypeID, String ID) {
+//        myNom = db.getNomByUniFilters(TypeID, ID);
+//        nomenList.setAdapter(null);
+//        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+//        nomenList.post(new Runnable() {
+//            public void run() {
+//                nomenList.setAdapter(NomenAdapter);
+//            }
+//        });
+//        nomenList.setOnItemClickListener(GridNomenClick);
+//        nomenList.setOnItemLongClickListener(GridNomenLongClick);
+//    }
+//
+//    public void LoadUniFilters(View vw, String Descr) {
+//        curUniFilter = db.getUniFilters(Descr);
+//        spUniFilterResult = vw.findViewById(R.id.spinFilterResult);
+//        UniFilterAdatper adapter;
+//        adapter = new UniFilterAdatper(glbContext, R.layout.unifilter_layout, curUniFilter, new String[]{"TYPE_ID", "TYPE_DESCR", "ID", "LOWDESCR"}, new int[]{R.id.tvUniTypeID, R.id.tvUniTypeDescr, R.id.tvUniID, R.id.tvUniDescr}, 0);
+//        spUniFilterResult.setAdapter(adapter);
+//
+//    }
 
     public void SearchNom(String SearchStr) {
         nomenList.setAdapter(null);
@@ -792,7 +813,7 @@ public class GlobalVars extends Application {
     public void SearchNomInGroup(String SearchStr, String Group) {
         nomenList.setAdapter(null);
         myNom = db.getSearchNomInGroup(SearchStr, Group);
-        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "FOTO"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto}, 0);
         nomenList.post(new Runnable() {
             public void run() {
                 nomenList.setAdapter(NomenAdapter);
@@ -805,7 +826,7 @@ public class GlobalVars extends Application {
     public void SetSelectedSgi(String SgiID, String Grup) {
         for (int i = 0; i < spSgi.getCount(); i++) {
             Cursor value = (Cursor) spSgi.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (SgiID.equals(id)) {
                 spSgi.setSelection(i);
                 SelectGroup = Grup;
@@ -817,7 +838,7 @@ public class GlobalVars extends Application {
     public void SetSelectedGrup(String Grup) {
         for (int i = 0; i < spGrup.getCount(); i++) {
             Cursor value = (Cursor) spGrup.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (Grup.equals(id)) {
                 spGrup.setSelection(i);
                 break;
@@ -828,7 +849,7 @@ public class GlobalVars extends Application {
     public void SetSelectedFilterSgi(String ID) {
         for (int i = 0; i < spFSgi.getCount(); i++) {
             Cursor value = (Cursor) spFSgi.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (ID.equals(id)) {
                 spFSgi.setSelection(i);
                 break;
@@ -839,7 +860,7 @@ public class GlobalVars extends Application {
     public void SetSelectedFilterGroup(String ID) {
         for (int i = 0; i < spFGroup.getCount(); i++) {
             Cursor value = (Cursor) spFGroup.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (ID.equals(id)) {
                 spFGroup.setSelection(i);
                 break;
@@ -1031,7 +1052,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public boolean DownloadPhoto(final String FileName) {
+    public void DownloadPhoto(final String FileName) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1063,10 +1084,13 @@ public class GlobalVars extends Application {
                     String isDownloaded = FilenameUtils.removeExtension(FileName);
                     String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
 
-                    if (tmpName.equals("_2")) {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET P2D=1 WHERE COD='" + isDownloaded.replace(tmpName, "") + "'");
-                    } else {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET P1D=1 WHERE COD='" + isDownloaded + "'");
+                    try {
+                        if (tmpName.equals("_2")) {
+                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
+                        } else {
+                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
+                        }
+                    } catch (Exception ignored) {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1101,7 +1125,6 @@ public class GlobalVars extends Application {
                 });
             }
         }).start();
-        return true;
     }
 
     public void ShowNomenPhoto(final String PhotoFileName) {
@@ -1178,8 +1201,7 @@ public class GlobalVars extends Application {
     public void PreviewZakaz() {
         nomenList.setAdapter(null);
         myNom = db.getOrderNom();
-        PreviewZakazAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
-
+        PreviewZakazAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "FOTO"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto}, 0);
         nomenList.setAdapter(PreviewZakazAdapter);
         nomenList.setOnItemClickListener(GridNomenClick);
         nomenList.setOnItemLongClickListener(PreviewNomenLongClick);
@@ -1207,12 +1229,12 @@ public class GlobalVars extends Application {
     public void LoadTpList() {
         TP = db.getTpList();
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, TP, new String[]{"_id", "ID", "DESCR"}, new int[]{R.id.ColTP_ROWID, R.id.ColTPID, R.id.ColTPDescr});
+        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, TP, new String[]{"_id", "CODE", "DESCR"}, new int[]{R.id.ColTP_ROWID, R.id.ColTPID, R.id.ColTPDescr});
         TPList.setAdapter(adapter);
 
         TPList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-                String ItemID = TP.getString(TP.getColumnIndex("ID"));
+                String ItemID = TP.getString(TP.getColumnIndex("CODE"));
                 CurrentTp = ItemID;
             }
 
@@ -1251,7 +1273,7 @@ public class GlobalVars extends Application {
         spinContr.setAdapter(null);
         Contr = db.getContrList();
         ContrsAdapter adapter;
-        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"ID", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
         spinContr.setAdapter(adapter);
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
@@ -1260,7 +1282,7 @@ public class GlobalVars extends Application {
         spinContr.setAdapter(null);
         Contr = db.getContrFilterList(FindStr);
         ContrsAdapter adapter;
-        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"ID", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
         spinContr.setAdapter(adapter);
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
@@ -1268,7 +1290,7 @@ public class GlobalVars extends Application {
     public void LoadContrAddr(String ContID) {
         Addr = db.getContrAddress(ContID);
         AddrsAdapter adapter;
-        adapter = new AddrsAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"ID", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
+        adapter = new AddrsAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
         spinAddr.setAdapter(adapter);
         spinAddr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -1287,7 +1309,7 @@ public class GlobalVars extends Application {
     public void SetSelectedAddr(String AddrID) {
         for (int i = 0; i < spinAddr.getCount(); i++) {
             Cursor value = (Cursor) spinAddr.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (AddrID.equals(id)) {
                 spinAddr.setSelection(i);
                 break;
@@ -1296,14 +1318,13 @@ public class GlobalVars extends Application {
     }
 
     public String FormDBFForZakaz(int ID) throws DBFException {
-        String DBF_FIleForSend;
-        String DBF_FileName;
+//        String DBF_FIleForSend;
+//        String DBF_FileName;
         Cursor c;
 
-        String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
+        String TP, CONTR, ADDR, DOCNO, COMMENT, NOMEN;
         java.util.Date DELIVERY, DOCDATE;
         Double QTY, PRICE;
-        Double getMoney, getBackward, getBacktype;
 
         DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
@@ -1312,7 +1333,7 @@ public class GlobalVars extends Application {
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
 
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
+        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCID, ZAKAZY.DOC_DATE, ZAKAZY.DELIVERY_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP = TORG_PRED.CODE JOIN CONTRS ON ZAKAZY.CONTR = CONTRS.CODE JOIN ADDRS ON ZAKAZY.ADDR = ADDRS.CODE JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return "";
@@ -1325,117 +1346,144 @@ public class GlobalVars extends Application {
 
         DBFWriter Table = new DBFWriter(DBFFile);
         Table.setCharactersetName("cp866");
-        DBFField[] fields = new DBFField[14];
+        DBFField[] fields = new DBFField[10];
 
-        fields[0] = new DBFField();
-        fields[0].setName("TP");
-        fields[0].setDataType(DBFField.FIELD_TYPE_C);
-        fields[0].setFieldLength(13);
+        int index = 0;
 
-        fields[1] = new DBFField();
-        fields[1].setName("CONTR");
-        fields[1].setDataType(DBFField.FIELD_TYPE_C);
-        fields[1].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("TP");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[2] = new DBFField();
-        fields[2].setName("ADDR");
-        fields[2].setDataType(DBFField.FIELD_TYPE_C);
-        fields[2].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("CONTR");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[3] = new DBFField();
-        fields[3].setName("DOCNO");
-        fields[3].setDataType(DBFField.FIELD_TYPE_C);
-        fields[3].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("ADDR");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[4] = new DBFField();
-        fields[4].setName("DELIVERY");
-        fields[4].setDataType(DBFField.FIELD_TYPE_D);
+        fields[index] = new DBFField();
+        fields[index].setName("DOCNO");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[5] = new DBFField();
-        fields[5].setName("DOCDATE");
-        fields[5].setDataType(DBFField.FIELD_TYPE_D);
+        fields[index] = new DBFField();
+        fields[index].setName("DELIVERY");
+        fields[index].setDataType(DBFField.FIELD_TYPE_D);
+        index++;
 
-        fields[6] = new DBFField();
-        fields[6].setName("COMMENT");
-        fields[6].setDataType(DBFField.FIELD_TYPE_C);
-        fields[6].setFieldLength(255);
+        fields[index] = new DBFField();
+        fields[index].setName("DOCDATE");
+        fields[index].setDataType(DBFField.FIELD_TYPE_D);
+        index++;
 
-        fields[7] = new DBFField();
-        fields[7].setName("CODE");
-        fields[7].setDataType(DBFField.FIELD_TYPE_C);
-        fields[7].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("COMMENT");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(255);
+        index++;
 
-        fields[8] = new DBFField();
-        fields[8].setName("QTY");
-        fields[8].setDataType(DBFField.FIELD_TYPE_N);
-        fields[8].setFieldLength(13);
-        fields[8].setDecimalCount(0);
+        fields[index] = new DBFField();
+        fields[index].setName("NOMEN");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[9] = new DBFField();
-        fields[9].setName("PRICE");
-        fields[9].setDataType(DBFField.FIELD_TYPE_N);
-        fields[9].setFieldLength(16);
-        fields[9].setDecimalCount(2);
+        fields[index] = new DBFField();
+        fields[index].setName("QTY");
+        fields[index].setDataType(DBFField.FIELD_TYPE_N);
+        fields[index].setFieldLength(13);
+        fields[index].setDecimalCount(0);
+        index++;
 
-        fields[10] = new DBFField();
-        fields[10].setName("DELIV_TIME");
-        fields[10].setDataType(DBFField.FIELD_TYPE_C);
-        fields[10].setFieldLength(13);
-
-        fields[11] = new DBFField();
-        fields[11].setName("GETMONEY");
-        fields[11].setDataType(DBFField.FIELD_TYPE_N);
-        fields[11].setFieldLength(13);
-        fields[11].setDecimalCount(0);
-
-        fields[12] = new DBFField();
-        fields[12].setName("GETBACK");
-        fields[12].setDataType(DBFField.FIELD_TYPE_N);
-        fields[12].setFieldLength(13);
-        fields[12].setDecimalCount(0);
-
-        fields[13] = new DBFField();
-        fields[13].setName("BACKTYPE");
-        fields[13].setDataType(DBFField.FIELD_TYPE_N);
-        fields[13].setFieldLength(13);
-        fields[13].setDecimalCount(0);
-
+        fields[index] = new DBFField();
+        fields[index].setName("PRICE");
+        fields[index].setDataType(DBFField.FIELD_TYPE_N);
+        fields[index].setFieldLength(12);
+        fields[index].setDecimalCount(2);
         Table.setFields(fields);
+
+//        fields[0] = new DBFField();
+//        fields[0].setName("TP");
+//        fields[0].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[0].setFieldLength(13);
+//
+//        fields[1] = new DBFField();
+//        fields[1].setName("CONTR");
+//        fields[1].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[1].setFieldLength(13);
+//
+//        fields[2] = new DBFField();
+//        fields[2].setName("ADDR");
+//        fields[2].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[2].setFieldLength(13);
+//
+//        fields[3] = new DBFField();
+//        fields[3].setName("DOCID");
+//        fields[3].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[3].setFieldLength(13);
+//
+//        fields[4] = new DBFField();
+//        fields[4].setName("DOCDATE");
+//        fields[4].setDataType(DBFField.FIELD_TYPE_D);
+//
+//        fields[5] = new DBFField();
+//        fields[5].setName("COMMENT");
+//        fields[5].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[5].setFieldLength(255);
+//
+//        fields[6] = new DBFField();
+//        fields[6].setName("NOMEN");
+//        fields[6].setDataType(DBFField.FIELD_TYPE_C);
+//        fields[6].setFieldLength(13);
+//
+//        fields[7] = new DBFField();
+//        fields[7].setName("QTY");
+//        fields[7].setDataType(DBFField.FIELD_TYPE_N);
+//        fields[7].setFieldLength(13);
+//        fields[7].setDecimalCount(0);
+//
+//        fields[8] = new DBFField();
+//        fields[8].setName("PRICE");
+//        fields[8].setDataType(DBFField.FIELD_TYPE_N);
+//        fields[8].setFieldLength(16);
+//        fields[8].setDecimalCount(2);
+//        Table.setFields(fields);
 
         try {
             while (c.moveToNext()) {
+//                TP, CONTR, ADDR, ZAKAZY.DOCID, ZAKAZY.DOC_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE
                 TP = c.getString(0);
                 CONTR = c.getString(1);
                 ADDR = c.getString(2);
                 DOCNO = c.getString(3);
-                DELIVERY = StrToDbfDate(c.getString(4));
-                DOCDATE = StrToDbfDate(c.getString(5));
+                DOCDATE = StrToDbfDate(c.getString(4));
+                DELIVERY = StrToDbfDate(c.getString(5));
 
                 COMMENT = c.getString(6);
-                CODE = c.getString(7);
-                QTY = c.getDouble(10);
-                PRICE = c.getDouble(11);
+                NOMEN = c.getString(7);
+                QTY = c.getDouble(9);
+                PRICE = c.getDouble(10);
 
-                TIME = c.getString(12);
-                getMoney = c.getDouble(13);
-                getBackward = c.getDouble(14);
-                getBacktype = c.getDouble(15);
 
-                Object[] rowData = new Object[14];
+                Object[] rowData = new Object[10];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
                 rowData[3] = DOCNO;
-                rowData[4] = DELIVERY;
-                rowData[5] = DOCDATE;
+                rowData[4] = DOCDATE;
+                rowData[5] = DELIVERY;
                 rowData[6] = COMMENT;
-                rowData[7] = CODE;
+                rowData[7] = NOMEN;
                 rowData[8] = QTY;
                 rowData[9] = PRICE;
-                rowData[10] = TIME;
-                rowData[11] = getMoney;
-                rowData[12] = getBackward;
-                rowData[13] = getBacktype;
                 Table.addRecord(rowData);
             }
         } catch (Exception e) {
@@ -1444,7 +1492,7 @@ public class GlobalVars extends Application {
         Table.write();
         DBF_FIleForSend = FileName;
         if (isNetworkAvailable()) {
-            Integer[] data = new Integer[] {ID};
+            Integer[] data = new Integer[]{ID};
             new UploadDBFFile().execute(data);
         } else {
             Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
@@ -1456,9 +1504,7 @@ public class GlobalVars extends Application {
         GlobalVars.allOrders.clear();
         layout.removeAllViews();
 
-        if (c.getCount() == 0) {
-            return;
-        }
+        if (c.getCount() == 0) return;
 
         int id;
         String status;
@@ -1466,7 +1512,7 @@ public class GlobalVars extends Application {
         c.moveToFirst();
         do {
             id = c.getInt(0);
-            status =  c.getString(4);
+            status = c.getString(5);
 
             CheckBox checkBox = new CheckBox(layout.getContext());
             checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
@@ -1483,15 +1529,16 @@ public class GlobalVars extends Application {
     public void LoadOrders() {
         gdOrders.setAdapter(null);
         Orders = db.getZakazy();
-        putCheckBox(Orders);
-        OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCNO", "STATUS", "DOC_DATE", "CONTR", "ADDR", "SUM", "DELIVERY_DATE"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum, R.id.ColOrdDeliveryDate}, 0);
+        if (Orders != null)
+            putCheckBox(Orders);
+        OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
         gdOrders.setAdapter(OrdersAdapter);
     }
 
     public void LoadOrdersDetails(String ZakazID) {
         orderdtList.setAdapter(null);
         OrdersDt = db.getZakazDetails(ZakazID);
-        OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOM_ID", "COD5", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
+        OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOM_ID", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
         orderdtList.setAdapter(OrdersDtAdapter);
         orderdtList.setOnItemClickListener(OrderDtNomenClick);
     }
@@ -1517,7 +1564,6 @@ public class GlobalVars extends Application {
         String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
         java.util.Date DELIVERY, DOCDATE;
         double QTY, PRICE;
-        double getMoney, getBackward, getBacktype;
         int ID;
         DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
@@ -1525,8 +1571,10 @@ public class GlobalVars extends Application {
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
-
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCNO, ZAKAZY.DELIVERY_DATE, ZAKAZY.DOC_DATE , ZAKAZY.COMMENT, ZAKAZY_DT.CODE, ZAKAZY_DT.COD5, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.DELIV_TIME, ZAKAZY.GETMONEY, ZAKAZY.GETBACKWARD, ZAKAZY.BACKTYPE, ZAKAZY.ROWID FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP_ID = TORG_PRED.ID JOIN CONTRS ON ZAKAZY.CONTR_ID = CONTRS.ID JOIN ADDRS ON ZAKAZY.ADDR_ID = ADDRS.ID JOIN ZAKAZY_DT ON ZAKAZY.DOCNO = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
+        Log.d("xd", DBF_FileName);
+        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCID," +
+                " ZAKAZY.DELIVERY_DATE," +
+                " ZAKAZY.DOC_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP = TORG_PRED.CODE JOIN CONTRS ON ZAKAZY.CONTR = CONTRS.CODE JOIN ADDRS ON ZAKAZY.ADDR = ADDRS.CODE JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return;
@@ -1539,121 +1587,101 @@ public class GlobalVars extends Application {
 
         DBFWriter Table = new DBFWriter(DBFFile);
         Table.setCharactersetName("cp866");
-        DBFField[] fields = new DBFField[14];
+        DBFField[] fields = new DBFField[10];
 
-        fields[0] = new DBFField();
-        fields[0].setName("TP");
-        fields[0].setDataType(DBFField.FIELD_TYPE_C);
-        fields[0].setFieldLength(13);
+        int index = 0;
 
-        fields[1] = new DBFField();
-        fields[1].setName("CONTR");
-        fields[1].setDataType(DBFField.FIELD_TYPE_C);
-        fields[1].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("TP");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[2] = new DBFField();
-        fields[2].setName("ADDR");
-        fields[2].setDataType(DBFField.FIELD_TYPE_C);
-        fields[2].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("CONTR");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[3] = new DBFField();
-        fields[3].setName("DOCNO");
-        fields[3].setDataType(DBFField.FIELD_TYPE_C);
-        fields[3].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("ADDR");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[4] = new DBFField();
-        fields[4].setName("DELIVERY");
-        fields[4].setDataType(DBFField.FIELD_TYPE_D);
+        fields[index] = new DBFField();
+        fields[index].setName("DOCNO");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[5] = new DBFField();
-        fields[5].setName("DOCDATE");
-        fields[5].setDataType(DBFField.FIELD_TYPE_D);
+        fields[index] = new DBFField();
+        fields[index].setName("DOCDATE");
+        fields[index].setDataType(DBFField.FIELD_TYPE_D);
+        index++;
 
-        fields[6] = new DBFField();
-        fields[6].setName("COMMENT");
-        fields[6].setDataType(DBFField.FIELD_TYPE_C);
-        fields[6].setFieldLength(255);
+        fields[index] = new DBFField();
+        fields[index].setName("DELIVERY");
+        fields[index].setDataType(DBFField.FIELD_TYPE_D);
+        index++;
 
-        fields[7] = new DBFField();
-        fields[7].setName("CODE");
-        fields[7].setDataType(DBFField.FIELD_TYPE_C);
-        fields[7].setFieldLength(13);
+        fields[index] = new DBFField();
+        fields[index].setName("COMMENT");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(255);
+        index++;
 
-        fields[8] = new DBFField();
-        fields[8].setName("QTY");
-        fields[8].setDataType(DBFField.FIELD_TYPE_N);
-        fields[8].setFieldLength(13);
-        fields[8].setDecimalCount(0);
+        fields[index] = new DBFField();
+        fields[index].setName("CODE");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(13);
+        index++;
 
-        fields[9] = new DBFField();
-        fields[9].setName("PRICE");
-        fields[9].setDataType(DBFField.FIELD_TYPE_N);
-        fields[9].setFieldLength(12);
-        fields[9].setDecimalCount(2);
+        fields[index] = new DBFField();
+        fields[index].setName("QTY");
+        fields[index].setDataType(DBFField.FIELD_TYPE_N);
+        fields[index].setFieldLength(13);
+        fields[index].setDecimalCount(0);
+        index++;
 
-        fields[10] = new DBFField();
-        fields[10].setName("DELIV_TIME");
-        fields[10].setDataType(DBFField.FIELD_TYPE_C);
-        fields[10].setFieldLength(13);
-
-        fields[11] = new DBFField();
-        fields[11].setName("GETMONEY");
-        fields[11].setDataType(DBFField.FIELD_TYPE_N);
-        fields[11].setFieldLength(13);
-        fields[11].setDecimalCount(0);
-
-        fields[12] = new DBFField();
-        fields[12].setName("GETBACK");
-        fields[12].setDataType(DBFField.FIELD_TYPE_N);
-        fields[12].setFieldLength(13);
-        fields[12].setDecimalCount(0);
-
-        fields[13] = new DBFField();
-        fields[13].setName("BACKTYPE");
-        fields[13].setDataType(DBFField.FIELD_TYPE_N);
-        fields[13].setFieldLength(13);
-        fields[13].setDecimalCount(0);
+        fields[index] = new DBFField();
+        fields[index].setName("PRICE");
+        fields[index].setDataType(DBFField.FIELD_TYPE_N);
+        fields[index].setFieldLength(12);
+        fields[index].setDecimalCount(2);
         Table.setFields(fields);
 
+        // TP, CONTR, ADDR, DOCNO, DOC_DATE, DELIVERY_DATE, COMMENT, NOM_ID, DESCR, QTY, PRICE, ROWID
         try {
             while (c.moveToNext()) {
-                ID = c.getInt(16);
+                ID = c.getInt(c.getColumnIndex("ID"));
 
                 if (Arrays.binarySearch(chosenOrdersID, ID) < 0)
                     continue;
-
 
                 TP = c.getString(0);
                 CONTR = c.getString(1);
                 ADDR = c.getString(2);
                 DOCNO = c.getString(3);
-                DELIVERY = StrToDbfDate(c.getString(4));
-                DOCDATE = StrToDbfDate(c.getString(5));
+                DOCDATE = StrToDbfDate(c.getString(4));
+                DELIVERY = StrToDbfDate(c.getString(5));
 
                 COMMENT = c.getString(6);
                 CODE = c.getString(7);
-                QTY = c.getDouble(10);
-                PRICE = c.getDouble(11);
-                TIME = c.getString(12);
-                getMoney = c.getDouble(13);
-                getBackward = c.getDouble(14);
-                getBacktype = c.getDouble(15);
+                QTY = c.getDouble(9);
+                PRICE = c.getDouble(10);
 
-                Object[] rowData = new Object[14];
+                Object[] rowData = new Object[10];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
                 rowData[3] = DOCNO;
-                rowData[4] = DELIVERY;
-                rowData[5] = DOCDATE;
+                rowData[4] = DOCDATE;
+                rowData[5] = DELIVERY;
                 rowData[6] = COMMENT;
                 rowData[7] = CODE;
                 rowData[8] = QTY;
                 rowData[9] = PRICE;
-                rowData[10] = TIME;
-                rowData[11] = getMoney;
-                rowData[12] = getBackward;
-                rowData[13] = getBacktype;
                 Table.addRecord(rowData);
             }
         } catch (Exception e) {
@@ -2175,23 +2203,24 @@ public class GlobalVars extends Application {
     public void checkPhotoInDB(String FileName) {
         Cursor cur;
         String isDownloaded = FilenameUtils.removeExtension(FileName);
-        String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
+//        Log.d("xd", isDownloaded);
+//        String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
+        String tmpName = isDownloaded;
         String Sql;
 
         if (tmpName.equals("_2")) {
-            Sql = "SELECT P2D From Nomen WHERE COD='" + isDownloaded.replace(tmpName, "") + "'";
-            cur = db.getWritableDatabase().rawQuery(Sql, null);
+            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'";
         } else {
-            Sql = "SELECT P1D From Nomen WHERE COD='" + isDownloaded + "'";
-            cur = db.getWritableDatabase().rawQuery(Sql, null);
+            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded + "'";
         }
+        cur = db.getWritableDatabase().rawQuery(Sql, null);
 
         if (cur.moveToFirst()) {
             if (cur.getInt(0) == 0) {
                 if (tmpName.equals("_2")) {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET P2D=1 WHERE COD='" + isDownloaded.replace(tmpName, "") + "'");
+                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
                 } else {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET P1D=1 WHERE COD='" + isDownloaded + "'");
+                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
                 }
             }
         }
@@ -2213,12 +2242,8 @@ public class GlobalVars extends Application {
             Cursor cursor = getCursor();
             TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
 
-            if (!cursor.getString(3).equals("")) {
-                String text = cursor.getString(2) + " / " + cursor.getString(3);
-                tvDescr.setText(text);
-            } else {
-                tvDescr.setText(cursor.getString(2));
-            }
+            String text = cursor.getString(2);
+            tvDescr.setText(text);
 
             return view;
         }
@@ -2234,11 +2259,7 @@ public class GlobalVars extends Application {
             } else {
                 tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
             }
-            if (!cursor.getString(3).equals("")) {
-                tvDescr.setText(cursor.getString(2) + " / " + cursor.getString(3));
-            } else {
-                tvDescr.setText(cursor.getString(2));
-            }
+            tvDescr.setText(cursor.getString(2));
 
             return view;
         }
@@ -2298,7 +2319,7 @@ public class GlobalVars extends Application {
             final Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
-            TextView tvMH = view.findViewById(R.id.ColNomMH);
+//            Log.d("xd", (String) tvDescr.getText());
             TextView tvPrice = view.findViewById(R.id.ColNomPrice);
             TextView tvPosition = view.findViewById(R.id.ColNomPosition);
 
@@ -2330,22 +2351,25 @@ public class GlobalVars extends Application {
                 }
             });
 
-            if (isDiscount && Discount != 0) {
-                String text = String.format("%.2f", cursor.getDouble(5) - cursor.getDouble(5) * Discount / 100);
-                tvPrice.setText(text);
-            }
+            tvPrice.setText(String.format("%.2f", cursor.getDouble(4)));
 
-            if (!cursor.getString(9).equals("")) {
-                if (cursor.getInt(18) == 1) {
-                    if (!cursor.getString(10).equals("")) {
-                        if (cursor.getInt(19) == 1) {
-                            resID = glbContext.getResources().getIdentifier("photo_blue", "drawable", glbContext.getPackageName());
-                        } else {
-                            resID = glbContext.getResources().getIdentifier("photo_green_blue", "drawable", glbContext.getPackageName());
-                        }
-                    } else {
-                        resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-                    }
+//            ID, CODE, DESCR, OST, PRICE, GRUPPA, ZAKAZ, FOTO, PD, SGIID
+//            try {
+//                if (!cursor.getString(8).equals("")) {
+//                    resID = glbContext.getResources().getIdentifier("photo", "drawable", glbContext.getPackageName());
+//
+//                    SpannableStringBuilder builder = new SpannableStringBuilder();
+//                    builder.append(" ").append(" ");
+//                    builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
+//                    builder.append(" ");
+//                    tvPhoto.setText(builder);
+//                }
+//            } catch (Exception ignored) {
+//            }
+
+            if (!cursor.getString(8).equals("")) {
+                if (cursor.getInt(9) == 1) {
+                    resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
                 } else {
                     resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
                 }
@@ -2357,32 +2381,11 @@ public class GlobalVars extends Application {
                 tvPhoto.setText(builder);
             }
 
+
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
                 view.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-
-            if (cursor.getInt(6) != 0) {
-                view.setBackgroundColor(Color.rgb(212, 236, 187));
-            }
-
-            if (cursor.getInt(12) == 1) {
-                tvDescr.setTextColor(Color.rgb(255, 0, 0));
-            } else {
-                if (cursor.getInt(13) == 1) {
-                    tvDescr.setTextColor(Color.rgb(0, 30, 255));
-                } else {
-                    if (cursor.getInt(14) == 1) {
-                        tvDescr.setTextColor(Color.rgb(32, 131, 34));
-                    } else {
-                        tvDescr.setTextColor(Color.rgb(0, 0, 0));
-                    }
-                }
-            }
-
-            if (cursor.getInt(16) == 1) {
-                tvMH.setText("ПРМ");
             }
 
             tvPosition.setText(String.valueOf(position + 1));
@@ -2435,43 +2438,17 @@ public class GlobalVars extends Application {
 
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
-            int resID = glbContext.getResources().getIdentifier("photo_free", "drawable", glbContext.getPackageName());
+            int resID;
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
-            final TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
-            TextView tvDescr = view.findViewById(R.id.ColNomDescr);
             TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
-
-            if (tvPhoto != null && !cursor.getString(9).equals("")) {
-                if (cursor.getInt(18) == 1) {
-                    if (!cursor.getString(10).equals("")) {
-                        if (cursor.getInt(19) == 1) {
-                            resID = glbContext.getResources().getIdentifier("photo_blue", "drawable", glbContext.getPackageName());
-                        } else {
-                            resID = glbContext.getResources().getIdentifier("photo_green_blue", "drawable", glbContext.getPackageName());
-                        }
-                    } else {
-                        resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-                    }
-                } else {
-                    resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
-                }
-
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(" ").append(" ");
-                builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
-                builder.append(" ");
-                tvPhoto.setText(builder);
-            }
+//            TextView tvCod = view.findViewById(R.id.ColOrdDtCod);
+//            tvCod.setText(cursor.getString());
 
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
                 view.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-
-            if (cursor.getInt(6) != 0) {
-                view.setBackgroundColor(Color.rgb(212, 236, 187));
             }
 
             if (cursor.getInt(8) == 1) {
@@ -2491,7 +2468,6 @@ public class GlobalVars extends Application {
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            String contrInfo = cursor.getString(6);
             String resDescr = cursor.getString(2);
 
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
@@ -2499,10 +2475,6 @@ public class GlobalVars extends Application {
                 tvDescr.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
                 tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-
-            if (!contrInfo.equals("")) {
-                resDescr += " (" + contrInfo + ")";
             }
 
             tvDescr.setText(resDescr);
@@ -2557,25 +2529,29 @@ public class GlobalVars extends Application {
 
             FTPClient ftpClient = new FTPClient();
 
+            try {
+                ftpClient.connect(server, 21);
+                ftpClient.login(username, password);
+                ftpClient.enterLocalPassiveMode();
+                ftpClient.changeWorkingDirectory("EXCHANGE/IN/MARS");
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                InputStream inputStream;
+
+                File secondLocalFile = new File(DBF_FIleForSend);
+                String secondRemoteFile = DBF_FileName;
+                inputStream = new FileInputStream(secondLocalFile);
+
+                OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
+                byte[] bytesIn = new byte[65536];
+                int read;
+
                 try {
-                    ftpClient.connect(server, 21);
-                    ftpClient.login(username, password);
-                    ftpClient.enterLocalPassiveMode();
-                    ftpClient.changeWorkingDirectory("newARM");
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                    InputStream inputStream;
-
-                    File secondLocalFile = new File(DBF_FIleForSend);
-                    String secondRemoteFile = DBF_FileName;
-                    inputStream = new FileInputStream(secondLocalFile);
-
-                    OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
-                    byte[] bytesIn = new byte[65536];
-                    int read;
-
-                while ((read = inputStream.read(bytesIn)) != -1) {
-                    outputStream.write(bytesIn, 0, read);
+                    while ((read = inputStream.read(bytesIn)) != -1) {
+                        outputStream.write(bytesIn, 0, read);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 inputStream.close();
@@ -2742,62 +2718,3 @@ public class GlobalVars extends Application {
         }
     }
 }
-
-//        class DBFieldData {
-//            public String name;
-//            public byte dataType;
-//
-//            // Использую не int, чтобы не париться с проверкой на равенство null ниже в коде
-//            public Integer length;
-//            public Integer decimalCount;
-//
-//            public DBFieldData(String name, byte dataType, Integer length) {
-//                this.name = name;
-//                this.dataType = dataType;
-//                this.length = length;
-//            }
-//
-//            public DBFieldData(String name, byte dataType) {
-//                this.name = name;
-//                this.dataType = dataType;
-//                this.length = 0;
-//            }
-//
-//            public DBFieldData(String name, byte dataType, Integer length, Integer decimalCount) {
-//                this.name = name;
-//                this.dataType = dataType;
-//                this.length = length;
-//                this.decimalCount = decimalCount;
-//                this.length = 0;
-//            }
-//        }
-//
-//
-//        DBFieldData[] dbFieldData = new DBFieldData[] {
-//            new DBFieldData("TP", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("CONTR", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("ADDR", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("DOCNO", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("DELIVERY", DBFField.FIELD_TYPE_D),
-//            new DBFieldData("DOCDATE", DBFField.FIELD_TYPE_D),
-//            new DBFieldData("COMMENT", DBFField.FIELD_TYPE_C, 255),
-//            new DBFieldData("CODE", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("QTY", DBFField.FIELD_TYPE_N, 13, 0),
-//            new DBFieldData("PRICE", DBFField.FIELD_TYPE_N, 12, 0),
-//            new DBFieldData("DELIV_TIME", DBFField.FIELD_TYPE_C, 13),
-//            new DBFieldData("GETMONEY", DBFField.FIELD_TYPE_N, 13, 0),
-//            new DBFieldData("GETBACK", DBFField.FIELD_TYPE_N, 13, 0),
-//            new DBFieldData("BACKTYPE", DBFField.FIELD_TYPE_N, 13, 0),
-//        };
-//
-//        for (int i = 0; i < 14; i++) {
-//            fields[i] = new DBFField();
-//            fields[i].setName(dbFieldData[i].name);
-//            fields[i].setDataType(dbFieldData[i].dataType);
-//            if (dbFieldData[i].length != null) {
-//                fields[i].setFieldLength(dbFieldData[i].length);
-//            }
-//            if (dbFieldData[i].decimalCount != null) {
-//                fields[i].setDecimalCount(dbFieldData[i].decimalCount);
-//            }
-//        }

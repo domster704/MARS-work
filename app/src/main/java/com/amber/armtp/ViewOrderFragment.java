@@ -54,7 +54,8 @@ public class ViewOrderFragment extends Fragment {
         String OrderSum = glbVars.db.getOrderSum();
         try {
             toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.PreviewZakaz();

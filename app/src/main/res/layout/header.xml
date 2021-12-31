@@ -1,99 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="190dp"
-        android:background="@drawable/side_nav_bar"
-        android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="190dp"
+    android:background="@drawable/side_nav_bar"
+    android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="86dp"
+            android:layout_height="96dp"
+            android:src="@drawable/logo_orange" />
+
+        <TextView
             android:id="@+id/textView2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/textView"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_toEndOf="@+id/imageView"
-            android:layout_toRightOf="@+id/imageView"
+            android:layout_height="match_parent"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/app_name"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="#ffffff"
             android:textSize="46dp" />
+    </LinearLayout>
 
-    <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/tvVersion"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_toEndOf="@+id/imageView"
-            android:layout_toRightOf="@+id/imageView"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/emailto"
-            android:textColor="#ffffff"
-            android:textSize="22dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="10dp">
 
-    <TextView
-            android:id="@+id/tvVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/tvLastUpdate"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="10dp"
-            android:text="Версия программы:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#ffffff"
-            android:textSize="14dp" />
-
-    <TextView
+        <TextView
             android:id="@+id/tvLastUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
             android:layout_marginBottom="20dp"
-            android:paddingLeft="10dp"
-            android:text="Актуальность данных:"
+            android:paddingStart="10dp"
+            android:text="Время обновления:"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff"
             android:textSize="14dp" />
 
-    <TextView
-            android:id="@+id/tvAppVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/tvLastUpdateText"
-            android:layout_alignStart="@+id/tvLastUpdateText"
-            android:layout_alignLeft="@+id/tvLastUpdateText"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#ffffff"
-            android:textSize="14dp" />
-
-    <TextView
+        <TextView
             android:id="@+id/tvLastUpdateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/tvLastUpdate"
             android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_toEndOf="@+id/tvLastUpdate"
-            android:layout_toRightOf="@+id/tvLastUpdate"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff"
             android:textSize="14dp" />
+    </LinearLayout>
 
-    <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="86dp"
-            android:layout_height="96dp"
-            android:layout_alignTop="@+id/textView2"
-            android:layout_alignBottom="@+id/textView2"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:src="@drawable/logo_orange" />
 
-</RelativeLayout>
+</LinearLayout>

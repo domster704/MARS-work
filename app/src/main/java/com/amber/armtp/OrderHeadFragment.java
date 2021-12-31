@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -35,6 +34,8 @@ public class OrderHeadFragment extends Fragment {
     SharedPreferences.Editor editor;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v7.widget.Toolbar toolbar;
+
+    public static String CONTR_ID;
 
     public OrderHeadFragment() {
     }
@@ -78,8 +79,7 @@ public class OrderHeadFragment extends Fragment {
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-        String OrderSum = glbVars.db.getOrderSum();
-        toolbar.setSubtitle("Заказ на сумму " + OrderSum);
+        setContrAndSum();
 
         glbVars.LoadTpList();
         glbVars.LoadContrList();
@@ -142,11 +142,14 @@ public class OrderHeadFragment extends Fragment {
                 glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
 
                 String TP_ID = glbVars.spTp.getText().toString();
-                String CONTR_ID = glbVars.spContr.getText().toString();
+                CONTR_ID = glbVars.spContr.getText().toString();
                 String CurContr = glbVars.db.GetContrID();
 
+                glbVars.db.resetContrPrices();
+//                glbVars.db.putContrNewPrices(CONTR_ID);
+
                 if (!CurContr.equals(CONTR_ID)) {
-                    glbVars.db.resetContrSales();
+                    glbVars.db.resetContrPrices();
                     setContrAndSum();
                 }
 
@@ -167,17 +170,12 @@ public class OrderHeadFragment extends Fragment {
                 editor.putString("TP_ID", TP_ID);
                 editor.commit();
 
-                if (glbVars.db.CheckTPAccess(TP_ID) > 0) {
-                    editor.putBoolean("TP_LOCK", true);
-                    editor.commit();
-                }
-
-                if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
-                    glbVars.db.resetContrSales();
+                if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+                    glbVars.db.resetContrPrices();
                     setContrAndSum();
                 } else {
                     if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
-                        glbVars.db.resetContrSales();
+                        glbVars.db.resetContrPrices();
                         setContrAndSum();
                     } else {
                         Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
@@ -222,7 +220,6 @@ public class OrderHeadFragment extends Fragment {
         }
 
         setContrAndSum();
-
     }
 
     public void SetSelectedContr(int ROWID) {
@@ -248,10 +245,14 @@ public class OrderHeadFragment extends Fragment {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         try {
-            if (ToolBarContr.trim().equals("")) {
-                toolbar.setSubtitle("Заказ на сумму " + OrderSum.substring(2) + " руб.");
+            if (!OrderSum.equals("")) {
+                if (ToolBarContr.trim().equals("")) {
+                    toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
+                } else {
+                    toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
+                }
             } else {
-                toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
+                toolbar.setSubtitle("");
             }
         } catch (Exception ignored) {
         }

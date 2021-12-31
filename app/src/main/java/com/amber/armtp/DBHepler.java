@@ -12,7 +12,7 @@ import android.util.Log;
  * Updated by domster704 on 27.09.2021
  */
 public class DBHepler extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "armtp.db";
+    public static final String DATABASE_NAME = "armtp3.db";
     private static final String TB_NOMEN = "Nomen";
     private static final String TB_ORDER = "ORDERS";
     private static final String KEY_ZAKAZ = "ZAKAZ";
@@ -45,7 +45,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите СГИ ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM sgi", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите СГИ' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM SGI", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -57,7 +57,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите товарную категорию ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=3", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите товарную категорию' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=3", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -69,7 +69,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите функциональную группу ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=4", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите функциональную группу' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=4", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -81,7 +81,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите Брэнд ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=5", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите Брэнд' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=5", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -93,7 +93,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите Демографический признак ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=6", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите Демографический признак' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=6", null);
 
             return cursor;
         } catch (Exception e) {
@@ -106,7 +106,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите производителя/импортера ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=7", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите производителя/импортера' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=7", null);
 
             return cursor;
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите Фокус ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=8", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите Фокус' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=8", null);
 
             return cursor;
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите модель ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=9 AND DESCR<>''", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите модель' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=9 AND DESCR<>''", null);
 
             return cursor;
         } catch (Exception e) {
@@ -145,7 +145,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите цвет ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=10 AND DESCR<>''", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите цвет' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=10 AND DESCR<>''", null);
 
             return cursor;
         } catch (Exception e) {
@@ -158,7 +158,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите группу ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=2", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите группу' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM GRUPS", null);
 
             return cursor;
         } catch (Exception e) {
@@ -171,20 +171,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите СГИ ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=1", null);
-            return cursor;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Cursor getUniFilters(String Descr) {
-        Cursor cursor;
-
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT rowid as _id, [TYPE_ID], [TYPE_DESCR], [ID], [LOWDESCR] FROM [UNI_MATRIX] WHERE LOWDESCR LIKE '%" + Descr + "%'", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите СГИ' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM SGI", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -196,25 +183,63 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите группу ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM GRUPS WHERE SGIID='" + KEY_GRUP_SGIID + "'", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR, 0 AS SGI UNION ALL SELECT ROWID AS _id, CODE, DESCR, SGI FROM GRUPS WHERE SGI='" + KEY_GRUP_SGIID + "'", null);
             return cursor;
         } catch (Exception e) {
+            Log.d("xd", String.valueOf(e));
             return null;
         }
     }
 
-    public Cursor getNomByGroup(String KEY_NOM_GROUPID) {
+    public Cursor getNomByGroup(String GroupID, String SgiID) {
+        Cursor cursor1;
         Cursor cursor;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE OST>0 AND Nomen.GRUPID='" + KEY_NOM_GROUPID + "' ORDER BY Nomen.DESCR"
-                    , null);
+
+            // Обновление цен по GROUP
+            if (!SgiID.equals("")) {
+                cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'",null);
+            } else {
+                cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "'",null);
+            }
+            updatePrices(cursor1, SgiID, GroupID);
+
+            // Обновление цен по SGI
+            if (!SgiID.equals("")) {
+                cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA IS NULL",null);
+            } else {
+                cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "'",null);
+            }
+            updatePrices(cursor1, SgiID, GroupID);
+
+            // Инфа про Nomen
+            cursor = db.rawQuery("SELECT rowid AS _id, KOD5, DESCR, OST," +
+                    " PRICE," +
+                    " GRUPPA, ZAKAZ, FOTO, PD, SGI FROM Nomen WHERE OST>0 AND Nomen.GRUPPA='" + GroupID + "' ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void updatePrices(Cursor cursor, String SgiID, String GroupID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursorSetPrices;
+        for (int i = 0; i < cursor.getCount(); i++) {
+            cursor.moveToNext();
+            cursorSetPrices = db.rawQuery("SELECT NOMEN, CENA FROM PRICES WHERE TIPCEN = '" + cursor.getString(1) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID  + "')",null);
+            Log.d("xd", cursorSetPrices.getCount() + "");
+
+
+            for (int j = 0; j < cursorSetPrices.getCount(); j++) {
+                cursorSetPrices.moveToNext();
+                float price = Float.parseFloat(cursorSetPrices.getString(1)) * (1 - Float.parseFloat(cursor.getString(0)) / 100 );
+                db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + cursorSetPrices.getString(0) + "'");
+            }
         }
     }
 
@@ -235,7 +260,7 @@ public class DBHepler extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
             cursor = db.rawQuery(
-                    "SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE OST>0 " + sqlMX + " ORDER BY Nomen.DESCR", null);
+                    "SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.KOD5, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE OST>0 " + sqlMX + " ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -282,7 +307,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE OST>0 " + sqlMX + " ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, printf('%.2f', (SELECT CENA FROM PRICES WHERE NOMEN = NOMEN.KOD5)) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGI, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA =  GRUPS.CODE WHERE OST>0 " + sqlMX + " ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -305,7 +330,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE  OST>0 AND (Nomen.lowDESCR LIKE '" + Condition + "' OR Nomen.COD LIKE '" + Condition + "') ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, printf('%.2f', (SELECT CENA FROM PRICES WHERE NOMEN = NOMEN.KOD5)) AS PRICE,  ZAKAZ,  GRUPPA, Nomen.SGI, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPID = GRUPS.CODE WHERE OST>0 AND (Nomen.DESCR LIKE '" + Condition + "' OR Nomen.KOD5 LIKE '" + Condition + "') ORDER BY Nomen.DESCR", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -317,7 +342,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE  OST>0 AND Nomen.GRUPID='" + Group + "' AND (Nomen.lowDESCR LIKE '%" + SearchStr + "%' OR Nomen.COD LIKE '%" + SearchStr + "%')  ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, printf('%.2f', (SELECT CENA FROM PRICES WHERE NOMEN = NOMEN.KOD5)) AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, PD, FOTO FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE  OST>0 AND Nomen.GRUPPA='" + Group + "' AND (Nomen.DESCR LIKE '%" + SearchStr + "%' OR Nomen.KOD5 LIKE '%" + SearchStr + "%')  ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -330,27 +355,35 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.ID, Nomen.COD, Nomen.DESCR, OST, printf('%.2f', CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END) AS PRICE,  ZAKAZ,  GRUPID, Nomen.SGIID, CASE WHEN PHOTO1 IS NULL THEN '' ELSE PHOTO1 END AS PHOTO1, CASE WHEN PHOTO2 IS NULL THEN '' ELSE PHOTO2 END AS PHOTO2, VKOROB, ISNEW, IS7DAY, IS28DAY, MP, IS_PERM, GRUPS.DESCR AS GRUP, P1D, P2D FROM Nomen JOIN GRUPS ON Nomen.GRUPID =  GRUPS.ID WHERE ZAKAZ<>0  ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, Nomen.SGI, FOTO, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
 
     public String getOrderSum() {
-        String Sum = "";
+        String res = "";
         Cursor cursor = null;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT CASE WHEN CAST(SUM((CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END)*ZAKAZ) AS NUMERIC) IS NULL THEN 0 ELSE printf('%.2f', SUM((CASE WHEN SALE_PRICE>0 THEN SALE_PRICE ELSE PRICE END)*ZAKAZ)) END AS SUM FROM Nomen WHERE ZAKAZ<>0", null);
+            cursor = db.rawQuery("SELECT SUM(ROUND(PRICE * ZAKAZ, 2)) AS SUM, PRICE, ZAKAZ FROM Nomen WHERE ZAKAZ <> 0", null);
+
+            if (cursor.getCount() == 0)
+                return res;
+
             if (cursor.moveToNext()) {
-                Sum = cursor.getString(cursor.getColumnIndex("SUM")).equals("0") ? "" : " - " + cursor.getString(cursor.getColumnIndex("SUM"));
+                res = cursor.getFloat(0) == 0.0 ? "" : " - " + cursor.getFloat(0);
             }
-            return Sum;
+
+            Log.d("xd2", res + " #" + " " + cursor.getFloat(0));
+            return res;
         } catch (Exception e) {
-            return Sum;
+            e.printStackTrace();
+            return res;
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -364,7 +397,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT OST FROM Nomen WHERE ID='" + ID + "'", null);
+            cursor = db.rawQuery("SELECT OST FROM Nomen WHERE KOD5='" + ID + "'", null);
             if (cursor.moveToNext()) {
                 Ost = cursor.getString(cursor.getColumnIndex("OST"));
             }
@@ -403,33 +436,31 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public Boolean updateQty(String ID, int Qty) {
+    public void UpdateQty(String ID, int Qty) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
             ContentValues updatedValues = new ContentValues();
             updatedValues.put(KEY_ZAKAZ, Qty);
-            db.update(TB_NOMEN, updatedValues, "ID='" + ID + "'", null);
+            db.update(TB_NOMEN, updatedValues, "KOD5='" + ID + "'", null);
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
         }
     }
 
-    public int GetCod(Long RowID) {
+    public String GetCod(Long RowID) {
         SQLiteDatabase db;
         Cursor cursor;
         db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            cursor = db.rawQuery("SELECT COD FROM Nomen WHERE rowid=" + RowID, null);
-            int x = 0;
+            cursor = db.rawQuery("SELECT FOTO FROM Nomen WHERE rowid=" + RowID, null);
+            String x = "";
             if (cursor.moveToNext()) {
-                x = cursor.getInt(cursor.getColumnIndex("COD"));
+                x = cursor.getString(cursor.getColumnIndex("FOTO"));
                 cursor.close();
             }
             return x;
@@ -439,40 +470,36 @@ public class DBHepler extends SQLiteOpenHelper {
             db.endTransaction();
         }
 
-        return -1;
+        return "";
     }
 
-    public Boolean PlusQty(Long RowID) {
+    public void PlusQty(Long RowID) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ+1 WHERE rowid=" + RowID);
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
         }
     }
 
-    public Boolean MinusQty(Long RowID) {
+    public void MinusQty(Long RowID) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1)<=0 THEN 0 ELSE ZAKAZ-1 END WHERE rowid=" + RowID);
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
         }
     }
 
-    public Boolean updateOrderQty(String ZakID, String ID, int Qty) {
+    public void UpdateOrderQty(String ZakID, String ID, int Qty) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
@@ -481,21 +508,19 @@ public class DBHepler extends SQLiteOpenHelper {
             updatedValues.put("QTY", Qty);
             db.update("ZAKAZY_DT", updatedValues, "NOM_ID='" + ID + "' AND ZAKAZ_ID='" + ZakID + "'", null);
             db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         } finally {
             db.endTransaction();
         }
     }
 
-    public Boolean insertOrder(String TP_ID, String Contr_ID, String Addr_ID, String Data, String Comment, String DelivTime, Integer getMoney, Integer getBackward, Long BackwardType) {
+    public Boolean insertOrder(String TP_ID, String Contr_ID, String Addr_ID, String Data, String Comment) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
             if (getCount() == 0) {
-                db.execSQL("INSERT INTO ORDERS(TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE) VALUES ('" + TP_ID + "', '" + Contr_ID + "', '" + Addr_ID + "', '" + Data + "', '" + Comment + "', '" + DelivTime + "', " + getMoney + ", " + getBackward + ", " + BackwardType + ")");
+                db.execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DATA,COMMENT) VALUES ('" + TP_ID + "', '" + Contr_ID + "', '" + Addr_ID + "', '" + Data + "', '" + Comment + "')");
                 db.setTransactionSuccessful();
                 return true;
             } else {
@@ -513,7 +538,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите торгового представителя ----' AS DESCR UNION ALL SELECT ROWID AS _id, ID , DESCR FROM TORG_PRED", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите торгового представителя' AS DESCR UNION ALL SELECT rowid AS _id, CODE, DESCR FROM TORG_PRED", null);
             return cursor;
 
         } catch (Exception e) {
@@ -539,7 +564,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите контрагента ----' AS DESCR, 0 AS INSTOP, 0 AS DOLG, 0 AS DYNAMO, '' AS INFO UNION ALL SELECT ROWID AS [_id], ID, DESCR, INSTOP, DOLG, DYNAMO, INFO FROM CONTRS", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберете контрагента' as DESCR UNION ALL SELECT rowid AS _id, CODE, DESCR FROM CONTRS", null);
             return cursor;
         } catch (Exception e) {
             return null;
@@ -551,7 +576,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT ROWID AS _id, ID, DESCR, INSTOP, DOLG, DYNAMO, INFO  FROM CONTRS WHERE lowDESCR LIKE '%" + FindStr + "%'", null);
+            cursor = db.rawQuery("SELECT ROWID AS _id, CODE, DESCR FROM CONTRS WHERE DESCR LIKE '%" + FindStr + "%'", null);
             return cursor;
 
         } catch (Exception e) {
@@ -564,7 +589,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, '---- Выберите адрес доставки ----' AS DESCR, '' AS DOP_INFO UNION ALL SELECT rowid AS _id, ID, DESCR, DOP_INFO FROM ADDRS WHERE PARENTEXT ='" + ContrID + "'", null);
+            cursor = db.rawQuery("SELECT '0' as _id, '0' AS CODE, 'Выберите адрес доставки' AS DESCR UNION ALL SELECT rowid as _id, CODE, DESCR FROM ADDRS WHERE KONTRCODE ='" + ContrID + "'", null);
             return cursor;
 
         } catch (Exception e) {
@@ -589,46 +614,12 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public int GetTPRowID() {
-        Cursor c = null;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT [TORG_PRED].[ROWID] AS [_id] FROM [ORDERS] JOIN [TORG_PRED] ON [ORDERS].[TP_ID]=[TORG_PRED].[ID]", null);
-            if (c.moveToFirst()) {
-                return c.getInt(0);
-            }
-            return 0;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
     public int GetTPByID(String ID) {
         Cursor c = null;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT [ROWID] AS [_id] FROM [TORG_PRED] WHERE [ID]='" + ID + "'", null);
-            if (c.moveToFirst()) {
-                return c.getInt(0);
-            }
-            return 0;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    public int GetContrRowID() {
-        Cursor c = null;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT [CONTRS].[ROWID] AS [_id] FROM [ORDERS] JOIN [CONTRS] ON [ORDERS].[CONTR_ID]=[CONTRS].[ID]", null);
+            c = db.rawQuery("SELECT ROWID AS _id FROM TORG_PRED WHERE CODE='" + ID + "'", null);
             if (c.moveToFirst()) {
                 return c.getInt(0);
             }
@@ -662,7 +653,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT CONTR_ID FROM [ORDERS]", null);
+            c = db.rawQuery("SELECT CONTR FROM ORDERS", null);
             if (c.moveToFirst()) {
                 return c.getString(0);
             }
@@ -679,7 +670,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT [ADDR_ID] FROM [ORDERS]", null);
+            c = db.rawQuery("SELECT ADDR FROM ORDERS", null);
             if (c.moveToFirst()) {
                 return c.getString(0);
             }
@@ -732,7 +723,7 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            Cursor cursor = db.rawQuery("SELECT DOCNO FROM ZAKAZY WHERE ROWID=" + id, null);
+            Cursor cursor = db.rawQuery("SELECT DOCID FROM ZAKAZY WHERE ROWID=" + id, null);
             String data = "0";
             if (cursor.moveToFirst()) {
                 data = cursor.getString(0);
@@ -778,20 +769,18 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public Boolean ResetNomen() {
+    public void ResetNomen() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.setLockingEnabled(false);
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET ZAKAZ=0, SALE_PRICE=0 WHERE ZAKAZ>0");
+            db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
             db.setTransactionSuccessful();
-            return true;
         } catch (Exception e) {
-            return false;
         } finally {
             db.endTransaction();
-            return true;
+            return;
         }
     }
 
@@ -815,22 +804,23 @@ public class DBHepler extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
             db.setLockingEnabled(false);
-            cursor = db.rawQuery("SELECT\n" +
-                    "  ZAKAZY.ROWID AS _id,\n" +
-                    "  ZAKAZY.DOC_DATE,\n" +
-                    "  CONTRS.DESCR AS CONTR,\n" +
-                    "  ADDRS.DESCR AS ADDR,\n" +
-                    "  CASE ZAKAZY.STATUS WHEN 0 THEN 'Сохранен' WHEN 1 THEN 'Отправлен' WHEN 2 THEN 'Получен' WHEN 3 THEN 'Оформлен' WHEN 4 THEN 'Оформлен(-)' WHEN 6 THEN 'Собран' WHEN 7 THEN 'Собран(-)' WHEN 5 THEN 'Удален' WHEN 99 THEN 'Отменен' END AS STATUS,\n" +
-                    "  (SELECT printf('%.2f', ROUND(SUM(QTY*PRICE),2)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCNO) AS SUM,\n" +
-                    "  ZAKAZY.DOCNO,\n" +
-                    "  ZAKAZY.DELIVERY_DATE\n" +
-                    "FROM ZAKAZY\n" +
-                    "  JOIN CONTRS ON ZAKAZY.CONTR_ID=CONTRS.ID\n" +
-                    "  JOIN ADDRS ON ZAKAZY.ADDR_ID=ADDRS.ID\n" +
-                    "WHERE\n" +
-                    "  DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))\n", null);
+            cursor = db.rawQuery("SELECT" +
+                    "  ZAKAZY.ROWID AS _id," +
+                    "  ZAKAZY.DOC_DATE," +
+                    "  CONTRS.DESCR AS CONTR," +
+                    "  ADDRS.DESCR AS ADDR," +
+                    "  ZAKAZY.DELIVERY_DATE AS DELIVERY," +
+                    "  CASE ZAKAZY.STATUS WHEN 0 THEN 'Сохранен' WHEN 1 THEN 'Отправлен' WHEN 2 THEN 'Получен' WHEN 3 THEN 'Оформлен' WHEN 4 THEN 'Оформлен(-)' WHEN 6 THEN 'Собран' WHEN 7 THEN 'Собран(-)' WHEN 5 THEN 'Удален' WHEN 99 THEN 'Отменен' END AS STATUS," +
+                    "  (SELECT printf('%.2f', ROUND(SUM(QTY * PRICE),2)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
+                    "  ZAKAZY.DOCID AS DOCID" +
+                    "  FROM ZAKAZY" +
+                    "  JOIN CONTRS ON ZAKAZY.CONTR=CONTRS.CODE" +
+                    "  JOIN ADDRS ON ZAKAZY.ADDR=ADDRS.CODE" +
+                    "  WHERE" +
+                    "  DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -865,7 +855,7 @@ public class DBHepler extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
             db.setLockingEnabled(false);
-            cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOM_ID, COD5, DESCR, QTY, printf('%.2f', PRICE) AS PRICE, printf('%.2f', ROUND(QTY*PRICE,2)) AS SUM, IS_OUTED, OUT_QTY FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
+            cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOM_ID, DESCR, QTY, printf('%.2f', PRICE) AS PRICE, printf('%.2f', ROUND(QTY*PRICE,2)) AS SUM, IS_OUTED, OUT_QTY FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
             return cursor;
 
         } catch (Exception e) {
@@ -897,9 +887,9 @@ public class DBHepler extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
             db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT CONTRS.DESCR FROM ORDERS JOIN CONTRS ON ORDERS.CONTR_ID=CONTRS.ID", null);
+            c = db.rawQuery("SELECT CONTRS.DESCR FROM ORDERS JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE", null);
             if (c.moveToFirst()) {
-                return c.getString(0);
+                return c.getString(0).trim();
             }
             return "";
         } finally {
@@ -908,21 +898,6 @@ public class DBHepler extends SQLiteOpenHelper {
             }
         }
     }
-
-    public void ClearOrderTb() {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.setLockingEnabled(false);
-        db.beginTransaction();
-        try {
-            db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
-            db.setTransactionSuccessful();
-        } catch (Exception ignored) {
-        } finally {
-            db.endTransaction();
-        }
-    }
-
 
     public Cursor getDebetByContr(String ID) {
         Cursor cursor;
@@ -1067,12 +1042,12 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public void resetContrSales() {
+    public void resetContrPrices() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET SALE_PRICE=0 WHERE SALE_PRICE>0");
+            db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE>0");
             db.setTransactionSuccessful();
         } catch (Exception ignored) {
         } finally {
@@ -1080,39 +1055,12 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public void calcSales(String Contr_ID) {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.beginTransaction();
-        Cursor c;
-        try {
-            c = db.rawQuery("SELECT count(ID) AS CNT FROM Nomen WHERE SALE_PRICE>0", null);
-            if (c.moveToFirst()) {
-                if (c.getInt(0) > 0) {
-                    resetContrSales();
-                    if (c != null) {
-                        c.close();
-                    }
-                } else {
-                    c = db.rawQuery("SELECT NOMEN.ID, printf('%.2f',NOMEN.PRICE-NOMEN.PRICE*SALES.SALE)  AS SALEPRICE FROM SALES JOIN Nomen ON SALES.GRUP_ID=Nomen.GRUPID WHERE SALES.CONTR_ID='" + Contr_ID + "'", null);
-                    while (c.moveToNext()) {
-                        db.execSQL("UPDATE Nomen SET SALE_PRICE=" + c.getDouble(1) + " WHERE ID='" + c.getString(0) + "'");
-                    }
-                    c.close();
-                }
-            }
-        } catch (Exception ignored) {
-        }
-        db.setTransactionSuccessful();
-        db.endTransaction();
-    }
-
-    public int CheckForSales() {
+    public int GetContrRowID() {
         Cursor c = null;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT count(ID) AS CNT FROM Nomen WHERE SALE_PRICE>0", null);
+            c = db.rawQuery("SELECT CONTRS.ROWID AS _id FROM ORDERS JOIN CONTRS ON ORDERS.CONTR = CONTRS.CODE", null);
             if (c.moveToFirst()) {
                 return c.getInt(0);
             }
@@ -1124,12 +1072,12 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public int CheckTPAccess(String TP_ID) {
+    public int GetTPRowID() {
         Cursor c = null;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT count(TP_ID) AS CNT FROM TP_GRUP_ACCESS WHERE TP_ID='" + TP_ID + "'", null);
+            c = db.rawQuery("SELECT TORG_PRED.ROWID AS _id FROM ORDERS JOIN TORG_PRED ON ORDERS.TP = TORG_PRED.CODE", null);
             if (c.moveToFirst()) {
                 return c.getInt(0);
             }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">МАРС ТП</string>
+    <string name="start_fragment_name">Журнал</string>
     <string name="app_version">1.0</string>
     <string name="emailto">it@amberplus.ru</string>
     <string name="action_settings">Настройки</string>
@@ -42,7 +43,7 @@
     <string name="lblFilterWC">Демографический признак</string>
     <string name="lblFilterProd">Производитель/Импортер</string>
     <string name="lblFilterFocus">Фокус</string>
-    <string name="chkFocus">Обновление Фокусов</string>
+    <string name="chkFocus">Обновление фокусов</string>
     <string name="lblFilterModel">Модель</string>
     <string name="lblFilterColor">Цвет</string>
 </resources>

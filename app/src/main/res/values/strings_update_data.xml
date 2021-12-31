@@ -3,6 +3,7 @@
     <string name="chkSGi">Обновление СГИ</string>
     <string name="chkGroups">Обновление товарных групп</string>
     <string name="chkNomen">Обновление номенклатуры</string>
+    <string name="chkPrice">Обновление цен</string>
     <string name="chkContrs">Обновление контрагентов</string>
     <string name="chkAddrs">Обновление адресов</string>
     <string name="chkTorgPred">Обновление торговых представителей</string>
@@ -12,7 +13,7 @@
     <string name="chkSales">Обновление скидок</string>
     <string name="chkGrupAccess">Обновление привязок товарных групп</string>
 
-    <string name="btUpdateData">Обновить все данные</string>
+    <string name="btUpdateData">Обновить</string>
 
     <string name="btUpdateStatus">Обновить только статусы заказов</string>
 

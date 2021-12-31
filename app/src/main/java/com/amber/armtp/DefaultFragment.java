@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 /**
  * Updated by domster704 on 27.09.2021
@@ -45,7 +46,7 @@ public class DefaultFragment extends Fragment {
         toolbar.setSubtitle("");
         settings = getActivity().getSharedPreferences("apk_version", 0);
         editor = settings.edit();
-        webview = getActivity().findViewById(R.id.ChangeWebView);
-        webview.loadUrl("file:///android_asset/changelog/changes.html");
+//        webview = getActivity().findViewById(R.id.ChangeWebView);
+//        webview.loadUrl("file:///android_asset/changelog/changes.html");
     }
 }

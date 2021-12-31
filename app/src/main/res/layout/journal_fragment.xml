@@ -14,7 +14,11 @@
             android:layout_height="match_parent"
             android:layout_marginTop="31dp"
             android:orientation="vertical"
-            />
+            >
+<!--        <CheckBox-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"/>-->
+    </LinearLayout>
 
     <ViewFlipper
             android:id="@+id/viewflipper"
@@ -76,16 +80,16 @@
                     android:layout_alignParentLeft="true" />
 
             <TextView
-                    android:id="@+id/textView19"
-                    android:layout_width="120dp"
-                    android:layout_height="25dp"
-                    android:layout_alignTop="@+id/textView18"
-                    android:layout_alignParentLeft="true"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journStatus"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                android:id="@+id/textView19"
+                android:layout_width="120dp"
+                android:layout_height="25dp"
+                android:layout_alignTop="@+id/textView18"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/journStatus"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
 
             <TextView
                     android:id="@+id/textView20"
@@ -100,16 +104,16 @@
                     android:textColor="#000000" />
 
             <TextView
-                    android:id="@+id/textView36"
-                    android:layout_width="120dp"
-                    android:layout_height="25dp"
-                    android:layout_toEndOf="@+id/textView18"
-                    android:layout_toRightOf="@+id/textView18"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journDeliveryDate"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                android:id="@+id/textView36"
+                android:layout_width="120dp"
+                android:layout_height="25dp"
+                android:layout_toEndOf="@+id/textView18"
+                android:layout_toRightOf="@+id/textView18"
+                android:background="@drawable/table_header"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/journDeliveryDate"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
 
         </RelativeLayout>
 
