@@ -1,42 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/TabUpdateSrv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp"
+    android:scrollbars="none"
+    tools:ignore="RtlCompat">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="0.7"
         android:orientation="vertical">
 
-    <TabHost
-            android:id="@+id/tabHost"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp"
+                android:text="FTP-сервер"
+                android:textColor="#000"
+                android:textSize="16sp" />
+
+            <View style="@style/Divider.Horizontal" />
+
+        </LinearLayout>
 
         <LinearLayout
-                android:layout_width="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvServer"
+                android:layout_width="160dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:gravity="end|center_vertical"
+                android:paddingEnd="8dp"
+                android:text="@string/resUpdateServer"
+                android:textAlignment="center"
+                android:textColor="#000"
+                android:textSize="@dimen/textSizeSettings"
+                tools:text="Сервер" />
 
-            <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:showDividers="middle" />
-
-            <FrameLayout
-                    android:id="@android:id/tabcontent"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                <include layout="@layout/setting_db" />
-
-                <include layout="@layout/setting_dbf" />
-
-                <include layout="@layout/setting_prices" />
-
-                <include layout="@layout/setting_paths" />
-
-                <include layout="@layout/setting_updatesrv" />
-
-                <include layout="@layout/setting_default" />
-            </FrameLayout>
+            <EditText
+                android:id="@+id/edFtpServer"
+                android:layout_width="398dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:ems="10"
+                android:inputType="text"
+                android:text="91.208.84.67"
+                android:textAlignment="center"
+                android:textSize="@dimen/textSizeSettings"
+                tools:text="91.208.84.67" />
         </LinearLayout>
-    </TabHost>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvLogin"
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="end|center_vertical"
+                android:paddingEnd="8dp"
+                android:text="@string/resLogin"
+                android:textAlignment="center"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/edFtpUser"
+                android:layout_width="398dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:textSize="@dimen/textSizeSettings" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvPass"
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="end|center_vertical"
+                android:paddingEnd="8dp"
+                android:text="@string/resPass"
+                android:textAlignment="center"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/edFtpPass"
+                android:layout_width="398dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:ems="10"
+                android:inputType="text"
+                android:textSize="@dimen/textSizeSettings"
+                tools:text="Yjdfz Ptkfylbz.ru" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvPort"
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="end|center_vertical"
+                android:paddingEnd="8dp"
+                android:text="@string/resPort"
+                android:textAlignment="center"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/edFtpPort"
+                android:layout_width="398dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:ems="10"
+                android:inputType="text"
+                android:text="20123"
+                android:textSize="@dimen/textSizeSettings" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp"
+                android:text="Шрифт"
+                android:textColor="#000"
+                android:textSize="16sp" />
+
+            <View style="@style/Divider.Horizontal" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dividerSettings">
+
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                android:gravity="end|center_vertical"
+                android:text="Шрифт"
+                android:paddingEnd="8dp"
+                android:textAlignment="center"
+                android:textColor="#000"
+                android:textSize="@dimen/textSizeSettings" />
+
+            <EditText
+                android:id="@+id/fontSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:minWidth="35dp"
+                android:textSize="@dimen/textSizeSettings"
+                android:layout_marginStart="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sp"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btSaveSettings"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="20dp"
+        android:background="@android:drawable/btn_default"
+        android:text="Сохранить" />
 </LinearLayout>

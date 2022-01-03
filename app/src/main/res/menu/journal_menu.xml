@@ -11,24 +11,24 @@
         app:showAsAction="always"/>
 
     <!-- Начало оступов   -->
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
-    <item
-        app:showAsAction="always"
-        android:enabled="false"/>
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
+<!--    <item-->
+<!--        app:showAsAction="always"-->
+<!--        android:enabled="false"/>-->
     <!-- Конец оступов   -->
 
     <item

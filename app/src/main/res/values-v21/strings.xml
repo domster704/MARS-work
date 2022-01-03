@@ -2,7 +2,7 @@
 <resources>
     <string name="resUpdateServer">Сервер обновлений</string>
     <string name="resSaveSettings" />
-    <string name="resSqlPort">Порт SQL</string>
-    <string name="resSqlLogin">Логин</string>
-    <string name="resSqlPass">Пароль</string>
+    <string name="resPort">Порт</string>
+    <string name="resLogin">Логин</string>
+    <string name="resPass">Пароль</string>
 </resources>

@@ -188,6 +188,8 @@ public class GlobalVars extends Application {
             long viewId = myView.getId();
 
             if (viewId == R.id.ColNomPhoto) {
+                if (((TextView) myView).getText().equals(""))
+                    return;
                 isSecondPhoto = false;
                 String photoDir = getPhotoDir();
                 long ID = myAdapter.getItemIdAtPosition(position);
@@ -748,6 +750,12 @@ public class GlobalVars extends Application {
     }
 
     public void LoadNom(String GrupID, String SgiID) {
+        FormOrderFragment.isSorted = false;
+        nomenList.setSelection(0);
+        if (!FormOrderFragment.isSorted) {
+            FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
+        }
+
         myNom = db.getNomByGroup(GrupID, SgiID);
         nomenList.setAdapter(null);
         NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "FOTO"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto}, 0);
@@ -1711,8 +1719,11 @@ public class GlobalVars extends Application {
     public void LoadDebet(String TP_ID, String CONTR_ID) {
         debetList.setAdapter(null);
         curDebet = db.getDebet(TP_ID, CONTR_ID);
+        if (curDebet == null) {
+            Toast.makeText(getContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+        }
         DebetAdapter adapter;
-        adapter = new DebetAdapter(CurAc, R.layout.debet_layout, curDebet, new String[]{"DESCR", "STATUS", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE"}, new int[]{R.id.ColDebetContr, R.id.ColDebetStatus, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor}, 0);
+        adapter = new DebetAdapter(CurAc, R.layout.debet_layout, curDebet, new String[]{"DESCR", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE"}, new int[]{R.id.ColDebetContr, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor}, 0);
         debetList.setAdapter(adapter);
     }
 
@@ -1728,14 +1739,14 @@ public class GlobalVars extends Application {
         spContrDeb.setAdapter(null);
         curDebetContr = db.getContrList();
         DebetContrsAdapter adapter;
-        adapter = new DebetContrsAdapter(CurAc, R.layout.contr_layout, curDebetContr, new String[]{"ID", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        adapter = new DebetContrsAdapter(CurAc, R.layout.contr_layout, curDebetContr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
         spContrDeb.setAdapter(adapter);
     }
 
     public void LoadTpListDeb() {
         curDebetTp = db.getTpList();
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, curDebetTp, new String[]{"_id", "ID", "DESCR"}, new int[]{R.id.ColTP_ROWID, R.id.ColTPID, R.id.ColTPDescr});
+        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, curDebetTp, new String[]{"_id", "CODE", "DESCR"}, new int[]{R.id.ColTP_ROWID, R.id.ColTPID, R.id.ColTPDescr});
         spTP.setAdapter(adapter);
 
         spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2276,7 +2287,7 @@ public class GlobalVars extends Application {
             Cursor cursor = getCursor();
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
 
-            String contrInfo = cursor.getString(6);
+//            String contrInfo = cursor.getString(6);
             String resDescr = cursor.getString(2);
 
             if (position % 2 == 0) {
@@ -2285,9 +2296,9 @@ public class GlobalVars extends Application {
                 tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
             }
 
-            if (!contrInfo.equals("")) {
-                resDescr += " (" + contrInfo + ")";
-            }
+//            if (!contrInfo.equals("")) {
+//                resDescr += " (" + contrInfo + ")";
+//            }
 
             tvDescr.setText(resDescr);
             return view;
@@ -2312,6 +2323,7 @@ public class GlobalVars extends Application {
             super(context, layout, c, from, to, flags);
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             int resID;
@@ -2319,7 +2331,6 @@ public class GlobalVars extends Application {
             final Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
-//            Log.d("xd", (String) tvDescr.getText());
             TextView tvPrice = view.findViewById(R.id.ColNomPrice);
             TextView tvPosition = view.findViewById(R.id.ColNomPosition);
 
@@ -2351,24 +2362,11 @@ public class GlobalVars extends Application {
                 }
             });
 
-            tvPrice.setText(String.format("%.2f", cursor.getDouble(4)));
+            tvPrice.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex("PRICE"))));
 
 //            ID, CODE, DESCR, OST, PRICE, GRUPPA, ZAKAZ, FOTO, PD, SGIID
-//            try {
-//                if (!cursor.getString(8).equals("")) {
-//                    resID = glbContext.getResources().getIdentifier("photo", "drawable", glbContext.getPackageName());
-//
-//                    SpannableStringBuilder builder = new SpannableStringBuilder();
-//                    builder.append(" ").append(" ");
-//                    builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
-//                    builder.append(" ");
-//                    tvPhoto.setText(builder);
-//                }
-//            } catch (Exception ignored) {
-//            }
-
-            if (!cursor.getString(8).equals("")) {
-                if (cursor.getInt(9) == 1) {
+            if (cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
+                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
                     resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
                 } else {
                     resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());

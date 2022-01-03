@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/order_header"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="@dimen/tvWidthOrderFragment"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:gravity="center_vertical|start"
+                android:minWidth="@dimen/tvWidthOrderFragment"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderTp"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <Spinner
+                android:id="@+id/SpinTP"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="@dimen/editTextParentWidth"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:gravity="center_vertical|start"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderFindContr"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <EditText
+                android:id="@+id/txtContrFilter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="start"
+                android:imeOptions="flagNoExtractUi"
+                android:singleLine="true"
+                android:textSize="@dimen/headOrderFontSize"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="@dimen/tvWidthOrderFragment"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:layout_marginStart="-1dp"
+                android:layout_marginTop="0dp"
+                android:gravity="center_vertical|start"
+                android:minWidth="@dimen/tvWidthOrderFragment"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderContr"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <Spinner
+                android:id="@+id/SpinContr"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="@dimen/tvWidthOrderFragment"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:gravity="center_vertical|start"
+                android:minWidth="@dimen/tvWidthOrderFragment"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderAddr"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <Spinner
+                android:id="@+id/SpinAddr"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="@dimen/editTextParentWidth"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:layout_marginTop="0dp"
+                android:gravity="center_vertical|start"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderDate"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <EditText
+                android:id="@+id/txtDelivDate"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:ems="10"
+                android:focusable="false"
+                android:singleLine="true"
+                android:textColor="#000"
+                android:textSize="@dimen/headOrderFontSize"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="@dimen/editTextParentWidth"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:gravity="center_vertical|start"
+                android:paddingStart="10dp"
+                android:text="@string/OrdHeaderComment"
+                android:textColor="#000"
+                android:textSize="@dimen/mainFontSize" />
+
+            <EditText
+                android:id="@+id/txtComment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top"
+                android:textColor="#000"
+                android:textSize="@dimen/headOrderFontSize"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/NecessaryFields"
+        android:textColor="#000"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btSaveHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@android:drawable/btn_default"
+        android:padding="15dp"
+        android:text="@string/OrdHeaderSave"
+        android:textColor="#000" />
+
+</RelativeLayout>

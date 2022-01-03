@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,8 +53,6 @@ public class DebetFragment extends Fragment {
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     String DebTP_ID;
-    android.support.v4.app.Fragment fragment = null;
-    android.support.v4.app.FragmentTransaction fragmentTransaction;
     private android.support.v7.widget.Toolbar toolbar;
 
     public DebetFragment() {
@@ -116,13 +115,14 @@ public class DebetFragment extends Fragment {
                 glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
                 String DebetContr = glbVars.tvContr.getText().toString();
                 String DebetTp = glbVars.tvTP.getText().toString();
+                Log.d("xd", DebetContr + " " + DebetTp);
                 glbVars.LoadDebet(DebetTp, DebetContr);
             }
         });
 
         glbVars.spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-                String ItemID = glbVars.curDebetTp.getString(glbVars.curDebetTp.getColumnIndex("ID"));
+                String ItemID = glbVars.curDebetTp.getString(glbVars.curDebetTp.getColumnIndex("CODE"));
                 settings = Objects.requireNonNull(getActivity()).getSharedPreferences("apk_version", 0);
                 editor = settings.edit();
                 editor.putString("debet_tp", ItemID);
@@ -154,19 +154,6 @@ public class DebetFragment extends Fragment {
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск по дебиторке");
         searchView.setOnQueryTextListener(searchTextListner);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.returnToOrderHead) {
-//            fragment = new OrderHeadFragment();
-//            fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
-//            fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
-//            fragmentTransaction.commit();
-//            toolbar.setTitle("Шапка заказа");
-//            return true;
-//        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void SetSelectedDebTP(int ROWID) {

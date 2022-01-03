@@ -118,7 +118,7 @@ public class CheckSMS extends IntentService {
             sendBroadcast(i);
 
             // Отключено 18-08-2016 для проверки работы на Android SDK 24/6
-            ShortcutBadger.applyCount(getApplicationContext(), count.equals("") ? 0 : Integer.parseInt(count));
+//            ShortcutBadger.applyCount(getApplicationContext(), count.equals("") ? 0 : Integer.parseInt(count));
 
             try {
                 if (reset != null) {

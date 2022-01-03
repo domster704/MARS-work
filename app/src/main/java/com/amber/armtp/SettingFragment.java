@@ -8,8 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
@@ -20,14 +18,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
-import java.io.File;
 import java.util.Objects;
 
 /**
@@ -42,37 +34,15 @@ public class SettingFragment extends Fragment {
     private final int LOCATION_SDPATH = 1;
     private final int LOCATION_PHOTO_PATH = 2;
     public GlobalVars glbVars;
-    SharedPreferences serverSettings, PriceSettings, settingPaths, settings;
-    SharedPreferences.Editor editor, PriceEditor, settingPathEditor, settingsEditor;
-    Button btClearSgi,
-            btClearGroups,
-            btClearNomen,
-            btClearContrs,
-            btClearAddrs,
-            btClearTP,
-            btClearDebet,
-            btClearAll,
-            btCompactDb,
-            btCheckDb,
-            btDeleteDBF,
-            btClearZakazy,
-            btClearZakazyDt,
-            btDeleteCanceledZakaz,
-            btUnlockTP,
-            btLockTP,
-            btSaveUpdateSrv;
+    SharedPreferences serverSettings, settings;
+    SharedPreferences.Editor editor, settingPathEditor, settingsEditor;
 
     Button btSaveSettings;
     EditText fontSize;
 
-    Button btSetPhotoPath, btSetSDPath;
-    TextView tvPhotoPath, tvSDPath, tbPublicPhoto;
-    Switch swTestLoadPhoto;
-    EditText etUpdateSrv, etSqlPort, etSqlLogin, etSqlPass, etSqlDB;
     EditText etFtpPhoto, etFtpPhotoUser, etFtpPhotoPass;
-    EditText etFtpUpdate, etFtpUpdateUser, etFtpUpdatePass;
+    EditText etFtpServer, etFtpUser, etFtpPass;
     Boolean isSelectPath = false;
-    String CenTypeID;
 
     @Nullable
     @Override
@@ -102,49 +72,6 @@ public class SettingFragment extends Fragment {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
-        TabHost tabs = Objects.requireNonNull(getActivity()).findViewById(R.id.tabHost);
-
-        tabs.setup();
-
-        TabHost.TabSpec spec = tabs.newTabSpec("tag1");
-
-        spec.setContent(R.id.TabDB);
-        spec.setIndicator("База данных");
-        tabs.addTab(spec);
-
-        spec = tabs.newTabSpec("tag2");
-        spec.setContent(R.id.TabDBF);
-        spec.setIndicator("DBF");
-        tabs.addTab(spec);
-
-        spec = tabs.newTabSpec("tag3");
-        spec.setContent(R.id.TabPaths);
-        spec.setIndicator("Пути");
-        tabs.addTab(spec);
-
-        spec = tabs.newTabSpec("tag4");
-        spec.setContent(R.id.TabPrices);
-        spec.setIndicator("Цены");
-        tabs.addTab(spec);
-
-        spec = tabs.newTabSpec("tag5");
-        spec.setContent(R.id.TabUpdateSrv);
-        spec.setIndicator("Сервера обновлений");
-        tabs.addTab(spec);
-
-        spec = tabs.newTabSpec("tag5");
-        spec.setContent(R.id.TabDefaultSetting);
-        spec.setIndicator("Другое");
-        tabs.addTab(spec);
-
-        tabs.setCurrentTab(0);
-
-        glbVars.spinCenTypes = getActivity().findViewById(R.id.spnCentype);
-        glbVars.LoadCenTypes();
-
-        tvPhotoPath = getActivity().findViewById(R.id.tvPhotoPath);
-        tvSDPath = getActivity().findViewById(R.id.tvSDPath1);
-        tbPublicPhoto = getActivity().findViewById(R.id.tvPublicPhoto);
         serverSettings = getActivity().getSharedPreferences("apk_version", 0);
         editor = serverSettings.edit();
 
@@ -156,74 +83,15 @@ public class SettingFragment extends Fragment {
             settingsEditor.apply();
         }
 
-        PriceSettings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        etFtpServer = getActivity().findViewById(R.id.edFtpServer);
+        etFtpPass = getActivity().findViewById(R.id.edFtpPass);
+        etFtpUser = getActivity().findViewById(R.id.edFtpUser);
 
-        PriceEditor = PriceSettings.edit();
-        settingPaths = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        tvPhotoPath.setText(settingPaths.getString("PhotoPath", ""));
-        tvSDPath.setText(settingPaths.getString("SDPath", ""));
-        tbPublicPhoto.setText(glbVars.getPhotoDir());
-        settingPathEditor = settingPaths.edit();
+        etFtpServer.setText(serverSettings.getString("FtpServerHost", getResources().getString(R.string.host)));
+        etFtpPass.setText(serverSettings.getString("FtpServerPass", getResources().getString(R.string.password)));
+        etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
 
-        btClearSgi = getActivity().findViewById(R.id.btClearSgi);
-        btClearGroups = getActivity().findViewById(R.id.btClearGroups);
-        btClearNomen = getActivity().findViewById(R.id.btClearNomen);
-        btClearContrs = getActivity().findViewById(R.id.btClearContrs);
-        btClearAddrs = getActivity().findViewById(R.id.btClearAddrs);
-        btClearTP = getActivity().findViewById(R.id.btClearTP);
-        btClearDebet = getActivity().findViewById(R.id.btClearDebet);
-        btCompactDb = getActivity().findViewById(R.id.btCompactDB);
-        btClearZakazy = getActivity().findViewById(R.id.btClearZakazy);
-        btClearZakazyDt = getActivity().findViewById(R.id.btClearZakazyDt);
-        btClearAll = getActivity().findViewById(R.id.btClearAll);
-        btCheckDb = getActivity().findViewById(R.id.btCheckDB);
-        btDeleteDBF = getActivity().findViewById(R.id.btDeleteDBF);
-        btUnlockTP = getActivity().findViewById(R.id.btUnlockTP);
-        btLockTP = getActivity().findViewById(R.id.btLockTp);
-        btSaveUpdateSrv = getActivity().findViewById(R.id.btSaveSrv);
-
-        btDeleteCanceledZakaz = getActivity().findViewById(R.id.btDeleteCanceledZakaz);
-
-        btSetPhotoPath = getActivity().findViewById(R.id.btSetImagesPath);
-        btSetSDPath = getActivity().findViewById(R.id.btSetSDPath);
-
-        swTestLoadPhoto = getActivity().findViewById(R.id.swTestLoadPhoto);
-
-        etUpdateSrv = getActivity().findViewById(R.id.edUpdateServer);
-        etSqlPort = getActivity().findViewById(R.id.edSqlPort);
-        etSqlLogin = getActivity().findViewById(R.id.edSqlLogin);
-        etSqlPass = getActivity().findViewById(R.id.edSqlPass);
-        etSqlDB = getActivity().findViewById(R.id.edSqlDB);
-
-        etUpdateSrv.setText(serverSettings.getString("UpdateSrv", getResources().getString(R.string.sql_server)));
-        etSqlPort.setText(serverSettings.getString("sqlPort", getResources().getString(R.string.sql_port)));
-        etSqlLogin.setText(serverSettings.getString("sqlLogin", getResources().getString(R.string.sql_user)));
-        etSqlPass.setText(serverSettings.getString("sqlPass", getResources().getString(R.string.sql_pass)));
-        etSqlDB.setText(serverSettings.getString("sqlDB", getResources().getString(R.string.sql_db)));
-
-        etFtpUpdate = getActivity().findViewById(R.id.edFtpUpdate);
-        etFtpUpdatePass = getActivity().findViewById(R.id.edFtpUpdatePass);
-        etFtpUpdateUser = getActivity().findViewById(R.id.edFtpUpdateUser);
-
-        etFtpUpdate.setText(serverSettings.getString("AppUpdateSrv", getResources().getString(R.string.ftp_update_server)));
-        etFtpUpdatePass.setText(serverSettings.getString("AppUpdatePass", getResources().getString(R.string.ftp_update_pass)));
-        etFtpUpdateUser.setText(serverSettings.getString("AppUpdateUser", getResources().getString(R.string.ftp_update_user)));
-
-        etFtpPhoto = getActivity().findViewById(R.id.edFtpPhoto);
-        etFtpPhotoPass = getActivity().findViewById(R.id.edFtpPhotoPass);
-        etFtpPhotoUser = getActivity().findViewById(R.id.edFtpPhotoUser);
-
-        etFtpPhoto.setText(serverSettings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server)));
-        etFtpPhotoPass.setText(serverSettings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_pass)));
-        etFtpPhotoUser.setText(serverSettings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_user)));
-
-        CenTypeID = serverSettings.getString("usr_centype", "");
-
-        boolean TestLoad = settingPaths.getBoolean("TestingLoad", false);
-
-        swTestLoadPhoto.setChecked(TestLoad);
-
-        btSaveSettings = getActivity().findViewById(R.id.saveSettings);
+        btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
 
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
@@ -233,66 +101,17 @@ public class SettingFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        initButtons(false);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        initButtons(false);
-    }
-
-    private void buttonSetOnClickListener(final ButtonClearValue bel) {
-        bel.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Очистка таблицы СГИ");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM " + bel.tableName + "; DELETE FROM sqlite_sequence WHERE name = '" + bel.tableName + "';");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        initButtons(true);
-        int CenTypeRowid = glbVars.db.GetCenTypeRowID(CenTypeID);
-        SetSelectedCenType(CenTypeRowid);
-
-        ButtonClearValue[] buttonClearValue = new ButtonClearValue[]{
-                new ButtonClearValue("sgi", btClearSgi),
-                new ButtonClearValue("GRUPS", btClearGroups),
-                new ButtonClearValue("Nomen", btClearNomen),
-                new ButtonClearValue("CONTRS", btClearContrs),
-                new ButtonClearValue("ADDRS", btClearAddrs),
-                new ButtonClearValue("TORG_PRED", btClearTP),
-                new ButtonClearValue("DEBET", btClearDebet),
-                new ButtonClearValue("ZAKAZY", btClearZakazy),
-                new ButtonClearValue("ZAKAZY_DT", btClearZakazyDt),
-                new ButtonClearValue("ZAKAZY_DT", btClearZakazyDt),
-        };
-
-        for (ButtonClearValue i : buttonClearValue) {
-            buttonSetOnClickListener(i);
-        }
 
         btSaveSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -310,213 +129,22 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        btCompactDb.setOnClickListener(new View.OnClickListener() {
+        btSaveSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Сжатие базы данных");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(true);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("VACUUM");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
+                editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
+                editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
+                editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
 
-        btCheckDb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Проверка целостности базы данных");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(true);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean result;
-                        result = glbVars.db.getWritableDatabase().isDatabaseIntegrityOk();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                                if (result) {
-                                    Toast.makeText(getActivity(), "База данных в полном порядке", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(getActivity(), "База данных не совсем в порядке", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btDeleteDBF.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Удаление DBF файлов");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(true);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        File dir = FileUtils.getFile(glbVars.GetSDCardpath() + glbVars.DBFolder + "/");
-                        File delFile;
-                        for (String file : dir.list(new SuffixFileFilter(".dbf"))) {
-                            delFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + file);
-                            FileUtils.deleteQuietly(delFile);
-                            final File finalDelFile = delFile;
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressDialog.setTitle(finalDelFile.toString());
-                                }
-                            });
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btDeleteCanceledZakaz.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setIndeterminate(false);
-                progressDialog.setTitle("Удаление отмененных/удаленных заказов");
-                progressDialog.setMessage("Пожалуйста подождите...");
-                progressDialog.setCancelable(false);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZY_DT.ZAKAZ_ID IN (SELECT DOCNO FROM ZAKAZY WHERE ZAKAZY.STATUS=5 OR ZAKAZY.STATUS=99);");
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY WHERE STATUS=5 OR STATUS=99;");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-
-        btSetPhotoPath.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                startActivityForResult(intent, LOCATION_PHOTO_PATH);
-            }
-        });
-
-        btSetSDPath.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                startActivityForResult(intent, LOCATION_SDPATH);
-            }
-        });
-
-        swTestLoadPhoto.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingPathEditor.putBoolean("TestingLoad", isChecked);
-                settingPathEditor.commit();
-            }
-        });
-
-        btUnlockTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                settingPathEditor.putBoolean("TP_LOCK", false);
-                settingPathEditor.commit();
-            }
-        });
-
-        btLockTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                settingPathEditor.putBoolean("TP_LOCK", true);
-                settingPathEditor.commit();
-            }
-        });
-
-        btSaveUpdateSrv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editor.putString("UpdateSrv", etUpdateSrv.getText().toString());
-                editor.putString("sqlPort", etSqlPort.getText().toString());
-                editor.putString("sqlLogin", etSqlLogin.getText().toString());
-                editor.putString("sqlPass", etSqlPass.getText().toString());
-                editor.putString("sqlDB", etSqlDB.getText().toString());
-
-                editor.putString("FtpPhotoSrv", etFtpPhoto.getText().toString());
-                editor.putString("FtpPhotoPass", etFtpPhotoPass.getText().toString());
-                editor.putString("FtpPhotoUser", etFtpPhotoUser.getText().toString());
-
-                editor.putString("AppUpdateSrv", etFtpUpdate.getText().toString());
-                editor.putString("AppUpdatePass", etFtpUpdatePass.getText().toString());
-                editor.putString("AppUpdateUser", etFtpUpdateUser.getText().toString());
+                editor.putString("FtpServerHost", etFtpServer.getText().toString());
+                editor.putString("FtpServerPass", etFtpPass.getText().toString());
+                editor.putString("FtpServerUser", etFtpUser.getText().toString());
 
                 editor.commit();
             }
         });
     }
 
-    private void initButtons(Boolean EnableButtons) {
-        btClearSgi.setEnabled(EnableButtons);
-        btClearGroups.setEnabled(EnableButtons);
-        btClearNomen.setEnabled(EnableButtons);
-        btClearContrs.setEnabled(EnableButtons);
-        btClearAddrs.setEnabled(EnableButtons);
-        btClearTP.setEnabled(EnableButtons);
-        btClearDebet.setEnabled(EnableButtons);
-        btCompactDb.setEnabled(EnableButtons);
-        btClearZakazy.setEnabled(EnableButtons);
-        btClearZakazyDt.setEnabled(EnableButtons);
-        btClearAll.setEnabled(EnableButtons);
-        btCheckDb.setEnabled(EnableButtons);
-        btDeleteDBF.setEnabled(EnableButtons);
-        btDeleteCanceledZakaz.setEnabled(EnableButtons);
-        btSetPhotoPath.setEnabled(EnableButtons);
-        btSetSDPath.setEnabled(EnableButtons);
-        btUnlockTP.setEnabled(EnableButtons);
-        btLockTP.setEnabled(EnableButtons);
-        btSaveUpdateSrv.setEnabled(EnableButtons);
-        etSqlDB.setEnabled(EnableButtons);
-        etSqlPass.setEnabled(EnableButtons);
-        etSqlLogin.setEnabled(EnableButtons);
-        etSqlPort.setEnabled(EnableButtons);
-        etUpdateSrv.setEnabled(EnableButtons);
-    }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -527,36 +155,27 @@ public class SettingFragment extends Fragment {
                 settingPathEditor.putString("PhotoPath", resultData.getDataString());
                 settingPathEditor.putString("PhotoPathName", pickedDir.getName());
                 settingPathEditor.commit();
-                tvPhotoPath.setText(resultData.getDataString());
             } else if (requestCode == LOCATION_SDPATH) {
                 settingPathEditor.putString("SDPath", resultData.getDataString());
                 settingPathEditor.putString("SDPathName", pickedDir.getName());
                 settingPathEditor.commit();
-                tvSDPath.setText(resultData.getDataString());
             }
-            initButtons(true);
             isSelectPath = true;
         }
     }
-
-    public void SetSelectedCenType(int ROWID) {
-        for (int i = 0; i < glbVars.spinCenTypes.getCount(); i++) {
-            Cursor value = (Cursor) glbVars.spinCenTypes.getItemAtPosition(i);
-            int id = value.getInt(value.getColumnIndexOrThrow("_id"));
-            if (ROWID == id) {
-                glbVars.spinCenTypes.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    private static class ButtonClearValue {
-        public final String tableName;
-        public final Button button;
-
-        public ButtonClearValue(String tableName, Button button) {
-            this.tableName = tableName;
-            this.button = button;
-        }
-    }
 }
+
+//<map>
+//  <string name="AppUpdatePass">103343</string>
+//  <string name="FtpPhotoUser">amberftp</string>
+//  <string name="sqlLogin">sa</string>
+//  <string name="FtpPhotoPass">201002</string>
+//  <string name="FtpPhotoSrv">91.208.84.67</string>
+//  <string name="UpdateSrv">91.208.84.67</string>
+//  <string name="sqlPass">Yjdfz Ptkfylbz.ru</string>
+//  <string name="sqlDB">IZH_2015</string>
+//  <string name="AppUpdateUser">amberftp</string>
+//  <string name="debet_tp">0</string>
+//  <string name="sqlPort">1439</string>
+//  <string name="AppUpdateSrv">185.201.89.169</string>
+//</map>

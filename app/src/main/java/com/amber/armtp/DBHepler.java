@@ -16,15 +16,11 @@ public class DBHepler extends SQLiteOpenHelper {
     private static final String TB_NOMEN = "Nomen";
     private static final String TB_ORDER = "ORDERS";
     private static final String KEY_ZAKAZ = "ZAKAZ";
-    private static final String KEY_ORD_TP_ID = "TP_ID";
-    private static final String KEY_ORD_CONTR_ID = "CONTR_ID";
-    private static final String KEY_ORD_ADDR_ID = "ADDR_ID";
+    private static final String KEY_ORD_TP_ID = "TP";
+    private static final String KEY_ORD_CONTR_ID = "CONTR";
+    private static final String KEY_ORD_ADDR_ID = "ADDR";
     private static final String KEY_ORD_DATA = "DATA";
     private static final String KEY_ORD_COMMENT = "COMMENT";
-    private static final String KEY_ORD_DELIVTIME = "DELIV_TIME";
-    private static final String KEY_ORD_GETMONEY = "GETMONEY";
-    private static final String KEY_ORD_GETBACKWARD = "GETBACKWARD";
-    private static final String KEY_ORD_BACKWARD_TYPE = "BACKTYPE";
 
     public DBHepler(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -48,6 +44,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите СГИ' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM SGI", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -60,6 +57,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите товарную категорию' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=3", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -72,6 +70,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите функциональную группу' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=4", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -84,6 +83,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS ID, 'Выберите Брэнд' AS DESCR UNION ALL SELECT ROWID AS _id, ID, DESCR FROM UNI_MATRIX WHERE TYPE_ID=5", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -97,6 +97,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -110,6 +111,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -123,6 +125,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -136,6 +139,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -149,6 +153,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -162,6 +167,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -174,6 +180,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите СГИ' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM SGI", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -186,7 +193,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR, 0 AS SGI UNION ALL SELECT ROWID AS _id, CODE, DESCR, SGI FROM GRUPS WHERE SGI='" + KEY_GRUP_SGIID + "'", null);
             return cursor;
         } catch (Exception e) {
-            Log.d("xd", String.valueOf(e));
+            e.printStackTrace();
             return null;
         }
     }
@@ -333,6 +340,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, printf('%.2f', (SELECT CENA FROM PRICES WHERE NOMEN = NOMEN.KOD5)) AS PRICE,  ZAKAZ,  GRUPPA, Nomen.SGI, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPID = GRUPS.CODE WHERE OST>0 AND (Nomen.DESCR LIKE '" + Condition + "' OR Nomen.KOD5 LIKE '" + Condition + "') ORDER BY Nomen.DESCR", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -346,6 +354,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -403,6 +412,7 @@ public class DBHepler extends SQLiteOpenHelper {
             }
             return Ost;
         } catch (Exception e) {
+            e.printStackTrace();
             return Ost;
         } finally {
             if (cursor != null) {
@@ -422,14 +432,11 @@ public class DBHepler extends SQLiteOpenHelper {
             updatedValues.put(KEY_ORD_CONTR_ID, CONTR_ID);
             updatedValues.put(KEY_ORD_ADDR_ID, ADDR_ID);
             updatedValues.put(KEY_ORD_DATA, DelivDate);
-            updatedValues.put(KEY_ORD_DELIVTIME, DelivTime);
-            updatedValues.put(KEY_ORD_GETMONEY, GetMoney);
-            updatedValues.put(KEY_ORD_GETBACKWARD, GetBackward);
-            updatedValues.put(KEY_ORD_BACKWARD_TYPE, BackwardType);
             db.update(TB_ORDER, updatedValues, null, null);
             db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         } finally {
             db.endTransaction();
@@ -445,7 +452,8 @@ public class DBHepler extends SQLiteOpenHelper {
             updatedValues.put(KEY_ZAKAZ, Qty);
             db.update(TB_NOMEN, updatedValues, "KOD5='" + ID + "'", null);
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -465,7 +473,7 @@ public class DBHepler extends SQLiteOpenHelper {
             }
             return x;
         } catch (SQLiteException e) {
-            Log.d("xd", String.valueOf(e));
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -480,7 +488,8 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ+1 WHERE rowid=" + RowID);
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -493,7 +502,8 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1)<=0 THEN 0 ELSE ZAKAZ-1 END WHERE rowid=" + RowID);
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -508,7 +518,8 @@ public class DBHepler extends SQLiteOpenHelper {
             updatedValues.put("QTY", Qty);
             db.update("ZAKAZY_DT", updatedValues, "NOM_ID='" + ID + "' AND ZAKAZ_ID='" + ZakID + "'", null);
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -527,6 +538,7 @@ public class DBHepler extends SQLiteOpenHelper {
                 return false;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         } finally {
             db.endTransaction();
@@ -542,6 +554,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -555,6 +568,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -567,6 +581,7 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберете контрагента' as DESCR UNION ALL SELECT rowid AS _id, CODE, DESCR FROM CONTRS", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -580,6 +595,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -593,6 +609,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -731,7 +748,8 @@ public class DBHepler extends SQLiteOpenHelper {
 
             db.execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID=\"" + data + "\"");
             db.execSQL("DELETE FROM ZAKAZY WHERE ROWID=" + id);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -744,7 +762,8 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("DELETE FROM ORDERS");
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -778,9 +797,9 @@ public class DBHepler extends SQLiteOpenHelper {
             db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
-            return;
         }
     }
 
@@ -792,7 +811,8 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("UPDATE ZAKAZY SET STATUS=" + Status + " WHERE STATUS=" + State + " AND ROWID=" + id);
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }
@@ -845,6 +865,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -859,6 +880,7 @@ public class DBHepler extends SQLiteOpenHelper {
             return cursor;
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -931,6 +953,7 @@ public class DBHepler extends SQLiteOpenHelper {
                     " FROM DEBET JOIN CONTRS ON RTRIM(DEBET.CONTR_ID)=CONTRS.ID WHERE CONTRS.ID='" + ID + "'", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -939,14 +962,15 @@ public class DBHepler extends SQLiteOpenHelper {
         Cursor cursor;
         String Sql = "";
         if (!TP_ID.equals("0") && !Contr_ID.equals("0")) {
-            Sql = " WHERE CONTRS.ID='" + Contr_ID + "' AND (DEBET.TP_ID='" + TP_ID + "' AND DEBET.TP_IDS LIKE '%" + TP_ID + "%')";
+            Sql = " WHERE CONTRS.CODE='" + Contr_ID + "' AND (DEBET.TP='" + TP_ID + "')";
         } else {
+//            return null;
             if (!Contr_ID.equals("0")) {
-                Sql = " WHERE CONTRS.ID='" + Contr_ID + "'";
+                Sql = " WHERE CONTRS.CODE='" + Contr_ID + "'";
             }
 
             if (!TP_ID.equals("0")) {
-                Sql = " WHERE DEBET.TP_ID='" + TP_ID + "' AND DEBET.TP_IDS LIKE '%" + TP_ID + "%'";
+                Sql = " WHERE DEBET.TP='" + TP_ID + "'";
             }
         }
 
@@ -956,10 +980,8 @@ public class DBHepler extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT DISTINCT\n" +
                     "DEBET.ROWID AS _id ,\n" +
                     "CONTRS.DESCR, \n" +
-//                    "CASE WHEN CONTRS.INSTOP=1 THEN 'ЗАПРЕТ' WHEN CONTRS.DOLG=1 THEN 'ДОЛЖНИК'  WHEN CONTRS.DYNAMO THEN 'ДИНАМЩИК' ELSE '' END  AS STATUS,\n" +
-                    "CONTRS.INFO AS STATUS, \n" +
-                    "DEBET.KREDIT|| CASE WHEN NEKONTR =0 THEN '/x' ELSE '/' END || DEBET.LIM AS KREDIT,  \n" +
-                    "printf('%.2f', DEBET.SALDO) AS SALDO,\n" +
+                    "DEBET.KREDIT, \n" +
+                    "printf('%.2f', DEBET.DOLG) AS SALDO,\n" +
                     " printf('%.2f', DEBET.A7) AS A7, \n" +
                     " printf('%.2f', DEBET.A14) AS A14, \n" +
                     " printf('%.2f', DEBET.A21) AS A21, \n" +
@@ -971,38 +993,15 @@ public class DBHepler extends SQLiteOpenHelper {
                     " printf('%.2f', DEBET.A63) AS A63, \n" +
                     " printf('%.2f', DEBET.A64) AS A64, \n" +
 
-                    " printf('%.2f', DEBET.OTG30) AS OTG30, \n" +
+                    " printf('%.2f', DEBET.OTGR30) AS OTG30, \n" +
                     " printf('%.2f', DEBET.OPL30) AS OPL30, \n" +
-                    " printf('%.2f', DEBET.OTG30/DEBET.SALDO) AS KOB, \n" +
-                    " DEBET.FIRMA, \n" +
-                    " CONTRS.CRT_DATE \n" +
-                    " FROM DEBET JOIN CONTRS ON RTRIM(DEBET.CONTR_ID)=CONTRS.ID" + Sql + " ORDER BY CONTRS.DESCR", null);
-            System.out.println("Sql query:" + "SELECT DISTINCT\n" +
-                    "DEBET.ROWID AS _id ,\n" +
-                    "CONTRS.DESCR, \n" +
-//                    "CASE WHEN CONTRS.INSTOP=1 THEN 'ЗАПРЕТ' WHEN CONTRS.DOLG=1 THEN 'ДОЛЖНИК'  WHEN CONTRS.DYNAMO THEN 'ДИНАМЩИК' ELSE '' END  AS STATUS,\n" +
-                    "CONTRS.INFO AS STATUS, \n" +
-                    "DEBET.KREDIT|| CASE WHEN NEKONTR =0 THEN '/x' ELSE '/' END || DEBET.LIM AS KREDIT,  \n" +
-                    "printf('%.2f', DEBET.SALDO) AS SALDO,\n" +
-                    " printf('%.2f', DEBET.A7) AS A7, \n" +
-                    " printf('%.2f', DEBET.A14) AS A14, \n" +
-                    " printf('%.2f', DEBET.A21) AS A21, \n" +
-                    " printf('%.2f', DEBET.A28) AS A28, \n" +
-                    " printf('%.2f', DEBET.A35) AS A35, \n" +
-                    " printf('%.2f', DEBET.A42) AS A42, \n" +
-                    " printf('%.2f', DEBET.A49) AS A49, \n" +
-                    " printf('%.2f', DEBET.A56) AS A56, \n" +
-                    " printf('%.2f', DEBET.A63) AS A63, \n" +
-                    " printf('%.2f', DEBET.A64) AS A64, \n" +
-
-                    " printf('%.2f', DEBET.OTG30) AS OTG30, \n" +
-                    " printf('%.2f', DEBET.OPL30) AS OPL30, \n" +
-                    " printf('%.2f', DEBET.OTG30/DEBET.SALDO) AS KOB, \n" +
-                    "DEBET.FIRMA, \n" +
-                    "CONTRS.CRT_DATE \n" +
-                    " FROM DEBET JOIN CONTRS ON RTRIM(DEBET.CONTR_ID)=CONTRS.ID" + Sql + " ORDER BY CONTRS.DESCR");
+                    " printf('%.2f', DEBET.OTGR30/DEBET.DOLG) AS KOB, \n" +
+                    " DEBET.SCHET AS FIRMA, \n" +
+                    " DEBET.DOGOVOR AS CRT_DATE \n" +
+                    " FROM DEBET JOIN CONTRS" + Sql + " ORDER BY CONTRS.DESCR LIMIT 100", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -1038,6 +1037,7 @@ public class DBHepler extends SQLiteOpenHelper {
                     " FROM DEBET JOIN CONTRS ON RTRIM(DEBET.CONTR_ID)=CONTRS.ID WHERE CONTRS.lowDESCR LIKE '%" + Contr + "%' ORDER BY CONTRS.DESCR", null);
             return cursor;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -1049,7 +1049,8 @@ public class DBHepler extends SQLiteOpenHelper {
         try {
             db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE>0");
             db.setTransactionSuccessful();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             db.endTransaction();
         }

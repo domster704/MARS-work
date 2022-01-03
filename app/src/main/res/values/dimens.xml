@@ -10,9 +10,10 @@
     <dimen name="headOrderFontSize">16sp</dimen>
     <dimen name="mainFontSize">16sp</dimen>
 
-    <dimen name="tvWidthOrderFragment">220dp</dimen>
+    <dimen name="orderFragNecFieldsHeight">60dp</dimen>
+    <dimen name="tvWidthOrderFragment">280dp</dimen>
     <!-- на 5dp должно быть меньше чем tvWidthOrderFragment  -->
-    <dimen name="editTextParentWidth">215dp</dimen>
+    <dimen name="editTextParentWidth">275dp</dimen>
     <!-- padding в SettingFragment   -->
     <dimen name="layoutPadding">10dp</dimen>
 
@@ -24,4 +25,7 @@
 
     <dimen name="pgWidth">600dp</dimen>
     <dimen name="percWidth">50dp</dimen>
+
+    <!-- Settings dimen -->
+    <dimen name="textSizeSettings">14sp</dimen>
 </resources>

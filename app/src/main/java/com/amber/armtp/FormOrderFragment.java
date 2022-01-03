@@ -12,9 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.SearchView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -43,12 +41,13 @@ import java.util.Objects;
  */
 public class FormOrderFragment extends Fragment implements View.OnClickListener {
     public GlobalVars glbVars;
-    Menu mainMenu;
+    public static Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     SearchView searchView;
 
-    static ImageButton filter;
+    public static ImageButton filter;
+    public static boolean isSorted = false;
 
     private boolean isSaved = false;
 
@@ -293,10 +292,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
-//        glbVars.db.calcSales(glbVars.db.GetContrID());
 
         if (glbVars.NomenAdapter != null) {
-//            glbVars.myNom.requery();
             glbVars.NomenAdapter.notifyDataSetChanged();
         }
 
@@ -508,8 +505,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         }).start();
     }
 
-    private boolean isListFromTheEnd = false;
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -630,14 +625,14 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
                 return true;
             case R.id.NomenSort:
-                if (isListFromTheEnd) {
+                if (!isSorted) {
                     item.setIcon(R.drawable.to_top);
                     glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
-                    isListFromTheEnd = false;
+                    isSorted = true;
                 } else {
                     item.setIcon(R.drawable.to_end);
                     glbVars.nomenList.setSelection(0);
-                    isListFromTheEnd = true;
+                    isSorted = false;
                 }
                 return true;
             case R.id.NomenDiscount:
@@ -645,7 +640,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 return true;
             case R.id.NomenMultiSelect:
                 if (!glbVars.isMultiSelect) {
-
                     LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
                     View promptView;
 
@@ -730,6 +724,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onResume() {
         super.onResume();
+
         String SgiID = settings.getString("ColSgiID", "0");
         String GrupID = settings.getString("ColGrupID", "0");
         int VisiblePos = settings.getInt("ColPosition", 0);

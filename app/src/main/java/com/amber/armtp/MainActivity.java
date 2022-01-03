@@ -233,10 +233,6 @@ public class MainActivity extends AppCompatActivity {
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
-                    case R.id.nav_update_app:
-                        DisplayFragment(new UpdateAppFragment(), "frag_update_app");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
                     case R.id.nav_debet:
                         DisplayFragment(new DebetFragment(), "frag_debet");
                         setToolbarTitle(menuItem.getTitle());
@@ -288,13 +284,13 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         setToolbarTitle("Журнал");
 
-        if (!globalVariable.isServiceRunning(CheckSMS.class)) {
-            SMSIntent = new Intent(this, CheckSMS.class);
-            PendingIntent pSMSintent = PendingIntent.getService(this, 0, SMSIntent, 0);
-
-            AlarmManager alarm2 = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
-            alarm2.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), SMS_NOTIFY_INTERVAL, pSMSintent);
-        }
+//        if (!globalVariable.isServiceRunning(CheckSMS.class)) {
+//            SMSIntent = new Intent(this, CheckSMS.class);
+//            PendingIntent pSMSintent = PendingIntent.getService(this, 0, SMSIntent, 0);
+//
+//            AlarmManager alarm2 = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
+//            alarm2.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), SMS_NOTIFY_INTERVAL, pSMSintent);
+//        }
 
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
@@ -361,9 +357,9 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if (globalVariable.isServiceRunning(CheckSMS.class)) {
-            stopService(SMSIntent);
-        }
+//        if (globalVariable.isServiceRunning(CheckSMS.class)) {
+//            stopService(SMSIntent);
+//        }
     }
 
     @Override
