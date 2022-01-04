@@ -98,7 +98,7 @@ public class GlobalVars extends Application {
     public Context frContext;
     public Activity CurAc;
     public Cursor myNom, mySgi, myGrups, Orders, OrdersDt;
-    public Cursor curTovcat, curFunc, curBrand, curWC, curProd, curFSgi, curFGroup, curFocus, curModel, curColors, curUniFilter;
+    public Cursor curWC, curFSgi, curFGroup, curFocus;
 
     public MyCursorAdapter NomenAdapter, PreviewZakazAdapter;
     public JournalAdapter OrdersAdapter;
@@ -106,6 +106,8 @@ public class GlobalVars extends Application {
 
     public View view;
     public DBHepler db;
+    public DBOrdersHelper dbOrders;
+    public DBAppHelper dbApp;
     public GridView nomenList;
     public android.support.v7.widget.Toolbar toolbar;
     public String SelectGroup = null;
@@ -123,9 +125,7 @@ public class GlobalVars extends Application {
     public String frGroup;
 
     public Spinner spSgi, spGrup;
-    public Spinner spTovcat, spFunc, spBrand, spWC, spProd, spFSgi, spFGroup, spFocus, spModel, spColors;
-    public Spinner spUniFilterResult;
-    public EditText txtUniFilter;
+    public Spinner spWC, spFSgi, spFGroup, spFocus;
     public File appDBFolder = new File(GetSDCardpath() + "ARMTP_DB");
     public File appPhotoFolder = new File(GetSDCardpath() + "ARM_PHOTO");
     public File appUpdatesFolder = new File(GetSDCardpath() + "ARM_UPDATES");
@@ -669,68 +669,19 @@ public class GlobalVars extends Application {
         spGrup.setOnItemSelectedListener(SelectedGroup);
     }
 
-    public void LoadFiltersTovcat(View vw) {
-        curTovcat = db.getTovcats();
-        spTovcat = vw.findViewById(R.id.spinTovcat);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.tovcat_layout, curTovcat, new String[]{"ID", "DESCR"}, new int[]{R.id.ColTovcatID, R.id.ColTovcatDescr});
-        spTovcat.setAdapter(adapter);
-    }
-
-    public void LoadFiltersFunc(View vw) {
-        curFunc = db.getFuncs();
-        spFunc = vw.findViewById(R.id.spinFunc);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.func_layout, curFunc, new String[]{"ID", "DESCR"}, new int[]{R.id.ColFuncID, R.id.ColFuncDescr});
-        spFunc.setAdapter(adapter);
-    }
-
-    public void LoadFiltersBrand(View vw) {
-        curBrand = db.getBrands();
-        spBrand = vw.findViewById(R.id.spinBrand);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.brand_layout, curBrand, new String[]{"ID", "DESCR"}, new int[]{R.id.ColBrandID, R.id.ColBrandDescr});
-        spBrand.setAdapter(adapter);
-    }
-
     public void LoadFiltersWC(View vw) {
-        curWC = db.getWCs();
+        curWC = dbApp.getWCs();
         spWC = vw.findViewById(R.id.spinWC);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"ID", "DESCR"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"DEMP", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
         spWC.setAdapter(adapter);
-    }
-
-    public void LoadFiltersProd(View vw) {
-        curProd = db.getProds();
-        spProd = vw.findViewById(R.id.spinProd);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.prod_layout, curProd, new String[]{"ID", "DESCR"}, new int[]{R.id.ColProdID, R.id.ColProdDescr});
-        spProd.setAdapter(adapter);
     }
 
     public void LoadFiltersFocus(View vw) {
         curFocus = db.getFocuses();
         spFocus = vw.findViewById(R.id.spinFocus);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"ID", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr});
         spFocus.setAdapter(adapter);
-    }
-
-    public void LoadFiltersModels(View vw) {
-        curModel = db.getModels();
-        spModel = vw.findViewById(R.id.spinModel);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.model_layout, curModel, new String[]{"ID", "DESCR"}, new int[]{R.id.ColModelID, R.id.ColModelDescr});
-        spModel.setAdapter(adapter);
-    }
-
-    public void LoadFiltersColors(View vw) {
-        curColors = db.getColor();
-        spColors = vw.findViewById(R.id.spinColor);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.colors_layout, curColors, new String[]{"ID", "DESCR"}, new int[]{R.id.ColColorID, R.id.ColColorDescr});
-        spColors.setAdapter(adapter);
     }
 
     public void LoadFiltersSgi(View vw) {
@@ -769,10 +720,12 @@ public class GlobalVars extends Application {
 
     }
 
-    public void LoadNomByFilters(String SgiID, String GrupID, String TovcatID, String FuncID, String BrandID, String WCID, String ProdID, String FocusID, String ModelID, String ColorID) {
-        myNom = db.getNomByFilters(SgiID, GrupID, TovcatID, FuncID, BrandID, WCID, ProdID, FocusID, ModelID, ColorID);
+    public void LoadNomByFilters(String SgiID, String GrupID, String WCID, String FocusID) {
+        Log.d("xd", SgiID + " " + GrupID + " " + WCID + " " + FocusID);
+        myNom = db.getNomByFilters(SgiID, GrupID, WCID, FocusID);
+
         nomenList.setAdapter(null);
-        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "FOTO"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto}, 0);
         nomenList.post(new Runnable() {
             public void run() {
                 nomenList.setAdapter(NomenAdapter);
@@ -782,28 +735,6 @@ public class GlobalVars extends Application {
         nomenList.setOnItemLongClickListener(GridNomenLongClick);
 
     }
-
-//    public void LoadNomByUniFilters(String TypeID, String ID) {
-//        myNom = db.getNomByUniFilters(TypeID, ID);
-//        nomenList.setAdapter(null);
-//        NomenAdapter = new MyCursorAdapter(glbContext, R.layout.nomen_layout, myNom, new String[]{"ID", "COD", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPID", "SGIID", "PHOTO1", "VKOROB", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
-//        nomenList.post(new Runnable() {
-//            public void run() {
-//                nomenList.setAdapter(NomenAdapter);
-//            }
-//        });
-//        nomenList.setOnItemClickListener(GridNomenClick);
-//        nomenList.setOnItemLongClickListener(GridNomenLongClick);
-//    }
-//
-//    public void LoadUniFilters(View vw, String Descr) {
-//        curUniFilter = db.getUniFilters(Descr);
-//        spUniFilterResult = vw.findViewById(R.id.spinFilterResult);
-//        UniFilterAdatper adapter;
-//        adapter = new UniFilterAdatper(glbContext, R.layout.unifilter_layout, curUniFilter, new String[]{"TYPE_ID", "TYPE_DESCR", "ID", "LOWDESCR"}, new int[]{R.id.tvUniTypeID, R.id.tvUniTypeDescr, R.id.tvUniID, R.id.tvUniDescr}, 0);
-//        spUniFilterResult.setAdapter(adapter);
-//
-//    }
 
     public void SearchNom(String SearchStr) {
         nomenList.setAdapter(null);
@@ -876,56 +807,12 @@ public class GlobalVars extends Application {
         }
     }
 
-    public void SetSelectedFilterTovcat(String ID) {
-        for (int i = 0; i < spTovcat.getCount(); i++) {
-            Cursor value = (Cursor) spTovcat.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spTovcat.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    public void SetSelectedFilterFunc(String ID) {
-        for (int i = 0; i < spFunc.getCount(); i++) {
-            Cursor value = (Cursor) spFunc.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spFunc.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    public void SetSelectedFilterBrand(String ID) {
-        for (int i = 0; i < spBrand.getCount(); i++) {
-            Cursor value = (Cursor) spBrand.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spBrand.setSelection(i);
-                break;
-            }
-        }
-    }
-
     public void SetSelectedFilterWC(String ID) {
         for (int i = 0; i < spWC.getCount(); i++) {
             Cursor value = (Cursor) spWC.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("DEMP"));
             if (ID.equals(id)) {
                 spWC.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    public void SetSelectedFilterProd(String ID) {
-        for (int i = 0; i < spProd.getCount(); i++) {
-            Cursor value = (Cursor) spProd.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spProd.setSelection(i);
                 break;
             }
         }
@@ -934,31 +821,9 @@ public class GlobalVars extends Application {
     public void SetSelectedFilterFocus(String ID) {
         for (int i = 0; i < spFocus.getCount(); i++) {
             Cursor value = (Cursor) spFocus.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
+            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (ID.equals(id)) {
                 spFocus.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    public void SetSelectedFilterModel(String ID) {
-        for (int i = 0; i < spModel.getCount(); i++) {
-            Cursor value = (Cursor) spModel.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spModel.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    public void SetSelectedFilterColor(String ID) {
-        for (int i = 0; i < spColors.getCount(); i++) {
-            Cursor value = (Cursor) spColors.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("ID"));
-            if (ID.equals(id)) {
-                spColors.setSelection(i);
                 break;
             }
         }
@@ -1536,7 +1401,7 @@ public class GlobalVars extends Application {
 
     public void LoadOrders() {
         gdOrders.setAdapter(null);
-        Orders = db.getZakazy();
+        Orders = dbOrders.getZakazy();
         if (Orders != null)
             putCheckBox(Orders);
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
@@ -1545,25 +1410,16 @@ public class GlobalVars extends Application {
 
     public void LoadOrdersDetails(String ZakazID) {
         orderdtList.setAdapter(null);
-        OrdersDt = db.getZakazDetails(ZakazID);
-        OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOM_ID", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
+        OrdersDt = dbOrders.getZakazDetails(ZakazID);
+        OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
         orderdtList.setAdapter(OrdersDtAdapter);
         orderdtList.setOnItemClickListener(OrderDtNomenClick);
     }
 
     public String ReadLastUpdate() {
         SharedPreferences settings;
-        SharedPreferences.Editor editor;
         settings = glbContext.getSharedPreferences("update_settings", 0);
         return settings.getString("Last_date", "");
-    }
-
-    public void LoadOrdersForSend() {
-        orderList.setAdapter(null);
-        Orders = db.getZakazyForSend();
-        SendOrdersAdapter adapter;
-        adapter = new SendOrdersAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCNO", "STATUS", "DOC_DATE", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
-        orderList.setAdapter(adapter);
     }
 
     public void SendOrders(int[] chosenOrdersID) throws DBFException {
@@ -1579,10 +1435,9 @@ public class GlobalVars extends Application {
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
-        Log.d("xd", DBF_FileName);
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCID," +
-                " ZAKAZY.DELIVERY_DATE," +
-                " ZAKAZY.DOC_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP = TORG_PRED.CODE JOIN CONTRS ON ZAKAZY.CONTR = CONTRS.CODE JOIN ADDRS ON ZAKAZY.ADDR = ADDRS.CODE JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
+        c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID," +
+                " ZAKAZY.DELIVERY_DATE as DEL_DATE," +
+                " ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return;
@@ -1667,17 +1522,17 @@ public class GlobalVars extends Application {
                 if (Arrays.binarySearch(chosenOrdersID, ID) < 0)
                     continue;
 
-                TP = c.getString(0);
-                CONTR = c.getString(1);
-                ADDR = c.getString(2);
-                DOCNO = c.getString(3);
-                DOCDATE = StrToDbfDate(c.getString(4));
-                DELIVERY = StrToDbfDate(c.getString(5));
+                TP = c.getString(c.getColumnIndex("TP"));
+                CONTR = c.getString(c.getColumnIndex("CONTR"));
+                ADDR = c.getString(c.getColumnIndex("ADDR"));
+                DOCNO = c.getString(c.getColumnIndex("DOCID"));
+                DOCDATE = StrToDbfDate(c.getString(c.getColumnIndex("DOC_DATE")));
+                DELIVERY = StrToDbfDate(c.getString(c.getColumnIndex("DEL_DATE")));
 
-                COMMENT = c.getString(6);
-                CODE = c.getString(7);
-                QTY = c.getDouble(9);
-                PRICE = c.getDouble(10);
+                COMMENT = c.getString(c.getColumnIndex("COMMENT"));
+                CODE = c.getString(c.getColumnIndex("NOMEN"));
+                QTY = c.getDouble(c.getColumnIndex("QTY"));
+                PRICE = c.getDouble(c.getColumnIndex("PRICE"));
 
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
@@ -2576,7 +2431,7 @@ public class GlobalVars extends Application {
             progressDialog.dismiss();
             if (ret_completed) {
                 for (Integer id : result) {
-                    db.SetZakazStatus(1, 0, id);
+                    dbOrders.SetZakazStatus(1, 0, id);
                 }
 
                 Toast.makeText(CurAc, "Заказы успешно сформированы в файл и отправлены", Toast.LENGTH_LONG).show();

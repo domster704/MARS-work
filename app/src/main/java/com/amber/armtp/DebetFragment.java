@@ -115,7 +115,6 @@ public class DebetFragment extends Fragment {
                 glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
                 String DebetContr = glbVars.tvContr.getText().toString();
                 String DebetTp = glbVars.tvTP.getText().toString();
-                Log.d("xd", DebetContr + " " + DebetTp);
                 glbVars.LoadDebet(DebetTp, DebetContr);
             }
         });

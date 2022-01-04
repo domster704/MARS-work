@@ -42,8 +42,7 @@ public class JournalFragment extends Fragment {
 
     private final ArrayList<GlobalVars.CheckBoxData> chosenOrders = new ArrayList<>();
 
-
-    private final int[] itemsList = new int[] {R.id.SendOrders, R.id.DeleteOrders, ID_GOBACK};
+    private int[] itemsList;
 
     Menu mainMenu;
     public GlobalVars glbVars;
@@ -200,7 +199,7 @@ public class JournalFragment extends Fragment {
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
                 int id = GlobalVars.allOrders.get(i).id;
-                glbVars.db.DeleteOrderByID(id);
+                glbVars.dbOrders.DeleteOrderByID(id);
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
             glbVars.LoadOrders();
@@ -240,7 +239,6 @@ public class JournalFragment extends Fragment {
 
                     InputStream inputStream;
                     File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
-                    Log.d("xd1", secondLocalFile.getPath());
 
                     inputStream = new FileInputStream(secondLocalFile);
 
@@ -367,6 +365,11 @@ public class JournalFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.journal_menu, menu);
         mainMenu = menu;
+
+        itemsList = new int[mainMenu.size()];
+        for (int i = 0; i < mainMenu.size(); i++) {
+            itemsList[i] = mainMenu.getItem(i).getItemId();
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -395,7 +398,7 @@ public class JournalFragment extends Fragment {
                     }
 
                     int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
-                    Log.d("xd", (chosenOrders.size() - countOfSentOrders) + " " + chosenOrders.size() + " " + countOfSentOrders);
+
                     int index = 0;
                     for (int i = 0; i < chosenOrders.size(); i++) {
                         if (!chosenOrders.get(i).status.equals("Отправлен")) {
@@ -436,7 +439,7 @@ public class JournalFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 for (GlobalVars.CheckBoxData data : chosenOrders) {
-                                    glbVars.db.DeleteOrderByID(data.id);
+                                    glbVars.dbOrders.DeleteOrderByID(data.id);
                                 }
                                 chosenOrders.clear();
 
@@ -504,7 +507,6 @@ public class JournalFragment extends Fragment {
      * @param id - поле ROWID в таблице ZAKAZY
      */
     private void resendOrder(int id) {
-        Log.d("xd2", id + "");
         String FileName = "";
 
         try {
@@ -513,7 +515,6 @@ public class JournalFragment extends Fragment {
             e.printStackTrace();
         } finally {
             if (!FileName.equals("")) {
-                Log.d("xd2", FileName);
                 SendDBFFile(FileName);
             } else {
                 Toast.makeText(getActivity(), "Неверное имя файла для отправки", Toast.LENGTH_LONG).show();

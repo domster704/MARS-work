@@ -1,15 +1,20 @@
 package com.amber.armtp.ServerWork.Zip;
 
+import android.util.Log;
+
 import com.amber.armtp.ServerDetails;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ZipDownload {
+    public static long dbSize;
+
     private final String host;
     private final int port;
     private final String dir;
@@ -35,10 +40,14 @@ public class ZipDownload {
             client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
 
             if (login) {
+//                client.sendCommand("SIZE", dir);
+//                dbSize = Long.parseLong(client.getReplyString().split(" ")[1]);
+
                 //  Download file from FTP server.
                 File f = new File(filePathInAndroid);
                 FileOutputStream fos = new FileOutputStream(f);
                 client.retrieveFile(dir, fos);
+
                 fos.close();
             }
         } catch (IOException e) {

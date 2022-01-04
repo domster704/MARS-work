@@ -10,19 +10,23 @@
     android:paddingTop="10dp"
     android:paddingRight="10dp"
     android:scrollbars="none"
-    tools:ignore="RtlCompat">
+    tools:ignore="RtlCompat"
+    android:animateLayoutChanges="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="0.7"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/ftpServerLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,120 +40,131 @@
 
             <View style="@style/Divider.Horizontal" />
 
+            <LinearLayout
+                android:id="@+id/ftpServerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvServer"
+                        android:layout_width="160dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end|center_vertical"
+                        android:paddingEnd="8dp"
+                        android:text="@string/resUpdateServer"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:textSize="@dimen/textSizeSettings"
+                        tools:text="Сервер" />
+
+                    <EditText
+                        android:id="@+id/edFtpServer"
+                        android:layout_width="398dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:ems="10"
+                        android:inputType="text"
+                        android:text="91.208.84.67"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/textSizeSettings"
+                        tools:text="91.208.84.67" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvLogin"
+                        android:layout_width="160dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end|center_vertical"
+                        android:paddingEnd="8dp"
+                        android:text="@string/resLogin"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/edFtpUser"
+                        android:layout_width="398dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:ems="10"
+                        android:inputType="textPersonName"
+                        android:textSize="@dimen/textSizeSettings" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/tvPass"
+                        android:layout_width="160dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end|center_vertical"
+                        android:paddingEnd="8dp"
+                        android:text="@string/resPass"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/edFtpPass"
+                        android:layout_width="398dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:ems="10"
+                        android:inputType="text"
+                        android:textSize="@dimen/textSizeSettings"
+                        tools:text="Yjdfz Ptkfylbz.ru" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvPort"
+                        android:layout_width="160dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end|center_vertical"
+                        android:paddingEnd="8dp"
+                        android:text="@string/resPort"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/edFtpPort"
+                        android:layout_width="398dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:ems="10"
+                        android:inputType="text"
+                        android:text="20123"
+                        android:textSize="@dimen/textSizeSettings" />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvServer"
-                android:layout_width="160dp"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="@string/resUpdateServer"
-                android:textAlignment="center"
-                android:textColor="#000"
-                android:textSize="@dimen/textSizeSettings"
-                tools:text="Сервер" />
-
-            <EditText
-                android:id="@+id/edFtpServer"
-                android:layout_width="398dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:ems="10"
-                android:inputType="text"
-                android:text="91.208.84.67"
-                android:textAlignment="center"
-                android:textSize="@dimen/textSizeSettings"
-                tools:text="91.208.84.67" />
-        </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvLogin"
-                android:layout_width="160dp"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="@string/resLogin"
-                android:textAlignment="center"
-                android:textColor="#000"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/edFtpUser"
-                android:layout_width="398dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:textSize="@dimen/textSizeSettings" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvPass"
-                android:layout_width="160dp"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="@string/resPass"
-                android:textAlignment="center"
-                android:textColor="#000"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/edFtpPass"
-                android:layout_width="398dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:ems="10"
-                android:inputType="text"
-                android:textSize="@dimen/textSizeSettings"
-                tools:text="Yjdfz Ptkfylbz.ru" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvPort"
-                android:layout_width="160dp"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:paddingEnd="8dp"
-                android:text="@string/resPort"
-                android:textAlignment="center"
-                android:textColor="#000"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/edFtpPort"
-                android:layout_width="398dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:ems="10"
-                android:inputType="text"
-                android:text="20123"
-                android:textSize="@dimen/textSizeSettings" />
-        </LinearLayout>
-
-
-        <LinearLayout
+            android:id="@+id/fontLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -163,39 +178,46 @@
 
             <View style="@style/Divider.Horizontal" />
 
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/dividerSettings">
-
-            <TextView
-                android:layout_width="160dp"
+            <LinearLayout
+                android:id="@+id/fontLayout"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:text="Шрифт"
-                android:paddingEnd="8dp"
-                android:textAlignment="center"
-                android:textColor="#000"
-                android:textSize="@dimen/textSizeSettings" />
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <EditText
-                android:id="@+id/fontSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:digits="0123456789"
-                android:minWidth="35dp"
-                android:textSize="@dimen/textSizeSettings"
-                android:layout_marginStart="10dp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/dividerSettings">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="sp"
-                android:textColor="#000"
-                android:textSize="@dimen/mainFontSize" />
+                    <TextView
+                        android:layout_width="160dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end|center_vertical"
+                        android:paddingEnd="8dp"
+                        android:text="Шрифт"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:textSize="@dimen/textSizeSettings" />
+
+                    <EditText
+                        android:id="@+id/fontSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:digits="0123456789"
+                        android:minWidth="35dp"
+                        android:textSize="@dimen/textSizeSettings" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sp"
+                        android:textColor="#000"
+                        android:textSize="@dimen/mainFontSize" />
+
+                </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
 

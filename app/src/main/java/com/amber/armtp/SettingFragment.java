@@ -1,11 +1,10 @@
 package com.amber.armtp;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,19 +14,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.Objects;
 
 /**
  * Панель настроек
- *
+ * <p>
  * Updated by domster704 on 27.09.2021
  */
-public class SettingFragment extends Fragment {
+public class SettingFragment extends Fragment implements View.OnClickListener {
 
     public static int nomenDescriptionFontSize = 14;
 
@@ -40,8 +37,7 @@ public class SettingFragment extends Fragment {
     Button btSaveSettings;
     EditText fontSize;
 
-    EditText etFtpPhoto, etFtpPhotoUser, etFtpPhotoPass;
-    EditText etFtpServer, etFtpUser, etFtpPass;
+    EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort;
     Boolean isSelectPath = false;
 
     @Nullable
@@ -86,16 +82,21 @@ public class SettingFragment extends Fragment {
         etFtpServer = getActivity().findViewById(R.id.edFtpServer);
         etFtpPass = getActivity().findViewById(R.id.edFtpPass);
         etFtpUser = getActivity().findViewById(R.id.edFtpUser);
+        etFtpPort = getActivity().findViewById(R.id.edFtpPort);
 
         etFtpServer.setText(serverSettings.getString("FtpServerHost", getResources().getString(R.string.host)));
         etFtpPass.setText(serverSettings.getString("FtpServerPass", getResources().getString(R.string.password)));
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
+        etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", getResources().getInteger(R.integer.port))));
 
         btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
 
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
         fontSize.setText(String.valueOf(nomenDescriptionFontSize));
+
+        getActivity().findViewById(R.id.ftpServerLayoutMain).setOnClickListener(this);
+        getActivity().findViewById(R.id.fontLayoutMain).setOnClickListener(this);
     }
 
     @Override
@@ -135,10 +136,12 @@ public class SettingFragment extends Fragment {
                 editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
                 editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
                 editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
+                editor.putString("FtpPhotoPort", etFtpUser.getText().toString());
 
                 editor.putString("FtpServerHost", etFtpServer.getText().toString());
                 editor.putString("FtpServerPass", etFtpPass.getText().toString());
                 editor.putString("FtpServerUser", etFtpUser.getText().toString());
+                editor.putString("FtpServerPort", etFtpPort.getText().toString());
 
                 editor.commit();
             }
@@ -163,19 +166,25 @@ public class SettingFragment extends Fragment {
             isSelectPath = true;
         }
     }
-}
 
-//<map>
-//  <string name="AppUpdatePass">103343</string>
-//  <string name="FtpPhotoUser">amberftp</string>
-//  <string name="sqlLogin">sa</string>
-//  <string name="FtpPhotoPass">201002</string>
-//  <string name="FtpPhotoSrv">91.208.84.67</string>
-//  <string name="UpdateSrv">91.208.84.67</string>
-//  <string name="sqlPass">Yjdfz Ptkfylbz.ru</string>
-//  <string name="sqlDB">IZH_2015</string>
-//  <string name="AppUpdateUser">amberftp</string>
-//  <string name="debet_tp">0</string>
-//  <string name="sqlPort">1439</string>
-//  <string name="AppUpdateSrv">185.201.89.169</string>
-//</map>
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ftpServerLayoutMain:
+                if (view.findViewById(R.id.ftpServerLayout).getVisibility() == View.GONE) {
+                    view.findViewById(R.id.ftpServerLayout).setVisibility(View.VISIBLE);
+                } else {
+                    view.findViewById(R.id.ftpServerLayout).setVisibility(View.GONE);
+                }
+                break;
+            case R.id.fontLayoutMain:
+                if (view.findViewById(R.id.fontLayout).getVisibility() == View.GONE) {
+                    view.findViewById(R.id.fontLayout).setVisibility(View.VISIBLE);
+                } else {
+                    view.findViewById(R.id.fontLayout).setVisibility(View.GONE);
+                }
+                break;
+        }
+    }
+}

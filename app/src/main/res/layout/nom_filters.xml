@@ -1,241 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="10dp"
-        android:paddingRight="10dp"
-        android:screenOrientation="landscape"
-        android:weightSum="1">
-
-    <Spinner
-            android:id="@+id/spinColor"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvColor"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingTop="15dp"
+    android:paddingEnd="15dp"
+    android:paddingRight="15dp"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
 
     <TextView
-            android:id="@+id/tvColor"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@+id/tvModel"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginStart="2dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterColor"
-            android:textColor="@android:color/black" />
+        android:id="@+id/tvSGI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:text="@string/lblFilterSgi"
+        android:textColor="@android:color/black" />
 
     <TextView
-            android:id="@+id/tvModel"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@+id/tvFocus"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginStart="2dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterModel"
-            android:textColor="@android:color/black" />
-
-    <Spinner
-            android:id="@+id/spinModel"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvModel"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+        android:id="@+id/tvGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_below="@id/tvSGI"
+        android:layout_alignStart="@+id/tvSGI"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:text="@string/lblFilterGroup"
+        android:textColor="@android:color/black" />
 
     <TextView
-            android:id="@+id/tvFocus"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@+id/tvProd"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterFocus"
-            android:textColor="@android:color/black" />
-
-    <Spinner
-            android:id="@+id/spinFocus"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvFocus"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+        android:id="@+id/tvWC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_below="@id/tvGroup"
+        android:layout_alignStart="@+id/tvSGI"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:text="@string/lblFilterWC"
+        android:textColor="@android:color/black" />
 
     <TextView
-            android:id="@+id/tvSGI"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterSgi"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvSGI"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginStart="0dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterGroup"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvTovcat"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvGroup"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterTovcat"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvFunc"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvTovcat"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterFunc"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvBrand"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvFunc"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterBrand"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvWC"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvBrand"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterWC"
-            android:textColor="@android:color/black" />
-
-    <TextView
-            android:id="@+id/tvProd"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/tvWC"
-            android:layout_alignStart="@+id/tvSGI"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="@string/lblFilterProd"
-            android:textColor="@android:color/black" />
+        android:id="@+id/tvFocus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_below="@+id/tvWC"
+        android:layout_alignStart="@+id/tvSGI"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:text="@string/lblFilterFocus"
+        android:textColor="@android:color/black" />
 
     <Spinner
-            android:id="@+id/spinSGI"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvSGI"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:spinnerMode="dropdown"
-            android:textAlignment="center" />
+        android:id="@+id/spinFocus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_alignTop="@+id/tvFocus"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/tvWC"
+        android:textAlignment="center" />
 
     <Spinner
-            android:id="@+id/spinGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvGroup"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+        android:id="@+id/spinSGI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_alignTop="@+id/tvSGI"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/tvWC"
+        android:spinnerMode="dropdown"
+        android:textAlignment="center" />
 
     <Spinner
-            android:id="@+id/spinTovcat"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvTovcat"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+        android:id="@+id/spinGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_alignTop="@+id/tvGroup"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/tvWC"
+        android:textAlignment="center" />
 
     <Spinner
-            android:id="@+id/spinFunc"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvFunc"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
-
-    <Spinner
-            android:id="@+id/spinBrand"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvBrand"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
-
-    <Spinner
-            android:id="@+id/spinWC"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvWC"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
-
-    <Spinner
-            android:id="@+id/spinProd"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignTop="@+id/tvProd"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@+id/tvProd"
-            android:textAlignment="center" />
+        android:id="@+id/spinWC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="35dp"
+        android:layout_alignTop="@+id/tvWC"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/tvWC"
+        android:textAlignment="center" />
 
 </RelativeLayout>

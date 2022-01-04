@@ -1,14 +1,9 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Build;
@@ -138,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.db = new DBHepler(getApplicationContext());
         }
 
+        if (globalVariable.dbOrders == null) {
+            globalVariable.dbOrders = new DBOrdersHelper(getApplicationContext());
+        }
+
+        if (globalVariable.dbApp == null) {
+            globalVariable.dbApp = new DBAppHelper(getApplicationContext());
+        }
+
         File old_db = new File(globalVariable.GetSDCardpath() + "ARMTP_DB" + "/armtp3.db");
         if (old_db.exists()) {
             try {
@@ -149,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // armtp3.db
         try {
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SGI (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
@@ -161,23 +165,35 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS STATUS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VYCHERK (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, NOM TEXT, COL NUMERIC)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOCUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
-
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOM_ID TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOKUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
-        if (globalVariable.SmsDB == null) {
-            globalVariable.SmsDB = openOrCreateDatabase("armtp_msg.db", MODE_MULTI_PROCESS, null);
+        // order.db
+        try {
+            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT)");
+            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
+            } catch (SQLiteException e) {
+            e.printStackTrace();
         }
 
+        // appData.db
         try {
-            globalVariable.SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW_ID INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
-        } catch (SQLiteException ignored) {
+            globalVariable.dbApp.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEMP (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DEMP TEXT)");
+        } catch (SQLiteException e) {
+            e.printStackTrace();
         }
+
+//        if (globalVariable.SmsDB == null) {
+//            globalVariable.SmsDB = openOrCreateDatabase("armtp_msg.db", MODE_MULTI_PROCESS, null);
+//        }
+//
+//        try {
+//            globalVariable.SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW_ID INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
+//        } catch (SQLiteException ignored) {
+//        }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(LAYOUT);
@@ -265,12 +281,10 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
                 super.onDrawerOpened(drawerView);
-//                initVersion();
                 initLastUpdate();
             }
         };
 
-        setPriceOnChosenNomen();
 
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
@@ -284,45 +298,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         setToolbarTitle("Журнал");
 
-//        if (!globalVariable.isServiceRunning(CheckSMS.class)) {
-//            SMSIntent = new Intent(this, CheckSMS.class);
-//            PendingIntent pSMSintent = PendingIntent.getService(this, 0, SMSIntent, 0);
-//
-//            AlarmManager alarm2 = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
-//            alarm2.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), SMS_NOTIFY_INTERVAL, pSMSintent);
-//        }
-
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
 
-    private void setPriceOnChosenNomen() {
-//        Cursor cursor;
-//        try {
-//            SQLiteDatabase db = globalVariable.db.getReadableDatabase();
-//
-//
-//            cursor = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
-//
-//            SQLiteDatabase db1 = globalVariable.db.getWritableDatabase();
-//            Cursor cursorSetPrices;
-//            for (int i = 0; i < cursor.getCount(); i++) {
-//                cursor.moveToNext();
-//                cursorSetPrices = db1.rawQuery("SELECT NOMEN, CENA FROM PRICES WHERE TIPCEN = '" + cursor.getString(1) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "')", null);
-//                Log.d("xd", cursorSetPrices.getCount() + "");
-//
-//
-//                for (int j = 0; j < cursorSetPrices.getCount(); j++) {
-//                    cursorSetPrices.moveToNext();
-//                    float price = Float.parseFloat(cursorSetPrices.getString(1)) * (1 - Float.parseFloat(cursor.getString(0)) / 100);
-//                    db1.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + cursorSetPrices.getString(0) + "'");
-//                }
-//            }
-//
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-    }
 
     private void initNavigationView() {
         drawerLayout = findViewById(R.id.drawer);
@@ -356,10 +334,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-//        if (globalVariable.isServiceRunning(CheckSMS.class)) {
-//            stopService(SMSIntent);
-//        }
     }
 
     @Override
@@ -381,15 +355,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void setToolbarTitle(CharSequence Title) {
         toolbar.setTitle(Title);
-    }
-
-    private void initVersion() {
-        PackageInfo pInfo = null;
-        try {
-            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initLastUpdate() {
@@ -427,6 +392,13 @@ public class MainActivity extends AppCompatActivity {
                 DownloadDB();
             } else if (countOfReturning >= 3) {
                 Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
+            } else {
+                File f = new File(filesPath + "orders.db");
+                if (f.exists()) {
+                    f.delete();
+                }
+
+                globalVariable.dbApp.putDemp(globalVariable.db.getReadableDatabase());
             }
 
             restart();
@@ -434,7 +406,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
-
     }
 
     public void restart() {

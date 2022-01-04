@@ -28,7 +28,6 @@ public class ZipUnpacking {
 
         while (entries.hasMoreElements()) {
             ZipEntry entry = (ZipEntry) entries.nextElement();
-            Log.d("ftp", entry.getName());
 
             if (entry.isDirectory()) {
                 new File(file.getParent(), entry.getName()).mkdirs();
@@ -50,7 +49,6 @@ public class ZipUnpacking {
         }
 
         try {
-            Log.d("xd", fileDir);
             unZip(file);
         } catch (Exception e) {
             e.printStackTrace();

@@ -140,25 +140,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             alertD.show();
             glbVars.LoadFiltersSgi(promptView);
             glbVars.LoadFiltersGroups(promptView);
-//            glbVars.LoadFiltersTovcat(promptView);
-            glbVars.LoadFiltersFunc(promptView);
-            glbVars.LoadFiltersBrand(promptView);
             glbVars.LoadFiltersWC(promptView);
-            glbVars.LoadFiltersProd(promptView);
             glbVars.LoadFiltersFocus(promptView);
-            glbVars.LoadFiltersModels(promptView);
-            glbVars.LoadFiltersColors(promptView);
 
             String SgiFID = settings.getString("ColSgiFID", "0");
             String GrupFID = settings.getString("ColGrupFID", "0");
-//            String TovcatID = settings.getString("ColTovcatID", "0");
-            String FuncID = settings.getString("ColFuncID", "0");
-            String BrandID = settings.getString("ColBrandID", "0");
             String WCID = settings.getString("ColWCID", "0");
-            String ProdID = settings.getString("ColProdID", "0");
             String FocusID = settings.getString("ColFocusID", "0");
-            String ModelID = settings.getString("ColModelID", "0");
-            String ColorID = settings.getString("ColColorID", "0");
 
             if (!SgiFID.equals("0")) {
                 glbVars.SetSelectedFilterSgi(SgiFID);
@@ -168,36 +156,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 glbVars.SetSelectedFilterGroup(GrupFID);
             }
 
-//            if (!TovcatID.equals("0")) {
-//                glbVars.SetSelectedFilterTovcat(TovcatID);
-//            }
-
-            if (!FuncID.equals("0")) {
-                glbVars.SetSelectedFilterFunc(FuncID);
-            }
-
-            if (!BrandID.equals("0")) {
-                glbVars.SetSelectedFilterBrand(BrandID);
-            }
-
             if (!WCID.equals("0")) {
                 glbVars.SetSelectedFilterWC(WCID);
             }
 
-            if (!ProdID.equals("0")) {
-                glbVars.SetSelectedFilterProd(ProdID);
-            }
-
             if (!FocusID.equals("0")) {
                 glbVars.SetSelectedFilterFocus(FocusID);
-            }
-
-            if (!ModelID.equals("0")) {
-                glbVars.SetSelectedFilterModel(ModelID);
-            }
-
-            if (!ColorID.equals("0")) {
-                glbVars.SetSelectedFilterColor(ColorID);
             }
 
             alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
@@ -209,28 +173,16 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
                     FilterSgi_ID = promptView.findViewById(R.id.ColSgiFID);
                     FilterGroup_ID = promptView.findViewById(R.id.ColGroupFID);
-                    FilterTovcat_ID = promptView.findViewById(R.id.ColTovcatID);
-                    FilterFunc_ID = promptView.findViewById(R.id.ColFuncID);
-                    FilterBrand_ID = promptView.findViewById(R.id.ColBrandID);
                     FilterWC_ID = promptView.findViewById(R.id.ColWCID);
-                    FilterProd_ID = promptView.findViewById(R.id.ColProdID);
                     FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
-                    FilterModel_ID = promptView.findViewById(R.id.ColModelID);
-                    FilterColor_ID = promptView.findViewById(R.id.ColColorID);
 
                     editor.putString("ColSgiFID", FilterSgi_ID.getText().toString());
                     editor.putString("ColGrupFID", FilterGroup_ID.getText().toString());
-                    editor.putString("ColTovcatID", FilterTovcat_ID.getText().toString());
-                    editor.putString("ColFuncID", FilterFunc_ID.getText().toString());
-                    editor.putString("ColBrandID", FilterBrand_ID.getText().toString());
                     editor.putString("ColWCID", FilterWC_ID.getText().toString());
-                    editor.putString("ColProdID", FilterProd_ID.getText().toString());
                     editor.putString("ColFocusID", FilterFocus_ID.getText().toString());
-                    editor.putString("ColModelID", FilterModel_ID.getText().toString());
-                    editor.putString("ColColorID", FilterColor_ID.getText().toString());
 
                     editor.commit();
-                    glbVars.LoadNomByFilters(FilterSgi_ID.getText().toString(), FilterGroup_ID.getText().toString(), FilterTovcat_ID.getText().toString(), FilterFunc_ID.getText().toString(), FilterBrand_ID.getText().toString(), FilterWC_ID.getText().toString(), FilterProd_ID.getText().toString(), FilterFocus_ID.getText().toString(), FilterModel_ID.getText().toString(), FilterColor_ID.getText().toString());
+                    glbVars.LoadNomByFilters(FilterSgi_ID.getText().toString(), FilterGroup_ID.getText().toString(), FilterWC_ID.getText().toString(), FilterFocus_ID.getText().toString());
                     alertD.dismiss();
                 }
             });
@@ -240,14 +192,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 public void onClick(View v) {
                     glbVars.SetSelectedFilterSgi("0");
                     glbVars.SetSelectedFilterGroup("0");
-                    glbVars.SetSelectedFilterTovcat("0");
-                    glbVars.SetSelectedFilterFunc("0");
-                    glbVars.SetSelectedFilterBrand("0");
                     glbVars.SetSelectedFilterWC("0");
-                    glbVars.SetSelectedFilterProd("0");
                     glbVars.SetSelectedFilterFocus("0");
-                    glbVars.SetSelectedFilterModel("0");
-                    glbVars.SetSelectedFilterColor("0");
                 }
             });
         }
@@ -317,12 +263,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             @Override
             public void run() {
                 Cursor c, c2, c1;
-                String TP_ID;
-                String Contr_ID;
-                String Addr_ID;
-                String Data;
-                String Comment;
-                String IDDOC;
+                String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC;
+                String ContrDes, AddrDes;
                 int Status = 0;
 
                 String sql;
@@ -331,7 +273,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 String curdate = df.format(Calendar.getInstance().getTime());
 
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP_ID, ORDERS.DATA, ORDERS.COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
                 if (c.getCount() == 0) {
                     getActivity().runOnUiThread(new Runnable() {
@@ -357,21 +299,22 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
 //               TP_ID, ORDERS.DATA, ORDERS.COMMENT, CONTR_ID, ADDR_ID
                 c.moveToFirst();
-                TP_ID = c.getString(0);
-                Data = c.getString(1);
-                Comment = c.getString(2);
-                Contr_ID = c.getString(3);
-                Addr_ID = c.getString(4);
+                TP_ID = c.getString(c.getColumnIndex("TP_ID"));
+                Data = c.getString(c.getColumnIndex("DATA"));
+                Comment = c.getString(c.getColumnIndex("COMMENT"));
+                Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
+                Addr_ID = c.getString(c.getColumnIndex("ADDR_ID"));
+                ContrDes = c.getString(c.getColumnIndex("C_DES"));
+                AddrDes = c.getString(c.getColumnIndex("A_DES"));
                 c.close();
 
                 int Docno = glbVars.db.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
                 IDDOC += "." + TP_ID;
-                Log.d("xd", IDDOC);
 
-                sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS)  VALUES (?,?,?,?,?,?,?,?);";
-                stmt = glbVars.db.getWritableDatabase().compileStatement(sql);
-                glbVars.db.getWritableDatabase().beginTransaction();
+                sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES)  VALUES (?,?,?,?,?,?,?,?,?,?);";
+                stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
+                glbVars.dbOrders.getWritableDatabase().beginTransaction();
                 try {
                     stmt.clearBindings();
                     stmt.bindString(1, IDDOC);
@@ -382,13 +325,15 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     stmt.bindString(6, Data);
                     stmt.bindString(7, Comment);
                     stmt.bindLong(8, Status);
+                    stmt.bindString(9, ContrDes);
+                    stmt.bindString(10, AddrDes);
                     stmt.executeInsert();
                     stmt.clearBindings();
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
+                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.dbOrders.getWritableDatabase().endTransaction();
                 }
 
                 c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
@@ -396,10 +341,21 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     c1.close();
                     return;
                 } else {
-                    glbVars.db.getWritableDatabase().beginTransaction();
-                    glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) SELECT '" + IDDOC + "', KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
+
+                    Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0", null);
+
+                    glbVars.dbOrders.getWritableDatabase().beginTransaction();
+                    for (int i = 0; i < nomenData.getCount(); i++) {
+                        nomenData.moveToNext();
+                        String KOD5  = nomenData.getString(nomenData.getColumnIndex("KOD5"));
+                        String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
+                        String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
+                        String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
+                        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) VALUES('" + IDDOC + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE +"')");
+                    }
+
+                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.dbOrders.getWritableDatabase().endTransaction();
                     glbVars.db.ClearOrderHeader();
                     glbVars.db.ResetNomen();
                 }
