@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -381,11 +380,11 @@ public class JournalFragment extends Fragment {
                 return true;
             case R.id.SendOrders:
                 if (glbVars.isNetworkAvailable()) {
-                    if(isAtLeastOneSelectedOrder())
+                    if (isAtLeastOneSelectedOrder())
                         return true;
 
                     int countOfSentOrders = 0;
-                    for (GlobalVars.CheckBoxData i: chosenOrders) {
+                    for (GlobalVars.CheckBoxData i : chosenOrders) {
                         if (i.status.equals("Отправлен")) {
                             resendOrder(i.id);
                             countOfSentOrders++;
@@ -424,7 +423,7 @@ public class JournalFragment extends Fragment {
                 glbVars.layout.setVisibility(View.VISIBLE);
                 return true;
             case R.id.DeleteOrders:
-                if(isAtLeastOneSelectedOrder())
+                if (isAtLeastOneSelectedOrder())
                     return true;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
@@ -451,7 +450,7 @@ public class JournalFragment extends Fragment {
                         .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                for (GlobalVars.CheckBoxData data: chosenOrders) {
+                                for (GlobalVars.CheckBoxData data : chosenOrders) {
                                     if (data.checkBox.isChecked()) {
                                         data.checkBox.setChecked(false);
                                     }
@@ -489,8 +488,9 @@ public class JournalFragment extends Fragment {
 
     /**
      * Проверяет наличие хотя бы одного выбранного заказа
+     *
      * @return true  - если не выбран
-     *         false - если выбран
+     * false - если выбран
      */
     private boolean isAtLeastOneSelectedOrder() {
         checkCB();
@@ -504,6 +504,7 @@ public class JournalFragment extends Fragment {
 
     /**
      * Повторно отправляет заказ со статутосм "Отправлено" (логично)
+     *
      * @param id - поле ROWID в таблице ZAKAZY
      */
     private void resendOrder(int id) {

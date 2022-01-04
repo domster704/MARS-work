@@ -29,7 +29,7 @@ public class DBAppHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM DEMP");
         for (int i = 0; i < nomen.getCount(); i++) {
             nomen.moveToNext();
-            db.execSQL("INSERT INTO DEMP(DEMP) VALUES('" + nomen.getString(nomen.getColumnIndex("DEMP")) +"')");
+            db.execSQL("INSERT INTO DEMP(DEMP) VALUES('" + nomen.getString(nomen.getColumnIndex("DEMP")) + "')");
         }
     }
 

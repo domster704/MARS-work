@@ -154,7 +154,7 @@ public class DBHepler extends SQLiteOpenHelper {
 
     private void updatePrices(Cursor cursor, String SgiID, String GroupID) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursorSetPrices;
+        Cursor cursorSetPrices = null;
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
             cursorSetPrices = db.rawQuery("SELECT NOMEN, CENA FROM PRICES WHERE TIPCEN = '" + cursor.getString(1) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "')", null);
@@ -165,6 +165,8 @@ public class DBHepler extends SQLiteOpenHelper {
                 db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + cursorSetPrices.getString(0) + "'");
             }
         }
+        if (cursorSetPrices != null)
+            cursorSetPrices.close();
     }
 
     public Cursor getNomByFilters(String SgiID, String GrupID, String WCID, String FocusID) {
@@ -284,7 +286,7 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public Boolean updateOrderHead(String TP_ID, String CONTR_ID, String ADDR_ID, String DelivDate, String Comment, String DelivTime, Integer GetMoney, Integer GetBackward, Long BackwardType) {
+    public Boolean updateOrderHead(String TP_ID, String CONTR_ID, String ADDR_ID, String DelivDate, String Comment) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
@@ -414,20 +416,6 @@ public class DBHepler extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
             cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите торгового представителя' AS DESCR UNION ALL SELECT rowid AS _id, CODE, DESCR FROM TORG_PRED", null);
-            return cursor;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Cursor getCenTypes() {
-        Cursor cursor;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT ROW_ID AS _id, CEN_ID , DESCR FROM CEN_TYPES", null);
             return cursor;
 
         } catch (Exception e) {
@@ -710,7 +698,6 @@ public class DBHepler extends SQLiteOpenHelper {
         if (!TP_ID.equals("0") && !Contr_ID.equals("0")) {
             Sql = " WHERE CONTRS.CODE='" + Contr_ID + "' AND (DEBET.TP='" + TP_ID + "')";
         } else {
-//            return null;
             if (!Contr_ID.equals("0")) {
                 Sql = " WHERE CONTRS.CODE='" + Contr_ID + "'";
             }

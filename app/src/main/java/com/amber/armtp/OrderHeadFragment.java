@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /**
  * Фрагмент "Шапка заказа"
- *
+ * <p>
  * Updated by domster704 on 27.09.2021
  */
 public class OrderHeadFragment extends Fragment {
@@ -137,7 +137,7 @@ public class OrderHeadFragment extends Fragment {
             public void onClick(View v) {
                 String ADDR_ID;
 
-                glbVars.spTp = getActivity().findViewById(R.id.ColTPID);
+                glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
                 glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
                 glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
 
@@ -146,18 +146,13 @@ public class OrderHeadFragment extends Fragment {
                 String CurContr = glbVars.db.GetContrID();
 
                 glbVars.db.resetContrPrices();
-//                glbVars.db.putContrNewPrices(CONTR_ID);
 
                 if (!CurContr.equals(CONTR_ID)) {
                     glbVars.db.resetContrPrices();
                     setContrAndSum();
                 }
 
-                if (glbVars.spAddr != null) {
-                    ADDR_ID = glbVars.spAddr.getText().toString();
-                } else {
-                    ADDR_ID = "0";
-                }
+                ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
 
                 String DeliveryDate = glbVars.txtDate.getText().toString();
                 String Comment = glbVars.txtComment.getText().toString();
@@ -174,7 +169,7 @@ public class OrderHeadFragment extends Fragment {
                     glbVars.db.resetContrPrices();
                     setContrAndSum();
                 } else {
-                    if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment, "", 0, 0, 0L)) {
+                    if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
                         glbVars.db.resetContrPrices();
                         setContrAndSum();
                     } else {

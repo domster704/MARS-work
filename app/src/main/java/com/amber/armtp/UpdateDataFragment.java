@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.ServerWork.DBF.DBFConvertorToSQL;
-import com.amber.armtp.ServerWork.Zip.ZipDownload;
-import com.amber.armtp.ServerWork.Zip.ZipUnpacking;
+import com.amber.armtp.zip.ZipDownload;
+import com.amber.armtp.zip.ZipUnpacking;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

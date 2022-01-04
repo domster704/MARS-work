@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,7 +52,6 @@ public class DebetFragment extends Fragment {
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     String DebTP_ID;
-    private android.support.v7.widget.Toolbar toolbar;
 
     public DebetFragment() {
     }
@@ -83,7 +81,7 @@ public class DebetFragment extends Fragment {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-        toolbar = getActivity().findViewById(R.id.toolbar);
+        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
         glbVars.btFilter = getActivity().findViewById(R.id.btFilterDebet);

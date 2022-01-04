@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,14 +24,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.ServerWork.Zip.ZipDownload;
-import com.amber.armtp.ServerWork.Zip.ZipUnpacking;
+import com.amber.armtp.zip.ZipDownload;
+import com.amber.armtp.zip.ZipUnpacking;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Objects;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -44,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     public static String filesPath;
 
     //Defining Variables
-    private static final long SMS_NOTIFY_INTERVAL = 30 * 60 * 1000; // интервал проверки обновления 5 минут
     private static final int LAYOUT = R.layout.activity_main;
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
@@ -57,10 +54,7 @@ public class MainActivity extends AppCompatActivity {
     ActionBarDrawerToggle actionBarDrawerToggle;
     Fragment fragment = null;
     FragmentTransaction fragmentTransaction;
-    TextView tvAppVer, tvLastUpdate;
-    Calendar cal;
-    Intent SMSIntent;
-    SQLiteDatabase UpdateSchemaDB;
+    TextView tvLastUpdate;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
 
@@ -175,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT)");
             globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
-            } catch (SQLiteException e) {
+        } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
@@ -185,15 +179,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
-
-//        if (globalVariable.SmsDB == null) {
-//            globalVariable.SmsDB = openOrCreateDatabase("armtp_msg.db", MODE_MULTI_PROCESS, null);
-//        }
-//
-//        try {
-//            globalVariable.SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ROW_ID INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
-//        } catch (SQLiteException ignored) {
-//        }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(LAYOUT);
@@ -209,9 +194,6 @@ public class MainActivity extends AppCompatActivity {
         if (!globalVariable.appUpdatesFolder.exists()) {
             globalVariable.appUpdatesFolder.mkdir();
         }
-
-        cal = Calendar.getInstance();
-//        UpdateDbSchema();
 
         // Initializing Toolbar and setting it as the actionbar
         initToolbar();

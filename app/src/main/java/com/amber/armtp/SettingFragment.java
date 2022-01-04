@@ -28,8 +28,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     public static int nomenDescriptionFontSize = 14;
 
-    private final int LOCATION_SDPATH = 1;
-    private final int LOCATION_PHOTO_PATH = 2;
     public GlobalVars glbVars;
     SharedPreferences serverSettings, settings;
     SharedPreferences.Editor editor, settingPathEditor, settingsEditor;
@@ -143,17 +141,19 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 editor.putString("FtpServerUser", etFtpUser.getText().toString());
                 editor.putString("FtpServerPort", etFtpPort.getText().toString());
 
+                ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpUser.getText().toString()));
                 editor.commit();
             }
         });
     }
-
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (resultCode == Activity.RESULT_OK && resultData != null) {
             DocumentFile pickedDir = DocumentFile.fromTreeUri(getActivity(), resultData.getData());
+            int LOCATION_SDPATH = 1;
+            int LOCATION_PHOTO_PATH = 2;
             if (requestCode == LOCATION_PHOTO_PATH) {
                 settingPathEditor.putString("PhotoPath", resultData.getDataString());
                 settingPathEditor.putString("PhotoPathName", pickedDir.getName());

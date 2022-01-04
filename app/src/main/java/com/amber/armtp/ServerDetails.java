@@ -6,9 +6,9 @@ package com.amber.armtp;
 public class ServerDetails {
     private static ServerDetails instance;
 
-    public final String host;
+    public String host;
     public final String dir;
-    public final int port;
+    public int port;
 
     public final String filePathInAndroid;
 
@@ -26,6 +26,14 @@ public class ServerDetails {
 
     public static ServerDetails getInstance(String host, String dir, int port, String filePathInAndroid) {
         if (instance == null) instance = new ServerDetails(host, dir, port, filePathInAndroid);
+        return instance;
+    }
+
+    public static ServerDetails getInstance(String host, int port) {
+        if (instance != null) {
+            instance.host = host;
+            instance.port = port;
+        }
         return instance;
     }
 }

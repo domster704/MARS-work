@@ -49,10 +49,6 @@
             </intent-filter>
         </activity>
 
-        <service
-                android:name=".CheckSMS"
-                tools:ignore="WrongManifestParent" />
-
         <!-- <meta-data android:name="com.google.android.gms.version" /> -->
 
     </application>

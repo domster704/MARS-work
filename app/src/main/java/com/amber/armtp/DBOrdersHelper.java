@@ -89,9 +89,10 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
             db.execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID=\"" + data + "\"");
             db.execSQL("DELETE FROM ZAKAZY WHERE ROWID=" + id);
+
+            cursor.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

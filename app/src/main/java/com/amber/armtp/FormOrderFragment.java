@@ -2,6 +2,7 @@ package com.amber.armtp;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -12,9 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,10 +61,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("CODE"));
                     }
 
-                    final String curSgi = "";
-
-//                    TextView txtSgi = getView().findViewById(R.id.ColSgiID);
-//                    curSgi = txtSgi.getText().toString();
+                    String curSgi;
+                    TextView txtSgi = Objects.requireNonNull(getView()).findViewById(R.id.ColSgiID);
+                    curSgi = txtSgi.getText().toString();
 
                     if (newText.equals("")) {
                         if (!isSearchClicked) {
@@ -106,7 +104,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     MenuItem searchItem;
     View thisView;
     TextView txtSgi, txtGroup, tvHeadCod, tvHeadDescr, tvHeadMP, tvHeadZakaz;
-    TextView FilterSgi_ID, FilterGroup_ID, FilterTovcat_ID, FilterFunc_ID, FilterBrand_ID, FilterWC_ID, FilterProd_ID, FilterFocus_ID, FilterModel_ID, FilterColor_ID;
+    TextView FilterSgi_ID, FilterGroup_ID, FilterWC_ID, FilterFocus_ID;
     private android.support.v7.widget.Toolbar toolbar;
 
     @Override
@@ -148,19 +146,19 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             String WCID = settings.getString("ColWCID", "0");
             String FocusID = settings.getString("ColFocusID", "0");
 
-            if (!SgiFID.equals("0")) {
+            if (SgiFID != null && !SgiFID.equals("0")) {
                 glbVars.SetSelectedFilterSgi(SgiFID);
             }
 
-            if (!GrupFID.equals("0")) {
+            if (GrupFID != null && !GrupFID.equals("0")) {
                 glbVars.SetSelectedFilterGroup(GrupFID);
             }
 
-            if (!WCID.equals("0")) {
+            if (WCID != null && !WCID.equals("0")) {
                 glbVars.SetSelectedFilterWC(WCID);
             }
 
-            if (!FocusID.equals("0")) {
+            if (FocusID != null && !FocusID.equals("0")) {
                 glbVars.SetSelectedFilterFocus(FocusID);
             }
 
@@ -270,13 +268,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 String sql;
                 SQLiteStatement stmt;
 
-                SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 String curdate = df.format(Calendar.getInstance().getTime());
 
                 c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
                 if (c.getCount() == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
@@ -288,7 +286,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 c2.moveToFirst();
 
                 if (c2.getInt(1) == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
@@ -297,7 +295,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     return;
                 }
 
-//               TP_ID, ORDERS.DATA, ORDERS.COMMENT, CONTR_ID, ADDR_ID
                 c.moveToFirst();
                 TP_ID = c.getString(c.getColumnIndex("TP_ID"));
                 Data = c.getString(c.getColumnIndex("DATA"));
@@ -306,7 +303,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 Addr_ID = c.getString(c.getColumnIndex("ADDR_ID"));
                 ContrDes = c.getString(c.getColumnIndex("C_DES"));
                 AddrDes = c.getString(c.getColumnIndex("A_DES"));
+
                 c.close();
+                c2.close();
 
                 int Docno = glbVars.db.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
@@ -347,11 +346,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.dbOrders.getWritableDatabase().beginTransaction();
                     for (int i = 0; i < nomenData.getCount(); i++) {
                         nomenData.moveToNext();
-                        String KOD5  = nomenData.getString(nomenData.getColumnIndex("KOD5"));
+                        String KOD5 = nomenData.getString(nomenData.getColumnIndex("KOD5"));
                         String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
                         String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
                         String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
-                        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) VALUES('" + IDDOC + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE +"')");
+                        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) VALUES('" + IDDOC + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "')");
                     }
 
                     glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
@@ -360,7 +359,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.db.ResetNomen();
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_SHORT).show();
@@ -395,7 +394,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
                 if (c.getCount() == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show();
@@ -407,7 +406,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 c2.moveToFirst();
 
                 if (c2.getInt(1) == 0) {
-                    getActivity().runOnUiThread(new Runnable() {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show();
@@ -415,6 +414,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     });
                     return;
                 }
+
+                c.close();
+                c2.close();
+
                 glbVars.db.getWritableDatabase().beginTransaction();
                 cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ORDERS", null);
                 if (cHead.moveToNext()) {
@@ -435,7 +438,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.OrderID = "";
                 }
 
-                getActivity().runOnUiThread(new Runnable() {
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
@@ -511,7 +514,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         });
 
                 final AlertDialog alertDlg = RangeDlg.create();
-                alertDlg.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                Objects.requireNonNull(alertDlg.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
                 alertDlg.show();
 
@@ -530,13 +533,14 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 edInput.performClick();
                 edInput.setPressed(true);
                 edInput.invalidate();
-                InputMethodManager immPP = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                getActivity();
+                InputMethodManager immPP = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
                 immPP.showSoftInput(edInput, InputMethodManager.SHOW_IMPLICIT);
 
                 alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (edBeginPP.getText().toString() != "" && edEndPP.getText().toString() != "" && edPPQty.getText().toString() != "") {
+                        if (!edBeginPP.getText().toString().equals("") && !edEndPP.getText().toString().equals("") && !edPPQty.getText().toString().equals("")) {
                             glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
                             glbVars.BeginPos = 0;
                             glbVars.EndPos = 0;
@@ -619,7 +623,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                             });
 
                     final AlertDialog alertD = alertDialogBuilder.create();
-                    alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                    Objects.requireNonNull(alertD.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
                     alertD.show();
                     input.requestFocus();
@@ -627,7 +631,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     input.performClick();
                     input.setPressed(true);
                     input.invalidate();
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                    getActivity();
+                    InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
                     alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
@@ -635,7 +640,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         public void onClick(View v) {
                             glbVars.isMultiSelect = true;
                             glbVars.MultiQty = Integer.parseInt(input.getText().toString());
-                            item.setIcon(getActivity().getResources().getDrawable(R.drawable.checkbox_marked));
+                            item.setIcon(Objects.requireNonNull(getActivity()).getResources().getDrawable(R.drawable.checkbox_marked));
                             alertD.dismiss();
                         }
                     });
@@ -664,7 +669,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onPause() {
         super.onPause();
-        txtGroup = getActivity().findViewById(R.id.ColGrupID);
+        txtGroup = Objects.requireNonNull(getActivity()).findViewById(R.id.ColGrupID);
         txtSgi = getActivity().findViewById(R.id.ColSgiID);
 
         glbVars.isMultiSelect = false;
@@ -717,11 +722,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         editor = settings.edit();
 
         glbVars.LoadSgi();
-//        if (glbVars.frSgi != null && !glbVars.frSgi.equals("")) {
-//            glbVars.SetSelectedSgi(glbVars.frSgi, glbVars.frGroup);
-//            glbVars.LoadGroups(glbVars.frSgi);
-//            glbVars.SetSelectedGrup(glbVars.frGroup);
-//        }
 
         filter = getActivity().findViewById(R.id.NomenFilters);
         filter.setOnClickListener(this);

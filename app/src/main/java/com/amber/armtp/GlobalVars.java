@@ -2,7 +2,6 @@ package com.amber.armtp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -70,21 +69,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
-
-import me.leolin.shortcutbadger.ShortcutBadger;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -114,7 +105,6 @@ public class GlobalVars extends Application {
 
     public LinearLayout layout;
 
-    public boolean isSales = false;
     public boolean isDiscount = false;
     public float Discount = 0;
 
@@ -129,7 +119,6 @@ public class GlobalVars extends Application {
     public File appDBFolder = new File(GetSDCardpath() + "ARMTP_DB");
     public File appPhotoFolder = new File(GetSDCardpath() + "ARM_PHOTO");
     public File appUpdatesFolder = new File(GetSDCardpath() + "ARM_UPDATES");
-    public String DBFolder = "ARMTP_DB";
     public String AsyncFileName;
     public SubsamplingScaleImageView imageView;
     public AlertDialog alertPhoto = null;
@@ -166,21 +155,16 @@ public class GlobalVars extends Application {
     public ViewFlipper viewFlipper;
     public String ordStatus;
     public GridView gdOrders;
-    public GridView orderList, orderdtList;
+    public GridView orderdtList;
     public String DBF_FIleForSend;
     public String DBF_FileName;
     public Button btFilter, btClearFilter;
     public GridView debetList;
     public Spinner spContrDeb, spTP;
     public Cursor curDebet, curDebetContr, curDebetTp;
-    public Cursor cur_sms;
     public SQLiteDatabase SmsDB = null;
-    public SMSAdapter SMSadapter;
-    public GridView smsList;
-    //    public GPSTracker gps;
     public int BeginPos = 0, EndPos = 0;
-    public Connection conn = null;
-    //    public SQLiteDatabase geoDB = null;
+
     public AdapterView.OnItemClickListener GridNomenClick = new AdapterView.OnItemClickListener() {
 
         @Override
@@ -193,10 +177,8 @@ public class GlobalVars extends Application {
                 isSecondPhoto = false;
                 String photoDir = getPhotoDir();
                 long ID = myAdapter.getItemIdAtPosition(position);
-                String cod = db.GetCod(ID);
 
-//                String FileName = cod + ".jpg";
-                String FileName = cod;
+                String FileName = db.GetCod(ID);
                 File imgFile = new File(photoDir + "/" + FileName);
                 if (!imgFile.exists() || imgFile.length() == 0) {
                     AsyncFileName = FileName;
@@ -276,11 +258,11 @@ public class GlobalVars extends Application {
                     final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
                     final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
 
-                    input.setText(myNom.getString(6));
-                    txtCod.setText(myNom.getString(2));
-                    txtDescr.setText(myNom.getString(3));
-                    txtOst.setText(myNom.getString(4));
-//                    txtGrup.setText(myNom.getString(17));
+                    input.setText(myNom.getString(myNom.getColumnIndex("ZAKAZ")));
+                    txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
+                    txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
+                    txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
+                    txtGrup.setText(myNom.getString(myNom.getColumnIndex("GRUPPA")));
 
                     alertDialogBuilder
                             .setCancelable(true)
@@ -403,20 +385,12 @@ public class GlobalVars extends Application {
             String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
             if (!ItemID.equals("0")) {
                 SharedPreferences settings = getSharedPreferences("form_order", 0);
-                ;
                 SharedPreferences.Editor editor = settings.edit();
-                ;
 
                 editor.putString("ColSgiFID", "");
                 editor.putString("ColGrupFID", "");
-                editor.putString("ColTovcatID", "");
-                editor.putString("ColFuncID", "");
-                editor.putString("ColBrandID", "");
                 editor.putString("ColWCID", "");
-                editor.putString("ColProdID", "");
                 editor.putString("ColFocusID", "");
-                editor.putString("ColModelID", "");
-                editor.putString("ColColorID", "");
 
                 editor.apply();
 
@@ -441,20 +415,12 @@ public class GlobalVars extends Application {
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
             if (!ItemID.equals("0")) {
                 SharedPreferences settings = getSharedPreferences("form_order", 0);
-                ;
                 SharedPreferences.Editor editor = settings.edit();
-                ;
 
                 editor.putString("ColSgiFID", "");
                 editor.putString("ColGrupFID", "");
-                editor.putString("ColTovcatID", "");
-                editor.putString("ColFuncID", "");
-                editor.putString("ColBrandID", "");
                 editor.putString("ColWCID", "");
-                editor.putString("ColProdID", "");
                 editor.putString("ColFocusID", "");
-                editor.putString("ColModelID", "");
-                editor.putString("ColColorID", "");
 
                 editor.apply();
                 FormOrderFragment.filter.setImageResource(R.drawable.filter);
@@ -568,7 +534,7 @@ public class GlobalVars extends Application {
             });
         }
     };
-    TextView grupID, sgiID, tvCod;
+    TextView grupID, sgiID;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     android.support.v4.app.FragmentManager fragManager;
@@ -615,13 +581,10 @@ public class GlobalVars extends Application {
         Year = Date.substring(6, 10);
         Mon = Date.substring(3, 5);
         Day = Date.substring(0, 2);
-//        String[] data = Date.split("\\.");
-//        Year = data[2];
-//        Mon = data[1];
-//        Day = data[0];
+
         String date = Year + Mon + Day;
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
             return_date = formatter.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -661,7 +624,6 @@ public class GlobalVars extends Application {
 
     public void LoadGroups(String SgiID) {
         myGrups = db.getGrupBySgi(SgiID);
-//        Log.d("xd", String.valueOf(myGrups.getString(2)));
         spGrup = view.findViewById(R.id.SpinGrups);
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr});
@@ -860,17 +822,7 @@ public class GlobalVars extends Application {
 
     }
 
-    public String GetStoragePath2019() {
-
-        String sdpath;
-        sdpath = Objects.requireNonNull(getExternalFilesDir(null)) + "/";
-
-        return sdpath;
-
-    }
-
     public boolean isNetworkAvailable() {
-
         ConnectivityManager connectivityManager = (ConnectivityManager) glbContext.getSystemService(CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
@@ -1080,23 +1032,10 @@ public class GlobalVars extends Application {
         nomenList.setOnItemLongClickListener(PreviewNomenLongClick);
     }
 
-    public void WriteLastUpdate() {
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        String curdate = df.format(Calendar.getInstance().getTime());
-
-        SharedPreferences settings;
-        SharedPreferences.Editor editor;
-        settings = CurAc.getSharedPreferences("update_settings", 0);
-        editor = settings.edit();
-        editor.putString("Last_date", curdate);
-        editor.commit();
-    }
-
     public Boolean CheckTPLock() {
         SharedPreferences settings;
         settings = PreferenceManager.getDefaultSharedPreferences(frContext);
-        Boolean TP_LOCK = settings.getBoolean("TP_LOCK", false);
-        return TP_LOCK;
+        return settings.getBoolean("TP_LOCK", false);
     }
 
     public void LoadTpList() {
@@ -1107,8 +1046,7 @@ public class GlobalVars extends Application {
 
         TPList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-                String ItemID = TP.getString(TP.getColumnIndex("CODE"));
-                CurrentTp = ItemID;
+                CurrentTp = TP.getString(TP.getColumnIndex("CODE"));
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -1117,29 +1055,6 @@ public class GlobalVars extends Application {
         if (CheckTPLock()) {
             TPList.setEnabled(false);
         }
-    }
-
-    public void LoadCenTypes() {
-        CenTypes = db.getCenTypes();
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.centype_layout, CenTypes, new String[]{"_id", "CEN_ID", "DESCR"}, new int[]{R.id.ColCen_ROWID, R.id.ColCenID, R.id.ColCenDescr});
-        spinCenTypes.setAdapter(adapter);
-
-        spinCenTypes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-                String ItemID = CenTypes.getString(CenTypes.getColumnIndex("CEN_ID"));
-                SharedPreferences settings;
-                SharedPreferences.Editor editor;
-                settings = CurAc.getSharedPreferences("apk_version", 0);
-                editor = settings.edit();
-                editor.putString("usr_centype", ItemID);
-                editor.commit();
-                CurrentCenType = ItemID;
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
     }
 
     public void LoadContrList() {
@@ -1191,22 +1106,20 @@ public class GlobalVars extends Application {
     }
 
     public String FormDBFForZakaz(int ID) throws DBFException {
-//        String DBF_FIleForSend;
-//        String DBF_FileName;
         Cursor c;
 
         String TP, CONTR, ADDR, DOCNO, COMMENT, NOMEN;
         java.util.Date DELIVERY, DOCDATE;
-        Double QTY, PRICE;
+        double QTY, PRICE;
 
-        DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
         String curdate = df.format(Calendar.getInstance().getTime());
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
 
-        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ZAKAZY.DOCID, ZAKAZY.DOC_DATE, ZAKAZY.DELIVERY_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP = TORG_PRED.CODE JOIN CONTRS ON ZAKAZY.CONTR = CONTRS.CODE JOIN ADDRS ON ZAKAZY.ADDR = ADDRS.CODE JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
+        c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP, CONTRS.CODE as CONTR, ADDRS.CODE as ADDR, ZAKAZY.DOCID as DOCID, ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.DELIVERY_DATE as DEL_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE FROM ZAKAZY JOIN TORG_PRED ON ZAKAZY.TP = TORG_PRED.CODE JOIN CONTRS ON ZAKAZY.CONTR = CONTRS.CODE JOIN ADDRS ON ZAKAZY.ADDR = ADDRS.CODE JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return "";
@@ -1283,68 +1196,22 @@ public class GlobalVars extends Application {
         fields[index].setDecimalCount(2);
         Table.setFields(fields);
 
-//        fields[0] = new DBFField();
-//        fields[0].setName("TP");
-//        fields[0].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[0].setFieldLength(13);
-//
-//        fields[1] = new DBFField();
-//        fields[1].setName("CONTR");
-//        fields[1].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[1].setFieldLength(13);
-//
-//        fields[2] = new DBFField();
-//        fields[2].setName("ADDR");
-//        fields[2].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[2].setFieldLength(13);
-//
-//        fields[3] = new DBFField();
-//        fields[3].setName("DOCID");
-//        fields[3].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[3].setFieldLength(13);
-//
-//        fields[4] = new DBFField();
-//        fields[4].setName("DOCDATE");
-//        fields[4].setDataType(DBFField.FIELD_TYPE_D);
-//
-//        fields[5] = new DBFField();
-//        fields[5].setName("COMMENT");
-//        fields[5].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[5].setFieldLength(255);
-//
-//        fields[6] = new DBFField();
-//        fields[6].setName("NOMEN");
-//        fields[6].setDataType(DBFField.FIELD_TYPE_C);
-//        fields[6].setFieldLength(13);
-//
-//        fields[7] = new DBFField();
-//        fields[7].setName("QTY");
-//        fields[7].setDataType(DBFField.FIELD_TYPE_N);
-//        fields[7].setFieldLength(13);
-//        fields[7].setDecimalCount(0);
-//
-//        fields[8] = new DBFField();
-//        fields[8].setName("PRICE");
-//        fields[8].setDataType(DBFField.FIELD_TYPE_N);
-//        fields[8].setFieldLength(16);
-//        fields[8].setDecimalCount(2);
-//        Table.setFields(fields);
 
         try {
             while (c.moveToNext()) {
 //                TP, CONTR, ADDR, ZAKAZY.DOCID, ZAKAZY.DOC_DATE, ZAKAZY.COMMENT, ZAKAZY_DT.NOMEN, ZAKAZY_DT.DESCR, ZAKAZY_DT.QTY, ZAKAZY_DT.PRICE
-                TP = c.getString(0);
-                CONTR = c.getString(1);
-                ADDR = c.getString(2);
-                DOCNO = c.getString(3);
-                DOCDATE = StrToDbfDate(c.getString(4));
-                DELIVERY = StrToDbfDate(c.getString(5));
+                TP = c.getString(c.getColumnIndex("TP"));
+                CONTR = c.getString(c.getColumnIndex("CONTR"));
+                ADDR = c.getString(c.getColumnIndex("ADDR"));
+                DOCNO = c.getString(c.getColumnIndex("DOCID"));
+                DOCDATE = StrToDbfDate(c.getString(c.getColumnIndex("DOC_DATE")));
+                DELIVERY = StrToDbfDate(c.getString(c.getColumnIndex("DEL_DATE")));
+                COMMENT = c.getString(c.getColumnIndex("COMMENT"));
+                NOMEN = c.getString(c.getColumnIndex("NOMEN"));
+                QTY = c.getDouble(c.getColumnIndex("QTY"));
+                PRICE = c.getDouble(c.getColumnIndex("PRICE"));
 
-                COMMENT = c.getString(6);
-                NOMEN = c.getString(7);
-                QTY = c.getDouble(9);
-                PRICE = c.getDouble(10);
-
+                c.close();
 
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
@@ -1425,11 +1292,11 @@ public class GlobalVars extends Application {
     public void SendOrders(int[] chosenOrdersID) throws DBFException {
         OrderID = "";
         Cursor c;
-        String TP, CONTR, ADDR, DOCNO, COMMENT, CODE, TIME;
+        String TP, CONTR, ADDR, DOCNO, COMMENT, CODE;
         java.util.Date DELIVERY, DOCDATE;
         double QTY, PRICE;
         int ID;
-        DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
         String curdate = df.format(Calendar.getInstance().getTime());
 
@@ -1528,12 +1395,12 @@ public class GlobalVars extends Application {
                 DOCNO = c.getString(c.getColumnIndex("DOCID"));
                 DOCDATE = StrToDbfDate(c.getString(c.getColumnIndex("DOC_DATE")));
                 DELIVERY = StrToDbfDate(c.getString(c.getColumnIndex("DEL_DATE")));
-
                 COMMENT = c.getString(c.getColumnIndex("COMMENT"));
                 CODE = c.getString(c.getColumnIndex("NOMEN"));
                 QTY = c.getDouble(c.getColumnIndex("QTY"));
                 PRICE = c.getDouble(c.getColumnIndex("PRICE"));
 
+                c.close();
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
@@ -1640,13 +1507,10 @@ public class GlobalVars extends Application {
         settings = CurAc.getSharedPreferences("apk_version", 0);
         editor = settings.edit();
 
-        FTPClient ftpClient = null;
+        FTPClient ftpClient;
         ftpClient = new FTPClient();
-//        String FileName = GetSDCardpath()+UpdatesFolder+"/ver.txt";
         String FileName = CurAc.getFilesDir() + "/ver.txt";
 
-        File appFile = new File(FileName);
-        String response = "";
         String version = "", versionName = "";
 
         try {
@@ -1663,7 +1527,7 @@ public class GlobalVars extends Application {
             versionName = result[1];
 
             editor.putInt("NewVersion", Integer.parseInt(result[0]));
-            editor.commit();
+            editor.apply();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -1684,7 +1548,6 @@ public class GlobalVars extends Application {
 
         FTPClient ftpClient;
         ftpClient = new FTPClient();
-        String FileName = CurAc.getFilesDir() + "/ver.txt";
         String version = "", versionName = "";
 
         try {
@@ -1779,37 +1642,14 @@ public class GlobalVars extends Application {
         }
     }
 
-    public void LoadSms(String Bdate, String Edate) {
-        smsList.setAdapter(null);
-        cur_sms = SmsDB.rawQuery("SELECT ROW_ID AS _id, MSG_HEAD, MESSAGE, MSG_DATE, MSG_TIME, IS_NEW FROM MSGS" +
-                        " WHERE\n" +
-                        " IS_NEW = 1 OR \n" +
-                        "  DATE(substr(MSGS.MSG_DATE, 7, 4) || '-' || substr(MSGS.MSG_DATE, 4, 2) || '-' || substr(MSGS.MSG_DATE, 1, 2))\n" +
-                        "  BETWEEN DATE(substr('" + Bdate + "', 7, 4) || '-' || substr('" + Bdate + "', 4, 2) || '-' || substr('" + Bdate + "', 1, 2)) AND DATE(substr('" + Edate + "', 7, 4) || '-' || substr('" + Edate + "', 4, 2) || '-' || substr('" + Edate + "', 1, 2)) ORDER BY ROW_ID"
-                , null);
-        if (cur_sms.moveToNext()) {
-            SMSadapter = new SMSAdapter(CurAc, R.layout.sms_item, cur_sms, new String[]{"_id", "MSG_DATE", "MSG_TIME", "MSG_HEAD", "MESSAGE"}, new int[]{R.id.ColSMSID, R.id.ColSMSDate, R.id.ColSMSTime, R.id.ColSMSHead, R.id.ColSMSMessage}, 0);
-            smsList.setAdapter(SMSadapter);
-        }
-    }
-
     public Integer getSMSCount() {
         String count = "";
         Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT(ROW_ID) IS NULL THEN '0' ELSE COUNT(ROW_ID) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
         if (cur_sms.moveToNext()) {
             count = cur_sms.getString(cur_sms.getColumnIndex("CNT"));
         }
+        cur_sms.close();
         return count.equals("") ? 0 : Integer.parseInt(count);
-    }
-
-    public boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void UpdateNomenRange(int BeginRange, int EndRange, int Qty) {
@@ -1837,144 +1677,6 @@ public class GlobalVars extends Application {
         String ToolBarContr = db.GetToolbarContr();
         String OrderSum = db.getOrderSum();
         toolbar.setSubtitle(ToolBarContr + OrderSum);
-    }
-
-    public Integer getLastSmsId() {
-        Integer lastId = 0;
-        Cursor cursor = SmsDB.rawQuery("SELECT CASE WHEN MAX([ROW]) IS NULL THEN 0 ELSE MAX([ROW]) END AS [ROW] FROM MSGS", null);
-        if (cursor.moveToNext()) {
-            lastId = cursor.getInt(cursor.getColumnIndex("ROW"));
-        }
-        return lastId;
-    }
-
-    public void getNewSMS() {
-        int Rowid;
-        int msgRow;
-        String TP_ID, TP_IDS, MSG_HEAD, MSG, MSG_DATE, MSG_TIME;
-        Statement stmt;
-        ResultSet reset = null;
-
-        if (isNetworkAvailable()) {
-
-            if (SmsDB == null) {
-                SmsDB = openOrCreateDatabase(GetStoragePath2019() + DBFolder + "/armtp_msg.db", MODE_WORLD_WRITEABLE, null);
-            }
-
-            SmsDB.execSQL("CREATE TABLE IF NOT EXISTS MSGS (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [ROW] INTEGER, TP_ID TEXT, TP_IDS TEXT, MSG_HEAD TEXT, MESSAGE TEXT,MSG_DATE TEXT, MSG_TIME TEXT, IS_NEW INTEGER DEFAULT 1)");
-
-            Rowid = getLastSmsId();
-
-            if (conn == null) {
-                ConnectToSql();
-            }
-
-            String sql_insert = "INSERT INTO MSGS([ROW],TP_ID,TP_IDS,MSG_HEAD,MESSAGE,MSG_DATE,MSG_TIME) VALUES(?,?,?,?,?,?,?);";
-            SQLiteStatement statement = SmsDB.compileStatement(sql_insert);
-
-            SmsDB.beginTransactionNonExclusive();
-
-            try {
-
-                stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                reset = stmt.executeQuery("SELECT [ROWID],[TP_ID],[TP_IDS],[MSG_HEAD],[MESSAGE],[MSG_DATE],[MSG_TIME] FROM [ARM_MESSAGES] WHERE ROWID>" + Rowid);
-                while (reset.next()) {
-                    msgRow = reset.getInt(1);
-                    TP_ID = reset.getString(2);
-                    TP_IDS = reset.getString(3);
-                    MSG_HEAD = reset.getString(4);
-                    MSG = reset.getString(5);
-                    MSG_DATE = reset.getString(6);
-                    MSG_TIME = reset.getString(7);
-                    statement.clearBindings();
-                    statement.bindLong(1, msgRow);
-                    statement.bindString(2, TP_ID);
-                    statement.bindString(3, TP_IDS);
-                    statement.bindString(4, MSG_HEAD);
-                    statement.bindString(5, MSG);
-                    statement.bindString(6, MSG_DATE);
-                    statement.bindString(7, MSG_TIME);
-                    statement.executeInsert();
-                    statement.clearBindings();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                SmsDB.setTransactionSuccessful();
-                SmsDB.endTransaction();
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            String currentDate = sdf.format(new Date());
-            LoadSms(currentDate, currentDate);
-
-            if (SMSadapter != null) {
-                SMSadapter.notifyDataSetChanged();
-                cur_sms.requery();
-            }
-
-            String count = "";
-            Cursor cur_sms = SmsDB.rawQuery("SELECT CASE WHEN COUNT([ROW]) IS NULL THEN '0' ELSE COUNT([ROW]) END  AS CNT FROM MSGS WHERE IS_NEW=1", null);
-            if (cur_sms.moveToNext()) {
-                count = cur_sms.getString(cur_sms.getColumnIndex("CNT"));
-                cur_sms.close();
-            }
-
-            // Отключено 18-08-2016 для проверки работы на Android SDK 24/6
-            ShortcutBadger.applyCount(getApplicationContext(), count.equals("") ? 0 : Integer.parseInt(count));
-            try {
-                if (reset != null) {
-                    reset.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-                conn = null;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void ConnectToSql() {
-        String connString;
-        String sql_server;
-        String sql_port;
-        String sql_db;
-        String sql_loging;
-        String sql_pass;
-
-        sql_server = glbContext.getResources().getString(R.string.sql_server);
-        sql_port = glbContext.getResources().getString(R.string.sql_port);
-        sql_db = glbContext.getResources().getString(R.string.sql_db);
-        sql_loging = glbContext.getResources().getString(R.string.sql_user);
-        sql_pass = glbContext.getResources().getString(R.string.sql_pass);
-
-        try {
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-
-            connString = "jdb" + "c:jtds:sqlserver://" + sql_server + ":" + sql_port + ";instance=MSSQLSERVER;databaseName=" + sql_db + ";user=" + sql_loging + ";password=" + sql_pass;
-            conn = DriverManager.getConnection(connString, sql_loging, sql_pass);
-            if (conn != null) {
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setSaleIcon(Menu menu, int MenuItem, Boolean vis) {
-        Drawable drawable = menu.getItem(MenuItem).getIcon();
-        drawable.mutate();
-        if (vis) {
-            drawable.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-        } else {
-            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        }
-        isSales = vis;
     }
 
     public void setDiscountIcon(Menu menu, int MenuItem, Boolean vis) {
@@ -2069,8 +1771,6 @@ public class GlobalVars extends Application {
     public void checkPhotoInDB(String FileName) {
         Cursor cur;
         String isDownloaded = FilenameUtils.removeExtension(FileName);
-//        Log.d("xd", isDownloaded);
-//        String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
         String tmpName = isDownloaded;
         String Sql;
 
@@ -2142,8 +1842,7 @@ public class GlobalVars extends Application {
             Cursor cursor = getCursor();
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
 
-//            String contrInfo = cursor.getString(6);
-            String resDescr = cursor.getString(2);
+            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR"));
 
             if (position % 2 == 0) {
                 tvDescr.setBackgroundColor(Color.rgb(201, 235, 255));
@@ -2151,24 +1850,7 @@ public class GlobalVars extends Application {
                 tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
             }
 
-//            if (!contrInfo.equals("")) {
-//                resDescr += " (" + contrInfo + ")";
-//            }
-
             tvDescr.setText(resDescr);
-            return view;
-        }
-    }
-
-    public class UniFilterAdatper extends SimpleCursorAdapter {
-        public UniFilterAdatper(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-
-            View view = super.getView(position, convertView, parent);
             return view;
         }
     }
@@ -2218,8 +1900,6 @@ public class GlobalVars extends Application {
             });
 
             tvPrice.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex("PRICE"))));
-
-//            ID, CODE, DESCR, OST, PRICE, GRUPPA, ZAKAZ, FOTO, PD, SGIID
             if (cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
                 if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
                     resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
@@ -2259,7 +1939,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class JournalAdapter extends SimpleCursorAdapter {
+    public static class JournalAdapter extends SimpleCursorAdapter {
         Cursor cursor;
 
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -2284,19 +1964,17 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class JournalDetailsAdapter extends SimpleCursorAdapter {
+    public static class JournalDetailsAdapter extends SimpleCursorAdapter {
         public JournalDetailsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
-            int resID;
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
-//            TextView tvCod = view.findViewById(R.id.ColOrdDtCod);
-//            tvCod.setText(cursor.getString());
 
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
@@ -2305,14 +1983,14 @@ public class GlobalVars extends Application {
             }
 
             if (cursor.getInt(8) == 1) {
-                tvQty.setText(cursor.getInt(5) + "(-" + cursor.getInt(9) + ")");
+                tvQty.setText(cursor.getInt(cursor.getColumnIndex("QTY")) + "(-" + cursor.getInt(9) + ")");
             }
 
             return view;
         }
     }
 
-    public class ContrsAdapter extends SimpleCursorAdapter {
+    public static class ContrsAdapter extends SimpleCursorAdapter {
         public ContrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
@@ -2335,28 +2013,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class SendOrdersAdapter extends SimpleCursorAdapter {
-        Cursor cursor;
-
-        public SendOrdersAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-            cursor = c;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View view = super.getView(position, convertView, parent);
-
-            if (position % 2 == 0) {
-                view.setBackgroundColor(Color.rgb(201, 235, 255));
-            } else {
-                view.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-            return view;
-        }
-    }
-
+    @SuppressLint("StaticFieldLeak")
     public class UploadDBFFile extends AsyncTask<Integer[], Integer, Integer[]> {
         boolean ret_completed;
         ProgressDialog progressDialog;
@@ -2441,7 +2098,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public class DebetAdapter extends SimpleCursorAdapter {
+    public static class DebetAdapter extends SimpleCursorAdapter {
 
         public DebetAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -2541,32 +2198,6 @@ public class GlobalVars extends Application {
                 tvDolg.setTextColor(Color.rgb(0, 0, 0));
             }
 
-            return view;
-        }
-    }
-
-    public class SMSAdapter extends SimpleCursorAdapter {
-        public SMSAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            if (position % 2 == 0) {
-                view.setBackgroundColor(Color.rgb(201, 235, 255));
-            } else {
-                view.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-
-            Cursor cursor = getCursor();
-
-            Button btMarkAsRead = view.findViewById(R.id.btMarkAsRead);
-            if (cursor.getInt(5) == 0) {
-                btMarkAsRead.setVisibility(View.INVISIBLE);
-            } else {
-                btMarkAsRead.setVisibility(View.VISIBLE);
-            }
             return view;
         }
     }
