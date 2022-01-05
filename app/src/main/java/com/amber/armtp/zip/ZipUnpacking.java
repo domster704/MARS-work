@@ -3,6 +3,7 @@ package com.amber.armtp.zip;
 
 import android.util.Log;
 
+import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 
 import java.io.BufferedOutputStream;
@@ -50,6 +51,7 @@ public class ZipUnpacking {
 
         try {
             unZip(file);
+            file.delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
