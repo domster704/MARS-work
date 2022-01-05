@@ -585,25 +585,6 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public int GetDocNumber() {
-        Cursor c = null;
-        int DocNo = 0;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            c = db.rawQuery("SELECT CASE WHEN MAX(ROWID)+1 IS NULL THEN 1 ELSE MAX(ROWID)+1 END AS [DOCNO] FROM ZAKAZY;", null);
-            if (c.moveToFirst()) {
-                DocNo = c.getInt(0);
-            }
-            return DocNo;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
     public void ResetNomen() {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data

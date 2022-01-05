@@ -307,7 +307,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 c.close();
                 c2.close();
 
-                int Docno = glbVars.db.GetDocNumber();
+                int Docno = glbVars.dbOrders.GetDocNumber();
                 IDDOC = Integer.toString(Docno, 36).toUpperCase();
                 IDDOC += "." + TP_ID;
 
