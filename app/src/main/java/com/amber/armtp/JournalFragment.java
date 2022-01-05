@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -283,13 +284,23 @@ public class JournalFragment extends Fragment {
             public void run() {
                 Cursor cNom, cHead;
                 glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATA, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
+                cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
                 if (cHead.moveToNext()) {
                     try {
                         if (glbVars.db.getCount() == 0) {
-                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES ('" + cHead.getString(0) + "', '" + cHead.getString(1) + "', '" + cHead.getString(2) + "', '" + cHead.getString(3) + "', '" + cHead.getString(4) + ")");
+                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES (" +
+                                    "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+                                    "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+                                    "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+                                    "'" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
+                                    "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + ")");
                         } else {
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET TP = '" + cHead.getString(0) + "', CONTR = '" + cHead.getString(1) + "',ADDR = '" + cHead.getString(2) + "', DOC_DATA = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4));
+                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
+                                    "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+                                    "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+                                    "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+                                    "DOC_DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
+                                    "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -298,11 +309,11 @@ public class JournalFragment extends Fragment {
                     cHead.close();
                 }
 
-                glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cNom = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                glbVars.db.ResetNomen();
+                cNom = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT PRICE, QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cNom.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(0) + " WHERE KOD5='" + cNom.getString(1) + "'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cNom.getString(cNom.getColumnIndex("PRICE")) + "', ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -317,6 +328,11 @@ public class JournalFragment extends Fragment {
                         progress.dismiss();
                     }
                 });
+
+                Fragment fragment = new OrderHeadFragment();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                fragmentTransaction.commit();
             }
         }).start();
     }
@@ -336,11 +352,11 @@ public class JournalFragment extends Fragment {
             public void run() {
                 Cursor cursor;
                 glbVars.db.getWritableDatabase().beginTransaction();
-                glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
-                cursor = glbVars.db.getWritableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                glbVars.db.ResetNomen();
+                cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cursor.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(0) + " WHERE KOD5='" + cursor.getString(1) + "'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE=" + cursor.getDouble(cursor.getColumnIndex("PRICE")) + ", ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -350,12 +366,18 @@ public class JournalFragment extends Fragment {
 
                 glbVars.db.getWritableDatabase().setTransactionSuccessful();
                 glbVars.db.getWritableDatabase().endTransaction();
+
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         progress.dismiss();
                     }
                 });
+
+                Fragment fragment = new OrderHeadFragment();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                fragmentTransaction.commit();
             }
         }).start();
     }

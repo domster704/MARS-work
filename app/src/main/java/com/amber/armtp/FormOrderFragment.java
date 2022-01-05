@@ -340,23 +340,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     c1.close();
                     return;
                 } else {
-
-                    Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0", null);
-
-                    glbVars.dbOrders.getWritableDatabase().beginTransaction();
-                    for (int i = 0; i < nomenData.getCount(); i++) {
-                        nomenData.moveToNext();
-                        String KOD5 = nomenData.getString(nomenData.getColumnIndex("KOD5"));
-                        String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
-                        String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
-                        String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
-                        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) VALUES('" + IDDOC + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "')");
-                    }
-
-                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.dbOrders.getWritableDatabase().endTransaction();
-                    glbVars.db.ClearOrderHeader();
-                    glbVars.db.ResetNomen();
+                    insertIntoZakazyDT(IDDOC);
                 }
 
                 Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
@@ -419,13 +403,17 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 c2.close();
 
                 glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP_ID,CONTR_ID,ADDR_ID,DATA, COMMENT, DELIV_TIME, GETMONEY, GETBACKWARD, BACKTYPE FROM ORDERS", null);
+                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DATA, COMMENT FROM ORDERS", null);
                 if (cHead.moveToNext()) {
                     try {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP_ID = '" + cHead.getString(0) + "', CONTR_ID = '" + cHead.getString(1) + "',ADDR_ID = '" + cHead.getString(2) + "', DELIVERY_DATE = '" + cHead.getString(3) + "', COMMENT = '" + cHead.getString(4) + "', DELIV_TIME = '" + cHead.getString(5) + "', GETMONEY = " + cHead.getInt(6) + ", GETBACKWARD = " + cHead.getInt(7) + ", BACKTYPE = " + cHead.getInt(8) + " WHERE DOCNO='" + OrderID + "'");
-                        glbVars.db.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOM_ID, CODE, COD5, DESCR, QTY, PRICE) SELECT '" + OrderID + "', ID, CODE, COD, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0");
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
+                        glbVars.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "'," +
+                                " CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "'," +
+                                " ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "'," +
+                                " DELIVERY_DATE = '" + cHead.getString(cHead.getColumnIndex("DATA")) + "'," +
+                                " COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "' WHERE DOCID='" + OrderID + "'");
+                        glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+
+                        insertIntoZakazyDT(OrderID);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -434,7 +422,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.db.getWritableDatabase().setTransactionSuccessful();
                     glbVars.db.getWritableDatabase().endTransaction();
                     glbVars.db.ClearOrderHeader();
-                    glbVars.db.ResetNomen();
                     glbVars.OrderID = "";
                 }
 
@@ -453,6 +440,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                         glbVars.edContrFilter.setText("");
 
                         clearChosenGroupSgi();
+
                         Fragment fragment = new JournalFragment();
                         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                         fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
@@ -462,6 +450,26 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 });
             }
         }).start();
+    }
+
+    private void insertIntoZakazyDT(String docid) {
+        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ>0", null);
+
+        glbVars.dbOrders.getWritableDatabase().beginTransaction();
+        for (int i = 0; i < nomenData.getCount(); i++) {
+            nomenData.moveToNext();
+            String KOD5 = nomenData.getString(nomenData.getColumnIndex("KOD5"));
+            String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
+            String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
+            String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
+            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "')");
+        }
+
+        glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+        glbVars.dbOrders.getWritableDatabase().endTransaction();
+        glbVars.db.ClearOrderHeader();
+        glbVars.db.ResetNomen();
+        nomenData.close();
     }
 
     @SuppressLint("NonConstantResourceId")

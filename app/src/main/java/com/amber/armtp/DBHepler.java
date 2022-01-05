@@ -756,20 +756,6 @@ public class DBHepler extends SQLiteOpenHelper {
         }
     }
 
-    public void resetContrPrices() {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.beginTransaction();
-        try {
-            db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE>0");
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
     public int GetContrRowID() {
         Cursor c = null;
         try {

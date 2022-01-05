@@ -145,10 +145,7 @@ public class OrderHeadFragment extends Fragment {
                 CONTR_ID = glbVars.spContr.getText().toString();
                 String CurContr = glbVars.db.GetContrID();
 
-                glbVars.db.resetContrPrices();
-
                 if (!CurContr.equals(CONTR_ID)) {
-                    glbVars.db.resetContrPrices();
                     setContrAndSum();
                 }
 
@@ -166,11 +163,9 @@ public class OrderHeadFragment extends Fragment {
                 editor.commit();
 
                 if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                    glbVars.db.resetContrPrices();
                     setContrAndSum();
                 } else {
                     if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                        glbVars.db.resetContrPrices();
                         setContrAndSum();
                     } else {
                         Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();

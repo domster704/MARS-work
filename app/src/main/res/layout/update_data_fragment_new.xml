@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:orientation="vertical"
-            android:padding="8dp" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,8 +20,7 @@
             android:layout_margin="2dp">
 
             <CheckBox
-                android:id="@+id/chkSGI"
-                android:minWidth="@dimen/updateChkWidth"
+                android:id="@+id/chkDB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
@@ -29,558 +28,51 @@
                 android:enabled="true"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
-                android:paddingEnd="10dp"
-                android:text="@string/chkSGi" />
-
-            <TextView
-                android:id="@+id/tvSgiPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:text="0%"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgSgi"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvSgiCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-
-            <CheckBox
-                android:id="@+id/chkGroups"
                 android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkGroups" />
+                android:paddingEnd="10dp"
+                android:text="@string/chkDB" />
 
             <TextView
-                android:id="@+id/tvGrupPerc"
+                android:id="@+id/tbDBPerc"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="end|center_vertical"
                 android:minWidth="@dimen/percWidth"
-                android:text="0%"
                 android:paddingStart="4dp"
+                android:text="0%"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ProgressBar
-                android:id="@+id/pgGroups"
+                android:id="@+id/pgDB"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="@dimen/pgWidth"
                 android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
 
             <TextView
-                android:id="@+id/tvGrupCount"
+                android:id="@+id/tvDBCount"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:paddingEnd="10dp"
                 android:paddingStart="4dp"
+                android:paddingEnd="10dp"
                 android:text="0/0"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkNomen"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkNomen" />
-
-            <TextView
-                android:id="@+id/tvNomenPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:text="0%"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgNomen"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvNomenCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkPrice"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkPrice" />
-
-            <TextView
-                android:id="@+id/tvPricePerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:text="0%"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgPrice"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvPriceCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkContrs"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkContrs" />
-
-            <TextView
-                android:id="@+id/tvContrPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgContrs"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvContrCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkAddrs"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkAddrs" />
-
-            <TextView
-                android:id="@+id/tvAddrPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgAddress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvAddrCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkTorgPred"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkTorgPred" />
-
-            <TextView
-                android:id="@+id/tvTpPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgTP"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvTpCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkDebet"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkDebet" />
-
-            <TextView
-                android:id="@+id/tvDebPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgDebet"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvDebCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkOrdStatus"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkStatus" />
-
-            <TextView
-                android:id="@+id/tvStatusPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgOrdStatus"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvStatusCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkOuted"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkOuted" />
-
-            <TextView
-                android:id="@+id/tvOutedPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgOuted"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvOutedCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkSales"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkSales" />
-
-            <TextView
-                android:id="@+id/tvSalesPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgSales"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvSalesCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp">
-            <CheckBox
-                android:id="@+id/chkFocus"
-                android:minWidth="@dimen/updateChkWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingRight="10dp"
-                android:text="@string/chkFocus" />
-
-            <TextView
-                android:id="@+id/tvFocusPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0%"
-                android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
-                android:paddingStart="4dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <ProgressBar
-                android:id="@+id/pgFocus"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
-                android:layout_height="match_parent"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp" />
-
-            <TextView
-                android:id="@+id/tvFocusCount"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingEnd="10dp"
-                android:paddingStart="4dp"
-                android:text="0/0"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        </LinearLayout>
-
-
-        <Button
-            android:id="@+id/btUpdateData"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="64dp"
-            android:layout_marginEnd="64dp"
-            android:padding="8dp"
-            android:background="@android:drawable/btn_default"
-            android:text="@string/btUpdateData" />
-
     </LinearLayout>
 
-</ScrollView>
+<!--    <Button-->
+<!--        android:id="@+id/btUpdateData"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="end"-->
+<!--        android:layout_marginTop="64dp"-->
+<!--        android:layout_marginEnd="64dp"-->
+<!--        android:background="@android:drawable/btn_default"-->
+<!--        android:padding="8dp"-->
+<!--        android:text="@string/btUpdateData"-->
+<!--        />-->
+
+</RelativeLayout>

@@ -89,8 +89,11 @@ public class MainActivity extends AppCompatActivity {
         String fileName = getResources().getString(R.string.fileName);
         int port = getResources().getInteger(R.integer.port);
 
+        String user = getResources().getString(R.string.user);
+        String password = getResources().getString(R.string.password);
+
         // It's singleton instance for future using
-        ServerDetails.getInstance(host, dir, port, filesPath + fileName);
+        ServerDetails.getInstance(host, dir, port, filesPath + fileName, user, password);
 
         globalVariable = (GlobalVars) getApplicationContext();
 
@@ -217,11 +220,13 @@ public class MainActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     // Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_update_data:
-                        try {
-                            DownloadDB();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        DisplayFragment(new UpdateDataFragment(), "frag_update_data");
+                        setToolbarTitle(menuItem.getTitle());
+//                        try {
+//                            DownloadDB();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
                         return true;
                     case R.id.nav_journal:
                         DisplayFragment(new JournalFragment(), "frag_journal");
@@ -353,50 +358,50 @@ public class MainActivity extends AppCompatActivity {
 
     private int countOfReturning = 0;
 
-    private void DownloadDB() throws IOException {
-        ZipDownload zipDownload;
-        try {
-            zipDownload = new ZipDownload(ServerDetails.getInstance());
-            zipDownload.downloadZip();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        ZipUnpacking zipUnpacking;
-        try {
-            zipUnpacking = new ZipUnpacking(ServerDetails.getInstance());
-            zipUnpacking.doUnpacking();
-            Toast.makeText(getApplication(), "Загрузка завершена", Toast.LENGTH_SHORT).show();
-
-            if (getFileSizeKiloBytes(new File(filesPath + "armtp3.db")) < 100 && countOfReturning < 3) {
-                countOfReturning++;
-                Toast.makeText(getApplication(), "Попытка: " + countOfReturning, Toast.LENGTH_SHORT).show();
-                DownloadDB();
-            } else if (countOfReturning >= 3) {
-                Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
-            } else {
-                File f = new File(filesPath + "orders.db");
-                if (f.exists()) {
-                    f.delete();
-                }
-
-                globalVariable.dbApp.putDemp(globalVariable.db.getReadableDatabase());
-            }
-
-            restart();
-        } catch (Exception e) {
-            Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-    }
-
-    public void restart() {
-        Intent intent = new Intent(this, MainActivity.class);
-        this.startActivity(intent);
-        System.exit(0);
-    }
-
-    private static double getFileSizeKiloBytes(File file) {
-        return (double) file.length() / 1024;
-    }
+//    private void DownloadDB() throws IOException {
+//        ZipDownload zipDownload;
+//        try {
+//            zipDownload = new ZipDownload(ServerDetails.getInstance());
+//            zipDownload.downloadZip();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        ZipUnpacking zipUnpacking;
+//        try {
+//            zipUnpacking = new ZipUnpacking(ServerDetails.getInstance());
+//            zipUnpacking.doUnpacking();
+//            Toast.makeText(getApplication(), "Загрузка завершена", Toast.LENGTH_SHORT).show();
+//
+//            if (getFileSizeKiloBytes(new File(filesPath + "armtp3.db")) < 100 && countOfReturning < 3) {
+//                countOfReturning++;
+//                Toast.makeText(getApplication(), "Попытка: " + countOfReturning, Toast.LENGTH_SHORT).show();
+//                DownloadDB();
+//            } else if (countOfReturning >= 3) {
+//                Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
+//            } else {
+//                File f = new File(filesPath + "orders.db");
+//                if (f.exists()) {
+//                    f.delete();
+//                }
+//
+//                globalVariable.dbApp.putDemp(globalVariable.db.getReadableDatabase());
+//            }
+//
+//            restart();
+//        } catch (Exception e) {
+//            Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public void restart() {
+//        Intent intent = new Intent(this, MainActivity.class);
+//        this.startActivity(intent);
+//        System.exit(0);
+//    }
+//
+//    private static double getFileSizeKiloBytes(File file) {
+//        return (double) file.length() / 1024;
+//    }
 }

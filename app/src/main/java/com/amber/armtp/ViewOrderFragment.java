@@ -47,16 +47,10 @@ public class ViewOrderFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
-        android.support.v7.widget.Toolbar toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        try {
-            toolbar.setSubtitle(ToolBarContr + OrderSum.substring(2) + " руб.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setContrAndSum();
+
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.PreviewZakaz();
         glbVars.fragManager = getActivity().getSupportFragmentManager();
@@ -78,5 +72,22 @@ public class ViewOrderFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setContrAndSum() {
+        String ToolBarContr = glbVars.db.GetToolbarContr();
+        String OrderSum = glbVars.db.getOrderSum();
+        try {
+            if (!OrderSum.equals("")) {
+                if (ToolBarContr.trim().equals("")) {
+                    glbVars.toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
+                } else {
+                    glbVars.toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
+                }
+            } else {
+                glbVars.toolbar.setSubtitle("");
+            }
+        } catch (Exception ignored) {
+        }
     }
 }
