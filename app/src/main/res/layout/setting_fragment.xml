@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/TabUpdateSrv"
     android:layout_width="match_parent"
@@ -15,8 +15,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.7"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
@@ -225,12 +224,12 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/btSaveSettings"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="20dp"
-        android:background="@android:drawable/btn_default"
-        android:text="Сохранить" />
-</LinearLayout>
+<!--    <Button-->
+<!--        android:id="@+id/btSaveSettings"-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="end|bottom"-->
+<!--        android:layout_margin="20dp"-->
+<!--        android:background="@android:drawable/btn_default"-->
+<!--        android:text="Сохранить" />-->
+</ScrollView>

@@ -11,6 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.provider.DocumentFile;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -43,6 +46,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.setting_fragment, container, false);
         glbVars.view = v;
+        setHasOptionsMenu(true);
         return v;
     }
 
@@ -87,7 +91,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
         etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", getResources().getInteger(R.integer.port))));
 
-        btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
+//        btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
 
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
@@ -112,39 +116,39 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         super.onResume();
 
 
-        btSaveSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Integer.parseInt(fontSize.getText().toString()) > 24) {
-                    Toast.makeText(getActivity(), "Слишком большой размер шрифта", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                nomenDescriptionFontSize = Integer.parseInt(fontSize.getText().toString());
-                settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
-                settingsEditor.apply();
-
-                Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btSaveSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
-                editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
-                editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
-                editor.putString("FtpPhotoPort", etFtpUser.getText().toString());
-
-                editor.putString("FtpServerHost", etFtpServer.getText().toString());
-                editor.putString("FtpServerPass", etFtpPass.getText().toString());
-                editor.putString("FtpServerUser", etFtpUser.getText().toString());
-                editor.putString("FtpServerPort", etFtpPort.getText().toString());
-
-                ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpUser.getText().toString()));
-                editor.commit();
-            }
-        });
+//        btSaveSettings.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (Integer.parseInt(fontSize.getText().toString()) > 24) {
+//                    Toast.makeText(getActivity(), "Слишком большой размер шрифта", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//
+//                nomenDescriptionFontSize = Integer.parseInt(fontSize.getText().toString());
+//                settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
+//                settingsEditor.apply();
+//
+//                Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        btSaveSettings.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
+//                editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
+//                editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
+//                editor.putString("FtpPhotoPort", etFtpUser.getText().toString());
+//
+//                editor.putString("FtpServerHost", etFtpServer.getText().toString());
+//                editor.putString("FtpServerPass", etFtpPass.getText().toString());
+//                editor.putString("FtpServerUser", etFtpUser.getText().toString());
+//                editor.putString("FtpServerPort", etFtpPort.getText().toString());
+//
+//                ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpUser.getText().toString()));
+//                editor.commit();
+//            }
+//        });
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -186,5 +190,54 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.settings_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar actions click
+        if (item.getItemId() == R.id.SettingsSave) {
+            changeServerData();
+            changeFontSize();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void changeServerData() {
+        // Меняем данные сервера
+        editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
+        editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
+        editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
+        editor.putInt("FtpPhotoPort", Integer.parseInt(etFtpPort.getText().toString()));
+
+        editor.putString("FtpServerHost", etFtpServer.getText().toString());
+        editor.putString("FtpServerPass", etFtpPass.getText().toString());
+        editor.putString("FtpServerUser", etFtpUser.getText().toString());
+        editor.putInt("FtpServerPort", Integer.parseInt(etFtpPort.getText().toString()));
+
+        ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpPort.getText().toString()));
+        editor.commit();
+    }
+
+    private void changeFontSize() {
+        // Меняем шрифт в приложении
+        if (Integer.parseInt(fontSize.getText().toString()) == settings.getInt("fontSize", -1)) {
+            return;
+        }
+
+        if (Integer.parseInt(fontSize.getText().toString()) > 24) {
+            Toast.makeText(getActivity(), "Слишком большой размер шрифта", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        nomenDescriptionFontSize = Integer.parseInt(fontSize.getText().toString());
+        settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
+        settingsEditor.apply();
+
+        Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
     }
 }
