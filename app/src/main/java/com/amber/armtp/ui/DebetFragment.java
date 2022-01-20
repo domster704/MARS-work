@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -16,6 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
+
 import java.util.Objects;
 
 /**
@@ -23,6 +26,9 @@ import java.util.Objects;
  */
 public class DebetFragment extends Fragment {
     public GlobalVars glbVars;
+
+    public DebetFragment() {
+    }
 
     SearchView searchView;
     private final SearchView.OnQueryTextListener searchTextListner =
@@ -53,9 +59,6 @@ public class DebetFragment extends Fragment {
     SharedPreferences.Editor editor;
     String DebTP_ID;
 
-    public DebetFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.debet_fragment, container, false);
@@ -68,11 +71,10 @@ public class DebetFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     @SuppressLint("CutPasteId")
@@ -84,12 +86,11 @@ public class DebetFragment extends Fragment {
         android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
+
+        glbVars.debetList = getActivity().findViewById(R.id.listContrs);
         glbVars.btFilter = getActivity().findViewById(R.id.btFilterDebet);
         glbVars.btClearFilter = getActivity().findViewById(R.id.btClearDebetFilter);
-        glbVars.spContrDeb = getActivity().findViewById(R.id.spContr);
         glbVars.spTP = getActivity().findViewById(R.id.spTorgPred);
-
-        glbVars.LoadContrListDeb();
 
         glbVars.LoadTpListDeb();
 
@@ -101,20 +102,13 @@ public class DebetFragment extends Fragment {
         int DebRPRowid = glbVars.db.GetTPByID(DebTP_ID);
         SetSelectedDebTP(DebRPRowid);
 
-        if (glbVars.DebetContr != null && !glbVars.DebetContr.equals("")) {
-            glbVars.LoadDebetByContr(glbVars.DebetContr);
-            glbVars.SetSelectedContr(glbVars.DebetContr);
-        }
-
-        glbVars.btFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                glbVars.tvContr = Objects.requireNonNull(getActivity()).findViewById(R.id.ColContrID);
-                glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
-                String DebetContr = glbVars.tvContr.getText().toString();
-                String DebetTp = glbVars.tvTP.getText().toString();
-                glbVars.LoadDebet(DebetTp, DebetContr);
-            }
+        settings = getActivity().getSharedPreferences("apk_version", 0);
+        editor = settings.edit();
+        glbVars.btFilter.setOnClickListener(v -> {
+            glbVars.tvContr = Objects.requireNonNull(getActivity()).findViewById(R.id.ColContrID);
+            glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
+            String DebetTp = glbVars.tvTP.getText().toString();
+            glbVars.LoadDebet(DebetTp);
         });
 
         glbVars.spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -131,15 +125,10 @@ public class DebetFragment extends Fragment {
             }
         });
 
-        glbVars.btClearFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                glbVars.spContrDeb.setSelection(0);
-                glbVars.spTP.setSelection(0);
-                glbVars.debetList.setAdapter(null);
-            }
+        glbVars.btClearFilter.setOnClickListener(v -> {
+            glbVars.spTP.setSelection(0);
+            glbVars.debetList.setAdapter(null);
         });
-
     }
 
     @Override

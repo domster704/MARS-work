@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +21,8 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
 import com.linuxense.javadbf.DBFException;
 
 import org.apache.commons.net.ftp.FTP;
@@ -169,7 +170,7 @@ public class JournalFragment extends Fragment {
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     @SuppressLint("CutPasteId")
@@ -187,7 +188,7 @@ public class JournalFragment extends Fragment {
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
-        glbVars.toolbar.setTitle("Журнал");
+        getActivity().setTitle("Журнал");
 
         glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
     }
@@ -209,179 +210,6 @@ public class JournalFragment extends Fragment {
         }
     }
 
-    private void SendDBFFile(String FileName) {
-        progress = null;
-        progress = new ProgressDialog(getActivity());
-        progress.setIndeterminate(false);
-        progress.setTitle("Загрузка файла заказов");
-        progress.setMessage("Идет загрузка файлов заказа. Пожалуйста подождите...");
-        progress.setCancelable(false);
-        progress.setIndeterminate(false);
-
-        progress.show();
-
-        final String tmp_filename = FileName;
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String server = getResources().getString(R.string.ftp_server);
-                String username = getResources().getString(R.string.ftp_user);
-                String password = getResources().getString(R.string.ftp_pass);
-
-                FTPClient ftpClient = new FTPClient();
-                try {
-                    ftpClient.connect(server, 21);
-                    ftpClient.login(username, password);
-                    ftpClient.enterLocalPassiveMode();
-                    ftpClient.changeWorkingDirectory("EXCHANGE/IN/MARS");
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                    InputStream inputStream;
-                    File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
-
-                    inputStream = new FileInputStream(secondLocalFile);
-
-                    OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
-                    byte[] bytesIn = new byte[4096];
-                    int read;
-
-                    try {
-                        while ((read = inputStream.read(bytesIn)) != -1) {
-                            outputStream.write(bytesIn, 0, read);
-                        }
-                        outputStream.close();
-                    } catch (Exception ignored) {
-                    }
-
-                    inputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.dismiss();
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void EditOrder(final String OrderID) {
-        progress = null;
-        progress = new ProgressDialog(getActivity());
-        progress.setIndeterminate(false);
-        progress.setTitle("Редактирование заказа");
-        progress.setMessage("Включение редактирования заказа. Пожалуйста подождите...");
-        progress.setCancelable(false);
-        progress.setIndeterminate(false);
-        progress.show();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Cursor cNom, cHead;
-                glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
-                if (cHead.moveToNext()) {
-                    try {
-                        if (glbVars.db.getCount() == 0) {
-                            glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES (" +
-                                    "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
-                                    "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
-                                    "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                    "'" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
-                                    "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + ")");
-                        } else {
-                            glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
-                                    "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
-                                    "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
-                                    "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                    "DOC_DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
-                                    "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    cHead.close();
-                }
-
-                glbVars.db.ResetNomen();
-                cNom = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT PRICE, QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
-                try {
-                    while (cNom.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cNom.getString(cNom.getColumnIndex("PRICE")) + "', ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                cNom.close();
-                glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                glbVars.db.getWritableDatabase().endTransaction();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.dismiss();
-                    }
-                });
-
-                Fragment fragment = new OrderHeadFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                fragmentTransaction.commit();
-            }
-        }).start();
-    }
-
-    private void CopyOrder(final String OrderID) {
-        progress = null;
-        progress = new ProgressDialog(getActivity());
-        progress.setIndeterminate(false);
-        progress.setTitle("Копирование заказа");
-        progress.setMessage("Идет копирование. Пожалуйста подождите...");
-        progress.setCancelable(false);
-        progress.setIndeterminate(false);
-        progress.show();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Cursor cursor;
-                glbVars.db.getWritableDatabase().beginTransaction();
-                glbVars.db.ResetNomen();
-                cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
-                try {
-                    while (cursor.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE=" + cursor.getDouble(cursor.getColumnIndex("PRICE")) + ", ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                cursor.close();
-
-                glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                glbVars.db.getWritableDatabase().endTransaction();
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progress.dismiss();
-                    }
-                });
-
-                Fragment fragment = new OrderHeadFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                fragmentTransaction.commit();
-            }
-        }).start();
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.journal_menu, menu);
@@ -401,41 +229,53 @@ public class JournalFragment extends Fragment {
                 selectAllOrders();
                 return true;
             case R.id.SendOrders:
-                if (glbVars.isNetworkAvailable()) {
-                    if (isAtLeastOneSelectedOrder())
-                        return true;
+                AlertDialog.Builder builderSend = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                builderSend.setMessage("Отправить заказы?")
+                        .setNegativeButton("Нет", (dialogInterface, i) -> dialogInterface.cancel())
+                        .setNeutralButton("Да", (dialogInterface, ii) -> {
+                            if (glbVars.isNetworkAvailable()) {
+                                if (isAtLeastOneSelectedOrder())
+                                    return;
 
-                    int countOfSentOrders = 0;
-                    for (GlobalVars.CheckBoxData i : chosenOrders) {
-                        if (i.status.equals("Отправлен")) {
-                            resendOrder(i.id);
-                            countOfSentOrders++;
-                        }
-                    }
+                                isChecked = false;
 
-                    if (chosenOrders.size() - countOfSentOrders == 0) {
-                        glbVars.LoadOrders();
-                        return true;
-                    }
+                                int countOfSentOrders = 0;
+                                for (GlobalVars.CheckBoxData i : chosenOrders) {
+                                    if (i.status.equals("Отправлен")) {
+                                        resendOrder(i.id);
+                                        countOfSentOrders++;
+                                    }
+                                }
 
-                    int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
+                                if (chosenOrders.size() - countOfSentOrders == 0) {
+                                    glbVars.LoadOrders();
+                                    return;
+                                }
 
-                    int index = 0;
-                    for (int i = 0; i < chosenOrders.size(); i++) {
-                        if (!chosenOrders.get(i).status.equals("Отправлен")) {
-                            chosenOrdersForSending[index] = chosenOrders.get(i).id;
-                            index++;
-                        }
-                    }
+                                int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
 
-                    try {
-                        glbVars.SendOrders(chosenOrdersForSending);
-                    } catch (DBFException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
-                }
+                                int index = 0;
+                                for (int i = 0; i < chosenOrders.size(); i++) {
+                                    if (!chosenOrders.get(i).status.equals("Отправлен")) {
+                                        chosenOrdersForSending[index] = chosenOrders.get(i).id;
+                                        index++;
+                                    }
+                                }
+
+                                try {
+                                    glbVars.SendOrders(chosenOrdersForSending);
+                                } catch (DBFException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                AlertDialog alertDlgSend = builderSend.create();
+                alertDlgSend.show();
+
+
                 return true;
             case ID_GOBACK:
                 Fragment fragment = new JournalFragment();
@@ -448,17 +288,15 @@ public class JournalFragment extends Fragment {
                 if (isAtLeastOneSelectedOrder())
                     return true;
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
-                builder.setMessage("Удалить заказы?")
-                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder builderDel = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                builderDel.setMessage("Удалить заказы?")
+                        .setNegativeButton("Нет", (dialogInterface, i) -> dialogInterface.cancel())
+                        // Поставил NeutralButton, чтобы кнопка была слева, а не рядом с кнопкой "Нет"
+                        .setNeutralButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        })
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+                                isChecked = false;
+
                                 for (GlobalVars.CheckBoxData data : chosenOrders) {
                                     glbVars.dbOrders.DeleteOrderByID(data.id);
                                 }
@@ -468,21 +306,21 @@ public class JournalFragment extends Fragment {
                                 toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
                                 toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
                             }
-                        })
-                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                for (GlobalVars.CheckBoxData data : chosenOrders) {
-                                    if (data.checkBox.isChecked()) {
-                                        data.checkBox.setChecked(false);
-                                    }
-                                }
-                                chosenOrders.clear();
-                            }
                         });
+//                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                for (GlobalVars.CheckBoxData data : chosenOrders) {
+//                                    if (data.tvData.isChecked()) {
+//                                        data.tvData.setChecked(false);
+//                                    }
+//                                }
+//                                chosenOrders.clear();
+//                            }
+//                        });
 
-                AlertDialog alertDlg = builder.create();
-                alertDlg.show();
+                AlertDialog alertDlgDel = builderDel.create();
+                alertDlgDel.show();
 
                 return true;
             default:
@@ -554,5 +392,123 @@ public class JournalFragment extends Fragment {
             chosenOrders.add(GlobalVars.allOrders.get(i));
         }
         isChecked = !isChecked;
+    }
+
+    private void SendDBFFile(String FileName) {
+        final String tmp_filename = FileName;
+
+        new Thread(() -> {
+            String server = getResources().getString(R.string.ftp_server);
+            String username = getResources().getString(R.string.ftp_user);
+            String password = getResources().getString(R.string.ftp_pass);
+
+            FTPClient ftpClient = new FTPClient();
+            try {
+                ftpClient.connect(server, 21);
+                ftpClient.login(username, password);
+                ftpClient.enterLocalPassiveMode();
+                ftpClient.changeWorkingDirectory("EXCHANGE/IN/MARS");
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                InputStream inputStream;
+                File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
+
+                inputStream = new FileInputStream(secondLocalFile);
+
+                OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
+                byte[] bytesIn = new byte[4096];
+                int read;
+
+                try {
+                    while ((read = inputStream.read(bytesIn)) != -1) {
+                        outputStream.write(bytesIn, 0, read);
+                    }
+                    outputStream.close();
+                } catch (Exception ignored) {
+                }
+
+                inputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void EditOrder(final String OrderID) {
+        new Thread(() -> {
+            Cursor cNom, cHead;
+            glbVars.db.getWritableDatabase().beginTransaction();
+            cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
+            if (cHead.moveToNext()) {
+                try {
+                    if (glbVars.db.getCount() == 0) {
+                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES (" +
+                                "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+                                "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+                                "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+                                "'" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
+                                "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + ")");
+                    } else {
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
+                                "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+                                "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+                                "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+                                "DOC_DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
+                                "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                cHead.close();
+            }
+
+            glbVars.db.ResetNomen();
+            cNom = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT PRICE, QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+            try {
+                while (cNom.moveToNext()) {
+                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cNom.getString(cNom.getColumnIndex("PRICE")) + "', ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            cNom.close();
+            glbVars.db.getWritableDatabase().setTransactionSuccessful();
+            glbVars.db.getWritableDatabase().endTransaction();
+
+            Fragment fragment = new OrderHeadFragment();
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+            fragmentTransaction.commit();
+        }).start();
+    }
+
+    private void CopyOrder(final String OrderID) {
+        new Thread(() -> {
+            Cursor cursor;
+            glbVars.db.getWritableDatabase().beginTransaction();
+            glbVars.db.ResetNomen();
+            cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+            try {
+                while (cursor.moveToNext()) {
+                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE=" + cursor.getDouble(cursor.getColumnIndex("PRICE")) + ", ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            cursor.close();
+
+            glbVars.db.getWritableDatabase().setTransactionSuccessful();
+            glbVars.db.getWritableDatabase().endTransaction();
+
+
+            Fragment fragment = new OrderHeadFragment();
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+            fragmentTransaction.commit();
+        }).start();
     }
 }

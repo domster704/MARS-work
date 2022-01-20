@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
 
 import java.util.Objects;
 
@@ -39,7 +42,7 @@ public class ViewOrderFragment extends Fragment {
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     @SuppressLint("CutPasteId")

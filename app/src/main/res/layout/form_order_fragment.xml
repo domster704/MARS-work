@@ -42,30 +42,30 @@
 
 
     <TextView
-            android:id="@+id/tvHeadCod"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toEndOf="@+id/textView30"
-            android:layout_toRightOf="@+id/textView30"
-            android:background="@drawable/table_header"
-            android:clickable="false"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenCod"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadCod"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toEndOf="@+id/textView30"
+        android:layout_toRightOf="@+id/textView30"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenCod"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/tvHeadDescr"
-            android:layout_width="600dp"
-            android:layout_height="25dp"
-            android:layout_alignTop="@+id/tvHeadCod"
-            android:layout_toLeftOf="@+id/tvHeadMP"
-            android:layout_toEndOf="@+id/textView8"
-            android:background="@drawable/table_header"
-            android:clickable="false"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenDescr"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadDescr"
+        android:layout_width="600dp"
+        android:layout_height="25dp"
+        android:layout_alignTop="@+id/tvHeadCod"
+        android:layout_toLeftOf="@+id/tvHeadMP"
+        android:layout_toEndOf="@+id/textView8"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenDescr"
+        android:textColor="#000000" />
 
     <TextView
             android:id="@+id/textView10"
@@ -107,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tvHeadCod"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:clickable="true"
         android:fastScrollEnabled="false"
         android:focusable="true"
@@ -116,16 +116,29 @@
         android:textFilterEnabled="true" />
 
     <TextView
-            android:id="@+id/textView30"
-            android:layout_width="50dp"
-            android:layout_height="35dp"
-            android:layout_above="@+id/listContrs"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toEndOf="@+id/tvPosition"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenPhoto"
-            android:textColor="#000000" />
+        android:id="@+id/showMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/listContrs"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:text="Показать ещё"
+        android:textSize="14pt"
+        android:gravity="center_horizontal|center_vertical"
+        android:paddingBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/textView30"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toEndOf="@+id/tvPosition"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenPhoto"
+        android:textColor="#000000" />
 
     <TextView
             android:id="@+id/textView34"
@@ -165,15 +178,15 @@
             android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/tvPosition"
-            android:layout_width="50dp"
-            android:layout_height="35dp"
-            android:layout_above="@+id/listContrs"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenPP"
-            android:textColor="#000000" />
+        android:id="@+id/tvPosition"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenPP"
+        android:textColor="#000000" />
 
 </RelativeLayout>

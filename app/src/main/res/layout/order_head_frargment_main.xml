@@ -184,7 +184,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@android:drawable/btn_default"
         android:padding="15dp"
         android:text="@string/OrdHeaderSave"
         android:textColor="#000" />

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="chkDB">Обновление базы данных</string>
+    <string name="chkApp">Обновление приложения</string>
     <string name="chkSGi">Обновление СГИ</string>
     <string name="chkGroups">Обновление товарных групп</string>
     <string name="chkNomen">Обновление номенклатуры</string>

@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -19,6 +19,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
+import com.amber.armtp.ServerDetails;
 
 import java.util.Objects;
 
@@ -57,7 +61,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     /**
@@ -89,7 +93,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         etFtpServer.setText(serverSettings.getString("FtpServerHost", getResources().getString(R.string.host)));
         etFtpPass.setText(serverSettings.getString("FtpServerPass", getResources().getString(R.string.password)));
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
-        etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", getResources().getInteger(R.integer.port))));
+        etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)))));
 
 //        btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
 
@@ -219,7 +223,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         editor.putString("FtpServerUser", etFtpUser.getText().toString());
         editor.putInt("FtpServerPort", Integer.parseInt(etFtpPort.getText().toString()));
 
-        ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpPort.getText().toString()));
+        ServerDetails.getInstance(etFtpServer.getText().toString(), etFtpPort.getText().toString());
         editor.commit();
     }
 

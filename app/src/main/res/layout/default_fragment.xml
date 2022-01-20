@@ -41,4 +41,13 @@
             android:textIsSelectable="true" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/postDataColor"
+        android:layout_margin="8dp"
+        android:paddingTop="20dp"
+        android:textColor="#000"
+        android:textSize="8pt"/>
+
 </LinearLayout>

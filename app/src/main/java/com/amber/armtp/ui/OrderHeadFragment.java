@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,6 +39,7 @@ public class OrderHeadFragment extends Fragment {
     android.support.v7.widget.Toolbar toolbar;
 
     public static String CONTR_ID;
+    public static String PREVIOUS_CONTR_ID = "";
 
     public OrderHeadFragment() {
     }
@@ -56,7 +60,7 @@ public class OrderHeadFragment extends Fragment {
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     @Override
@@ -143,6 +147,14 @@ public class OrderHeadFragment extends Fragment {
 
                 String TP_ID = glbVars.spTp.getText().toString();
                 CONTR_ID = glbVars.spContr.getText().toString();
+
+                if (PREVIOUS_CONTR_ID.equals("")) {
+                    PREVIOUS_CONTR_ID = CONTR_ID;
+                } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)){
+                    PREVIOUS_CONTR_ID = CONTR_ID;
+                    glbVars.db.ResetNomenPrice();
+                }
+
                 String CurContr = glbVars.db.GetContrID();
 
                 if (!CurContr.equals(CONTR_ID)) {
@@ -165,7 +177,7 @@ public class OrderHeadFragment extends Fragment {
                 if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
                     setContrAndSum();
                 } else {
-                    if (glbVars.db.updateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+                    if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
                         setContrAndSum();
                     } else {
                         Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
@@ -224,6 +236,8 @@ public class OrderHeadFragment extends Fragment {
     }
 
     public void goToFormOrderFragment() {
+//        glbVars.db.fillAllNomenPrice();
+
         toolbar.setTitle(R.string.form_order);
         Fragment fragment = new FormOrderFragment();
         fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();

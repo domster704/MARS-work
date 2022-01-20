@@ -1,10 +1,7 @@
-package com.amber.armtp.zip;
+package com.amber.armtp.ftp;
 
 
 import android.util.Log;
-
-import com.amber.armtp.ServerDetails;
-import com.amber.armtp.UpdateDataFragment;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,11 +16,11 @@ import java.util.zip.ZipFile;
 public class ZipUnpacking {
     private final String fileDir;
 
-    public ZipUnpacking(ServerDetails serverDetails) {
-        this.fileDir = serverDetails.filePathInAndroid;
+    public ZipUnpacking(String filePathInAndroid) {
+        this.fileDir = filePathInAndroid;
     }
 
-    private void unZip(File file, final UpdateDataFragment.UIData ui) throws IOException {
+    private void unZip(File file) throws IOException {
         ZipFile zip = new ZipFile(fileDir);
         Enumeration entries = zip.entries();
 
@@ -42,18 +39,20 @@ public class ZipUnpacking {
         zip.close();
     }
 
-    public void doUnpacking(UpdateDataFragment.UIData ui) {
+    public boolean doUnpacking() {
         File file = new File(fileDir);
         if (!file.exists() || !file.canRead()) {
             Log.e("ftp", "File cannot be read");
-            return;
+            return true;
         }
 
         try {
-            unZip(file, ui);
+            unZip(file);
             file.delete();
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 

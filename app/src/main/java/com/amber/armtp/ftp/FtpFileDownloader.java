@@ -1,9 +1,9 @@
-package com.amber.armtp.zip;
+package com.amber.armtp.ftp;
 
 import android.graphics.Color;
 
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.UpdateDataFragment;
+import com.amber.armtp.ui.UpdateDataFragment;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ZipDownload {
+public class FtpFileDownloader {
     private FTPClient client;
     private boolean login;
 
@@ -28,17 +28,16 @@ public class ZipDownload {
 
     private final String filePathInAndroid;
 
-    public ZipDownload(ServerDetails serverDetails) throws IOException {
+    public FtpFileDownloader(ServerDetails serverDetails, String remoteDir, String localDir, String fileName) throws IOException {
         this.user = serverDetails.user;
         this.password = serverDetails.password;
         this.host = serverDetails.host;
-        this.port = serverDetails.port;
-        this.dir = serverDetails.dir;
-        this.filePathInAndroid = serverDetails.filePathInAndroid;
+        this.port = Integer.parseInt(serverDetails.port);
+        this.dir = remoteDir;
+        this.filePathInAndroid = localDir + fileName;
 
         this.dbSize = getDbSize();
     }
-
 
     public long getDbSize() throws IOException {
         login = initFTPClient();
@@ -56,7 +55,7 @@ public class ZipDownload {
         return 1;
     }
 
-    public boolean downloadZip(final UpdateDataFragment.UIData ui) throws IOException {
+    public boolean download(final UpdateDataFragment.UIData ui) throws IOException {
         boolean isDownload = false;
 
         login = initFTPClient();
@@ -73,7 +72,12 @@ public class ZipDownload {
                 progressStatus += bytesRead;
                 outputStream.write(bytesArray, 0, bytesRead);
 
-                changePGData(dbSize, progressStatus, ui);
+                if (ui != null)
+                    changePGData(dbSize, progressStatus, ui);
+            }
+
+            if (ui != null) {
+                ui.handler.post(() -> ui.tvData.setTextColor(Color.rgb(3, 103, 0)));
             }
 
             isDownload = client.completePendingCommand();
@@ -88,7 +92,6 @@ public class ZipDownload {
             e.printStackTrace();
         }
 
-
         return isDownload;
     }
 
@@ -96,33 +99,23 @@ public class ZipDownload {
         final long perc = progressStatus * 100L / finalCount;
         ui.progressBar.setProgress((int) perc);
 
-        final int finalProgressStatus = progressStatus;
-        ui.handler.post(new Runnable() {
-            public void run() {
-                ui.tvCount.setText(finalProgressStatus + "/" + finalCount);
-                ui.tvPer.setText(perc + "%");
-            }
-        });
-
-        ui.handler.post(new Runnable() {
-            public void run() {
-                ui.checkBox.setChecked(true);
-                ui.checkBox.setTextColor(Color.rgb(3, 103, 0));
-            }
-        });
+//        final int finalProgressStatus = progressStatus;
+//        ui.handler.post(() -> {
+//            ui.tvCount.setText(finalProgressStatus + "/" + finalCount);
+//            ui.tvPer.setText(perc + "%");
+//        });
     }
 
 
     private boolean initFTPClient() {
-        client = new FTPClient();
+        this.client = new FTPClient();
         try {
-            client.connect(host, port);
-            boolean login = client.login(user, password);
+            this.client.connect(host, port);
+            boolean login = this.client.login(user, password);
 
-//            client.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out), true));
-            client.enterLocalPassiveMode();
-            client.setFileType(FTP.BINARY_FILE_TYPE);
-            client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+            this.client.enterLocalPassiveMode();
+            this.client.setFileType(FTP.BINARY_FILE_TYPE);
+            this.client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
 
             return login;
         } catch (IOException e) {

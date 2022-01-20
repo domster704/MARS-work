@@ -8,28 +8,27 @@
         android:weightSum="1">
 
     <TextView
-            android:id="@+id/tvHeadCod"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/textView30"
-            android:layout_toRightOf="@+id/textView30"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenCod"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadCod"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView30"
+        android:layout_toRightOf="@+id/textView30"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenCod"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/tvHeadDescr"
-            android:layout_width="600dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/txtSearch"
-            android:layout_toLeftOf="@+id/textView38"
-            android:layout_toEndOf="@+id/textView14"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenDescr"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadDescr"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_toStartOf="@id/textView38"
+        android:layout_toEndOf="@+id/tvHeadCod"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenDescr"
+        android:textColor="#000000" />
 
     <TextView
             android:id="@+id/textView10"
@@ -77,16 +76,16 @@
             android:longClickable="true" />
 
     <TextView
-            android:id="@+id/textView30"
-            android:layout_width="50dp"
-            android:layout_height="35dp"
-            android:layout_above="@+id/listContrs"
-            android:layout_below="@+id/SpinSgi"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:textColor="#000000" />
+        android:id="@+id/textView30"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/listContrs"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="NN"
+        android:textColor="#000000" />
 
     <TextView
             android:id="@+id/textView35"
@@ -112,15 +111,18 @@
             android:text="@string/nomenMP"
             android:textColor="#000000" />
 
-    <TextView
-            android:id="@+id/textView14"
-            android:layout_width="50dp"
-            android:layout_height="35dp"
-            android:layout_alignBottom="@+id/tvHeadCod"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/tvHeadCod"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenMH"
-            android:textColor="#000000" />
+<!--    <TextView-->
+<!--        android:id="@+id/textView14"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:layout_alignBottom="@+id/tvHeadCod"-->
+<!--        android:layout_alignParentTop="true"-->
+<!--        android:layout_marginStart="0dp"-->
+<!--        android:layout_marginTop="-1dp"-->
+<!--        android:layout_marginBottom="1dp"-->
+<!--        android:layout_toEndOf="@+id/tvHeadCod"-->
+<!--        android:background="@drawable/table_header"-->
+<!--        android:gravity="center_vertical|center_horizontal"-->
+<!--        android:text="@string/nomenMH"-->
+<!--        android:textColor="#000000" />-->
 </RelativeLayout>

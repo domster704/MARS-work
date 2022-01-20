@@ -1,5 +1,6 @@
-package com.amber.armtp;
+package com.amber.armtp.dbHelpers;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,6 +21,16 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         onCreate(sqLiteDatabase);
+    }
+
+    @Override
+    public synchronized SQLiteDatabase getReadableDatabase() {
+        return super.getReadableDatabase();
+    }
+
+    @Override
+    public synchronized SQLiteDatabase getWritableDatabase() {
+        return super.getWritableDatabase();
     }
 
     public Cursor getZakazy() {
@@ -112,6 +123,22 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             if (c != null) {
                 c.close();
             }
+        }
+    }
+
+    public void UpdateOrderQty(String ZakID, String ID, int Qty) {
+        SQLiteDatabase db;
+        db = this.getWritableDatabase(); // Read Data
+        db.beginTransaction();
+        try {
+            ContentValues updatedValues = new ContentValues();
+            updatedValues.put("QTY", Qty);
+            db.update("ZAKAZY_DT", updatedValues, "NOMEN='" + ID + "' AND ZAKAZ_ID='" + ZakID + "'", null);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
         }
     }
 }

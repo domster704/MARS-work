@@ -1,4 +1,4 @@
-package com.amber.armtp;
+package com.amber.armtp.dbHelpers;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -22,6 +22,16 @@ public class DBAppHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
+    @Override
+    public synchronized SQLiteDatabase getReadableDatabase() {
+        return super.getReadableDatabase();
+    }
+
+    @Override
+    public synchronized SQLiteDatabase getWritableDatabase() {
+        return super.getWritableDatabase();
+    }
+
     public void putDemp(SQLiteDatabase dbNomen) {
         Cursor nomen = dbNomen.rawQuery("SELECT DISTINCT DEMP FROM NOMEN", null);
 
@@ -38,7 +48,8 @@ public class DBAppHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT '0' as _id, 'Выберите Демографический признак' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
+//                                    SELECT 0 AS _id, '0' AS CODE, 'Выберите Фокус' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM FOKUS
+            cursor = db.rawQuery("SELECT 0 as _id, 'Выберите демографический признак' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
 
             return cursor;
         } catch (Exception e) {

@@ -21,10 +21,10 @@
 
     <dimen name="buttonWidth">400dp</dimen>
 
-    <dimen name="updateChkWidth">330dp</dimen>
+    <dimen name="updateChkWidth">300dp</dimen>
 
     <dimen name="pgWidth">600dp</dimen>
-    <dimen name="percWidth">50dp</dimen>
+    <dimen name="percWidth">55dp</dimen>
 
     <!-- Settings dimen -->
     <dimen name="textSizeSettings">14sp</dimen>

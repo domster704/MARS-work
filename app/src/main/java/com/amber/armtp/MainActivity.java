@@ -1,7 +1,6 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteException;
@@ -24,14 +23,33 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.zip.ZipDownload;
-import com.amber.armtp.zip.ZipUnpacking;
+import com.amber.armtp.dbHelpers.DBAppHelper;
+import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
+import com.amber.armtp.ServerDetails;
+import com.amber.armtp.ui.DebetFragment;
+import com.amber.armtp.ui.DefaultFragment;
+import com.amber.armtp.ui.JournalFragment;
+import com.amber.armtp.ui.OrderHeadFragment;
+import com.amber.armtp.ui.SettingFragment;
+import com.amber.armtp.ui.UpdateDataFragment;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
+import java.util.SimpleTimeZone;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -39,7 +57,8 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  * Updated by domster704 on 27.09.2021
  */
 public class MainActivity extends AppCompatActivity {
-    public static String filesPath;
+    public static String filesPathDB;
+    public static String filesPathAPK;
 
     //Defining Variables
     private static final int LAYOUT = R.layout.activity_main;
@@ -71,29 +90,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         String path = getFilesDir().getPath();
-        filesPath = path.substring(0, path.lastIndexOf("/")) + "/databases/";
-        Log.d("ftp", filesPath);
+        filesPathDB = path.substring(0, path.lastIndexOf("/")) + "/databases/";
+        filesPathAPK = path.substring(0, path.lastIndexOf("/")) + "/files/";
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+//        if (BuildConfig.DEBUG) {
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                    .detectLeakedSqlLiteObjects()
+//                    .detectLeakedClosableObjects()
+//                    .penaltyLog()
+//                    .penaltyDeath()
+//                    .build());
+//        }
+
         // For ftp-server
         String host = getResources().getString(R.string.host);
-        String dir = getResources().getString(R.string.fileDirectory);
-        String fileName = getResources().getString(R.string.fileName);
-        int port = getResources().getInteger(R.integer.port);
+        String dirDB = getResources().getString(R.string.fileDirectoryDB);
+        String dirAPK = getResources().getString(R.string.fileDirectoryApk);
+        String port = getResources().getString(R.string.port);
 
         String user = getResources().getString(R.string.user);
         String password = getResources().getString(R.string.password);
 
         // It's singleton instance for future using
-        ServerDetails.getInstance(host, dir, port, filesPath + fileName, user, password);
+        ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);
 
         globalVariable = (GlobalVars) getApplicationContext();
 
@@ -127,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (globalVariable.db == null) {
-            globalVariable.db = new DBHepler(getApplicationContext());
+            globalVariable.db = new DBHelper(getApplicationContext());
         }
 
         if (globalVariable.dbOrders == null) {
@@ -138,11 +166,11 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.dbApp = new DBAppHelper(getApplicationContext());
         }
 
-        File old_db = new File(globalVariable.GetSDCardpath() + "ARMTP_DB" + "/armtp3.db");
+        File old_db = new File(globalVariable.GetSDCardPath() + "ARMTP_DB" + "/armtp3.db");
         if (old_db.exists()) {
             try {
                 FileUtils.copyFile(new File(old_db.toString()), new File(globalVariable.db.getWritableDatabase().getPath()));
-                File toName = new File(globalVariable.GetSDCardpath() + "ARMTP_DB/armtp3.db_");
+                File toName = new File(globalVariable.GetSDCardPath() + "ARMTP_DB/armtp3.db_");
                 old_db.renameTo(toName);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -222,11 +250,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_update_data:
                         DisplayFragment(new UpdateDataFragment(), "frag_update_data");
                         setToolbarTitle(menuItem.getTitle());
-//                        try {
-//                            DownloadDB();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
                         return true;
                     case R.id.nav_journal:
                         DisplayFragment(new JournalFragment(), "frag_journal");
@@ -279,23 +302,13 @@ public class MainActivity extends AppCompatActivity {
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
 
+        sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         fragment = new JournalFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
         fragmentTransaction.commit();
         setToolbarTitle("Журнал");
-
-        sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    }
-
-
-    private void initNavigationView() {
-        drawerLayout = findViewById(R.id.drawer);
-    }
-
-    private void initToolbar() {
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -314,8 +327,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        Integer count = globalVariable.getSMSCount();
-        ShortcutBadger.applyCount(getApplicationContext(), count);
     }
 
     @Override
@@ -326,6 +337,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    public void setToolbarTitle(CharSequence Title) {
+        toolbar.setTitle(Title);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    private void initNavigationView() {
+        drawerLayout = findViewById(R.id.drawer);
+    }
+
+    private void initToolbar() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
+    private void initLastUpdate() {
+        tvLastUpdate = findViewById(R.id.tvLastUpdateText);
+        if (tvLastUpdate != null) {
+            tvLastUpdate.setText(globalVariable.ReadLastUpdate());
+        }
     }
 
     private void DisplayFragment(Fragment Frag, String Tag) {
@@ -339,69 +375,4 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Заданы неккоректные данные для загрузки", Toast.LENGTH_LONG).show();
         }
     }
-
-    public void setToolbarTitle(CharSequence Title) {
-        toolbar.setTitle(Title);
-    }
-
-    private void initLastUpdate() {
-        tvLastUpdate = findViewById(R.id.tvLastUpdateText);
-        if (tvLastUpdate != null) {
-            tvLastUpdate.setText(globalVariable.ReadLastUpdate());
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    private int countOfReturning = 0;
-
-//    private void DownloadDB() throws IOException {
-//        ZipDownload zipDownload;
-//        try {
-//            zipDownload = new ZipDownload(ServerDetails.getInstance());
-//            zipDownload.downloadZip();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        ZipUnpacking zipUnpacking;
-//        try {
-//            zipUnpacking = new ZipUnpacking(ServerDetails.getInstance());
-//            zipUnpacking.doUnpacking();
-//            Toast.makeText(getApplication(), "Загрузка завершена", Toast.LENGTH_SHORT).show();
-//
-//            if (getFileSizeKiloBytes(new File(filesPath + "armtp3.db")) < 100 && countOfReturning < 3) {
-//                countOfReturning++;
-//                Toast.makeText(getApplication(), "Попытка: " + countOfReturning, Toast.LENGTH_SHORT).show();
-//                DownloadDB();
-//            } else if (countOfReturning >= 3) {
-//                Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
-//            } else {
-//                File f = new File(filesPath + "orders.db");
-//                if (f.exists()) {
-//                    f.delete();
-//                }
-//
-//                globalVariable.dbApp.putDemp(globalVariable.db.getReadableDatabase());
-//            }
-//
-//            restart();
-//        } catch (Exception e) {
-//            Toast.makeText(getApplication(), "Что-то пошло не так. Проверьте подключение к интернету и попробуйте снова", Toast.LENGTH_SHORT).show();
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void restart() {
-//        Intent intent = new Intent(this, MainActivity.class);
-//        this.startActivity(intent);
-//        System.exit(0);
-//    }
-//
-//    private static double getFileSizeKiloBytes(File file) {
-//        return (double) file.length() / 1024;
-//    }
 }

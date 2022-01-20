@@ -15,7 +15,7 @@
     <string name="debetA64">до 64 дней</string>
     <string name="debetDolg">Долг</string>
     <string name="debetFilter">Показать</string>
-    <string name="debetClearFilter">X</string>
+    <string name="debetClearFilter">❌</string>
     <string name="debetOTG30">ОТГ30</string>
     <string name="debetOPL30">ОПЛ30</string>
     <string name="debetKOB">К. ОБ.</string>

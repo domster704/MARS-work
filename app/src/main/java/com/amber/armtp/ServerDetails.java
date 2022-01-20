@@ -9,18 +9,20 @@ public class ServerDetails {
     public String user;
     public String password;
     public String host;
-    public final String dir;
-    public int port;
+    public String dirDB;
+    public String dirAPK;
+    public String port;
 
-    public final String filePathInAndroid;
+//    public final String filePathInAndroid;
 
-    private ServerDetails(String host, String dir, int port, String filePathInAndroid, String user, String password) {
-        this.host = host;
-        this.dir = dir;
-        this.port = port;
-        this.filePathInAndroid = filePathInAndroid;
-        this.user = user;
-        this.password = password;
+    private ServerDetails(String... args) {
+        this.host = args[0];
+        this.dirDB = args[1];
+        this.port = args[2];
+//        this.filePathInAndroid = args[3];
+        this.user = args[3];
+        this.password = args[4];
+        this.dirAPK = args[5];
     }
 
     public static ServerDetails getInstance() throws Exception {
@@ -28,12 +30,12 @@ public class ServerDetails {
         return instance;
     }
 
-    public static ServerDetails getInstance(String host, String dir, int port, String filePathInAndroid, String user, String password) {
-        if (instance == null) instance = new ServerDetails(host, dir, port, filePathInAndroid, user, password);
+    public static ServerDetails getInstance(String... args) {
+        if (instance == null) instance = new ServerDetails(args);
         return instance;
     }
 
-    public static ServerDetails getInstance(String host, int port) {
+    public static ServerDetails getInstance(String host, String port) {
         if (instance != null) {
             instance.host = host;
             instance.port = port;

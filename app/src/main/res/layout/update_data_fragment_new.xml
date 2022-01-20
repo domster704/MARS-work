@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,65 +13,144 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="2dp">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/chkDB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:minWidth="@dimen/updateChkWidth"
+                android:layout_width="@dimen/updateChkWidth"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/tbDBPerc"
+                android:gravity="center_vertical"
                 android:paddingEnd="10dp"
-                android:text="@string/chkDB" />
+                android:text="@string/chkDB"
+                android:textColor="#000" />
+
+            <!--            <LinearLayout-->
+            <!--                android:id="@+id/pgDBLayout"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:orientation="horizontal">-->
+            <!--                android:visibility="invisible"-->
+            <!--                >-->
 
             <TextView
                 android:id="@+id/tbDBPerc"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/percWidth"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/chkDB"
                 android:gravity="end|center_vertical"
-                android:minWidth="@dimen/percWidth"
                 android:paddingStart="4dp"
-                android:text="0%"
+                android:text="@string/zeroPerc"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ProgressBar
                 android:id="@+id/pgDB"
                 style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/pgWidth"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/tbDBPerc"
+                android:layout_toStartOf="@+id/tvDBCount"
+                android:layout_toEndOf="@+id/tbDBPerc"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp" />
 
             <TextView
                 android:id="@+id/tvDBCount"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="start"
                 android:paddingStart="4dp"
                 android:paddingEnd="10dp"
-                android:text="0/0"
+                android:text="@string/hundredPerc"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        </LinearLayout>
+            <!--            </LinearLayout>-->
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btnDBUpdate"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="2dp"
+            android:layout_marginStart="100dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Обновить базу данных" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="2dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="2dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chkApp"
+                android:layout_width="@dimen/updateChkWidth"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/tvAppPerc"
+                android:gravity="center_vertical"
+                android:paddingEnd="10dp"
+                android:text="@string/chkApp"
+                android:textColor="#000" />
+
+            <!--            <LinearLayout-->
+            <!--                android:id="@+id/pgAppLayout"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:orientation="horizontal">-->
+            <!--                &lt;!&ndash;                android:visibility="invisible"&ndash;&gt;-->
+            <!--                &lt;!&ndash;                >&ndash;&gt;-->
+
+            <TextView
+                android:id="@+id/tvAppPerc"
+                android:layout_width="@dimen/percWidth"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/chkApp"
+                android:gravity="end|center_vertical"
+                android:paddingStart="4dp"
+                android:text="@string/zeroPerc"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <ProgressBar
+                android:id="@+id/pgApp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/tvAppPerc"
+                android:layout_toStartOf="@+id/tvAppCount"
+                android:layout_toEndOf="@+id/tvAppPerc"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <TextView
+                android:id="@+id/tvAppCount"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/tvAppPerc"
+                android:layout_alignParentEnd="true"
+                android:gravity="start"
+                android:paddingStart="4dp"
+                android:paddingEnd="10dp"
+                android:text="@string/hundredPerc"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <!--        </LinearLayout>-->
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btnAppUpdate"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="2dp"
+            android:layout_marginStart="100dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Обновить Приложение" />
     </LinearLayout>
 
-<!--    <Button-->
-<!--        android:id="@+id/btUpdateData"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="end"-->
-<!--        android:layout_marginTop="64dp"-->
-<!--        android:layout_marginEnd="64dp"-->
-<!--        android:background="@android:drawable/btn_default"-->
-<!--        android:padding="8dp"-->
-<!--        android:text="@string/btUpdateData"-->
-<!--        />-->
 
-</RelativeLayout>
+</LinearLayout>

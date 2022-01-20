@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">МАРС ТП</string>
+    <string name="app_name">МАРС</string>
     <string name="start_fragment_name">Журнал</string>
     <string name="app_version">1.0</string>
     <string name="emailto">it@amberplus.ru</string>
@@ -46,4 +46,10 @@
     <string name="chkFocus">Обновление фокусов</string>
     <string name="lblFilterModel">Модель</string>
     <string name="lblFilterColor">Цвет</string>
+
+    <string name="lblFilterContr">Контрагент</string>
+    <string name="lblFilterTP">Торгпред</string>
+    <string name="zeroPerc">0%</string>
+    <string name="hundredPerc">100%</string>
+    <string name="postDataColor">Товар, пришедший 4 дня назад подкрашивается зеленым, 2 дня назад - красным</string>
 </resources>

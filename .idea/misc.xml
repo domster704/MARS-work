@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/isupo/AppData/Local/Android/Sdk/platforms/android-28/data/res/drawable/btn_default.xml" value="0.3555" />
+        <entry key="..\:/Users/isupo/AppData/Local/Android/Sdk/platforms/android-28/data/res/drawable/btn_default_small.xml" value="0.6391666666666667" />
         <entry key="..\:/Users/isupo/GoogleDisk/Programming/Java/AndroidStudioProjects/MARS-work/app/src/main/res/layout/admin_fragment.xml" value="0.3541666666666667" />
         <entry key="..\:/Users/isupo/GoogleDisk/Programming/Java/AndroidStudioProjects/MARS-work/app/src/main/res/layout/order_head_fragment.xml" value="0.3541666666666667" />
         <entry key="..\:/Users/isupo/GoogleDisk/Programming/Java/AndroidStudioProjects/MARS-work/app/src/main/res/menu/order_head_menu.xml" value="0.3541666666666667" />
@@ -58,10 +59,14 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/debet_item_border_white.xml" value="0.2855" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/filter.xml" value="0.3555" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/filter_activated.xml" value="0.3555" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/filter_white.xml" value="0.6491666666666667" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/ic_add.xml" value="0.3335" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/ic_cross_black.xml" value="0.6391666666666667" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/ic_remove.xml" value="0.3335" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/journal_vector.xml" value="0.3555" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/multiselect.xml" value="0.4879518072289157" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/nomen_layout_stroke.xml" value="0.277734375" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/percent_sale.xml" value="0.277734375" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/send_orders_vector.xml" value="0.4879518072289157" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/table_header.xml" value="0.3555" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/update_app_vector.xml" value="0.3555" />
@@ -69,6 +74,7 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/update_data_vector_white.xml" value="0.3555" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/drawable/update_white.xml" value="0.7108333333333333" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout-v28/default_fragment.xml" value="0.3385416666666667" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout-v28/nomen_layout_preview.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout-v28/order_head_fragment2.xml" value="0.33138173302107726" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout-v28/order_head_fragment_new.xml" value="0.67" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/activity_login.xml" value="0.3981264637002342" />
@@ -88,6 +94,7 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/change_range_qty.xml" value="0.75" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/colors_layout.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/contr_layout.xml" value="0.3981264637002342" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/debet_filter.xml" value="0.75" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/debet_fragment.xml" value="0.67" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/debet_layout.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/default_fragment.xml" value="0.5" />
@@ -113,12 +120,14 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/nomen_layout.xml" value="0.5" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/nomen_layout_bak.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/nomen_layout_bak2.xml" value="0.67" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/nomen_layout_preview.xml" value="0.75" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/nomen_unifilter_layout.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/order_head_fragment.xml" value="0.67" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/order_head_frargment_main.xml" value="0.67" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/orderdt_item.xml" value="0.34894613583138173" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/orders_item.xml" value="1.0" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/prod_layout.xml" value="0.3981264637002342" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/progress_bar_loading.xml" value="0.75" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/search_layout.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/send_orders_fragment.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/setting_db.xml" value="0.3981264637002342" />
@@ -139,7 +148,7 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/update_data_fragment.xml" value="0.67" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/update_data_fragment2.xml" value="0.6894484412470024" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/update_data_fragment_new.xml" value="0.67" />
-        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/view_order_fragment.xml" value="0.3981264637002342" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/view_order_fragment.xml" value="0.33" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/layout/wc_layout.xml" value="0.3981264637002342" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/menu/debet_menu.xml" value="0.6766666666666666" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/menu/drawer.xml" value="0.5716666666666667" />
@@ -153,6 +162,7 @@
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/menu/settings_menu.xml" value="0.7383333333333333" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/menu/update_menu.xml" value="0.7316666666666667" />
         <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/menu/view_order_menu.xml" value="0.67" />
+        <entry key="..\:/Users/isupo/YandexDisk/Programming/Java/AndroidStudioProjects/MARS/app/src/main/res/xml/file_paths.xml" value="0.3747072599531616" />
       </map>
     </option>
   </component>

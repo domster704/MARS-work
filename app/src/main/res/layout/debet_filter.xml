@@ -11,49 +11,51 @@
     android:weightSum="1">
 
     <TextView
-        android:id="@+id/tvWC"
+        android:id="@+id/tvDebetContr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
-        android:text="@string/lblFilterWC"
+        android:minHeight="35dp"
+        android:text="@string/lblFilterContr"
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/tvFocus"
+        android:id="@+id/tvDebetTP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
-        android:layout_below="@+id/tvWC"
-        android:layout_alignStart="@+id/tvWC"
+        android:layout_below="@id/tvDebetContr"
+        android:layout_alignStart="@+id/tvDebetContr"
+        android:layout_marginStart="0dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
-        android:text="@string/lblFilterFocus"
+        android:minHeight="35dp"
+        android:text="@string/lblFilterTP"
         android:textColor="@android:color/black" />
 
     <Spinner
-        android:id="@+id/spinFocus"
+        android:id="@+id/spinDebetContr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
-        android:layout_alignTop="@+id/tvFocus"
+        android:layout_alignTop="@+id/tvDebetContr"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_toEndOf="@+id/tvWC"
+        android:layout_toEndOf="@+id/tvDebetContr"
+        android:minHeight="35dp"
+        android:spinnerMode="dropdown"
         android:textAlignment="center" />
 
     <Spinner
-        android:id="@+id/spinWC"
+        android:id="@+id/spinDebetTP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/tvWC"
+        android:layout_alignTop="@+id/tvDebetTP"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="10dp"
-        android:layout_toEndOf="@+id/tvWC"
+        android:layout_toEndOf="@+id/tvDebetContr"
         android:minHeight="35dp"
         android:textAlignment="center" />
 

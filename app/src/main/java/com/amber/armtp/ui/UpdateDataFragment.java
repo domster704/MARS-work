@@ -1,35 +1,33 @@
-package com.amber.armtp;
+package com.amber.armtp.ui;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.zip.ZipDownload;
-import com.amber.armtp.zip.ZipUnpacking;
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
+import com.amber.armtp.ftp.Downloader;
 
-import java.io.File;
 import java.util.Objects;
 
 /**
  * Updated by domster704 on 27.09.2021
  */
-public class UpdateDataFragment extends Fragment {
+public class UpdateDataFragment extends Fragment implements View.OnClickListener {
     public GlobalVars glbVars;
     public static UIData[] uiData;
 
@@ -41,20 +39,20 @@ public class UpdateDataFragment extends Fragment {
         }
     };
 
-    private int countOfReturning = 0;
-
     private final Handler handlerDB = new Handler();
-    private CheckBox chkDB;
-    private ProgressBar pgDB;
-    private TextView tvDBPerc;
-    private TextView tvDBCount;
+    private final Handler handlerApp = new Handler();
+    private TextView tvDB, tvApp;
+    private ProgressBar pgDB, pgApp;
+    private TextView tvDBPerc, tvAppPerc;
+    private TextView tvDBCount, tvAppCount;
+
+    Button btnDBUpdate, btnAppUpdate;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.update_data_fragment_new, container, false);
         v.setKeepScreenOn(true);
-        setHasOptionsMenu(true);
         glbVars.view = v;
         return v;
     }
@@ -66,7 +64,7 @@ public class UpdateDataFragment extends Fragment {
         glbVars = (GlobalVars) getActivity().getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
-        glbVars.CurAc = getActivity();
+        GlobalVars.CurAc = getActivity();
     }
 
     @Override
@@ -97,10 +95,25 @@ public class UpdateDataFragment extends Fragment {
         glbVars.toolbar.setSubtitle("");
         setRetainInstance(true);
 
-        chkDB = getActivity().findViewById(R.id.chkDB);
+        btnDBUpdate = getActivity().findViewById(R.id.btnDBUpdate);
+        btnDBUpdate.setOnClickListener(this);
+
+        tvDB = getActivity().findViewById(R.id.chkDB);
         pgDB = getActivity().findViewById(R.id.pgDB);
         tvDBPerc = getActivity().findViewById(R.id.tbDBPerc);
         tvDBCount = getActivity().findViewById(R.id.tvDBCount);
+
+        btnAppUpdate = getActivity().findViewById(R.id.btnAppUpdate);
+        btnAppUpdate.setOnClickListener(this);
+
+        tvApp = getActivity().findViewById(R.id.chkApp);
+        pgApp = getActivity().findViewById(R.id.pgApp);
+        tvAppPerc = getActivity().findViewById(R.id.tvAppPerc);
+        tvAppCount = getActivity().findViewById(R.id.tvAppCount);
+
+        uiData = new UIData[2];
+        uiData[0] = new UIData(tvDB, pgDB, tvDBCount, tvDBPerc, handlerDB);
+        uiData[1] = new UIData(tvApp, pgApp, tvAppCount, tvAppPerc, handlerApp);
 
         try {
             getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
@@ -108,98 +121,61 @@ public class UpdateDataFragment extends Fragment {
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.update_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.updateData:
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnDBUpdate:
                 if (DebetIsFinished.equals("1") || DebetIsFinished.equals("0")) {
                     if (glbVars.isNetworkAvailable()) {
-                        glbVars.UpdateWorking = 1;
-                        item.setEnabled(false);
+                        Downloader downloader = new Downloader(glbVars, getActivity());
 
-                        uiData = new UIData[2];
-                        uiData[0] = new UIData(chkDB, pgDB, tvDBPerc, tvDBCount, handlerDB);
+                        view.setEnabled(false);
 
-                        DownloadDB();
-                        item.setEnabled(true);
+                        pgDB.setProgress(0);
+                        tvDB.setTextColor(Color.rgb(0, 0, 0));
+
+                        downloader.downloadDB(uiData[0], view);
                     } else {
                         Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
                     }
                 }
-                return true;
-            default:
-                return true;
+                break;
+            case R.id.btnAppUpdate:
+                Downloader downloader = new Downloader(glbVars, getActivity());
+
+                if (!Downloader.isServerVerNewer) {
+                    Toast.makeText(getContext(), "На сервере нет новой версии", Toast.LENGTH_LONG).show();
+                    break;
+                }
+
+                view.setEnabled(false);
+
+                pgApp.setProgress(0);
+                tvApp.setTextColor(Color.rgb(0, 0, 0));
+
+                try {
+                    downloader.downloadApp(uiData[1], view);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
 
     public static class UIData {
-        public CheckBox checkBox;
+        public TextView tvData;
         public ProgressBar progressBar;
         public TextView tvPer;
         public TextView tvCount;
         public Handler handler;
 
-        public UIData(CheckBox checkBox, ProgressBar progressBar, TextView tvCount, TextView tvPer, Handler handler) {
-            this.checkBox = checkBox;
+        public UIData(TextView tvData, ProgressBar progressBar, TextView tvCount, TextView tvPer, Handler handler) {
+            this.tvData = tvData;
             this.progressBar = progressBar;
             this.tvPer = tvPer;
             this.tvCount = tvCount;
             this.handler = handler;
         }
-    }
-
-    private void DownloadDB() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ZipDownload zipDownload;
-                try {
-                    zipDownload = new ZipDownload(ServerDetails.getInstance());
-                    if (!zipDownload.downloadZip(uiData[0])) {
-                        return;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                File f = new File(MainActivity.filesPath + "orders.db");
-
-                ZipUnpacking zipUnpacking;
-                try {
-                    zipUnpacking = new ZipUnpacking(ServerDetails.getInstance());
-                    zipUnpacking.doUnpacking(uiData[0]);
-
-                    if (getFileSizeKiloBytes(new File(MainActivity.filesPath + "armtp3.db")) < 100 && countOfReturning < 3) {
-                        countOfReturning++;
-                        DownloadDB();
-                    } else if (countOfReturning >= 3) {
-                        return;
-                    } else {
-                        glbVars.dbApp.putDemp(glbVars.db.getReadableDatabase());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
-        }).start();
-    }
-
-    public void restart() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        this.startActivity(intent);
-        System.exit(0);
-    }
-
-    private static double getFileSizeKiloBytes(File file) {
-        return (double) file.length() / 1024;
     }
 }

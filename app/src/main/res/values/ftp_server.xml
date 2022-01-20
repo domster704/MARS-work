@@ -3,7 +3,8 @@
     <string name="host">91.208.84.67</string>
     <string name="user">amberftp</string>
     <string name="password">201002</string>
-    <integer name="port">21</integer>
-    <string name="fileDirectory">/EXCHANGE/OUT/MARS/armtp3.zip</string>
+    <string name="port">21</string>
+    <string name="fileDirectoryDB">/EXCHANGE/OUT/MARS/armtp3.zip</string>
+    <string name="fileDirectoryApk">/EXCHANGE/OUT/MARS/UPDATE/mars.apk</string>
     <string name="fileName">armtp3.zip</string>
 </resources>
