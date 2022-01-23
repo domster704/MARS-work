@@ -1,6 +1,7 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +32,9 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.interfaces.PGShowing;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -124,8 +128,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     })
                     .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel())
                     .setNeutralButton("Сбросить фильтры", (dialog, id) -> {
-                    })
-            ;
+                    });
 
             final AlertDialog alertD = alertDialogBuilder.create();
             alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -159,10 +162,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 try {
                     SgiId = ((TextView) getActivity().findViewById(R.id.ColSgiID)).getText().toString();
                     GroupID = ((TextView) getActivity().findViewById(R.id.ColGrupID)).getText().toString();
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
+                String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
                 glbVars.LoadFilterNomen(SgiId, GroupID,
-                        FilterWC_ID.getText().toString(), FilterFocus_ID.getText().toString());
+                        WC_ID, FilterFocus_ID.getText().toString());
                 alertD.dismiss();
             });
 
@@ -183,6 +188,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         setHasOptionsMenu(true);
         thisView = rootView;
         glbVars.view = rootView;
+        Log.d("Xd", String.valueOf(rootView));
 
         return rootView;
     }
@@ -233,99 +239,107 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     }
 
     public void SaveOrder() throws ParseException {
-        new Thread(() -> {
-            Cursor c, c2, c1;
-            String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC;
-            String ContrDes, AddrDes;
-            int Status = 0;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Cursor c, c2, c1;
+                String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC;
+                String ContrDes, AddrDes;
+                int Status = 0;
 
-            String sql;
-            SQLiteStatement stmt;
+                String sql;
+                SQLiteStatement stmt;
 
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-            String curdate = df.format(Calendar.getInstance().getTime());
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                String curdate = df.format(Calendar.getInstance().getTime());
 
-            c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-            c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-            if (c.getCount() == 0) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show());
+                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                if (c.getCount() == 0) {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show());
 
-                return;
+                    return;
+                }
+                c2.moveToFirst();
+
+                if (c2.getInt(1) == 0) {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show());
+                    return;
+                }
+
+                c.moveToFirst();
+                TP_ID = c.getString(c.getColumnIndex("TP_ID"));
+                Data = c.getString(c.getColumnIndex("DATA"));
+                Comment = c.getString(c.getColumnIndex("COMMENT"));
+                Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
+                Addr_ID = c.getString(c.getColumnIndex("ADDR_ID"));
+                ContrDes = c.getString(c.getColumnIndex("C_DES"));
+                AddrDes = c.getString(c.getColumnIndex("A_DES"));
+
+                c.close();
+                c2.close();
+
+                Calendar now = Calendar.getInstance();
+
+                String hours = now.get(Calendar.HOUR_OF_DAY) >= 10 ? now.get(Calendar.HOUR_OF_DAY) + "" : "0" + now.get(Calendar.HOUR_OF_DAY);
+                String minutes = now.get(Calendar.MINUTE) >= 10 ? now.get(Calendar.MINUTE) + "" : "0" + now.get(Calendar.MINUTE);
+
+                int Docno = glbVars.dbOrders.GetDocNumber();
+                IDDOC = Integer.toString(Docno, 36).toUpperCase();
+                IDDOC += "." + TP_ID + "." + Data.replace(".", "") + "_" + hours + minutes;
+
+                sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES)  VALUES (?,?,?,?,?,?,?,?,?,?);";
+                stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
+                glbVars.dbOrders.getWritableDatabase().beginTransaction();
+                try {
+                    stmt.clearBindings();
+                    stmt.bindString(1, IDDOC);
+                    stmt.bindString(2, TP_ID);
+                    stmt.bindString(3, Contr_ID);
+                    stmt.bindString(4, Addr_ID);
+                    stmt.bindString(5, curdate);
+                    stmt.bindString(6, Data);
+                    stmt.bindString(7, Comment);
+                    stmt.bindLong(8, Status);
+                    stmt.bindString(9, ContrDes);
+                    stmt.bindString(10, AddrDes);
+                    stmt.executeInsert();
+                    stmt.clearBindings();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.dbOrders.getWritableDatabase().endTransaction();
+                }
+
+                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
+                if (c1.getCount() == 0) {
+                    c1.close();
+                    return;
+                } else {
+                    _insertIntoZakazyDT(IDDOC);
+                }
+
+                getActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_SHORT).show();
+                    glbVars.spinContr.setSelection(0);
+                    glbVars.spinAddr.setSelection(0);
+                    glbVars.spinAddr.setAdapter(null);
+                    glbVars.txtDate.setText("");
+                    glbVars.txtComment.setText("");
+                    glbVars.edContrFilter.setText("");
+                    clearChosenGroupSgi();
+
+                    editor.putString("ColSgiID", "0");
+                    editor.commit();
+
+                    Fragment fragment = new JournalFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
+                    fragmentTransaction.commit();
+                    toolbar.setTitle(R.string.journal);
+                });
             }
-            c2.moveToFirst();
-
-            if (c2.getInt(1) == 0) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show());
-                return;
-            }
-
-            c.moveToFirst();
-            TP_ID = c.getString(c.getColumnIndex("TP_ID"));
-            Data = c.getString(c.getColumnIndex("DATA"));
-            Comment = c.getString(c.getColumnIndex("COMMENT"));
-            Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
-            Addr_ID = c.getString(c.getColumnIndex("ADDR_ID"));
-            ContrDes = c.getString(c.getColumnIndex("C_DES"));
-            AddrDes = c.getString(c.getColumnIndex("A_DES"));
-
-            c.close();
-            c2.close();
-
-            int Docno = glbVars.dbOrders.GetDocNumber();
-            IDDOC = Integer.toString(Docno, 36).toUpperCase();
-            IDDOC += "." + TP_ID + "." + Data.replace(".", "");
-
-            sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES)  VALUES (?,?,?,?,?,?,?,?,?,?);";
-            stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
-            glbVars.dbOrders.getWritableDatabase().beginTransaction();
-            try {
-                stmt.clearBindings();
-                stmt.bindString(1, IDDOC);
-                stmt.bindString(2, TP_ID);
-                stmt.bindString(3, Contr_ID);
-                stmt.bindString(4, Addr_ID);
-                stmt.bindString(5, curdate);
-                stmt.bindString(6, Data);
-                stmt.bindString(7, Comment);
-                stmt.bindLong(8, Status);
-                stmt.bindString(9, ContrDes);
-                stmt.bindString(10, AddrDes);
-                stmt.executeInsert();
-                stmt.clearBindings();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
-                glbVars.dbOrders.getWritableDatabase().endTransaction();
-            }
-
-            c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
-            if (c1.getCount() == 0) {
-                c1.close();
-                return;
-            } else {
-                _insertIntoZakazyDT(IDDOC);
-            }
-
-            getActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_SHORT).show();
-                glbVars.spinContr.setSelection(0);
-                glbVars.spinAddr.setSelection(0);
-                glbVars.spinAddr.setAdapter(null);
-                glbVars.txtDate.setText("");
-                glbVars.txtComment.setText("");
-                glbVars.edContrFilter.setText("");
-                clearChosenGroupSgi();
-
-                editor.putString("ColSgiID", "0");
-                editor.commit();
-
-                Fragment fragment = new JournalFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
-                fragmentTransaction.commit();
-                toolbar.setTitle(R.string.journal);
-            });
         }).start();
     }
 
@@ -381,9 +395,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                     glbVars.spinAddr.setAdapter(null);
                 } catch (Exception ignored) {
                 }
-                glbVars.txtDate.setText("");
-                glbVars.txtComment.setText("");
-                glbVars.edContrFilter.setText("");
+                try {
+                    glbVars.txtDate.setText("");
+                    glbVars.txtComment.setText("");
+                    glbVars.edContrFilter.setText("");
+                } catch (Exception ignored) {
+                }
+
 
                 clearChosenGroupSgi();
 

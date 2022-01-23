@@ -40,17 +40,17 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             db = this.getReadableDatabase();
             db.setLockingEnabled(false);
             cursor = db.rawQuery("SELECT" +
-                    "  ZAKAZY.ROWID AS _id," +
-                    "  ZAKAZY.DOC_DATE," +
-                    "  CONTR_DES AS CONTR," +
-                    "  ADDR_DES AS ADDR," +
-                    "  ZAKAZY.DELIVERY_DATE AS DELIVERY," +
-                    "  CASE ZAKAZY.STATUS WHEN 0 THEN 'Сохранен' WHEN 1 THEN 'Отправлен' WHEN 2 THEN 'Получен' WHEN 3 THEN 'Оформлен' WHEN 4 THEN 'Оформлен(-)' WHEN 6 THEN 'Собран' WHEN 7 THEN 'Собран(-)' WHEN 5 THEN 'Удален' WHEN 99 THEN 'Отменен' END AS STATUS," +
-                    "  (SELECT printf('%.2f', ROUND(SUM(QTY * PRICE),2)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
-                    "  ZAKAZY.DOCID AS DOCID" +
-                    "  FROM ZAKAZY" +
-                    "  WHERE" +
-                    "  DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))", null);
+                    " ZAKAZY.ROWID AS _id," +
+                    " ZAKAZY.DOC_DATE," +
+                    " CONTR_DES AS CONTR," +
+                    " ADDR_DES AS ADDR," +
+                    " ZAKAZY.DELIVERY_DATE AS DELIVERY," +
+                    " CASE ZAKAZY.STATUS WHEN 0 THEN 'Сохранен' WHEN 1 THEN 'Отправлен' WHEN 2 THEN 'Получен' WHEN 3 THEN 'Оформлен' WHEN 4 THEN 'Оформлен(-)' WHEN 6 THEN 'Собран' WHEN 7 THEN 'Собран(-)' WHEN 5 THEN 'Удален' WHEN 99 THEN 'Отменен' END AS STATUS," +
+                    " (SELECT printf('%.2f', ROUND(SUM(QTY * PRICE),2)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
+                    " ZAKAZY.DOCID AS DOCID" +
+                    " FROM ZAKAZY" +
+                    " WHERE" +
+                    " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2)) ORDER BY DOCID DESC", null);
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();

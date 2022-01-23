@@ -13,13 +13,10 @@ public class ServerDetails {
     public String dirAPK;
     public String port;
 
-//    public final String filePathInAndroid;
-
     private ServerDetails(String... args) {
         this.host = args[0];
         this.dirDB = args[1];
         this.port = args[2];
-//        this.filePathInAndroid = args[3];
         this.user = args[3];
         this.password = args[4];
         this.dirAPK = args[5];

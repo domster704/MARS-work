@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.amber.armtp.interfaces.Async;
+
 public class DBAppHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "appData.db";
 
@@ -32,6 +34,7 @@ public class DBAppHelper extends SQLiteOpenHelper {
         return super.getWritableDatabase();
     }
 
+    @Async
     public void putDemp(SQLiteDatabase dbNomen) {
         Cursor nomen = dbNomen.rawQuery("SELECT DISTINCT DEMP FROM NOMEN", null);
 
@@ -41,6 +44,8 @@ public class DBAppHelper extends SQLiteOpenHelper {
             nomen.moveToNext();
             db.execSQL("INSERT INTO DEMP(DEMP) VALUES('" + nomen.getString(nomen.getColumnIndex("DEMP")) + "')");
         }
+
+        nomen.close();
     }
 
     public Cursor getWCs() {
@@ -48,7 +53,6 @@ public class DBAppHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-//                                    SELECT 0 AS _id, '0' AS CODE, 'Выберите Фокус' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM FOKUS
             cursor = db.rawQuery("SELECT 0 as _id, 'Выберите демографический признак' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
 
             return cursor;
@@ -56,5 +60,13 @@ public class DBAppHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getWCByID(String id) {
+        if (id.equals("0"))
+            return "Выберите демографический признак";
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT DEMP FROM DEMP WHERE rowid ='" + id + "'", null);
+        c.moveToNext();
+        return c.getString(0);
     }
 }

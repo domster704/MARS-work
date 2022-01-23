@@ -135,7 +135,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                         pgDB.setProgress(0);
                         tvDB.setTextColor(Color.rgb(0, 0, 0));
 
-                        downloader.downloadDB(uiData[0], view);
+                        downloader.downloadDB(uiData[0], view, glbVars);
                     } else {
                         Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
                     }

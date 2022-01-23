@@ -261,18 +261,4 @@
         </RelativeLayout>
     </HorizontalScrollView>
 
-    <Button
-        android:id="@+id/btFilterDebet"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="26dp"
-        android:layout_toStartOf="@+id/btClearDebetFilter"
-        android:paddingLeft="15dp"
-        android:paddingTop="0dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="0dp"
-        android:text="@string/debetFilter" />
-
 </RelativeLayout>

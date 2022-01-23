@@ -29,6 +29,7 @@ import com.amber.armtp.dbHelpers.DBOrdersHelper;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
+import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
 import com.amber.armtp.ui.JournalFragment;
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS NOMEN (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, SGI TEXT, GRUPPA TEXT, KOD5 TEXT, DESCR TEXT, DEMP TEXT, FOCUSID TEXT, GOFRA INTEGER, FOTO TEXT, POSTDATA DATE, OST INTEGER, PD NUMERIC DEFAULT 0, ZAKAZ NUMERIC DEFAULT 0, PRICE NUMERIC DEFAULT 0)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS PRICES (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, NOMENID TEXT, TIPCE TEXT, PRICE NUMERIC)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
+            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT, STATUS TEXT)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTRCODE TEXT, CODE TEXT, DESCR TEXT)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT, DESCR TEXT NOT NULL)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEBET (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTR TEXT, CONTR_ID TEXT, SCHET TEXT, STATUS TEXT, KREDIT TEXT, DOGOVOR DATE, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, A35 NUMERIC, A42 NUMERIC, A49 NUMERIC, A56 NUMERIC, A63 NUMERIC, A64 NUMERIC, DOLG NUMERIC, OTGR30 NUMERIC, OPL30 NUMERIC, K_OBOR NUMERIC, FIRMA TEXT)");
@@ -357,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    @PGShowing
     private void initLastUpdate() {
         tvLastUpdate = findViewById(R.id.tvLastUpdateText);
         if (tvLastUpdate != null) {

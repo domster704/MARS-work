@@ -14,34 +14,36 @@
         android:id="@+id/tvWC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
+        android:minHeight="35dp"
         android:text="@string/lblFilterWC"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/nomFilterTextSize"/>
 
     <TextView
         android:id="@+id/tvFocus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
         android:layout_below="@+id/tvWC"
         android:layout_alignStart="@+id/tvWC"
         android:layout_marginBottom="5dp"
         android:gravity="center"
+        android:minHeight="35dp"
         android:text="@string/lblFilterFocus"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/nomFilterTextSize" />
 
     <Spinner
         android:id="@+id/spinFocus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="35dp"
         android:layout_alignTop="@+id/tvFocus"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/tvWC"
+        android:minHeight="35dp"
         android:textAlignment="center" />
 
     <Spinner

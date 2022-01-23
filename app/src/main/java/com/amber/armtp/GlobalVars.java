@@ -24,6 +24,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,6 +48,7 @@ import android.widget.ViewFlipper;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.interfaces.Async;
 import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.SettingFragment;
@@ -139,7 +141,7 @@ public class GlobalVars extends Application {
     public GridView orderdtList;
     public String DBF_FIleForSend;
     public String DBF_FileName;
-    public Button btFilter, btClearFilter;
+    public Button btClearFilter;
     public GridView debetList;
     public Spinner spTP;
     public Cursor curDebet, curDebetTp;
@@ -605,7 +607,7 @@ public class GlobalVars extends Application {
     public void LoadFiltersWC(View vw) {
         curWC = dbApp.getWCs();
         spWC = vw.findViewById(R.id.spinWC);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"DEMP", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
         spWC.setAdapter(adapter);
     }
 
@@ -657,6 +659,8 @@ public class GlobalVars extends Application {
         CurFocusID = FocusID;
         CurSearchName = "";
 
+        System.out.println(SgiID + " " + GrupID + " " + WCID + " " + FocusID);
+
         new Thread(new Runnable() {
             @Override
             @PGShowing
@@ -678,7 +682,6 @@ public class GlobalVars extends Application {
     public void LoadNextNomen(
             final String SgiID, final String GrupID, final String WCID,
             final String FocusID, final String search, final int positionSQL) {
-//        resetToZeroCurValues();
         CurSGI = SgiID;
         CurGroup = GrupID;
         CurWCID = WCID;
@@ -699,7 +702,7 @@ public class GlobalVars extends Application {
                     nomenList.setOnItemClickListener(GridNomenClick);
                     nomenList.setOnItemLongClickListener(GridNomenLongClick);
 
-                    nomenList.setSelection(positionSQL);
+                    nomenList.setSelection(positionSQL - 1);
                 });
                 isNewLoaded = false;
             }
@@ -779,7 +782,7 @@ public class GlobalVars extends Application {
     public void SetSelectedFilterWC(String ID) {
         for (int i = 0; i < spWC.getCount(); i++) {
             Cursor value = (Cursor) spWC.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("DEMP"));
+            String id = value.getString(value.getColumnIndexOrThrow("_id"));
             if (ID.equals(id)) {
                 spWC.setSelection(i);
                 break;
@@ -1109,7 +1112,7 @@ public class GlobalVars extends Application {
 
         @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
-        String curdate = df.format(Calendar.getInstance().getTimeInMillis());
+        String curdate = df.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
@@ -1150,9 +1153,9 @@ public class GlobalVars extends Application {
         index++;
 
         fields[index] = new DBFField();
-        fields[index].setName("DOCNO");
+        fields[index].setName("DOCID");
         fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
+        fields[index].setFieldLength(30);
         index++;
 
         fields[index] = new DBFField();
@@ -1250,7 +1253,8 @@ public class GlobalVars extends Application {
             status = c.getString(5);
 
             CheckBox checkBox = new CheckBox(layout.getContext());
-            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
+            float height = getResources().getDimension(R.dimen.heightOfOrdersItem);
+            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) height));
             layout.addView(checkBox);
 
             if (status.equals("Сохранен")) {
@@ -1273,6 +1277,8 @@ public class GlobalVars extends Application {
     }
 
     public void LoadOrdersDetails(String ZakazID) {
+        _doUpdateQTYByVycherk(ZakazID);
+
         orderdtList.setAdapter(null);
         OrdersDt = dbOrders.getZakazDetails(ZakazID);
         OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
@@ -1292,9 +1298,9 @@ public class GlobalVars extends Application {
         java.util.Date DELIVERY, DOCDATE;
         double QTY, PRICE;
         int ID;
-        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
 
-        String curdate = df.format(Calendar.getInstance().getTimeInMillis());
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
+        String curdate = df.format(Calendar.getInstance().getTimeInMillis()) + Calendar.MILLISECOND;
 
         String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
         DBF_FileName = "orders_" + curdate + ".dbf";
@@ -1336,9 +1342,9 @@ public class GlobalVars extends Application {
         index++;
 
         fields[index] = new DBFField();
-        fields[index].setName("DOCNO");
+        fields[index].setName("DOCID");
         fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
+        fields[index].setFieldLength(30);
         index++;
 
         fields[index] = new DBFField();
@@ -1642,30 +1648,6 @@ public class GlobalVars extends Application {
         }
     }
 
-    public static class DebetContrsAdapter extends SimpleCursorAdapter {
-        public DebetContrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            Cursor cursor = getCursor();
-            TextView tvDescr = view.findViewById(R.id.ColContrDescr);
-
-            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR"));
-
-            if (position % 2 == 0) {
-                tvDescr.setBackgroundColor(Color.rgb(201, 235, 255));
-            } else {
-                tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
-            }
-
-            tvDescr.setText(resDescr);
-            return view;
-        }
-    }
-
     public class MyCursorAdapter extends SimpleCursorAdapter {
         public MyCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -1708,8 +1690,11 @@ public class GlobalVars extends Application {
                 ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
             });
 
-//            tvPrice.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex("PRICE"))));
-            tvPrice.setText(String.valueOf(DBHelper.pricesMap.get(cursor.getString(cursor.getColumnIndex("KOD5")))));
+            String price = String.format("%.2f", DBHelper.pricesMap.get(cursor.getString(cursor.getColumnIndex("KOD5"))));
+            if (!DBHelper.pricesMap.containsKey(cursor.getString(cursor.getColumnIndex("KOD5"))))
+                price = "0";
+            tvPrice.setText(price);
+
             if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
                 if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
                     resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
@@ -1744,14 +1729,11 @@ public class GlobalVars extends Application {
             long daysSubstraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
             // Конец расчёта разниы дней
 
-
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
                 view.setBackgroundColor(Color.rgb(255, 255, 255));
             }
-
-
 
             if (daysSubstraction <= 4) {
                 int color;
@@ -1770,7 +1752,7 @@ public class GlobalVars extends Application {
             }
 
             tvPosition.setText(String.valueOf(position + 1));
-            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded) {
+            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit) {
                 isNewLoaded = true;
                 LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, cursor.getCount());
                 return view;
@@ -1997,6 +1979,18 @@ public class GlobalVars extends Application {
         }
     }
 
+    public void rewritePriceToMainDB(String DOCID) {
+        Cursor orderPrices;
+        orderPrices = dbOrders.getReadableDatabase().rawQuery("SELECT PRICE, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + DOCID + "'", null);
+
+        while (orderPrices.moveToNext()) {
+            DBHelper.pricesMap.remove(orderPrices.getString(1));
+            DBHelper.pricesMap.put(orderPrices.getString(1), orderPrices.getFloat(0));
+        }
+
+        orderPrices.close();
+    }
+
     private void _updateOrdersStatusFromDB() {
         SQLiteDatabase dbStatus = db.getReadableDatabase();
         SQLiteDatabase dbDocID = dbOrders.getReadableDatabase();
@@ -2011,5 +2005,23 @@ public class GlobalVars extends Application {
                 dbDocID.execSQL("UPDATE ZAKAZY STATUS = '" + Status + "'");
             }
         }
+    }
+
+    private void _doUpdateQTYByVycherk(String DocID) {
+        SQLiteDatabase dbApp = dbOrders.getWritableDatabase();
+        SQLiteDatabase dbVy = db.getReadableDatabase();
+
+        Cursor newQty = dbVy.rawQuery("SELECT NOMEN, KOL FROM VYCHERK WHERE DOCID ='" + DocID + "'", null);
+        Cursor c = null;
+
+        while (newQty.moveToNext()) {
+            c = dbApp.rawQuery("SELECT QTY FROM ZAKAZY_DT WHERE DOCID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'", null);
+            c.moveToNext();
+            dbApp.execSQL("UPDATE ZAKAZY_DT SET QTY = '" + c.getString(0) + " (" + newQty.getString(1) + ")" + "' WHERE DOCID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
+        }
+
+        newQty.close();
+        if (c != null)
+            c.close();
     }
 }

@@ -12,6 +12,7 @@ import com.amber.armtp.BuildConfig;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.MainActivity;
+import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
 import org.apache.commons.net.ftp.FTP;
@@ -67,7 +68,7 @@ public class Downloader {
 
     // Кол-во попыток, затраченных на скачивание файла
     private int countOfTrying = 0;
-    public void downloadDB(final UpdateDataFragment.UIData ui, View view) {
+    public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
         new Thread(() -> {
             String filePath = MainActivity.filesPathDB + "armtp3.zip";
 
@@ -86,12 +87,14 @@ public class Downloader {
                 zipUnpacking = new ZipUnpacking(filePath);
                 if (!zipUnpacking.doUnpacking() && countOfTrying < 3) {
                     countOfTrying++;
-                    downloadDB(ui, view);
+                    downloadDB(ui, view, globalVars);
                 } else if (countOfTrying >= 3) {
                     return;
                 }
 
                 activity.runOnUiThread(() -> {
+                    globalVariable.db = new DBHelper(activity.getApplicationContext());
+
                     view.setEnabled(true);
                     Toast.makeText(GlobalVars.CurAc, "База данных успешно обновлена", Toast.LENGTH_SHORT).show();
                 });

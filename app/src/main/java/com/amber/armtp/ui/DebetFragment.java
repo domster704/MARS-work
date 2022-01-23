@@ -88,7 +88,6 @@ public class DebetFragment extends Fragment {
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
 
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
-        glbVars.btFilter = getActivity().findViewById(R.id.btFilterDebet);
         glbVars.btClearFilter = getActivity().findViewById(R.id.btClearDebetFilter);
         glbVars.spTP = getActivity().findViewById(R.id.spTorgPred);
 
@@ -104,12 +103,6 @@ public class DebetFragment extends Fragment {
 
         settings = getActivity().getSharedPreferences("apk_version", 0);
         editor = settings.edit();
-        glbVars.btFilter.setOnClickListener(v -> {
-            glbVars.tvContr = Objects.requireNonNull(getActivity()).findViewById(R.id.ColContrID);
-            glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
-            String DebetTp = glbVars.tvTP.getText().toString();
-            glbVars.LoadDebet(DebetTp);
-        });
 
         glbVars.spTP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -119,6 +112,11 @@ public class DebetFragment extends Fragment {
                 editor.putString("debet_tp", ItemID);
                 editor.commit();
                 glbVars.CurrentDebTP = ItemID;
+
+                glbVars.tvContr = Objects.requireNonNull(getActivity()).findViewById(R.id.ColContrID);
+                glbVars.tvTP = getActivity().findViewById(R.id.ColTPID);
+                String DebetTp = glbVars.tvTP.getText().toString();
+                glbVars.LoadDebet(DebetTp);
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {

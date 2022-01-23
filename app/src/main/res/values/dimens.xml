@@ -28,4 +28,8 @@
 
     <!-- Settings dimen -->
     <dimen name="textSizeSettings">14sp</dimen>
+
+    <dimen name="heightOfOrdersItem">40dp</dimen>
+
+    <dimen name="nomFilterTextSize">16sp</dimen>
 </resources>

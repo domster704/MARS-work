@@ -1,7 +1,5 @@
 package com.amber.armtp.aspects;
 
-import android.util.Log;
-
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ProgressBarLoading;
 

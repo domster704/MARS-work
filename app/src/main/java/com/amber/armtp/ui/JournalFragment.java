@@ -1,13 +1,12 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +71,6 @@ public class JournalFragment extends Fragment {
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
 
-    ProgressDialog progress;
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, long id) {
@@ -81,40 +80,32 @@ public class JournalFragment extends Fragment {
             final String Status = tvStatus.getText().toString();
             nomPopupMenu = new PopupMenu(getActivity(), view);
             nomPopupMenu.getMenuInflater().inflate(R.menu.order_context_menu, nomPopupMenu.getMenu());
-            nomPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @SuppressLint("NonConstantResourceId")
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    switch (menuItem.getItemId()) {
-                        case R.id.CtxOrdEdit:
-                            glbVars.OrderID = ID;
-                            // Use the Builder class for convenient dialog construction
-                            builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
-                            builder.setMessage("Вы уверены?")
-                                    .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
+            nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
+                switch (menuItem.getItemId()) {
+                    case R.id.CtxOrdEdit:
+                        glbVars.OrderID = ID;
+                        // Use the Builder class for convenient dialog construction
+                        builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                        builder.setMessage("Вы уверены?")
+                                .setNegativeButton("Нет", (dialog, id1) -> {
 
-                                        }
-                                    })
-                                    .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            EditOrder(ID);
-                                            Fragment fragment = new FormOrderFragment();
-                                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
-                                            fragmentTransaction.commit();
-                                        }
-                                    });
-                            builder.create();
-                            builder.show();
-                            return true;
-                        case R.id.CtxOrdCopy:
-                            CopyOrder(ID);
-                            return true;
-                        default:
-                    }
-                    return true;
+                                })
+                                .setPositiveButton("Да", (dialog, id1) -> {
+                                    EditOrder(ID);
+                                    Fragment fragment = new FormOrderFragment();
+                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+                                    fragmentTransaction.commit();
+                                });
+                        builder.create();
+                        builder.show();
+                        return true;
+                    case R.id.CtxOrdCopy:
+                        CopyOrder(ID);
+                        return true;
+                    default:
                 }
+                return true;
             });
 
             if (Status.equals("Удален") || Status.equals("Отменен")) {
@@ -186,11 +177,14 @@ public class JournalFragment extends Fragment {
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
+        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
+
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
         getActivity().setTitle("Журнал");
 
-        glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
+        ScrollView view = getActivity().findViewById(R.id.scrollViewJ);
+        view.fullScroll(View.FOCUS_DOWN);
     }
 
     /**
@@ -292,20 +286,17 @@ public class JournalFragment extends Fragment {
                 builderDel.setMessage("Удалить заказы?")
                         .setNegativeButton("Нет", (dialogInterface, i) -> dialogInterface.cancel())
                         // Поставил NeutralButton, чтобы кнопка была слева, а не рядом с кнопкой "Нет"
-                        .setNeutralButton("Да", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                isChecked = false;
+                        .setNeutralButton("Да", (dialogInterface, i) -> {
+                            isChecked = false;
 
-                                for (GlobalVars.CheckBoxData data : chosenOrders) {
-                                    glbVars.dbOrders.DeleteOrderByID(data.id);
-                                }
-                                chosenOrders.clear();
-
-                                glbVars.LoadOrders();
-                                toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-                                toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+                            for (GlobalVars.CheckBoxData data : chosenOrders) {
+                                glbVars.dbOrders.DeleteOrderByID(data.id);
                             }
+                            chosenOrders.clear();
+
+                            glbVars.LoadOrders();
+                            toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+                            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
                         });
 //                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
 //                            @Override
@@ -435,26 +426,29 @@ public class JournalFragment extends Fragment {
     }
 
     private void EditOrder(final String OrderID) {
+        System.out.println(OrderID);
+        FragmentActivity a = getActivity();
         new Thread(() -> {
             Cursor cNom, cHead;
             glbVars.db.getWritableDatabase().beginTransaction();
             cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
             if (cHead.moveToNext()) {
+                OrderHeadFragment.CONTR_ID = cHead.getString(cHead.getColumnIndex("CONTR"));
                 try {
                     if (glbVars.db.getCount() == 0) {
-                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DOC_DATA,COMMENT) VALUES (" +
+                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DATA,COMMENT) VALUES (" +
                                 "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
                                 "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
                                 "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + ")");
+                                "'" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
+                                "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "')");
                     } else {
                         glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
                                 "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
                                 "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
                                 "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                "DOC_DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATA")) + "', " +
-                                "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")));
+                                "DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
+                                "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -477,9 +471,12 @@ public class JournalFragment extends Fragment {
             glbVars.db.getWritableDatabase().setTransactionSuccessful();
             glbVars.db.getWritableDatabase().endTransaction();
 
-            Fragment fragment = new OrderHeadFragment();
-            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+            glbVars.rewritePriceToMainDB(OrderID);
+
+            Fragment fragment = new FormOrderFragment();
+            assert a != null;
+            FragmentTransaction fragmentTransaction = a.getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
             fragmentTransaction.commit();
         }).start();
     }
