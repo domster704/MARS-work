@@ -6,6 +6,8 @@ import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteException;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
@@ -16,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,9 +27,6 @@ import android.widget.Toast;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.GlobalVars;
-import com.amber.armtp.R;
-import com.amber.armtp.ServerDetails;
 import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
@@ -41,16 +39,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
-import java.util.SimpleTimeZone;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -66,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
+
+    public static final int SIZE_KB = 1024;
+    public static final int SIZE_MB = SIZE_KB * SIZE_KB;
+
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -77,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tvLastUpdate;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+
 
     @Override
     public void onBackPressed() {
@@ -103,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        if (!_checkAvailableSpaceOnDevice())
+            Toast.makeText(getApplication(), "Для работы программы необходимо минимум 100 Мб. Освободите место!", Toast.LENGTH_SHORT).show();
+
+
+//      Для нахождения утечки памяти
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 //                    .detectLeakedSqlLiteObjects()
@@ -199,8 +199,8 @@ public class MainActivity extends AppCompatActivity {
 
         // order.db
         try {
-            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT)");
-            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE NUMERIC, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0)");
+            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT, SUM FLOAT)");
+            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE FLOAT, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0, SUM FLOAT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -376,5 +376,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(getApplicationContext(), "Заданы неккоректные данные для загрузки", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private boolean _checkAvailableSpaceOnDevice() {
+        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
+        long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / SIZE_MB;
+        return availableSpace > 100;
     }
 }

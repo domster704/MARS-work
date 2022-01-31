@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,7 +25,6 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,7 +48,6 @@ import android.widget.ViewFlipper;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.interfaces.Async;
 import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.SettingFragment;
@@ -74,6 +73,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -151,7 +151,6 @@ public class GlobalVars extends Application {
     private boolean isNewLoaded = false;
 
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
-
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = Contr.getString(Contr.getColumnIndex("CODE"));
@@ -165,7 +164,6 @@ public class GlobalVars extends Application {
     };
 
     public AdapterView.OnItemClickListener GridNomenClick = new AdapterView.OnItemClickListener() {
-
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
             long viewId = myView.getId();
@@ -195,12 +193,14 @@ public class GlobalVars extends Application {
                     }
                 }
             } else if (viewId == R.id.btPlus) {
-                long ID = myAdapter.getItemIdAtPosition(position);
-                TextView tvPrice = view.findViewById(R.id.ColNomPrice);
+                View parent = (View) myView.getParent();
+                TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
+                TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
                 String price = tvPrice.getText().toString();
+                String kod5 = tvKOD5.getText().toString();
 
-                db.putPriceInNomen(ID, price);
-                db.PlusQty(ID);
+                db.putPriceInNomen(kod5, price);
+                db.PlusQty(kod5);
 
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
@@ -217,8 +217,11 @@ public class GlobalVars extends Application {
                     PreviewZakazAdapter.notifyDataSetChanged();
                 }
             } else if (viewId == R.id.btMinus) {
-                long ID = myAdapter.getItemIdAtPosition(position);
-                db.MinusQty(ID);
+                View parent = (View) myView.getParent();
+                TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
+                String kod5 = tvKOD5.getText().toString();
+                db.MinusQty(kod5);
+
                 myNom.requery();
                 String ToolBarContr = db.GetToolbarContr();
                 String OrderSum = db.getOrderSum();
@@ -238,13 +241,15 @@ public class GlobalVars extends Application {
                 TextView c = myView.findViewById(R.id.ColNomCod);
                 final String ID = c.getText().toString();
 
+                int ost = Integer.parseInt(((TextView) myView.findViewById(R.id.ColNomOst)).getText().toString());
+
                 final TextView c1 = myView.findViewById(R.id.ColNomZakaz);
 
                 LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
                 View promptView;
 
                 if (isMultiSelect) {
-                    db.UpdateQty(ID, MultiQty);
+                    db.UpdateQty(ID, MultiQty, ost);
                     myNom.requery();
                     NomenAdapter.notifyDataSetChanged();
                     c1.setText(String.valueOf(MultiQty));
@@ -292,12 +297,27 @@ public class GlobalVars extends Application {
                     imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
                     alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                        db.UpdateQty(ID, Integer.parseInt(input.getText().toString()));
+                        TextView tvPrice = view.findViewById(R.id.ColNomPrice);
+                        String price = tvPrice.getText().toString();
+                        db.putPriceInNomen(ID, price);
+
+                        db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
                         c1.setText(input.getText());
                         myNom.requery();
                         String ToolBarContr = db.GetToolbarContr();
                         String OrderSum = db.getOrderSum();
-                        toolbar.setSubtitle(ToolBarContr + OrderSum);
+
+                        if (OrderSum.length() > 0) {
+                            toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
+                        } else {
+                            toolbar.setSubtitle(ToolBarContr);
+                        }
+                        if (NomenAdapter != null) {
+                            NomenAdapter.notifyDataSetChanged();
+                        }
+                        if (PreviewZakazAdapter != null) {
+                            PreviewZakazAdapter.notifyDataSetChanged();
+                        }
                         alertD.dismiss();
                     });
                     input.setOnEditorActionListener((v, actionId, event) -> {
@@ -433,7 +453,6 @@ public class GlobalVars extends Application {
             }
 
             TextView c = myView.findViewById(R.id.ColOrdDtID);
-            final String ID = c.getText().toString();
 
             final TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
 
@@ -459,6 +478,8 @@ public class GlobalVars extends Application {
             input.setText(c1.getText());
             txtCod.setText(c3.getText());
             txtDescr.setText(c4.getText());
+
+            String ID = txtCod.getText().toString();
             final String Ost = db.getNomenOst(ID);
             txtOst.setText(Ost);
 
@@ -488,7 +509,7 @@ public class GlobalVars extends Application {
             alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 Boolean wantToCloseDialog = false;
                 if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
-                    dbOrders.UpdateOrderQty(Zakaz_id, ID, Integer.parseInt(input.getText().toString()));
+                    dbOrders.updateOrderQty(Zakaz_id, ID, Integer.parseInt(input.getText().toString()));
                     c1.setText(input.getText());
                     OrdersDt.requery();
                     wantToCloseDialog = true;
@@ -658,8 +679,6 @@ public class GlobalVars extends Application {
         CurWCID = WCID;
         CurFocusID = FocusID;
         CurSearchName = "";
-
-        System.out.println(SgiID + " " + GrupID + " " + WCID + " " + FocusID);
 
         new Thread(new Runnable() {
             @Override
@@ -1038,8 +1057,7 @@ public class GlobalVars extends Application {
 
     public void LoadTpList() {
         TP = db.getTpList();
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, TP, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColTPID, R.id.ColTPDescr});
+        TPAdapter adapter = new TPAdapter(CurAc, R.layout.tp_layout, TP, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColTPID, R.id.ColTPDescr}, 0);
         TPList.setAdapter(adapter);
 
         TPList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1190,7 +1208,7 @@ public class GlobalVars extends Application {
         fields[index] = new DBFField();
         fields[index].setName("PRICE");
         fields[index].setDataType(DBFField.FIELD_TYPE_N);
-        fields[index].setFieldLength(12);
+        fields[index].setFieldLength(15);
         fields[index].setDecimalCount(2);
         Table.setFields(fields);
 
@@ -1207,7 +1225,7 @@ public class GlobalVars extends Application {
                 COMMENT = c.getString(c.getColumnIndex("COMMENT"));
                 NOMEN = c.getString(c.getColumnIndex("NOMEN"));
                 QTY = c.getDouble(c.getColumnIndex("QTY"));
-                PRICE = c.getDouble(c.getColumnIndex("PRICE"));
+                PRICE = Double.parseDouble(c.getString(c.getColumnIndex("PRICE")).replace(",", "."));
 
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
@@ -1266,12 +1284,13 @@ public class GlobalVars extends Application {
     }
 
     public void LoadOrders() {
+        _updateOrdersStatusFromDB();
+
         gdOrders.setAdapter(null);
         Orders = dbOrders.getZakazy();
         if (Orders != null)
             putCheckBox(Orders);
 
-        _updateOrdersStatusFromDB();
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
         gdOrders.setAdapter(OrdersAdapter);
     }
@@ -1306,7 +1325,7 @@ public class GlobalVars extends Application {
         DBF_FileName = "orders_" + curdate + ".dbf";
         c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID," +
                 " ZAKAZY.DELIVERY_DATE as DEL_DATE," +
-                " ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS=0", null);
+                " ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS='Сохранён'", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return;
@@ -1379,7 +1398,7 @@ public class GlobalVars extends Application {
         fields[index] = new DBFField();
         fields[index].setName("PRICE");
         fields[index].setDataType(DBFField.FIELD_TYPE_N);
-        fields[index].setFieldLength(12);
+        fields[index].setFieldLength(15);
         fields[index].setDecimalCount(2);
         Table.setFields(fields);
 
@@ -1400,9 +1419,8 @@ public class GlobalVars extends Application {
                 COMMENT = c.getString(c.getColumnIndex("COMMENT"));
                 CODE = c.getString(c.getColumnIndex("NOMEN"));
                 QTY = c.getDouble(c.getColumnIndex("QTY"));
-                PRICE = c.getDouble(c.getColumnIndex("PRICE"));
+                PRICE = Double.parseDouble(c.getString(c.getColumnIndex("PRICE")).replace(",", "."));
 
-//                c.close();
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
@@ -1691,8 +1709,19 @@ public class GlobalVars extends Application {
             });
 
             String price = String.format("%.2f", DBHelper.pricesMap.get(cursor.getString(cursor.getColumnIndex("KOD5"))));
+
             if (!DBHelper.pricesMap.containsKey(cursor.getString(cursor.getColumnIndex("KOD5"))))
                 price = "0";
+            else if (price.equals("" + DBHelper.pricesMap.get(cursor.getString(cursor.getColumnIndex("KOD5")))))
+                price = "" + DBHelper.pricesMap.get(cursor.getString(cursor.getColumnIndex("KOD5")));
+
+            if (price.equals("0")) {
+                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
+                if (!cPrice.equals("0") && !cPrice.equals("null")) {
+                    price = cPrice;
+                }
+            }
+
             tvPrice.setText(price);
 
             if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
@@ -1751,6 +1780,16 @@ public class GlobalVars extends Application {
                 tvCod.setTextColor(color);
             }
 
+            if (cursor.getInt(cursor.getColumnIndex("ACTION")) == 1) {
+                tvDescr.setTypeface(tvDescr.getTypeface(), Typeface.BOLD_ITALIC);
+                tvPrice.setTypeface(tvPrice.getTypeface(), Typeface.BOLD_ITALIC);
+                tvPosition.setTypeface(tvPosition.getTypeface(), Typeface.BOLD_ITALIC);
+                tvMP.setTypeface(tvMP.getTypeface(), Typeface.BOLD_ITALIC);
+                tvGofra.setTypeface(tvGofra.getTypeface(), Typeface.BOLD_ITALIC);
+                tvOst.setTypeface(tvOst.getTypeface(), Typeface.BOLD_ITALIC);
+                tvCod.setTypeface(tvCod.getTypeface(), Typeface.BOLD_ITALIC);
+            }
+
             tvPosition.setText(String.valueOf(position + 1));
             if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit) {
                 isNewLoaded = true;
@@ -1774,17 +1813,16 @@ public class GlobalVars extends Application {
         }
     }
 
-    public static class JournalAdapter extends SimpleCursorAdapter {
-        Cursor cursor;
-
+    public class JournalAdapter extends SimpleCursorAdapter {
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
-            cursor = c;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+            TextView tvSum = view.findViewById(R.id.ColOrdSum);
+            _updateTextFormatTo2DecAfterPoint(tvSum);
 
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
@@ -1795,7 +1833,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public static class JournalDetailsAdapter extends SimpleCursorAdapter {
+    public class JournalDetailsAdapter extends SimpleCursorAdapter {
         public JournalDetailsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
@@ -1807,14 +1845,37 @@ public class GlobalVars extends Application {
             View view = super.getView(position, convertView, parent);
             TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
 
+            TextView tvSum = view.findViewById(R.id.ColOrdDtSum);
+            _updateTextFormatTo2DecAfterPoint(tvSum);
+
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
             } else {
                 view.setBackgroundColor(Color.rgb(255, 255, 255));
             }
 
-            if (cursor.getInt(8) == 1) {
-                tvQty.setText(cursor.getInt(cursor.getColumnIndex("QTY")) + "(-" + cursor.getInt(9) + ")");
+            if (cursor.getInt(cursor.getColumnIndex("IS_OUTED")) == 1) {
+                tvQty.setText(cursor.getInt(cursor.getColumnIndex("QTY")) + "(-" + cursor.getInt(cursor.getColumnIndex("OUT_QTY")) + ")");
+            }
+
+            return view;
+        }
+    }
+
+    public static class TPAdapter extends SimpleCursorAdapter {
+        public TPAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flag) {
+            super(context, layout, c, from, to, flag);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+
+            TextView tvDescr = view.findViewById(R.id.ColTPDescr);
+            if (position % 2 == 0) {
+                tvDescr.setBackgroundColor(Color.rgb(201, 235, 255));
+            } else {
+                tvDescr.setBackgroundColor(Color.rgb(255, 255, 255));
             }
 
             return view;
@@ -1919,7 +1980,7 @@ public class GlobalVars extends Application {
             progressDialog.dismiss();
             if (ret_completed) {
                 for (Integer id : result) {
-                    dbOrders.SetZakazStatus(1, 0, id);
+                    dbOrders.setZakazStatus("Отправлен", id);
                 }
 
                 Toast.makeText(CurAc, "Заказы успешно отправлены", Toast.LENGTH_LONG).show();
@@ -1929,7 +1990,7 @@ public class GlobalVars extends Application {
         }
     }
 
-    public static class DebetAdapter extends SimpleCursorAdapter {
+    public class DebetAdapter extends SimpleCursorAdapter {
 
         public DebetAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -1938,44 +1999,46 @@ public class GlobalVars extends Application {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
-            TextView tvContr = view.findViewById(R.id.ColDebetContr);
-            TextView tvStatus = view.findViewById(R.id.ColDebetStatus);
-            TextView tvCredit = view.findViewById(R.id.ColDebetCredit);
-            TextView tvA7 = view.findViewById(R.id.ColDebetA7);
-            TextView tvA14 = view.findViewById(R.id.ColDebetA14);
-            TextView tvA21 = view.findViewById(R.id.ColDebetA21);
-            TextView tvA28 = view.findViewById(R.id.ColDebetA28);
-            TextView tvA35 = view.findViewById(R.id.ColDebetA35);
-            TextView tvA42 = view.findViewById(R.id.ColDebetA42);
-            TextView tvA49 = view.findViewById(R.id.ColDebetA49);
-            TextView tvA56 = view.findViewById(R.id.ColDebetA56);
-            TextView tvA63 = view.findViewById(R.id.ColDebetA63);
-            TextView tvA64 = view.findViewById(R.id.ColDebetA64);
-            TextView tvDolg = view.findViewById(R.id.ColDebetDolg);
+            TextView[] tvArray = new TextView[]{
+                    view.findViewById(R.id.ColDebetContr),
+                    view.findViewById(R.id.ColDebetStatus),
+                    view.findViewById(R.id.ColDebetCredit),
+                    view.findViewById(R.id.ColDebetA7),
+                    view.findViewById(R.id.ColDebetA14),
+                    view.findViewById(R.id.ColDebetA21),
+                    view.findViewById(R.id.ColDebetA28),
+                    view.findViewById(R.id.ColDebetA35),
+                    view.findViewById(R.id.ColDebetA42),
+                    view.findViewById(R.id.ColDebetA49),
+                    view.findViewById(R.id.ColDebetA56),
+                    view.findViewById(R.id.ColDebetA63),
+                    view.findViewById(R.id.ColDebetA64),
+                    view.findViewById(R.id.ColDebetDolg),
+                    view.findViewById(R.id.ColDebetOTG30),
+                    view.findViewById(R.id.ColDebetOPL30),
+                    view.findViewById(R.id.ColDebetKOB),
+            };
+
             if (position % 2 == 0) {
                 view.setBackgroundResource(R.drawable.debet_item_border_blue);
             } else {
                 view.setBackgroundResource(R.drawable.debet_item_border_white);
             }
 
-            tvContr.setTextColor(Color.rgb(0, 0, 0));
-            tvStatus.setTextColor(Color.rgb(0, 0, 0));
-            tvCredit.setTextColor(Color.rgb(0, 0, 0));
-            tvA7.setTextColor(Color.rgb(0, 0, 0));
-            tvA14.setTextColor(Color.rgb(0, 0, 0));
-            tvA21.setTextColor(Color.rgb(0, 0, 0));
-            tvA28.setTextColor(Color.rgb(0, 0, 0));
-
-            tvA35.setTextColor(Color.rgb(0, 0, 0));
-            tvA42.setTextColor(Color.rgb(0, 0, 0));
-            tvA49.setTextColor(Color.rgb(0, 0, 0));
-            tvA56.setTextColor(Color.rgb(0, 0, 0));
-            tvA63.setTextColor(Color.rgb(0, 0, 0));
-            tvA64.setTextColor(Color.rgb(0, 0, 0));
-
-            tvDolg.setTextColor(Color.rgb(0, 0, 0));
+            for (TextView v : tvArray) {
+                v.setTextColor(Color.rgb(0, 0, 0));
+                _updateTextFormatTo2DecAfterPoint(v);
+            }
 
             return view;
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void _updateTextFormatTo2DecAfterPoint(TextView v) {
+        try {
+            v.setText(String.format("%.2f", Float.parseFloat(v.getText().toString())));
+        } catch (Exception ignored) {
         }
     }
 
@@ -1985,26 +2048,30 @@ public class GlobalVars extends Application {
 
         while (orderPrices.moveToNext()) {
             DBHelper.pricesMap.remove(orderPrices.getString(1));
-            DBHelper.pricesMap.put(orderPrices.getString(1), orderPrices.getFloat(0));
+            DBHelper.pricesMap.put(orderPrices.getString(1), Float.parseFloat(orderPrices.getString(0).replace(",", ".")));
         }
 
         orderPrices.close();
     }
 
     private void _updateOrdersStatusFromDB() {
-        SQLiteDatabase dbStatus = db.getReadableDatabase();
-        SQLiteDatabase dbDocID = dbOrders.getReadableDatabase();
-
-        Cursor statusInApp = dbDocID.rawQuery("SELECT DOCID FROM ZAKAZY", null);
-
+        SQLiteDatabase dbApp = db.getReadableDatabase();
+        SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
+        Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
+        Cursor statusInDB = null;
         while (statusInApp.moveToNext()) {
-            Cursor statusInDB = dbStatus.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + statusInApp.getString(statusInApp.getColumnIndex("DOCID")) + "'", null);
+            String DOCID = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
+            statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + DOCID + "'", null);
             if (statusInDB.getCount() != 0) {
                 statusInDB.moveToNext();
                 String Status = statusInDB.getString(statusInDB.getColumnIndex("STATUS"));
-                dbDocID.execSQL("UPDATE ZAKAZY STATUS = '" + Status + "'");
+                dbOrd.execSQL("UPDATE ZAKAZY SET STATUS = '" + Status + "' WHERE DOCID='" + DOCID + "'");
             }
         }
+
+        statusInApp.close();
+        if (statusInDB != null)
+            statusInDB.close();
     }
 
     private void _doUpdateQTYByVycherk(String DocID) {
@@ -2015,9 +2082,18 @@ public class GlobalVars extends Application {
         Cursor c = null;
 
         while (newQty.moveToNext()) {
-            c = dbApp.rawQuery("SELECT QTY FROM ZAKAZY_DT WHERE DOCID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'", null);
-            c.moveToNext();
-            dbApp.execSQL("UPDATE ZAKAZY_DT SET QTY = '" + c.getString(0) + " (" + newQty.getString(1) + ")" + "' WHERE DOCID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
+            dbApp.execSQL("UPDATE ZAKAZY_DT SET IS_OUTED = 1, OUT_QTY = " + newQty.getInt(newQty.getColumnIndex("KOL")) + " WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
+//            c = dbApp.rawQuery("SELECT QTY FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'", null);
+//            c.moveToNext();
+
+//            String QTY = c.getString(0);
+//            int qty;
+//            if (!QTY.contains("(")) {
+//                qty = Integer.parseInt(QTY);
+//            } else {
+//                qty = Integer.parseInt(QTY.split(" \\(")[0]);
+//            }
+//            dbApp.execSQL("UPDATE ZAKAZY_DT SET QTY = '" + qty + " (" + (qty - newQty.getInt(1)) + ")" + "' WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
         }
 
         newQty.close();

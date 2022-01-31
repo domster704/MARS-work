@@ -13,7 +13,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -113,82 +112,72 @@ public class OrderHeadFragment extends Fragment {
 
         glbVars.txtDate = getActivity().findViewById(R.id.txtDelivDate);
 
-        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                glbVars.DeliveryDate.set(Calendar.YEAR, year);
-                glbVars.DeliveryDate.set(Calendar.MONTH, monthOfYear);
-                glbVars.DeliveryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                String myFormat = "dd.MM.yyyy"; //In which you need put here
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
+        final DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+            glbVars.DeliveryDate.set(Calendar.YEAR, year);
+            glbVars.DeliveryDate.set(Calendar.MONTH, monthOfYear);
+            glbVars.DeliveryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            String myFormat = "dd.MM.yyyy"; //In which you need put here
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
-                glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
-            }
-
+            glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
         };
 
-        glbVars.txtDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(Objects.requireNonNull(getActivity()), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        glbVars.txtDate.setOnClickListener(v -> {
+            // TODO Auto-generated method stub
+            new DatePickerDialog(Objects.requireNonNull(getActivity()), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        glbVars.btSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String ADDR_ID;
+        glbVars.btSave.setOnClickListener(v -> {
+            String ADDR_ID;
 
-                glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
-                glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
-                glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
+            glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
+            glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
+            glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
 
-                String TP_ID = glbVars.spTp.getText().toString();
-                CONTR_ID = glbVars.spContr.getText().toString();
+            String TP_ID = glbVars.spTp.getText().toString();
+            CONTR_ID = glbVars.spContr.getText().toString();
 
-                if (PREVIOUS_CONTR_ID.equals("")) {
-                    PREVIOUS_CONTR_ID = CONTR_ID;
-                } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)){
-                    PREVIOUS_CONTR_ID = CONTR_ID;
-                    glbVars.db.ResetNomenPrice();
-                }
+            if (PREVIOUS_CONTR_ID.equals("")) {
+                PREVIOUS_CONTR_ID = CONTR_ID;
+            } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
+                PREVIOUS_CONTR_ID = CONTR_ID;
+                glbVars.db.ResetNomenPrice();
+            }
 
-                String CurContr = glbVars.db.GetContrID();
+            String CurContr = glbVars.db.GetContrID();
 
-                if (!CurContr.equals(CONTR_ID)) {
-                    setContrAndSum();
-                }
+            if (!CurContr.equals(CONTR_ID)) {
+                setContrAndSum();
+            }
 
-                ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
+            ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
 
-                String DeliveryDate = glbVars.txtDate.getText().toString();
-                String Comment = glbVars.txtComment.getText().toString();
+            String DeliveryDate = glbVars.txtDate.getText().toString();
+            String Comment = glbVars.txtComment.getText().toString();
 
-                if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
-                    Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
-                    return;
-                }
+            if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
+                Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-                editor.putString("TP_ID", TP_ID);
-                editor.commit();
+            editor.putString("TP_ID", TP_ID);
+            editor.commit();
 
-                if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+            if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+                setContrAndSum();
+            } else {
+                if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
                     setContrAndSum();
                 } else {
-                    if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                        setContrAndSum();
-                    } else {
-                        Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
-                    }
+                    Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
                 }
-
-                goToFormOrderFragment();
             }
+
+            goToFormOrderFragment();
         });
 
         int ContRowid = glbVars.db.GetContrRowID();
+
         SetSelectedContr(ContRowid);
 
         String stTP_ID = settings.getString("TP_ID", "0");
@@ -222,6 +211,7 @@ public class OrderHeadFragment extends Fragment {
         }
 
         setContrAndSum();
+
     }
 
     public void SetSelectedContr(int ROWID) {
@@ -236,8 +226,6 @@ public class OrderHeadFragment extends Fragment {
     }
 
     public void goToFormOrderFragment() {
-//        glbVars.db.fillAllNomenPrice();
-
         toolbar.setTitle(R.string.form_order);
         Fragment fragment = new FormOrderFragment();
         fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();

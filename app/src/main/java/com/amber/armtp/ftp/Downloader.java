@@ -12,6 +12,7 @@ import com.amber.armtp.BuildConfig;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.MainActivity;
+import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
@@ -130,7 +131,19 @@ public class Downloader {
                 }
             }
 
-            return serverVersion.compareTo(ver) > 0;
+            String[] serverVer = serverVersion.split("\\.");
+            String[] curVer = ver.split("\\.");
+
+            boolean isNewer = false;
+            for (int i = 0; i < serverVer.length; i++) {
+                System.out.println((Integer.parseInt(serverVer[i]) > Integer.parseInt(curVer[i])) + " " + Integer.parseInt(serverVer[i]) + " " + Integer.parseInt(curVer[i]));
+                if (Integer.parseInt(serverVer[i]) > Integer.parseInt(curVer[i])) {
+                    isNewer = true;
+                    break;
+                }
+            }
+
+            return isNewer;
         } catch (Exception e) {
             e.printStackTrace();
         }

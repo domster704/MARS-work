@@ -180,7 +180,7 @@ public class JournalFragment extends Fragment {
         glbVars.viewFlipper = getActivity().findViewById(R.id.viewflipper);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        glbVars.toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+        glbVars.toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из 100");
         getActivity().setTitle("Журнал");
 
         ScrollView view = getActivity().findViewById(R.id.scrollViewJ);
@@ -194,7 +194,7 @@ public class JournalFragment extends Fragment {
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
                 int id = GlobalVars.allOrders.get(i).id;
-                glbVars.dbOrders.DeleteOrderByID(id);
+                glbVars.dbOrders.deleteOrderByID(id);
             }
             GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
             glbVars.LoadOrders();
@@ -235,7 +235,7 @@ public class JournalFragment extends Fragment {
 
                                 int countOfSentOrders = 0;
                                 for (GlobalVars.CheckBoxData i : chosenOrders) {
-                                    if (i.status.equals("Отправлен")) {
+                                    if (!i.status.equals("Сохранён")) {
                                         resendOrder(i.id);
                                         countOfSentOrders++;
                                     }
@@ -250,7 +250,7 @@ public class JournalFragment extends Fragment {
 
                                 int index = 0;
                                 for (int i = 0; i < chosenOrders.size(); i++) {
-                                    if (!chosenOrders.get(i).status.equals("Отправлен")) {
+                                    if (chosenOrders.get(i).status.equals("Сохранён")) {
                                         chosenOrdersForSending[index] = chosenOrders.get(i).id;
                                         index++;
                                     }
@@ -290,7 +290,7 @@ public class JournalFragment extends Fragment {
                             isChecked = false;
 
                             for (GlobalVars.CheckBoxData data : chosenOrders) {
-                                glbVars.dbOrders.DeleteOrderByID(data.id);
+                                glbVars.dbOrders.deleteOrderByID(data.id);
                             }
                             chosenOrders.clear();
 
@@ -426,7 +426,6 @@ public class JournalFragment extends Fragment {
     }
 
     private void EditOrder(final String OrderID) {
-        System.out.println(OrderID);
         FragmentActivity a = getActivity();
         new Thread(() -> {
             Cursor cNom, cHead;
@@ -495,12 +494,12 @@ public class JournalFragment extends Fragment {
                 e.printStackTrace();
             }
 
-
             cursor.close();
 
             glbVars.db.getWritableDatabase().setTransactionSuccessful();
             glbVars.db.getWritableDatabase().endTransaction();
 
+            glbVars.rewritePriceToMainDB(OrderID);
 
             Fragment fragment = new OrderHeadFragment();
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();

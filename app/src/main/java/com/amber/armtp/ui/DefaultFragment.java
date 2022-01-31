@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.amber.armtp.BuildConfig;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 
@@ -50,5 +52,8 @@ public class DefaultFragment extends Fragment {
         toolbar.setSubtitle("");
         settings = getActivity().getSharedPreferences("apk_version", 0);
         editor = settings.edit();
+
+        TextView version = getActivity().findViewById(R.id.appVer);
+        version.setText(BuildConfig.VERSION_NAME);
     }
 }

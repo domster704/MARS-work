@@ -13,15 +13,19 @@ public class AspectProgressBar {
     private final String pointCut = "@annotation(com.amber.armtp.interfaces.PGShowing)";
 
     @Pointcut(pointCut)
-    public void PointCutPG() {
+    public void setPointCutPG() {
     }
 
-    @Around("PointCutPG()")
-    public void weavePGJoinPointBefore(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("setPointCutPG()")
+    public void setJoinPointPG(ProceedingJoinPoint joinPoint) {
         ProgressBarLoading progressBarLoading = new ProgressBarLoading(GlobalVars.CurAc);
 
         progressBarLoading.show();
-        joinPoint.proceed();
+        try {
+            joinPoint.proceed();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
         progressBarLoading.stop();
     }
 }

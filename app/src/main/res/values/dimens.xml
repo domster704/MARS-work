@@ -26,10 +26,13 @@
     <dimen name="pgWidth">600dp</dimen>
     <dimen name="percWidth">55dp</dimen>
 
-    <!-- Settings dimen -->
+    <!--    Fonts-->
     <dimen name="textSizeSettings">14sp</dimen>
 
     <dimen name="heightOfOrdersItem">40dp</dimen>
 
     <dimen name="nomFilterTextSize">16sp</dimen>
+
+    <!-- Heights   -->
+    <dimen name="debetHeightsItem">30dp</dimen>
 </resources>

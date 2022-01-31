@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amber.armtp.interfaces.Async;
+import com.amber.armtp.interfaces.PGShowing;
 
 public class DBAppHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "appData.db";
@@ -34,7 +34,7 @@ public class DBAppHelper extends SQLiteOpenHelper {
         return super.getWritableDatabase();
     }
 
-    @Async
+    @PGShowing
     public void putDemp(SQLiteDatabase dbNomen) {
         Cursor nomen = dbNomen.rawQuery("SELECT DISTINCT DEMP FROM NOMEN", null);
 

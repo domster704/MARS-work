@@ -10,13 +10,14 @@ public class AspectAsync {
     private final String pointCut = "@annotation(com.amber.armtp.interfaces.Async)";
 
     @Pointcut(pointCut)
-    public void putThread() {
+    public void setPointCutThread() {
     }
 
-    @Around(value = "putThread()")
-    public void putAround(final ProceedingJoinPoint joinPoint) {
+    @Around("setPointCutThread()")
+    public void setJoinPointThread(final ProceedingJoinPoint joinPoint) {
         new Thread(() -> {
             try {
+                System.out.println(1);
                 joinPoint.proceed();
             } catch (Throwable throwable) {
                 throwable.printStackTrace();

@@ -51,5 +51,7 @@
     <string name="lblFilterTP">Торгпред</string>
     <string name="zeroPerc">0%</string>
     <string name="hundredPerc">100%</string>
-    <string name="postDataColor">Товар, пришедший 4 дня назад подкрашивается зеленым, 2 дня назад - красным</string>
+    <string name="redColorNomen">Красным цветом - товар пришёл 2 дня назад</string>
+    <string name="greenColorNomen">Зелёным цветом - товар пришёл 4 дня назад</string>
+    <string name="boldItalicStyleNomen">Жирным курсивом - акционный товар</string>
 </resources>

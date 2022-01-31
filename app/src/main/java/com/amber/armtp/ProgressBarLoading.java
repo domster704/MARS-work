@@ -3,6 +3,8 @@ package com.amber.armtp;
 import android.app.Activity;
 import android.app.AlertDialog;
 
+import java.lang.annotation.Target;
+
 public class ProgressBarLoading {
     private final Activity activity;
 
@@ -24,7 +26,12 @@ public class ProgressBarLoading {
 
     public void show() {
         activity.runOnUiThread(() -> {
-            if (dialog != null) dialog.show();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dialog.show();
         });
     }
 

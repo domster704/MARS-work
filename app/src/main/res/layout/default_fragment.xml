@@ -13,41 +13,88 @@
         android:textColor="#000"
         android:textSize="20pt" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="@string/appVersion"
-        android:textColor="#000"
-        android:textSize="8pt" />
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/appVersionTextBefore"
+            android:textColor="#000"
+            android:textSize="8pt" />
+
+        <TextView
+            android:id="@+id/appVer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textColor="#000"
+            android:textSize="8pt" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:text="@string/askQuestion"
             android:textColor="#000"
-            android:textSize="8pt"
-            android:text="@string/askQuestion" />
+            android:textSize="8pt" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:text="@string/email"
             android:textColor="#000"
-            android:textSize="8pt"
-            android:layout_margin="8dp"
-            android:textIsSelectable="true" />
+            android:textIsSelectable="true"
+            android:textSize="8pt" />
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/postDataColor"
         android:layout_margin="8dp"
-        android:paddingTop="20dp"
-        android:textColor="#000"
-        android:textSize="8pt"/>
+        android:orientation="vertical"
+        android:paddingTop="30dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Товар помечается:"
+            android:textColor="#000"
+            android:textSize="10pt" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/redColorNomen"
+            android:textColor="@color/postDataColorRed"
+            android:textSize="8pt" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/greenColorNomen"
+            android:textColor="@color/postDataColorGreen"
+            android:textSize="8pt" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/boldItalicStyleNomen"
+            android:textColor="#000"
+            android:textSize="8pt"
+            android:textStyle="bold|italic" />
+    </LinearLayout>
 </LinearLayout>

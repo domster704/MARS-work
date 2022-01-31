@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="companyName">ГП «Янтарь+»</string>
-    <string name="appVersion">Версия программы: 2.00</string>
+    <string name="appVersionTextBefore">Версия программы: </string>
+    <string name="appVersion">2.0.6</string>
     <string name="askQuestion">Все вопросы по улучшению программы направляйте на адрес: </string>
     <string name="email"><b>postmaster@amberizh.ru</b></string>
 </resources>

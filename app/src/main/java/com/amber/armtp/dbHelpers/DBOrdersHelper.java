@@ -45,8 +45,20 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " CONTR_DES AS CONTR," +
                     " ADDR_DES AS ADDR," +
                     " ZAKAZY.DELIVERY_DATE AS DELIVERY," +
-                    " CASE ZAKAZY.STATUS WHEN 0 THEN 'Сохранен' WHEN 1 THEN 'Отправлен' WHEN 2 THEN 'Получен' WHEN 3 THEN 'Оформлен' WHEN 4 THEN 'Оформлен(-)' WHEN 6 THEN 'Собран' WHEN 7 THEN 'Собран(-)' WHEN 5 THEN 'Удален' WHEN 99 THEN 'Отменен' END AS STATUS," +
-                    " (SELECT printf('%.2f', ROUND(SUM(QTY * PRICE),2)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
+                    " ZAKAZY.STATUS AS STATUS," +
+//                    " CASE ZAKAZY.STATUS" +
+//                    "   WHEN 0 THEN 'Сохранен'" +
+//                    "   WHEN 1 THEN 'Отправлен'" +
+//                    "   WHEN 2 THEN 'Получен'" +
+//                    "   WHEN 3 THEN 'Оформлен'" +
+//                    "   WHEN 4 THEN 'Оформлен(-)'" +
+//                    "   WHEN 6 THEN 'Собран'" +
+//                    "   WHEN 7 THEN 'Собран(-)'" +
+//                    "   WHEN 5 THEN 'Удален'" +
+//                    "   WHEN 99 THEN 'Отменен'" +
+//                    " END AS STATUS," +
+//                    " (SELECT SUM(QTY * cast(PRICE as REAL)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
+                    " ZAKAZY.SUM as SUM," +
                     " ZAKAZY.DOCID AS DOCID" +
                     " FROM ZAKAZY" +
                     " WHERE" +
@@ -63,8 +75,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
-            cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOMEN, DESCR, QTY, printf('%.2f', PRICE) AS PRICE, printf('%.2f', ROUND(QTY*PRICE,2)) AS SUM, IS_OUTED, OUT_QTY FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
+            cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, IS_OUTED, OUT_QTY, SUM FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
             return cursor;
 
         } catch (Exception e) {
@@ -73,13 +84,13 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void SetZakazStatus(int Status, int State, int id) {
+    public void setZakazStatus(String Status, int id) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.setLockingEnabled(false);
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE ZAKAZY SET STATUS=" + Status + " WHERE STATUS=" + State + " AND ROWID=" + id);
+            db.execSQL("UPDATE ZAKAZY SET STATUS='" + Status + "' WHERE ROWID=" + id);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,7 +99,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void DeleteOrderByID(long id) {
+    public void deleteOrderByID(long id) {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -107,7 +118,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int GetDocNumber() {
+    public int getDocNumber() {
         Cursor c = null;
         int DocNo = 0;
         try {
@@ -126,7 +137,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void UpdateOrderQty(String ZakID, String ID, int Qty) {
+    public void updateOrderQty(String ZakID, String ID, int Qty) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
