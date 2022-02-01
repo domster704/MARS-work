@@ -2,6 +2,9 @@ package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -21,6 +24,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amber.armtp.ConfigClass;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.linuxense.javadbf.DBFException;
@@ -74,10 +78,14 @@ public class JournalFragment extends Fragment {
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, long id) {
+            view.setElevation(10f);
+
             tvOrder = view.findViewById(R.id.ColOrdDocNo);
             tvStatus = view.findViewById(R.id.ColOrdStatus);
+
             final String ID = tvOrder.getText().toString();
             final String Status = tvStatus.getText().toString();
+
             nomPopupMenu = new PopupMenu(getActivity(), view);
             nomPopupMenu.getMenuInflater().inflate(R.menu.order_context_menu, nomPopupMenu.getMenu());
             nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -88,7 +96,6 @@ public class JournalFragment extends Fragment {
                         builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                         builder.setMessage("Вы уверены?")
                                 .setNegativeButton("Нет", (dialog, id1) -> {
-
                                 })
                                 .setPositiveButton("Да", (dialog, id1) -> {
                                     EditOrder(ID);
@@ -104,8 +111,13 @@ public class JournalFragment extends Fragment {
                         CopyOrder(ID);
                         return true;
                     default:
+                        return true;
                 }
-                return true;
+            });
+
+            nomPopupMenu.setOnDismissListener(popupMenu -> {
+                popupMenu.dismiss();
+                view.setElevation(0f);
             });
 
             if (Status.equals("Удален") || Status.equals("Отменен")) {
@@ -257,8 +269,10 @@ public class JournalFragment extends Fragment {
                                 }
 
                                 try {
-                                    glbVars.SendOrders(chosenOrdersForSending);
-                                } catch (DBFException e) {
+                                    for (int id: chosenOrdersForSending) {
+                                        resendOrder(id);
+                                    }
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else {
@@ -502,6 +516,11 @@ public class JournalFragment extends Fragment {
             glbVars.rewritePriceToMainDB(OrderID);
 
             Fragment fragment = new OrderHeadFragment();
+
+            Bundle args = new Bundle();
+            args.putBoolean("isCopied", true);
+            fragment.setArguments(args);
+
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
             fragmentTransaction.commit();

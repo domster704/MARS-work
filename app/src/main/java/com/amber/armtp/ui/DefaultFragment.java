@@ -45,7 +45,6 @@ public class DefaultFragment extends Fragment {
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);

@@ -646,7 +646,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
         toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);

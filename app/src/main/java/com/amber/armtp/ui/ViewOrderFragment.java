@@ -48,7 +48,6 @@ public class ViewOrderFragment extends Fragment {
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);

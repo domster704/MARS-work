@@ -1,5 +1,6 @@
 package com.amber.armtp.dbHelpers;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.R;
+import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import java.util.HashMap;
@@ -171,6 +175,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public static int limit = 40;
+
     public Cursor getNextNomen(
             String SgiID, String GrupID,
             String WCID, String FocusID, String SearchName, int position) {
@@ -628,30 +633,42 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void ResetNomenPrice() {
+    public void ResetNomenPrice(boolean isCopied) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
-        db.setLockingEnabled(false);
-        db.beginTransaction();
-        try {
-            pricesMap.clear();
-            listOfUpdatedGroups.clear();
 
-            Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0", null);
-            _setNomenPriceWithoutSgi(c);
-            Set<String> keys = pricesMap.keySet();
-            for (String key: keys) {
-                float price = pricesMap.get(key);
-                db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + key + "'");
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                try {
+                    db.beginTransaction();
+                    pricesMap.clear();
+                    listOfUpdatedGroups.clear();
+
+                    System.out.println(isCopied);
+                    Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
+
+                    if (isCopied || cCheck.getCount() != 0) {
+                        Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0", null);
+                        _setNomenPriceWithoutSgi(c);
+                        Set<String> keys = pricesMap.keySet();
+                        for (String key : keys) {
+                            float price = pricesMap.get(key);
+                            db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + key + "'");
+                        }
+                    } else {
+                        db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
+                    }
+
+                    db.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    db.endTransaction();
+                }
             }
-//            db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
-
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
+        }).start();
     }
 
     public String GetToolbarContr() {

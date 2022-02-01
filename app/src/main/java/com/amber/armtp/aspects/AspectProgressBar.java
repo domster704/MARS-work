@@ -17,15 +17,11 @@ public class AspectProgressBar {
     }
 
     @Around("setPointCutPG()")
-    public void setJoinPointPG(ProceedingJoinPoint joinPoint) {
+    public void setJoinPointPG(ProceedingJoinPoint joinPoint) throws Throwable {
         ProgressBarLoading progressBarLoading = new ProgressBarLoading(GlobalVars.CurAc);
 
         progressBarLoading.show();
-        try {
-            joinPoint.proceed();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        progressBarLoading.stop();
+        joinPoint.proceed();
+        progressBarLoading.dismiss();
     }
 }

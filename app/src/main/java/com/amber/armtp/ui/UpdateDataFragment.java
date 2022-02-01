@@ -89,7 +89,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.toolbar.setSubtitle("");

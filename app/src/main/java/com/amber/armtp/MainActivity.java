@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // TODO Auto-generated method stub
         if (globalVariable.viewFlipper != null) {
             int Lay = globalVariable.viewFlipper.getDisplayedChild();
             if (Lay == 1) {

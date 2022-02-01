@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amber.armtp.ConfigClass;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 
@@ -40,8 +41,11 @@ public class OrderHeadFragment extends Fragment {
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
 
+    private boolean isCopied = false;
+
     public OrderHeadFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,6 +63,12 @@ public class OrderHeadFragment extends Fragment {
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
+
+        if (getArguments() != null) {
+            isCopied = getArguments().getBoolean("isCopied");
+            getArguments().remove("isCopied");
+        }
+
         GlobalVars.CurAc = getActivity();
     }
 
@@ -70,7 +80,6 @@ public class OrderHeadFragment extends Fragment {
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
@@ -123,8 +132,7 @@ public class OrderHeadFragment extends Fragment {
         };
 
         glbVars.txtDate.setOnClickListener(v -> {
-            // TODO Auto-generated method stub
-            new DatePickerDialog(Objects.requireNonNull(getActivity()), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
+            new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
         });
 
         glbVars.btSave.setOnClickListener(v -> {
@@ -134,15 +142,9 @@ public class OrderHeadFragment extends Fragment {
             glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
             glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
 
-            String TP_ID = glbVars.spTp.getText().toString();
             CONTR_ID = glbVars.spContr.getText().toString();
 
-            if (PREVIOUS_CONTR_ID.equals("")) {
-                PREVIOUS_CONTR_ID = CONTR_ID;
-            } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
-                PREVIOUS_CONTR_ID = CONTR_ID;
-                glbVars.db.ResetNomenPrice();
-            }
+            String TP_ID = glbVars.spTp.getText().toString();
 
             String CurContr = glbVars.db.GetContrID();
 
@@ -162,6 +164,13 @@ public class OrderHeadFragment extends Fragment {
 
             editor.putString("TP_ID", TP_ID);
             editor.commit();
+
+            if (PREVIOUS_CONTR_ID.equals("")) {
+                PREVIOUS_CONTR_ID = CONTR_ID;
+            } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
+                PREVIOUS_CONTR_ID = CONTR_ID;
+                glbVars.db.ResetNomenPrice(isCopied);
+            }
 
             if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
                 setContrAndSum();

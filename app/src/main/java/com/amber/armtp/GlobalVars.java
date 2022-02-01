@@ -1,7 +1,6 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -21,10 +20,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -73,7 +74,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -82,9 +82,10 @@ import java.util.Locale;
 public class GlobalVars extends Application {
     public static ArrayList<CheckBoxData> allOrders = new ArrayList<>();
 
+    public static FragmentActivity CurAc;
+
     public Context glbContext;
     public Context frContext;
-    public static Activity CurAc;
     public Cursor myNom, mySgi, myGrups, Orders, OrdersDt;
     public Cursor curWC, curFocus;
 
@@ -505,7 +506,6 @@ public class GlobalVars extends Application {
             InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
 
-            // TODO: change it
             alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 Boolean wantToCloseDialog = false;
                 if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
@@ -1122,24 +1122,29 @@ public class GlobalVars extends Application {
     }
 
     public String FormDBFForZakaz(int ID) throws DBFException {
+        System.out.println(ID);
         Cursor c;
 
         String TP, CONTR, ADDR, DOCNO, COMMENT, NOMEN;
         java.util.Date DELIVERY, DOCDATE;
         double QTY, PRICE;
 
-        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
-
-        String curdate = df.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
-
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
-        DBF_FileName = "orders_" + curdate + ".dbf";
-
         c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID, ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.DELIVERY_DATE as DEL_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
             Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
             return "";
         }
+
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_HHmmss");
+        String curdate = df.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
+
+        Cursor cForTpId = dbOrders.getReadableDatabase().rawQuery("SELECT TP FROM ZAKAZY WHERE rowid='" + ID + "'", null);
+
+        cForTpId.moveToNext();
+        String tpID = cForTpId.getString(cForTpId.getColumnIndex("TP"));
+
+        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tpID + "_" + curdate + ".dbf";
+        DBF_FileName = tpID + "_" + curdate + ".dbf";
 
         File DBFFile = new File(FileName);
         if (DBFFile.exists()) {
@@ -1308,146 +1313,6 @@ public class GlobalVars extends Application {
     public String ReadLastUpdate() {
         String timeUpdate = db.getLastUpdateTime();
         return timeUpdate != null ? timeUpdate : "";
-    }
-
-    public void SendOrders(int[] chosenOrdersID) throws DBFException {
-        OrderID = "";
-        Cursor c;
-        String TP, CONTR, ADDR, DOCNO, COMMENT, CODE;
-        java.util.Date DELIVERY, DOCDATE;
-        double QTY, PRICE;
-        int ID;
-
-        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("ddMMyyyy_hhmmss");
-        String curdate = df.format(Calendar.getInstance().getTimeInMillis()) + Calendar.MILLISECOND;
-
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/orders_" + curdate + ".dbf";
-        DBF_FileName = "orders_" + curdate + ".dbf";
-        c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID," +
-                " ZAKAZY.DELIVERY_DATE as DEL_DATE," +
-                " ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE, ZAKAZY.ROWID AS ID FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.STATUS='Сохранён'", null);
-        if (c.getCount() == 0) {
-            Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        File DBFFile = new File(FileName);
-        if (DBFFile.exists()) {
-            DBFFile.delete();
-        }
-
-        DBFWriter Table = new DBFWriter(DBFFile);
-        Table.setCharactersetName("cp866");
-        DBFField[] fields = new DBFField[10];
-
-        int index = 0;
-
-        fields[index] = new DBFField();
-        fields[index].setName("TP");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("CONTR");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("ADDR");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("DOCID");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(30);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("DOCDATE");
-        fields[index].setDataType(DBFField.FIELD_TYPE_D);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("DELIVERY");
-        fields[index].setDataType(DBFField.FIELD_TYPE_D);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("COMMENT");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(255);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("CODE");
-        fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(13);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("QTY");
-        fields[index].setDataType(DBFField.FIELD_TYPE_N);
-        fields[index].setFieldLength(13);
-        fields[index].setDecimalCount(0);
-        index++;
-
-        fields[index] = new DBFField();
-        fields[index].setName("PRICE");
-        fields[index].setDataType(DBFField.FIELD_TYPE_N);
-        fields[index].setFieldLength(15);
-        fields[index].setDecimalCount(2);
-        Table.setFields(fields);
-
-        // TP, CONTR, ADDR, DOCNO, DOC_DATE, DELIVERY_DATE, COMMENT, NOM_ID, DESCR, QTY, PRICE, ROWID
-        try {
-            while (c.moveToNext()) {
-                ID = c.getInt(c.getColumnIndex("ID"));
-
-                if (Arrays.binarySearch(chosenOrdersID, ID) < 0)
-                    continue;
-
-                TP = c.getString(c.getColumnIndex("TP"));
-                CONTR = c.getString(c.getColumnIndex("CONTR"));
-                ADDR = c.getString(c.getColumnIndex("ADDR"));
-                DOCNO = c.getString(c.getColumnIndex("DOCID"));
-                DOCDATE = StrToDbfDate(c.getString(c.getColumnIndex("DOC_DATE")));
-                DELIVERY = StrToDbfDate(c.getString(c.getColumnIndex("DEL_DATE")));
-                COMMENT = c.getString(c.getColumnIndex("COMMENT"));
-                CODE = c.getString(c.getColumnIndex("NOMEN"));
-                QTY = c.getDouble(c.getColumnIndex("QTY"));
-                PRICE = Double.parseDouble(c.getString(c.getColumnIndex("PRICE")).replace(",", "."));
-
-                Object[] rowData = new Object[10];
-                rowData[0] = TP;
-                rowData[1] = CONTR;
-                rowData[2] = ADDR;
-                rowData[3] = DOCNO;
-                rowData[4] = DOCDATE;
-                rowData[5] = DELIVERY;
-                rowData[6] = COMMENT;
-                rowData[7] = CODE;
-                rowData[8] = QTY;
-                rowData[9] = PRICE;
-                Table.addRecord(rowData);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Table.write();
-        DBF_FIleForSend = FileName;
-        if (isNetworkAvailable()) {
-            Integer[] data = new Integer[chosenOrdersID.length];
-            for (int i = 0; i < chosenOrdersID.length; i++) {
-                data[i] = chosenOrdersID[i];
-            }
-            new UploadDBFFile().execute(data);
-        } else {
-            Toast.makeText(CurAc, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-        }
     }
 
     public void LoadDebet(final String TP_ID) {
@@ -1945,6 +1810,9 @@ public class GlobalVars extends Application {
                 inputStream = new FileInputStream(secondLocalFile);
 
                 OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
+                if (outputStream == null)
+                    return null;
+
                 byte[] bytesIn = new byte[65536];
                 int read;
 

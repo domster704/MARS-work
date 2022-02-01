@@ -71,7 +71,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
      */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onActivityCreated(savedInstanceState);
 
         serverSettings = getActivity().getSharedPreferences("apk_version", 0);

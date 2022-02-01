@@ -1,16 +1,14 @@
 package com.amber.armtp;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-
-import java.lang.annotation.Target;
+import android.support.v4.app.FragmentActivity;
 
 public class ProgressBarLoading {
-    private final Activity activity;
+    private final FragmentActivity activity;
 
     private AlertDialog dialog;
 
-    public ProgressBarLoading(Activity activity) {
+    public ProgressBarLoading(FragmentActivity activity) {
         this.activity = activity;
         _create();
     }
@@ -25,17 +23,10 @@ public class ProgressBarLoading {
     }
 
     public void show() {
-        activity.runOnUiThread(() -> {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            dialog.show();
-        });
+        activity.runOnUiThread(() -> dialog.show());
     }
 
-    public void stop() {
+    public void dismiss() {
         activity.runOnUiThread(() -> dialog.dismiss());
     }
 }
