@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.HashMap;
+
 public class DBOrdersHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "order.db";
 
@@ -138,8 +140,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     public void updateOrderQty(String ZakID, String ID, int Qty) {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
+        SQLiteDatabase db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
             ContentValues updatedValues = new ContentValues();
@@ -151,5 +152,19 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    public HashMap<String, String> getOrderData(String id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null);
+        c.moveToNext();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("TP", c.getString(c.getColumnIndex("TP")));
+        data.put("CONTR", c.getString(c.getColumnIndex("CONTR")));
+        data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
+        data.put("DOC_DATE", c.getString(c.getColumnIndex("DOC_DATE")));
+        data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
+        return data;
     }
 }

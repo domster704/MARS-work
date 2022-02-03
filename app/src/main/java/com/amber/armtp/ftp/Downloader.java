@@ -136,7 +136,6 @@ public class Downloader {
 
             boolean isNewer = false;
             for (int i = 0; i < serverVer.length; i++) {
-                System.out.println((Integer.parseInt(serverVer[i]) > Integer.parseInt(curVer[i])) + " " + Integer.parseInt(serverVer[i]) + " " + Integer.parseInt(curVer[i]));
                 if (Integer.parseInt(serverVer[i]) > Integer.parseInt(curVer[i])) {
                     isNewer = true;
                     break;

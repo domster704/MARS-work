@@ -3,9 +3,13 @@
     android:id="@+id/order_header"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:orientation="vertical"
-    android:screenOrientation="landscape"
-    android:weightSum="1">
+    android:screenOrientation="landscape">
+
+    <!--    <RelativeLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content">-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +29,8 @@
                 android:paddingStart="10dp"
                 android:text="@string/OrdHeaderTp"
                 android:textColor="#000"
-                android:textSize="@dimen/mainFontSize" />
+                android:textSize="@dimen/mainFontSize"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/SpinTP"
@@ -77,12 +82,14 @@
                 android:paddingStart="10dp"
                 android:text="@string/OrdHeaderContr"
                 android:textColor="#000"
-                android:textSize="@dimen/mainFontSize" />
+                android:textSize="@dimen/mainFontSize"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/SpinContr"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
                 android:textStyle="bold" />
@@ -101,7 +108,8 @@
                 android:paddingStart="10dp"
                 android:text="@string/OrdHeaderAddr"
                 android:textColor="#000"
-                android:textSize="@dimen/mainFontSize" />
+                android:textSize="@dimen/mainFontSize"
+                android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/SpinAddr"
@@ -109,7 +117,8 @@
                 android:layout_height="match_parent"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:gravity="center_vertical|center_horizontal" />
         </LinearLayout>
 
         <LinearLayout
@@ -125,7 +134,8 @@
                 android:paddingStart="10dp"
                 android:text="@string/OrdHeaderDate"
                 android:textColor="#000"
-                android:textSize="@dimen/mainFontSize" />
+                android:textSize="@dimen/mainFontSize"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/txtDelivDate"
@@ -133,6 +143,7 @@
                 android:layout_height="match_parent"
                 android:ems="10"
                 android:focusable="false"
+                android:gravity="start|bottom"
                 android:singleLine="true"
                 android:textColor="#000"
                 android:textSize="@dimen/headOrderFontSize"
@@ -157,7 +168,7 @@
                 android:id="@+id/txtComment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="top"
+                android:gravity="start|bottom"
                 android:textColor="#000"
                 android:textSize="@dimen/headOrderFontSize"
                 android:textStyle="bold" />
@@ -165,27 +176,27 @@
     </LinearLayout>
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/NecessaryFields"
-        android:textColor="#000"
-        android:textStyle="bold" />
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:text="@string/NecessaryFields"-->
+<!--        android:textColor="#000"-->
+<!--        android:textStyle="bold" />-->
 
-    <Button
-        android:id="@+id/btSaveHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:padding="15dp"
-        android:text="@string/OrdHeaderSave"
-        android:textColor="#000" />
-
+<!--    <Button-->
+<!--        android:id="@+id/btSaveHeader"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:padding="15dp"-->
+<!--        android:text="@string/OrdHeaderSave"-->
+<!--        android:textColor="#000" />-->
+    <!--    </RelativeLayout>-->
 </RelativeLayout>

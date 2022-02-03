@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/close/baseline_close_24.xml" />
+                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/navigate_next/baseline_navigate_next_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,7 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_cross_black" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_next_white" />
                             <entry key="sourceFile" value="C:\Users\isupo\GoogleDisk\Programming\Java\AndroidStudioProjects\MARS" />
                           </map>
                         </option>

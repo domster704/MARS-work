@@ -2,9 +2,6 @@ package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -24,7 +21,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.ConfigClass;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.linuxense.javadbf.DBFException;
@@ -37,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -47,6 +44,7 @@ public class JournalFragment extends Fragment {
 
     private final ArrayList<GlobalVars.CheckBoxData> chosenOrders = new ArrayList<>();
 
+//    private ArrayList<Integer> itemsList;
     private int[] itemsList;
 
     Menu mainMenu;
@@ -221,10 +219,16 @@ public class JournalFragment extends Fragment {
         inflater.inflate(R.menu.journal_menu, menu);
         mainMenu = menu;
 
-        itemsList = new int[mainMenu.size()];
+//        for (int i = 0; i < mainMenu.size(); i++) {
+//            itemsList.add(mainMenu.getItem(i).getItemId());
+//        }
+//        itemsList.add(ID_GOBACK);
+
+        itemsList = new int[mainMenu.size() + 1];
         for (int i = 0; i < mainMenu.size(); i++) {
             itemsList[i] = mainMenu.getItem(i).getItemId();
         }
+        itemsList[itemsList.length - 1] = ID_GOBACK;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -245,36 +249,36 @@ public class JournalFragment extends Fragment {
 
                                 isChecked = false;
 
-                                int countOfSentOrders = 0;
+//                                int countOfSentOrders = 0;
                                 for (GlobalVars.CheckBoxData i : chosenOrders) {
-                                    if (!i.status.equals("Сохранён")) {
-                                        resendOrder(i.id);
-                                        countOfSentOrders++;
+                                    if (i.status.equals("Сохранён") || i.status.equals("Отправлен")) {
+                                        sendOrders(i.id);
+//                                        countOfSentOrders++;
                                     }
                                 }
 
-                                if (chosenOrders.size() - countOfSentOrders == 0) {
-                                    glbVars.LoadOrders();
-                                    return;
-                                }
-
-                                int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
-
-                                int index = 0;
-                                for (int i = 0; i < chosenOrders.size(); i++) {
-                                    if (chosenOrders.get(i).status.equals("Сохранён")) {
-                                        chosenOrdersForSending[index] = chosenOrders.get(i).id;
-                                        index++;
-                                    }
-                                }
-
-                                try {
-                                    for (int id: chosenOrdersForSending) {
-                                        resendOrder(id);
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+//                                if (chosenOrders.size() - countOfSentOrders == 0) {
+//                                    glbVars.LoadOrders();
+//                                    return;
+//                                }
+//
+//                                int[] chosenOrdersForSending = new int[chosenOrders.size() - countOfSentOrders];
+//
+//                                int index = 0;
+//                                for (int i = 0; i < chosenOrders.size(); i++) {
+//                                    if (chosenOrders.get(i).status.equals("Сохранён")) {
+//                                        chosenOrdersForSending[index] = chosenOrders.get(i).id;
+//                                        index++;
+//                                    }
+//                                }
+//
+//                                try {
+//                                    for (int id: chosenOrdersForSending) {
+//                                        sendOrders(id);
+//                                    }
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
                             } else {
                                 Toast.makeText(getActivity(), "Нет доступного инетрнет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
                             }
@@ -312,17 +316,6 @@ public class JournalFragment extends Fragment {
                             toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
                             toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
                         });
-//                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                for (GlobalVars.CheckBoxData data : chosenOrders) {
-//                                    if (data.tvData.isChecked()) {
-//                                        data.tvData.setChecked(false);
-//                                    }
-//                                }
-//                                chosenOrders.clear();
-//                            }
-//                        });
 
                 AlertDialog alertDlgDel = builderDel.create();
                 alertDlgDel.show();
@@ -372,11 +365,11 @@ public class JournalFragment extends Fragment {
      *
      * @param id - поле ROWID в таблице ZAKAZY
      */
-    private void resendOrder(int id) {
+    private void sendOrders(int id) {
         String FileName = "";
 
         try {
-            FileName = glbVars.FormDBFForZakaz(id);
+            FileName = glbVars.CreateDBFForSending(id);
         } catch (DBFException e) {
             e.printStackTrace();
         } finally {
@@ -502,7 +495,7 @@ public class JournalFragment extends Fragment {
             cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
             try {
                 while (cursor.moveToNext()) {
-                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE=" + cursor.getDouble(cursor.getColumnIndex("PRICE")) + ", ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
+                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cursor.getDouble(cursor.getColumnIndex("PRICE")) + "', ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -515,10 +508,21 @@ public class JournalFragment extends Fragment {
 
             glbVars.rewritePriceToMainDB(OrderID);
 
+
+
+            HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
+
+//            glbVars.db.setContrAddr(orderData.get("ADDR"));
+
             Fragment fragment = new OrderHeadFragment();
 
             Bundle args = new Bundle();
             args.putBoolean("isCopied", true);
+            args.putString("TP", orderData.get("TP"));
+            args.putString("CONTR", orderData.get("CONTR"));
+            args.putString("ADDR", orderData.get("ADDR"));
+            args.putString("DOC_DATE", orderData.get("DOC_DATE"));
+            args.putString("COMMENT", orderData.get("COMMENT"));
             fragment.setArguments(args);
 
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();

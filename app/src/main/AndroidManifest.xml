@@ -45,12 +45,14 @@
 
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"
+            android:exported="true"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme"
-            android:exported="true">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.default" />
@@ -58,3 +60,5 @@
         </activity>
     </application>
 </manifest>
+
+<!--    android:windowSoftInputMode="adjustNothing"-->

@@ -25,7 +25,6 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +50,7 @@ import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
 import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.FormOrderFragment;
+import com.amber.armtp.ui.OrderHeadFragment;
 import com.amber.armtp.ui.SettingFragment;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -72,7 +72,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -129,8 +128,7 @@ public class GlobalVars extends Application {
     public Cursor Addr;
 
     public Spinner spinContr, spinAddr, TPList;
-    public Button btSave;
-    public Calendar DeliveryDate, DeliveryTime;
+    public Calendar DeliveryDate;
     public EditText txtDate;
     public EditText edContrFilter;
     public EditText txtComment;
@@ -155,7 +153,7 @@ public class GlobalVars extends Application {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = Contr.getString(Contr.getColumnIndex("CODE"));
-            if (!ItemID.equals("0")) {
+            if (!ItemID.equals("0") && !OrderHeadFragment.isCopied) {
                 LoadContrAddr(ItemID);
             }
         }
@@ -1082,6 +1080,17 @@ public class GlobalVars extends Application {
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
 
+    public void LoadContrListWithAddr(String Addr) {
+        spinContr.setAdapter(null);
+        Contr = db.getContrList();
+        ContrsAdapter adapter;
+        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        spinContr.setAdapter(adapter);
+//        spinContr.setOnItemSelectedListener(SelectedContr);
+
+//        SetSelectedAddr(Addr);
+    }
+
     public void LoadFilteredContrList(String FindStr) {
         spinContr.setAdapter(null);
         Contr = db.getContrFilterList(FindStr);
@@ -1096,38 +1105,34 @@ public class GlobalVars extends Application {
         AddrsAdapter adapter;
         adapter = new AddrsAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
         spinAddr.setAdapter(adapter);
-        spinAddr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
 
         String AddrID = db.GetContrAddr();
+        System.out.println(OrderHeadFragment._ADDR + " " + OrderHeadFragment.isCopied);
         if (!AddrID.equals("0")) {
             SetSelectedAddr(AddrID);
+        } else if (!OrderHeadFragment._ADDR.equals("")) {
+            SetSelectedAddr(OrderHeadFragment._ADDR);
         }
     }
 
     public void SetSelectedAddr(String AddrID) {
         for (int i = 0; i < spinAddr.getCount(); i++) {
             Cursor value = (Cursor) spinAddr.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
+            String id = value.getString(value.getColumnIndex("CODE"));
             if (AddrID.equals(id)) {
-                spinAddr.setSelection(i);
-                break;
+                spinAddr.setSelection(i, true);
+                return;
             }
         }
     }
 
-    public String FormDBFForZakaz(int ID) throws DBFException {
-        System.out.println(ID);
+    public String CreateDBFForSending(int ID) throws DBFException {
         Cursor c;
 
         String TP, CONTR, ADDR, DOCNO, COMMENT, NOMEN;
         java.util.Date DELIVERY, DOCDATE;
-        double QTY, PRICE;
+        double QTY;
+        String PRICE;
 
         c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID, ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.DELIVERY_DATE as DEL_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
@@ -1212,9 +1217,9 @@ public class GlobalVars extends Application {
 
         fields[index] = new DBFField();
         fields[index].setName("PRICE");
-        fields[index].setDataType(DBFField.FIELD_TYPE_N);
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
         fields[index].setFieldLength(15);
-        fields[index].setDecimalCount(2);
+//        fields[index].setDecimalCount(2);
         Table.setFields(fields);
 
 
@@ -1230,7 +1235,8 @@ public class GlobalVars extends Application {
                 COMMENT = c.getString(c.getColumnIndex("COMMENT"));
                 NOMEN = c.getString(c.getColumnIndex("NOMEN"));
                 QTY = c.getDouble(c.getColumnIndex("QTY"));
-                PRICE = Double.parseDouble(c.getString(c.getColumnIndex("PRICE")).replace(",", "."));
+//                PRICE = Double.parseDouble(c.getString(c.getColumnIndex("PRICE")).replace(",", "."));
+                PRICE = c.getString(c.getColumnIndex("PRICE")).replace(",", ".");
 
                 Object[] rowData = new Object[10];
                 rowData[0] = TP;
@@ -1261,40 +1267,13 @@ public class GlobalVars extends Application {
         return DBF_FileName;
     }
 
-    private void putCheckBox(Cursor c) {
-        GlobalVars.allOrders.clear();
-        layout.removeAllViews();
-
-        if (c.getCount() == 0) return;
-
-        int id;
-        String status;
-
-        c.moveToFirst();
-        do {
-            id = c.getInt(0);
-            status = c.getString(5);
-
-            CheckBox checkBox = new CheckBox(layout.getContext());
-            float height = getResources().getDimension(R.dimen.heightOfOrdersItem);
-            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) height));
-            layout.addView(checkBox);
-
-            if (status.equals("Сохранен")) {
-                checkBox.setChecked(true);
-            }
-
-            GlobalVars.allOrders.add(new CheckBoxData(id, checkBox, status));
-        } while (c.moveToNext());
-    }
-
     public void LoadOrders() {
         _updateOrdersStatusFromDB();
 
         gdOrders.setAdapter(null);
         Orders = dbOrders.getZakazy();
         if (Orders != null)
-            putCheckBox(Orders);
+            _putCheckBox(Orders);
 
         OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
         gdOrders.setAdapter(OrdersAdapter);
@@ -1503,18 +1482,6 @@ public class GlobalVars extends Application {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            Cursor cursor = getCursor();
-            TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
-
-            String text = cursor.getString(2);
-            tvDescr.setText(text);
-
-            return view;
-        }
-
-        @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
@@ -1711,7 +1678,9 @@ public class GlobalVars extends Application {
             TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
 
             TextView tvSum = view.findViewById(R.id.ColOrdDtSum);
+            TextView tvPrice = view.findViewById(R.id.ColOrdDtPrice);
             _updateTextFormatTo2DecAfterPoint(tvSum);
+            _updateTextFormatTo2DecAfterPoint(tvPrice);
 
             if (position % 2 == 0) {
                 view.setBackgroundColor(Color.rgb(201, 235, 255));
@@ -1720,7 +1689,9 @@ public class GlobalVars extends Application {
             }
 
             if (cursor.getInt(cursor.getColumnIndex("IS_OUTED")) == 1) {
-                tvQty.setText(cursor.getInt(cursor.getColumnIndex("QTY")) + "(-" + cursor.getInt(cursor.getColumnIndex("OUT_QTY")) + ")");
+                int outQTY = cursor.getInt(cursor.getColumnIndex("OUT_QTY"));
+                int QTY = cursor.getInt(cursor.getColumnIndex("QTY"));
+                tvQty.setText(QTY + "(" + (QTY - outQTY) + ")");
             }
 
             return view;
@@ -1902,14 +1873,6 @@ public class GlobalVars extends Application {
         }
     }
 
-    @SuppressLint("DefaultLocale")
-    private void _updateTextFormatTo2DecAfterPoint(TextView v) {
-        try {
-            v.setText(String.format("%.2f", Float.parseFloat(v.getText().toString())));
-        } catch (Exception ignored) {
-        }
-    }
-
     public void rewritePriceToMainDB(String DOCID) {
         Cursor orderPrices;
         orderPrices = dbOrders.getReadableDatabase().rawQuery("SELECT PRICE, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + DOCID + "'", null);
@@ -1920,6 +1883,14 @@ public class GlobalVars extends Application {
         }
 
         orderPrices.close();
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void _updateTextFormatTo2DecAfterPoint(TextView v) {
+        try {
+            v.setText(String.format("%.2f", Float.parseFloat(v.getText().toString())));
+        } catch (Exception ignored) {
+        }
     }
 
     private void _updateOrdersStatusFromDB() {
@@ -1951,21 +1922,37 @@ public class GlobalVars extends Application {
 
         while (newQty.moveToNext()) {
             dbApp.execSQL("UPDATE ZAKAZY_DT SET IS_OUTED = 1, OUT_QTY = " + newQty.getInt(newQty.getColumnIndex("KOL")) + " WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
-//            c = dbApp.rawQuery("SELECT QTY FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'", null);
-//            c.moveToNext();
-
-//            String QTY = c.getString(0);
-//            int qty;
-//            if (!QTY.contains("(")) {
-//                qty = Integer.parseInt(QTY);
-//            } else {
-//                qty = Integer.parseInt(QTY.split(" \\(")[0]);
-//            }
-//            dbApp.execSQL("UPDATE ZAKAZY_DT SET QTY = '" + qty + " (" + (qty - newQty.getInt(1)) + ")" + "' WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
         }
 
         newQty.close();
         if (c != null)
             c.close();
+    }
+
+    private void _putCheckBox(Cursor c) {
+        GlobalVars.allOrders.clear();
+        layout.removeAllViews();
+
+        if (c.getCount() == 0) return;
+
+        int id;
+        String status;
+
+        c.moveToFirst();
+        do {
+            id = c.getInt(0);
+            status = c.getString(5);
+
+            CheckBox checkBox = new CheckBox(layout.getContext());
+            float height = getResources().getDimension(R.dimen.heightOfOrdersItem);
+            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) height));
+            layout.addView(checkBox);
+
+            if (status.equals("Сохранен")) {
+                checkBox.setChecked(true);
+            }
+
+            GlobalVars.allOrders.add(new CheckBoxData(id, checkBox, status));
+        } while (c.moveToNext());
     }
 }

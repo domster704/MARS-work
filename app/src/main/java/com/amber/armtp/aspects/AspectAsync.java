@@ -17,7 +17,6 @@ public class AspectAsync {
     public void setJoinPointThread(final ProceedingJoinPoint joinPoint) {
         new Thread(() -> {
             try {
-                System.out.println(1);
                 joinPoint.proceed();
             } catch (Throwable throwable) {
                 throwable.printStackTrace();

@@ -11,12 +11,14 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.ConfigClass;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 
@@ -33,15 +35,20 @@ import java.util.Objects;
  */
 public class OrderHeadFragment extends Fragment {
     public GlobalVars glbVars;
-    SharedPreferences settings;
-    SharedPreferences.Editor editor;
-    android.support.v4.app.FragmentTransaction fragmentTransaction;
-    android.support.v7.widget.Toolbar toolbar;
-
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
 
-    private boolean isCopied = false;
+    public static boolean isCopied = false;
+    private String _TP = "";
+    private String _CONTR = "";
+    public static String _ADDR = "";
+    private String _DATE = "";
+    private String _COMMENT = "";
+
+    private SharedPreferences settings;
+    private SharedPreferences.Editor editor;
+    private android.support.v4.app.FragmentTransaction fragmentTransaction;
+    private android.support.v7.widget.Toolbar toolbar;
 
     public OrderHeadFragment() {
     }
@@ -60,13 +67,25 @@ public class OrderHeadFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        System.out.println(1);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         glbVars.frContext = getActivity();
 
         if (getArguments() != null) {
             isCopied = getArguments().getBoolean("isCopied");
+            _TP = getArguments().getString("TP");
+            _CONTR = getArguments().getString("CONTR");
+            _ADDR = getArguments().getString("ADDR");
+            _DATE = getArguments().getString("DOC_DATE");
+            _COMMENT = getArguments().getString("COMMENT");
+
             getArguments().remove("isCopied");
+            getArguments().remove("TP");
+            getArguments().remove("CONTR");
+            getArguments().remove("ADDR");
+            getArguments().remove("DOC_DATE");
+            getArguments().remove("COMMENT");
         }
 
         GlobalVars.CurAc = getActivity();
@@ -85,13 +104,12 @@ public class OrderHeadFragment extends Fragment {
         toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.edContrFilter = getActivity().findViewById(R.id.txtContrFilter);
         glbVars.txtComment = getActivity().findViewById(R.id.txtComment);
-        glbVars.btSave = getActivity().findViewById(R.id.btSaveHeader);
 
         glbVars.spinContr = getActivity().findViewById(R.id.SpinContr);
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-        setContrAndSum();
+        _setContrAndSum();
 
         glbVars.LoadTpList();
         glbVars.LoadContrList();
@@ -117,7 +135,6 @@ public class OrderHeadFragment extends Fragment {
         });
 
         glbVars.DeliveryDate = Calendar.getInstance();
-        glbVars.DeliveryTime = Calendar.getInstance();
 
         glbVars.txtDate = getActivity().findViewById(R.id.txtDelivDate);
 
@@ -133,56 +150,6 @@ public class OrderHeadFragment extends Fragment {
 
         glbVars.txtDate.setOnClickListener(v -> {
             new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
-        });
-
-        glbVars.btSave.setOnClickListener(v -> {
-            String ADDR_ID;
-
-            glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
-            glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
-            glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
-
-            CONTR_ID = glbVars.spContr.getText().toString();
-
-            String TP_ID = glbVars.spTp.getText().toString();
-
-            String CurContr = glbVars.db.GetContrID();
-
-            if (!CurContr.equals(CONTR_ID)) {
-                setContrAndSum();
-            }
-
-            ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
-
-            String DeliveryDate = glbVars.txtDate.getText().toString();
-            String Comment = glbVars.txtComment.getText().toString();
-
-            if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
-                Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            editor.putString("TP_ID", TP_ID);
-            editor.commit();
-
-            if (PREVIOUS_CONTR_ID.equals("")) {
-                PREVIOUS_CONTR_ID = CONTR_ID;
-            } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
-                PREVIOUS_CONTR_ID = CONTR_ID;
-                glbVars.db.ResetNomenPrice(isCopied);
-            }
-
-            if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                setContrAndSum();
-            } else {
-                if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                    setContrAndSum();
-                } else {
-                    Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            goToFormOrderFragment();
         });
 
         int ContRowid = glbVars.db.GetContrRowID();
@@ -219,8 +186,29 @@ public class OrderHeadFragment extends Fragment {
             glbVars.txtDate.setText(DelivDate, TextView.BufferType.EDITABLE);
         }
 
-        setContrAndSum();
+        _setContrAndSum();
 
+        if (isCopied) {
+            int tpID = glbVars.db.GetTPByID(_TP);
+            int contrID = glbVars.db.GetContrByID(_CONTR);
+
+            glbVars.LoadContrListWithAddr(_ADDR);
+
+            glbVars.TPList.setSelection(tpID);
+            glbVars.spinContr.setSelection(contrID);
+
+            String[] dateArray = _DATE.split("\\.");
+            glbVars.DeliveryDate.set(Calendar.YEAR, Integer.parseInt(dateArray[2]));
+            glbVars.DeliveryDate.set(Calendar.MONTH, Integer.parseInt(dateArray[1]) - 1);
+            glbVars.DeliveryDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateArray[0]));
+            String myFormat = "dd.MM.yyyy";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
+
+            glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
+            glbVars.txtComment.setText(_COMMENT);
+
+            OrderHeadFragment.isCopied = false;
+        }
     }
 
     public void SetSelectedContr(int ROWID) {
@@ -242,7 +230,74 @@ public class OrderHeadFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    private void setContrAndSum() {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.order_head_menu, menu);
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.saveHeader:
+                _saveOrderData();
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    private void _saveOrderData() {
+        String ADDR_ID;
+
+        glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
+        glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
+        glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
+
+        CONTR_ID = glbVars.spContr.getText().toString();
+
+        String TP_ID = glbVars.spTp.getText().toString();
+
+        String CurContr = glbVars.db.GetContrID();
+
+        if (!CurContr.equals(CONTR_ID)) {
+            _setContrAndSum();
+        }
+
+        ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
+
+        String DeliveryDate = glbVars.txtDate.getText().toString();
+        String Comment = glbVars.txtComment.getText().toString();
+
+        if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
+            Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        editor.putString("TP_ID", TP_ID);
+        editor.commit();
+
+        if (PREVIOUS_CONTR_ID.equals("")) {
+            PREVIOUS_CONTR_ID = CONTR_ID;
+        } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
+            PREVIOUS_CONTR_ID = CONTR_ID;
+            glbVars.db.ResetNomenPrice(isCopied);
+        }
+
+        if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+            _setContrAndSum();
+        } else {
+            if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+                _setContrAndSum();
+            } else {
+                Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        goToFormOrderFragment();
+    }
+
+    private void _setContrAndSum() {
         String ToolBarContr = glbVars.db.GetToolbarContr();
         String OrderSum = glbVars.db.getOrderSum();
         try {

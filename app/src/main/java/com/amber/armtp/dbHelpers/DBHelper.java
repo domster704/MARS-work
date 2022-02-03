@@ -532,6 +532,40 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    public int GetContrByID(String ID) {
+        Cursor c = null;
+        try {
+            SQLiteDatabase db;
+            db = this.getReadableDatabase();
+            c = db.rawQuery("SELECT ROWID AS _id FROM CONTRS WHERE CODE='" + ID + "'", null);
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+            return 0;
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
+    public int GetAddrByID(String ID) {
+        Cursor c = null;
+        try {
+            SQLiteDatabase db;
+            db = this.getReadableDatabase();
+            c = db.rawQuery("SELECT ROWID AS _id FROM ADDRS WHERE CODE='" + ID + "'", null);
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+            return 0;
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
     public String GetContrID() {
         Cursor c = null;
         try {
@@ -565,6 +599,20 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
     }
+
+//    public void setContrAddr(String addr) {
+//        SQLiteDatabase db;
+//        db = this.getWritableDatabase();
+//        db.beginTransaction();
+//        try {
+//            db.execSQL("");
+//            db.setTransactionSuccessful();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            db.endTransaction();
+//        }
+//    }
 
     public String GetComment() {
         Cursor c = null;
@@ -646,7 +694,6 @@ public class DBHelper extends SQLiteOpenHelper {
                     pricesMap.clear();
                     listOfUpdatedGroups.clear();
 
-                    System.out.println(isCopied);
                     Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
 
                     if (isCopied || cCheck.getCount() != 0) {
