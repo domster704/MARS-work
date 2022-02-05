@@ -16,9 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
+import com.amber.armtp.Mess;
 import com.amber.armtp.R;
 import com.amber.armtp.ftp.Downloader;
 
@@ -43,8 +43,8 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     private final Handler handlerApp = new Handler();
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
-    private TextView tvDBPerc, tvAppPerc;
-    private TextView tvDBCount, tvAppCount;
+
+    private Downloader downloader;
 
     Button btnDBUpdate, btnAppUpdate;
 
@@ -99,16 +99,16 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
 
         tvDB = getActivity().findViewById(R.id.chkDB);
         pgDB = getActivity().findViewById(R.id.pgDB);
-        tvDBPerc = getActivity().findViewById(R.id.tbDBPerc);
-        tvDBCount = getActivity().findViewById(R.id.tvDBCount);
+        TextView tvDBPerc = getActivity().findViewById(R.id.tbDBPerc);
+        TextView tvDBCount = getActivity().findViewById(R.id.tvDBCount);
 
         btnAppUpdate = getActivity().findViewById(R.id.btnAppUpdate);
         btnAppUpdate.setOnClickListener(this);
 
         tvApp = getActivity().findViewById(R.id.chkApp);
         pgApp = getActivity().findViewById(R.id.pgApp);
-        tvAppPerc = getActivity().findViewById(R.id.tvAppPerc);
-        tvAppCount = getActivity().findViewById(R.id.tvAppCount);
+        TextView tvAppPerc = getActivity().findViewById(R.id.tvAppPerc);
+        TextView tvAppCount = getActivity().findViewById(R.id.tvAppCount);
 
         uiData = new UIData[2];
         uiData[0] = new UIData(tvDB, pgDB, tvDBCount, tvDBPerc, handlerDB);
@@ -118,6 +118,8 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
             getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
         } catch (Exception ignored) {
         }
+
+        downloader = new Downloader(glbVars, getActivity());
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -125,39 +127,47 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnDBUpdate:
-                if (DebetIsFinished.equals("1") || DebetIsFinished.equals("0")) {
-                    if (glbVars.isNetworkAvailable()) {
-                        Downloader downloader = new Downloader(glbVars, getActivity());
+                new Thread(() -> {
+                    if (DebetIsFinished.equals("1") || DebetIsFinished.equals("0") || !Downloader.isServerVerNewer.equals("error")) {
+                        if (!glbVars.isNetworkAvailable()) {
+                            Mess.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
+                            return;
+                        }
 
-                        view.setEnabled(false);
-
-                        pgDB.setProgress(0);
-                        tvDB.setTextColor(Color.rgb(0, 0, 0));
-
-                        downloader.downloadDB(uiData[0], view, glbVars);
-                    } else {
-                        Toast.makeText(getActivity(), "Нет доступного интернет соединения. Проверьте соединение с Интернетом", Toast.LENGTH_LONG).show();
+                        try {
+                            downloader = new Downloader(glbVars, getActivity());
+                            getActivity().runOnUiThread(() -> {
+                                view.setEnabled(false);
+                                pgDB.setProgress(0);
+                                tvDB.setTextColor(Color.rgb(0, 0, 0));
+                            });
+                            downloader.downloadDB(uiData[0], view, glbVars);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
+                }).start();
                 break;
             case R.id.btnAppUpdate:
-                Downloader downloader = new Downloader(glbVars, getActivity());
-
-                if (!Downloader.isServerVerNewer) {
-                    Toast.makeText(getContext(), "На сервере нет новой версии", Toast.LENGTH_LONG).show();
-                    break;
+                if (Downloader.isServerVerNewer.equals("false")) {
+                    Mess.sout("На сервере нет новой версии");
+                    return;
                 }
 
-                view.setEnabled(false);
+                new Thread(() -> {
+                    try {
+                        downloader = new Downloader(glbVars, getActivity());
+                        getActivity().runOnUiThread(() -> {
+                            view.setEnabled(false);
+                            pgApp.setProgress(0);
+                            tvApp.setTextColor(Color.rgb(0, 0, 0));
+                        });
 
-                pgApp.setProgress(0);
-                tvApp.setTextColor(Color.rgb(0, 0, 0));
-
-                try {
-                    downloader.downloadApp(uiData[1], view);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                        downloader.downloadApp(uiData[1], view);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
                 break;
         }
     }

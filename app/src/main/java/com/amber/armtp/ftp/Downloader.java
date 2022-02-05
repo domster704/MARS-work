@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,7 +11,6 @@ import com.amber.armtp.BuildConfig;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.MainActivity;
-import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
@@ -23,13 +21,19 @@ import org.apache.commons.net.ftp.FTPFile;
 import java.io.File;
 
 public class Downloader {
+    public static String isServerVerNewer;
+
     private final GlobalVars globalVars;
     private final Activity activity;
 
-    public static boolean isServerVerNewer;
-
     static {
-        isServerVerNewer = isServerVersionNewer();
+        new Thread(() -> {
+            try {
+                isServerVerNewer = isServerVersionNewer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public Downloader(GlobalVars globalVars, Activity activity) {
@@ -37,9 +41,9 @@ public class Downloader {
         this.activity = activity;
     }
 
-    public void downloadApp(final UpdateDataFragment.UIData ui, View view) throws InterruptedException {
+    public void downloadApp(final UpdateDataFragment.UIData ui, View view) {
         if (globalVars.isNetworkAvailable()) {
-            if (isServerVerNewer)
+            if (isServerVerNewer.equals("true")) {
                 new Thread(() -> {
                     FtpFileDownloader ftpFileDownloader;
                     try {
@@ -64,6 +68,9 @@ public class Downloader {
                         e.printStackTrace();
                     }
                 }).start();
+            }
+        } else {
+            GlobalVars.CurAc.runOnUiThread(() -> view.setEnabled(true));
         }
     }
 
@@ -106,7 +113,7 @@ public class Downloader {
         }).start();
     }
 
-    private static boolean isServerVersionNewer() {
+    private static String isServerVersionNewer() {
         String ver = BuildConfig.VERSION_NAME;
 
         FTPClient client = new FTPClient();
@@ -142,11 +149,11 @@ public class Downloader {
                 }
             }
 
-            return isNewer;
+            return String.valueOf(isNewer);
         } catch (Exception e) {
+            GlobalVars.CurAc.runOnUiThread(() -> Toast.makeText(GlobalVars.CurAc, "Сервер недоступен", Toast.LENGTH_LONG).show());
             e.printStackTrace();
+            return "error";
         }
-
-        return false;
     }
 }

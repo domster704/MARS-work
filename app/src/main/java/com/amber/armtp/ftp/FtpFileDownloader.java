@@ -1,7 +1,9 @@
 package com.amber.armtp.ftp;
 
 import android.graphics.Color;
+import android.widget.Toast;
 
+import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.ui.UpdateDataFragment;
 
@@ -55,9 +57,8 @@ public class FtpFileDownloader {
         return 1;
     }
 
-    public boolean download(final UpdateDataFragment.UIData ui) throws IOException {
+    public boolean download(final UpdateDataFragment.UIData ui) throws Exception {
         boolean isDownload = false;
-
         login = initFTPClient();
         if (login) {
             File downloadFile = new File(filePathInAndroid);
@@ -98,12 +99,6 @@ public class FtpFileDownloader {
     private void changePGData(final long finalCount, int progressStatus, final UpdateDataFragment.UIData ui) {
         final long perc = progressStatus * 100L / finalCount;
         ui.progressBar.setProgress((int) perc);
-
-//        final int finalProgressStatus = progressStatus;
-//        ui.handler.post(() -> {
-//            ui.tvCount.setText(finalProgressStatus + "/" + finalCount);
-//            ui.tvPer.setText(perc + "%");
-//        });
     }
 
 
@@ -118,7 +113,7 @@ public class FtpFileDownloader {
             this.client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
 
             return login;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;

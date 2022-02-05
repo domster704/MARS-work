@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.ftp.Ping;
 import com.amber.armtp.interfaces.PGShowing;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplication(), "Для работы программы необходимо минимум 100 Мб. Освободите место!", Toast.LENGTH_SHORT).show();
 
 
+
 //      Для нахождения утечки памяти
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -112,13 +114,15 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // For ftp-server
-        String host = getResources().getString(R.string.host);
+        SharedPreferences serverSettings = getSharedPreferences("apk_version", 0);
+
+        String host = serverSettings.getString("FtpServerHost", getResources().getString(R.string.host));
+        String port = "" + serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)));
         String dirDB = getResources().getString(R.string.fileDirectoryDB);
         String dirAPK = getResources().getString(R.string.fileDirectoryApk);
-        String port = getResources().getString(R.string.port);
 
-        String user = getResources().getString(R.string.user);
-        String password = getResources().getString(R.string.password);
+        String user = serverSettings.getString("FtpServerUser", getResources().getString(R.string.user));
+        String password = serverSettings.getString("FtpServerPass", getResources().getString(R.string.password));
 
         // It's singleton instance for future using
         ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);

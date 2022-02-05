@@ -21,8 +21,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
+import com.amber.armtp.Mess;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
+import com.amber.armtp.ftp.Ping;
+import com.amber.armtp.interfaces.Async;
 
 import java.util.Objects;
 
@@ -32,18 +35,14 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class SettingFragment extends Fragment implements View.OnClickListener {
-
     public static int nomenDescriptionFontSize = 14;
-
     public GlobalVars glbVars;
-    SharedPreferences serverSettings, settings;
-    SharedPreferences.Editor editor, settingPathEditor, settingsEditor;
 
-    Button btSaveSettings;
-    EditText fontSize;
+    private SharedPreferences settings;
+    private SharedPreferences.Editor editor, settingsEditor;
 
-    EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort;
-    Boolean isSelectPath = false;
+    private EditText fontSize;
+    private EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort;
 
     @Nullable
     @Override
@@ -67,13 +66,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     /**
      * Получение элементов фрагмента и изменение их параметров
      *
-     * @param savedInstanceState
      */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        serverSettings = getActivity().getSharedPreferences("apk_version", 0);
+        SharedPreferences serverSettings = getActivity().getSharedPreferences("apk_version", 0);
         editor = serverSettings.edit();
 
         settings = getActivity().getSharedPreferences("settings", 0);
@@ -94,84 +92,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
         etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)))));
 
-//        btSaveSettings = getActivity().findViewById(R.id.btSaveSettings);
-
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
         fontSize.setText(String.valueOf(nomenDescriptionFontSize));
 
         getActivity().findViewById(R.id.ftpServerLayoutMain).setOnClickListener(this);
         getActivity().findViewById(R.id.fontLayoutMain).setOnClickListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-
-//        btSaveSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (Integer.parseInt(fontSize.getText().toString()) > 24) {
-//                    Toast.makeText(getActivity(), "Слишком большой размер шрифта", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//
-//                nomenDescriptionFontSize = Integer.parseInt(fontSize.getText().toString());
-//                settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
-//                settingsEditor.apply();
-//
-//                Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        btSaveSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
-//                editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
-//                editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
-//                editor.putString("FtpPhotoPort", etFtpUser.getText().toString());
-//
-//                editor.putString("FtpServerHost", etFtpServer.getText().toString());
-//                editor.putString("FtpServerPass", etFtpPass.getText().toString());
-//                editor.putString("FtpServerUser", etFtpUser.getText().toString());
-//                editor.putString("FtpServerPort", etFtpPort.getText().toString());
-//
-//                ServerDetails.getInstance(etFtpServer.getText().toString(), Integer.parseInt(etFtpUser.getText().toString()));
-//                editor.commit();
-//            }
-//        });
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        if (resultCode == Activity.RESULT_OK && resultData != null) {
-            DocumentFile pickedDir = DocumentFile.fromTreeUri(getActivity(), resultData.getData());
-            int LOCATION_SDPATH = 1;
-            int LOCATION_PHOTO_PATH = 2;
-            if (requestCode == LOCATION_PHOTO_PATH) {
-                settingPathEditor.putString("PhotoPath", resultData.getDataString());
-                settingPathEditor.putString("PhotoPathName", pickedDir.getName());
-                settingPathEditor.commit();
-            } else if (requestCode == LOCATION_SDPATH) {
-                settingPathEditor.putString("SDPath", resultData.getDataString());
-                settingPathEditor.putString("SDPathName", pickedDir.getName());
-                settingPathEditor.commit();
-            }
-            isSelectPath = true;
-        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -210,7 +136,27 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
+    @Async
     private void changeServerData() {
+        String host = etFtpServer.getText().toString();
+        String port = etFtpPort.getText().toString();
+        String user = etFtpUser.getText().toString();
+        String pass = etFtpPass.getText().toString();
+        if (!new Ping(host, port, user, pass).isReachable()) {
+            Mess.sout("Сервер недоступен. Настройки не были применены");
+            getActivity().runOnUiThread(() -> {
+                try {
+                    etFtpServer.setText(ServerDetails.getInstance().host);
+                    etFtpPass.setText(ServerDetails.getInstance().password);
+                    etFtpUser.setText(ServerDetails.getInstance().user);
+                    etFtpPort.setText(ServerDetails.getInstance().port);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            return;
+        }
+
         // Меняем данные сервера
         editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
         editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
@@ -224,8 +170,14 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         ServerDetails.getInstance(etFtpServer.getText().toString(), etFtpPort.getText().toString());
         editor.commit();
+
+        Mess.sout("Настройки сохранены");
     }
 
+    /**
+     * Пока что изменяет шрифт только в поле DESCR (Наименование) во фрагменте Формирование
+     */
+    @Async
     private void changeFontSize() {
         // Меняем шрифт в приложении
         if (Integer.parseInt(fontSize.getText().toString()) == settings.getInt("fontSize", -1)) {
@@ -241,6 +193,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
         settingsEditor.apply();
 
-        Toast.makeText(getActivity(), "Размер шрифта изменён на " + nomenDescriptionFontSize, Toast.LENGTH_SHORT).show();
+        Mess.sout( "Размер шрифта изменён на " + nomenDescriptionFontSize);
     }
 }

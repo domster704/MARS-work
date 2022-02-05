@@ -819,7 +819,6 @@ public class GlobalVars extends Application {
     }
 
     public String GetSDCardPath() {
-
         String sdpath = "";
         if (Build.BRAND.equals("samsung")) {
             sdpath = "/storage/extSdCard/";
@@ -1107,7 +1106,6 @@ public class GlobalVars extends Application {
         spinAddr.setAdapter(adapter);
 
         String AddrID = db.GetContrAddr();
-        System.out.println(OrderHeadFragment._ADDR + " " + OrderHeadFragment.isCopied);
         if (!AddrID.equals("0")) {
             SetSelectedAddr(AddrID);
         } else if (!OrderHeadFragment._ADDR.equals("")) {
