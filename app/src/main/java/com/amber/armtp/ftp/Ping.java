@@ -1,5 +1,8 @@
 package com.amber.armtp.ftp;
 
+import com.amber.armtp.ServerDetails;
+
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -16,18 +19,23 @@ public class Ping {
         this.pass = pass;
     }
 
+    public Ping(ServerDetails serverDetails) {
+        this.host = serverDetails.host;
+        this.port = serverDetails.port;
+        this.name = serverDetails.user;
+        this.pass = serverDetails.password;
+    }
+
     public boolean isReachable() {
-//        String ip = "ftp://" + name + "@" + host + "/";
         String ip = "ftp://" + name + ":" + pass + "@" + host + ":" + port + "/";
         try {
             URL url = new URL(ip);
             URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(1000);
+            connection.setConnectTimeout(7000);
             connection.connect();
 
             return true;
-        } catch (Exception e) {
-
+        } catch (IOException e) {
             return false;
         }
     }

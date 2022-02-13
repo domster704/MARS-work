@@ -40,7 +40,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
             cursor = db.rawQuery("SELECT" +
                     " ZAKAZY.ROWID AS _id," +
                     " ZAKAZY.DOC_DATE," +
@@ -48,18 +47,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " ADDR_DES AS ADDR," +
                     " ZAKAZY.DELIVERY_DATE AS DELIVERY," +
                     " ZAKAZY.STATUS AS STATUS," +
-//                    " CASE ZAKAZY.STATUS" +
-//                    "   WHEN 0 THEN 'Сохранен'" +
-//                    "   WHEN 1 THEN 'Отправлен'" +
-//                    "   WHEN 2 THEN 'Получен'" +
-//                    "   WHEN 3 THEN 'Оформлен'" +
-//                    "   WHEN 4 THEN 'Оформлен(-)'" +
-//                    "   WHEN 6 THEN 'Собран'" +
-//                    "   WHEN 7 THEN 'Собран(-)'" +
-//                    "   WHEN 5 THEN 'Удален'" +
-//                    "   WHEN 99 THEN 'Отменен'" +
-//                    " END AS STATUS," +
-//                    " (SELECT SUM(QTY * cast(PRICE as REAL)) FROM ZAKAZY_DT WHERE ZAKAZ_ID=ZAKAZY.DOCID) AS SUM," +
                     " ZAKAZY.SUM as SUM," +
                     " ZAKAZY.DOCID AS DOCID" +
                     " FROM ZAKAZY" +
@@ -88,8 +75,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
     public void setZakazStatus(String Status, int id) {
         SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.setLockingEnabled(false);
+        db = this.getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("UPDATE ZAKAZY SET STATUS='" + Status + "' WHERE ROWID=" + id);
@@ -126,7 +112,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
             c = db.rawQuery("SELECT CASE WHEN MAX(ROWID)+1 IS NULL THEN 1 ELSE MAX(ROWID)+1 END AS [DOCNO] FROM ZAKAZY;", null);
             if (c.moveToFirst()) {
                 DocNo = c.getInt(0);
@@ -140,7 +125,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     public void updateOrderQty(String ZakID, String ID, int Qty) {
-        SQLiteDatabase db = this.getWritableDatabase(); // Read Data
+        SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         try {
             ContentValues updatedValues = new ContentValues();

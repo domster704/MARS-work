@@ -38,7 +38,7 @@ public class DefaultFragment extends Fragment {
         setRetainInstance(true);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 

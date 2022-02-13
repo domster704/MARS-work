@@ -1,126 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:screenOrientation="landscape"
-        android:weightSum="1">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
 
     <TextView
-            android:id="@+id/textViewTitle"
-            android:layout_width="wrap_content"
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="10dp"
+        android:text="@string/nomenTitle"
+        android:textColor="#000000" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:paddingStart="0dp"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="15dp"
-            android:text="@string/nomenTitle"
+            android:text="@string/nomenBeginPP"
             android:textColor="#000000" />
 
-    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:paddingStart="0dp"
-            android:paddingBottom="5dp">
-
-        <TextView
-                android:id="@+id/textView"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:text="@string/nomenBeginPP"
-                android:textColor="#000000" />
-
         <EditText
-                android:id="@+id/edBeginPP"
-                android:layout_width="100dp"
-                android:layout_height="35dp"
-                android:clickable="true"
-                android:digits="1234567890"
-                android:ems="4"
-                android:focusable="true"
-                android:gravity="center_vertical|center_horizontal"
-                android:inputType="number|numberDecimal"
-                android:numeric="integer"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="@dimen/mainFontSize" />
+            android:id="@+id/edBeginPP"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:clickable="true"
+            android:digits="1234567890"
+            android:ems="4"
+            android:focusable="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:imeOptions="actionDone"
+            android:inputType="number|numberDecimal"
+            android:numeric="integer"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="@dimen/mainFontSize" />
     </LinearLayout>
 
 
     <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:paddingStart="0dp"
-            android:paddingBottom="5dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:paddingStart="0dp"
+        android:paddingBottom="5dp">
 
         <TextView
-                android:id="@+id/textView37"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:text="@string/nomenEndPP"
-                android:textColor="#000000" />
+            android:id="@+id/textView37"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:text="@string/nomenEndPP"
+            android:textColor="#000000" />
 
         <EditText
-                android:id="@+id/edEndPP"
-                android:layout_width="100dp"
-                android:layout_height="35dp"
-                android:layout_weight="0.07"
-                android:clickable="true"
-                android:digits="1234567890"
-                android:ems="4"
-                android:focusable="true"
-                android:gravity="center_vertical|center_horizontal"
-                android:inputType="number|numberDecimal"
-                android:numeric="integer"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="@dimen/mainFontSize" />
+            android:id="@+id/edEndPP"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_weight="0.07"
+            android:clickable="true"
+            android:digits="1234567890"
+            android:ems="4"
+            android:focusable="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:imeOptions="actionDone"
+            android:inputType="number|numberDecimal"
+            android:numeric="integer"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="@dimen/mainFontSize" />
 
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:paddingStart="0dp"
-            android:paddingBottom="5dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:paddingStart="0dp"
+        android:paddingBottom="5dp">
 
         <TextView
-                android:id="@+id/textView7"
-                android:layout_width="150dp"
-                android:layout_height="35dp"
-                android:paddingBottom="5dp"
-                android:text="@string/nomenSetQty"
-                android:textColor="#000000" />
+            android:id="@+id/textView7"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:paddingBottom="5dp"
+            android:text="@string/nomenSetQty"
+            android:textColor="#000000" />
 
         <EditText
-                android:id="@+id/edPPQty"
-                android:layout_width="100dp"
-                android:layout_height="35dp"
-                android:layout_weight="0.07"
-                android:clickable="true"
-                android:digits="1234567890"
-                android:ems="4"
-                android:focusable="true"
-                android:gravity="center_vertical|center_horizontal"
-                android:inputType="number|numberDecimal"
-                android:numeric="integer"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="@dimen/mainFontSize" />
+            android:id="@+id/edPPQty"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_weight="0.07"
+            android:clickable="true"
+            android:digits="1234567890"
+            android:ems="4"
+            android:focusable="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:imeOptions="actionDone"
+            android:inputType="number|numberDecimal"
+            android:numeric="integer"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="@dimen/mainFontSize" />
 
     </LinearLayout>
 

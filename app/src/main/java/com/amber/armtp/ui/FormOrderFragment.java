@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +30,7 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,13 +42,12 @@ import java.util.Objects;
 /**
  * Updated by domster704 on 27.09.2021
  */
-public class FormOrderFragment extends Fragment implements View.OnClickListener {
+public class FormOrderFragment extends Fragment implements View.OnClickListener, TBUpdate {
     public GlobalVars glbVars;
     public static Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
     SearchView searchView;
-    public static float CurPrice = 0f;
 
     public static ImageButton filter;
     public static boolean isSorted = false;
@@ -177,9 +176,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    public FormOrderFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.form_order_fragment, container, false);
@@ -197,7 +193,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 
@@ -221,7 +217,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             glbVars.NomenAdapter.notifyDataSetChanged();
         }
 
-        setContrAndSum();
+        setContrAndSum(glbVars);
         if (glbVars.isDiscount) {
             glbVars.isDiscount = false;
             glbVars.Discount = 0;
@@ -472,8 +468,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
                 edEndPP.setText((glbVars.EndPos != 0 ? String.valueOf(glbVars.EndPos) : "0"));
                 edPPQty.setText("0");
 
-                RangeDlg
-                        .setCancelable(true)
+                RangeDlg.setCancelable(true)
                         .setPositiveButton("OK", (dialog, id) -> {
                         })
                         .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
@@ -541,6 +536,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
                 return true;
             case R.id.NomenSort:
+                // TODO: fix
                 if (!isSorted) {
                     item.setIcon(R.drawable.to_top);
                     glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
@@ -640,7 +636,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
             glbVars.SetSelectedSgi(SgiID, GrupID);
             glbVars.SetSelectedGrup(GrupID);
         }
-        setContrAndSum();
+        setContrAndSum(glbVars);
     }
 
     @SuppressLint("CutPasteId")
@@ -667,23 +663,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener 
 
         filter = getActivity().findViewById(R.id.NomenFilters);
         filter.setOnClickListener(this);
-        setContrAndSum();
-    }
-
-    private void setContrAndSum() {
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        try {
-            if (!OrderSum.equals("")) {
-                if (ToolBarContr.trim().equals("")) {
-                    glbVars.toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
-                } else {
-                    glbVars.toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
-                }
-            } else {
-                glbVars.toolbar.setSubtitle("");
-            }
-        } catch (Exception ignored) {
-        }
+        setContrAndSum(glbVars);
     }
 }

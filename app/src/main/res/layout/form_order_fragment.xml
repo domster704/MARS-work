@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/view_order_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:screenOrientation="landscape"
-        android:weightSum="1">
+    android:id="@+id/view_order_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
 
     <LinearLayout
-            android:id="@+id/SpinLayout"
+        android:id="@+id/SpinLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/SpinSgi"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="50dp"
+            android:layout_weight="0.5"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:layout_marginStart="10dp"/>
 
         <Spinner
-                android:id="@+id/SpinSgi"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingTop="3dp"
-                android:layout_weight="0.5"
-                android:paddingBottom="3dp" />
-
-        <Spinner
-                android:id="@+id/SpinGrups"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingTop="3dp"
-                android:layout_weight="0.6"
-                android:paddingBottom="3dp" />
+            android:id="@+id/SpinGrups"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="0.6"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp" />
 
         <ImageButton
-                android:id="@+id/NomenFilters"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:scaleType="center"
-                android:src="@drawable/filter" />
+            android:id="@+id/NomenFilters"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:scaleType="center"
+            android:src="@drawable/filter"
+            android:layout_marginEnd="10dp"/>
 
     </LinearLayout>
-
 
     <TextView
         android:id="@+id/tvHeadCod"
         android:layout_width="100dp"
-        android:layout_height="25dp"
+        android:layout_height="@dimen/tableHeadersHeight"
         android:layout_below="@+id/SpinLayout"
         android:layout_toEndOf="@+id/textView30"
         android:layout_toRightOf="@+id/textView30"
@@ -57,7 +58,7 @@
     <TextView
         android:id="@+id/tvHeadDescr"
         android:layout_width="600dp"
-        android:layout_height="25dp"
+        android:layout_height="@dimen/tableHeadersHeight"
         android:layout_alignTop="@+id/tvHeadCod"
         android:layout_toLeftOf="@+id/tvHeadMP"
         android:layout_toEndOf="@+id/textView8"
@@ -68,39 +69,39 @@
         android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/textView10"
-            android:layout_width="75dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toStartOf="@+id/textView12"
-            android:layout_toLeftOf="@+id/textView12"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenOst"
-            android:textColor="#000000" />
+        android:id="@+id/textView10"
+        android:layout_width="75dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toStartOf="@+id/textView12"
+        android:layout_toLeftOf="@+id/textView12"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenOst"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/textView12"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:layout_alignTop="@+id/textView10"
-            android:layout_toStartOf="@+id/tvHeadZakaz"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenPrice"
-            android:textColor="#000000" />
+        android:id="@+id/textView12"
+        android:layout_width="100dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_alignTop="@+id/textView10"
+        android:layout_toStartOf="@+id/tvHeadZakaz"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenPrice"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/tvHeadZakaz"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:layout_alignTop="@+id/textView12"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/table_header"
-            android:clickable="false"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenZakaz"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadZakaz"
+        android:layout_width="100dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_alignTop="@+id/textView12"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenZakaz"
+        android:textColor="#000000" />
 
     <GridView
         android:id="@+id/listContrs"
@@ -108,30 +109,21 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/tvHeadCod"
         android:layout_alignParentStart="true"
+        android:layout_marginHorizontal="2dp"
+        android:layout_marginTop="5dp"
+        android:choiceMode="singleChoice"
         android:clickable="true"
         android:fastScrollEnabled="false"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:listSelector="@color/blue"
         android:longClickable="true"
         android:textFilterEnabled="true" />
 
     <TextView
-        android:id="@+id/showMore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/listContrs"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:text="Показать ещё"
-        android:textSize="14pt"
-        android:gravity="center_horizontal|center_vertical"
-        android:paddingBottom="4dp"/>
-
-    <TextView
         android:id="@+id/textView30"
         android:layout_width="50dp"
-        android:layout_height="35dp"
+        android:layout_height="@dimen/tableHeadersHeight"
         android:layout_above="@+id/listContrs"
         android:layout_below="@+id/SpinLayout"
         android:layout_toEndOf="@+id/tvPosition"
@@ -141,46 +133,46 @@
         android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/textView34"
-            android:layout_width="75dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toStartOf="@+id/textView10"
-            android:layout_toLeftOf="@+id/textView10"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenVKorob"
-            android:textColor="#000000" />
+        android:id="@+id/textView34"
+        android:layout_width="75dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toStartOf="@+id/textView10"
+        android:layout_toLeftOf="@+id/textView10"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenVKorob"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/tvHeadMP"
-            android:layout_width="100dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toStartOf="@+id/textView34"
-            android:layout_toLeftOf="@+id/textView34"
-            android:background="@drawable/table_header"
-            android:clickable="false"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenMP"
-            android:textColor="#000000" />
+        android:id="@+id/tvHeadMP"
+        android:layout_width="100dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toStartOf="@+id/textView34"
+        android:layout_toLeftOf="@+id/textView34"
+        android:background="@drawable/table_header"
+        android:clickable="false"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenMP"
+        android:textColor="#000000" />
 
     <TextView
-            android:id="@+id/textView8"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_above="@+id/listContrs"
-            android:layout_below="@+id/SpinLayout"
-            android:layout_toEndOf="@+id/tvHeadCod"
-            android:background="@drawable/table_header"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="@string/nomenMH"
-            android:textColor="#000000" />
+        android:id="@+id/textView8"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/tableHeadersHeight"
+        android:layout_above="@+id/listContrs"
+        android:layout_below="@+id/SpinLayout"
+        android:layout_toEndOf="@+id/tvHeadCod"
+        android:background="@drawable/table_header"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/nomenMH"
+        android:textColor="#000000" />
 
     <TextView
         android:id="@+id/tvPosition"
         android:layout_width="50dp"
-        android:layout_height="35dp"
+        android:layout_height="@dimen/tableHeadersHeight"
         android:layout_above="@+id/listContrs"
         android:layout_below="@+id/SpinLayout"
         android:layout_alignParentStart="true"
@@ -188,5 +180,21 @@
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/nomenPP"
         android:textColor="#000000" />
+
+    <View
+        android:id="@+id/divide2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerHeaderWidth"
+        android:layout_below="@+id/tvPosition"
+        android:layout_marginHorizontal="10dp"
+        android:background="@color/dividerColor" />
+
+    <View
+        android:id="@+id/divide1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dividerHeaderWidth"
+        android:layout_above="@+id/tvHeadCod"
+        android:layout_marginHorizontal="10dp"
+        android:background="@color/dividerColor" />
 
 </RelativeLayout>

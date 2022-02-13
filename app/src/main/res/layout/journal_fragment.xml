@@ -4,21 +4,23 @@
     android:id="@+id/scrollViewJ"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:orientation="horizontal"
     android:screenOrientation="landscape"
-    android:weightSum="1"
-    android:fillViewport="true">
+    android:weightSum="1">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Padding 6 + 5dp от  @+id/viewflipper      -->
         <LinearLayout
             android:id="@+id/checkboxLayout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginTop="31dp"
-            android:orientation="vertical" />
+            android:layout_marginTop="@dimen/tableHeadersHeight"
+            android:orientation="vertical"
+            android:paddingTop="11dp" />
 
         <ViewFlipper
             android:id="@+id/viewflipper"
@@ -26,8 +28,7 @@
             android:layout_height="fill_parent"
             android:layout_margin="6dp">
 
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/orders_journal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -40,7 +41,7 @@
                 <TextView
                     android:id="@+id/textView18"
                     android:layout_width="120dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_toEndOf="@+id/textView19"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
@@ -51,7 +52,7 @@
                 <TextView
                     android:id="@+id/textView21"
                     android:layout_width="200dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_toEndOf="@+id/textView36"
                     android:layout_toRightOf="@+id/textView36"
                     android:background="@drawable/table_header"
@@ -63,7 +64,7 @@
                 <TextView
                     android:id="@+id/textView22"
                     android:layout_width="@dimen/buttonWidth"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_toLeftOf="@+id/textView20"
                     android:layout_toRightOf="@+id/textView21"
                     android:background="@drawable/table_header"
@@ -77,12 +78,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_below="@+id/textView18"
-                    android:layout_alignParentLeft="true" />
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="5dp" />
 
                 <TextView
                     android:id="@+id/textView19"
                     android:layout_width="120dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_alignTop="@+id/textView18"
                     android:layout_alignParentLeft="true"
                     android:background="@drawable/table_header"
@@ -94,7 +96,7 @@
                 <TextView
                     android:id="@+id/textView20"
                     android:layout_width="120dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_above="@+id/listSMS"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/table_header"
@@ -106,7 +108,7 @@
                 <TextView
                     android:id="@+id/textView36"
                     android:layout_width="120dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_toEndOf="@+id/textView18"
                     android:layout_toRightOf="@+id/textView18"
                     android:background="@drawable/table_header"
@@ -115,6 +117,13 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#000000" />
 
+                <View
+                    android:id="@+id/divide1"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dividerHeaderWidth"
+                    android:layout_below="@+id/textView19"
+                    android:layout_marginHorizontal="1dp"
+                    android:background="@color/dividerColor"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -128,8 +137,8 @@
                 <TextView
                     android:id="@+id/textView23"
                     android:layout_width="100dp"
-                    android:layout_height="25dp"
-                    android:layout_alignParentLeft="true"
+                    android:layout_height="@dimen/tableHeadersHeight"
+                    android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
@@ -140,13 +149,13 @@
                 <TextView
                     android:id="@+id/textView27"
                     android:layout_width="fill_parent"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_alignParentTop="true"
-                    android:layout_toLeftOf="@+id/txtLastVer"
-                    android:layout_toRightOf="@+id/textView23"
+                    android:layout_toStartOf="@+id/txtLastVer"
+                    android:layout_toEndOf="@+id/textView23"
                     android:background="@drawable/table_header"
-                    android:gravity="left|center_vertical"
-                    android:paddingLeft="15dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="15dp"
                     android:text="@string/nomenDescr"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#000000" />
@@ -154,9 +163,9 @@
                 <TextView
                     android:id="@+id/txtLastVer"
                     android:layout_width="100dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_above="@+id/listOrdersDt"
-                    android:layout_toLeftOf="@+id/txtCurVer"
+                    android:layout_toStartOf="@+id/txtCurVer"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/nomenQty"
@@ -166,9 +175,9 @@
                 <TextView
                     android:id="@+id/txtCurVer"
                     android:layout_width="100dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_alignParentTop="true"
-                    android:layout_toLeftOf="@+id/textView24"
+                    android:layout_toStartOf="@+id/textView24"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/nomenPrice"
@@ -178,9 +187,9 @@
                 <TextView
                     android:id="@+id/textView24"
                     android:layout_width="100dp"
-                    android:layout_height="25dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/nomenSum"
@@ -192,212 +201,17 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_below="@+id/textView23"
-                    android:layout_alignParentLeft="true" />
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="5dp" />
 
+                <View
+                    android:id="@+id/divide2"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dividerHeaderWidth"
+                    android:layout_below="@+id/textView24"
+                    android:layout_marginHorizontal="1dp"
+                    android:background="@color/dividerColor" />
             </RelativeLayout>
-
         </ViewFlipper>
     </LinearLayout>
 </ScrollView>
-
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:id="@+id/scrollViewJ"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    android:orientation="horizontal"-->
-<!--    android:screenOrientation="landscape"-->
-<!--    android:fillViewport="true"-->
-<!--    android:weightSum="1">-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal">-->
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/checkboxLayout"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginTop="31dp"-->
-<!--            android:orientation="vertical" />-->
-
-<!--        <ViewFlipper-->
-<!--            android:id="@+id/viewFlipper"-->
-<!--            android:layout_width="fill_parent"-->
-<!--            android:layout_height="fill_parent">-->
-
-<!--            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--                android:id="@+id/orders_journal"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:longClickable="false"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:screenOrientation="landscape"-->
-<!--                android:weightSum="1"-->
-<!--                tools:ignore="RedundantNamespace">-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView18"-->
-<!--                    android:layout_width="120dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_marginTop="6dp"-->
-<!--                    android:layout_toEndOf="@+id/textView19"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journZakazDate"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView21"-->
-<!--                    android:layout_width="200dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_toEndOf="@+id/textView36"-->
-<!--                    android:layout_toRightOf="@+id/textView36"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journContr"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000"-->
-<!--                    android:layout_marginTop="6dp" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView22"-->
-<!--                    android:layout_width="@dimen/buttonWidth"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_toStartOf="@+id/textView20"-->
-<!--                    android:layout_toEndOf="@+id/textView21"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journAddr"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000"-->
-<!--                    android:layout_marginTop="6dp" />-->
-
-<!--                <GridView-->
-<!--                    android:id="@+id/listSMS"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_below="@+id/textView18" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView19"-->
-<!--                    android:layout_width="120dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_alignTop="@+id/textView18"-->
-<!--                    android:layout_alignParentStart="true"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journStatus"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000"/>-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView20"-->
-<!--                    android:layout_width="120dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_above="@+id/listSMS"-->
-<!--                    android:layout_alignParentEnd="true"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journSum"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000"/>-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView36"-->
-<!--                    android:layout_width="120dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_toEndOf="@+id/textView18"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/journDeliveryDate"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000"-->
-<!--                    android:layout_marginTop="6dp" />-->
-
-<!--            </RelativeLayout>-->
-
-<!--            <RelativeLayout-->
-<!--                android:id="@+id/ordersdt_details"-->
-<!--                android:layout_width="fill_parent"-->
-<!--                android:layout_height="fill_parent"-->
-<!--                android:gravity="center"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:screenOrientation="landscape">-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView23"-->
-<!--                    android:layout_width="100dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_alignParentStart="true"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/nomenCod"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView27"-->
-<!--                    android:layout_width="fill_parent"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:layout_toStartOf="@+id/txtLastVer"-->
-<!--                    android:layout_toEndOf="@+id/textView23"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="start|center_vertical"-->
-<!--                    android:paddingLeft="15dp"-->
-<!--                    android:text="@string/nomenDescr"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtLastVer"-->
-<!--                    android:layout_width="100dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_above="@+id/listOrdersDt"-->
-<!--                    android:layout_toStartOf="@+id/txtCurVer"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/nomenQty"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/txtCurVer"-->
-<!--                    android:layout_width="100dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:layout_toStartOf="@+id/textView24"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/nomenPrice"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <TextView-->
-<!--                    android:id="@+id/textView24"-->
-<!--                    android:layout_width="100dp"-->
-<!--                    android:layout_height="25dp"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:layout_alignParentEnd="true"-->
-<!--                    android:background="@drawable/table_header"-->
-<!--                    android:gravity="center_vertical|center_horizontal"-->
-<!--                    android:text="@string/nomenSum"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                    android:textColor="#000000" />-->
-
-<!--                <GridView-->
-<!--                    android:id="@+id/listOrdersDt"-->
-<!--                    android:layout_width="fill_parent"-->
-<!--                    android:layout_height="fill_parent"-->
-<!--                    android:layout_below="@+id/textView23"-->
-<!--                    android:layout_alignParentStart="true" />-->
-
-<!--            </RelativeLayout>-->
-<!--        </ViewFlipper>-->
-<!--    </LinearLayout>-->
-<!--</ScrollView>-->

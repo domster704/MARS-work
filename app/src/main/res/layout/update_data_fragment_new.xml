@@ -28,14 +28,6 @@
                 android:text="@string/chkDB"
                 android:textColor="#000" />
 
-            <!--            <LinearLayout-->
-            <!--                android:id="@+id/pgDBLayout"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:orientation="horizontal">-->
-            <!--                android:visibility="invisible"-->
-            <!--                >-->
-
             <TextView
                 android:id="@+id/tbDBPerc"
                 android:layout_width="@dimen/percWidth"
@@ -67,8 +59,6 @@
                 android:paddingEnd="10dp"
                 android:text="@string/hundredPerc"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <!--            </LinearLayout>-->
         </RelativeLayout>
 
         <Button

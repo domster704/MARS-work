@@ -13,13 +13,14 @@ import android.view.ViewGroup;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.interfaces.TBUpdate;
 
 import java.util.Objects;
 
 /**
  * Updated by domster704 on 27.09.2021
  */
-public class ViewOrderFragment extends Fragment {
+public class ViewOrderFragment extends Fragment implements TBUpdate {
     public GlobalVars glbVars;
     View thisView;
 
@@ -41,7 +42,7 @@ public class ViewOrderFragment extends Fragment {
         setRetainInstance(true);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 
@@ -51,7 +52,7 @@ public class ViewOrderFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        setContrAndSum();
+        setContrAndSum(glbVars);
 
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.PreviewZakaz();
@@ -74,22 +75,5 @@ public class ViewOrderFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setContrAndSum() {
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        try {
-            if (!OrderSum.equals("")) {
-                if (ToolBarContr.trim().equals("")) {
-                    glbVars.toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
-                } else {
-                    glbVars.toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
-                }
-            } else {
-                glbVars.toolbar.setSubtitle("");
-            }
-        } catch (Exception ignored) {
-        }
     }
 }

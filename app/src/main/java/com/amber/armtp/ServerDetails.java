@@ -32,11 +32,12 @@ public class ServerDetails {
         return instance;
     }
 
-    public static ServerDetails getInstance(String host, String port) {
+    public static void updateInstance(String host, String port, String user, String pass) {
         if (instance != null) {
             instance.host = host;
             instance.port = port;
+            instance.user = user;
+            instance.password = pass;
         }
-        return instance;
     }
 }

@@ -3,27 +3,17 @@
     android:id="@+id/debet_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:screenOrientation="landscape"
-    android:weightSum="1">
+    android:screenOrientation="landscape">
 
     <Spinner
         android:id="@+id/spTorgPred"
         android:layout_width="@dimen/buttonWidth"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="10dp"
-        android:gravity="center_vertical" />
-
-    <Button
-        android:id="@+id/btClearDebetFilter"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp"
-        android:text="@string/debetClearFilter"
-        android:textColor="#000"/>
+        android:gravity="center_vertical"
+        android:layout_marginBottom="10dp"/>
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -38,9 +28,15 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/begin"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_toStartOf="@+id/tvContr"/>
+
+            <TextView
                 android:id="@+id/tvContr"
-                android:layout_width="250dp"
-                android:layout_height="25dp"
+                android:layout_width="300dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:background="@drawable/table_header"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="@string/debetContr"
@@ -49,7 +45,7 @@
             <TextView
                 android:id="@+id/tvFirma"
                 android:layout_width="70dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_toEndOf="@+id/tvContr"
                 android:background="@drawable/table_header"
                 android:gravity="center_vertical|center_horizontal"
@@ -59,7 +55,7 @@
             <TextView
                 android:id="@+id/tvStatus"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvFirma"
                 android:background="@drawable/table_header"
@@ -70,7 +66,7 @@
             <TextView
                 android:id="@+id/tvCredit"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvStatus"
                 android:background="@drawable/table_header"
@@ -81,7 +77,7 @@
             <TextView
                 android:id="@+id/tvDogovor"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvCredit"
                 android:background="@drawable/table_header"
@@ -92,7 +88,7 @@
             <TextView
                 android:id="@+id/tvA7"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvDogovor"
                 android:background="@drawable/table_header"
@@ -103,7 +99,7 @@
             <TextView
                 android:id="@+id/tvA14"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvA7"
                 android:background="@drawable/table_header"
@@ -114,7 +110,7 @@
             <TextView
                 android:id="@+id/tvA21"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvA14"
                 android:background="@drawable/table_header"
@@ -125,7 +121,7 @@
             <TextView
                 android:id="@+id/tvA28"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvA21"
                 android:background="@drawable/table_header"
@@ -136,7 +132,7 @@
             <TextView
                 android:id="@+id/tvA35"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/tvA28"
                 android:background="@drawable/table_header"
@@ -147,7 +143,7 @@
             <TextView
                 android:id="@+id/tvA42"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA35"
                 android:layout_toEndOf="@+id/tvA35"
                 android:background="@drawable/table_header"
@@ -158,7 +154,7 @@
             <TextView
                 android:id="@+id/tvA49"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA42"
                 android:layout_toEndOf="@+id/tvA42"
                 android:background="@drawable/table_header"
@@ -169,7 +165,7 @@
             <TextView
                 android:id="@+id/tvA56"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA49"
                 android:layout_toEndOf="@+id/tvA49"
                 android:background="@drawable/table_header"
@@ -180,7 +176,7 @@
             <TextView
                 android:id="@+id/tvA63"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA56"
                 android:layout_toEndOf="@+id/tvA56"
                 android:background="@drawable/table_header"
@@ -191,7 +187,7 @@
             <TextView
                 android:id="@+id/tvA64"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA63"
                 android:layout_toEndOf="@+id/tvA63"
                 android:background="@drawable/table_header"
@@ -202,7 +198,7 @@
             <TextView
                 android:id="@+id/tvDolg"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvA64"
                 android:layout_toEndOf="@+id/tvA64"
                 android:background="@drawable/table_header"
@@ -213,7 +209,7 @@
             <TextView
                 android:id="@+id/tvOTG30"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvDolg"
                 android:layout_toEndOf="@+id/tvDolg"
                 android:background="@drawable/table_header"
@@ -224,7 +220,7 @@
             <TextView
                 android:id="@+id/tvOPL30"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvOTG30"
                 android:layout_toEndOf="@+id/tvOTG30"
                 android:background="@drawable/table_header"
@@ -235,13 +231,19 @@
             <TextView
                 android:id="@+id/tvKOB"
                 android:layout_width="100dp"
-                android:layout_height="25dp"
+                android:layout_height="@dimen/tableHeadersHeight"
                 android:layout_alignTop="@+id/tvOPL30"
                 android:layout_toEndOf="@+id/tvOPL30"
                 android:background="@drawable/table_header"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="@string/debetKOB"
                 android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/end"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_toEndOf="@+id/tvKOB"/>
 
             <GridView
                 android:id="@+id/listContrs"
@@ -251,14 +253,34 @@
                 android:layout_alignEnd="@+id/tvKOB"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
+                android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:fastScrollAlwaysVisible="false"
                 android:fastScrollEnabled="false"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:longClickable="true"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="true" />
+
+            <View
+                android:id="@+id/divide1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dividerHeaderWidth"
+                android:layout_below="@+id/tvContr"
+                android:layout_marginHorizontal="10dp"
+                android:layout_toStartOf="@+id/end"
+                android:layout_toEndOf="@+id/begin"
+                android:background="@color/dividerColor" />
+
+            <View
+                android:id="@+id/divide2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dividerHeaderWidth"
+                android:layout_marginHorizontal="10dp"
+                android:layout_toStartOf="@+id/end"
+                android:layout_toEndOf="@+id/begin"
+                android:background="@color/dividerColor" />
         </RelativeLayout>
     </HorizontalScrollView>
-
 </RelativeLayout>
+

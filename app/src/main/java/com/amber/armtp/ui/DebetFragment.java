@@ -27,33 +27,6 @@ import java.util.Objects;
 public class DebetFragment extends Fragment {
     public GlobalVars glbVars;
 
-    public DebetFragment() {
-    }
-
-    SearchView searchView;
-    private final SearchView.OnQueryTextListener searchTextListner =
-            new SearchView.OnQueryTextListener() {
-                boolean isSearchClicked = false;
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    if (!query.equals("")) {
-                        glbVars.SearchDebet(query);
-                        isSearchClicked = true;
-                        searchView.clearFocus();
-                        searchView.setIconified(true);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            };
-    MenuItem searchItem;
     Menu mainMenu;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
@@ -73,7 +46,7 @@ public class DebetFragment extends Fragment {
         super.onCreate(savedInstanceState);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 
@@ -87,7 +60,6 @@ public class DebetFragment extends Fragment {
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
 
         glbVars.debetList = getActivity().findViewById(R.id.listContrs);
-        glbVars.btClearFilter = getActivity().findViewById(R.id.btClearDebetFilter);
         glbVars.spTP = getActivity().findViewById(R.id.spTorgPred);
 
         glbVars.LoadTpListDeb();
@@ -121,22 +93,12 @@ public class DebetFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-
-        glbVars.btClearFilter.setOnClickListener(v -> {
-            glbVars.spTP.setSelection(0);
-            glbVars.debetList.setAdapter(null);
-        });
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.debet_menu, menu);
         mainMenu = menu;
-
-        searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setQueryHint("Поиск по дебиторке");
-        searchView.setOnQueryTextListener(searchTextListner);
     }
 
     public void SetSelectedDebTP(int ROWID) {
@@ -148,5 +110,15 @@ public class DebetFragment extends Fragment {
                 break;
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == R.id.clearTP) {
+            glbVars.spTP.setSelection(0);
+            glbVars.debetList.setAdapter(null);
+            return true;
+        }
+        return true;
     }
 }

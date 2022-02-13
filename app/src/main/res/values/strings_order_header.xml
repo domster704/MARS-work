@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="OrdHeaderTp">Торгпред *</string>
+    <string name="OrdHeaderTp">Торгпред</string>
     <string name="OrdHeaderFindContr">Поиск контрагента</string>
-    <string name="OrdHeaderContr">Контрагент *</string>
-    <string name="OrdHeaderAddr">Адрес доставки *</string>
-    <string name="OrdHeaderDate">Дата доставки *</string>
-    <string name="OrdHeaderTime">Время доставки *</string>
+    <string name="OrdHeaderContr">Контрагент</string>
+    <string name="OrdHeaderAddr">Адрес доставки</string>
+    <string name="OrdHeaderDate">Дата доставки</string>
+    <string name="OrdHeaderTime">Время доставки</string>
     <string name="OrdHeaderXTime">X</string>
     <string name="OrdHeaderComment">Комментарий</string>
     <string name="OrdHeaderGetMoney">Забрать у клиента деньги</string>

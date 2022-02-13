@@ -1,6 +1,5 @@
 package com.amber.armtp.dbHelpers;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,9 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amber.armtp.GlobalVars;
-import com.amber.armtp.R;
-import com.amber.armtp.interfaces.PGShowing;
+import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import java.util.HashMap;
@@ -26,9 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "armtp3.db";
 
-    private static final String TB_NOMEN = "Nomen";
     private static final String TB_ORDER = "ORDERS";
-    private static final String KEY_ZAKAZ = "ZAKAZ";
     private static final String KEY_ORD_TP_ID = "TP";
     private static final String KEY_ORD_CONTR_ID = "CONTR";
     private static final String KEY_ORD_ADDR_ID = "ADDR";
@@ -414,7 +409,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1)<=0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
+            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -423,7 +418,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Boolean insertOrder(String TP_ID, String Contr_ID, String Addr_ID, String Data, String Comment) {
+    public boolean insertOrder(String TP_ID, String Contr_ID, String Addr_ID, String Data, String Comment) {
         SQLiteDatabase db;
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
@@ -549,23 +544,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int GetAddrByID(String ID) {
-        Cursor c = null;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT ROWID AS _id FROM ADDRS WHERE CODE='" + ID + "'", null);
-            if (c.moveToFirst()) {
-                return c.getInt(0);
-            }
-            return 0;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
     public String GetContrID() {
         Cursor c = null;
         try {
@@ -600,20 +578,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-//    public void setContrAddr(String addr) {
-//        SQLiteDatabase db;
-//        db = this.getWritableDatabase();
-//        db.beginTransaction();
-//        try {
-//            db.execSQL("");
-//            db.setTransactionSuccessful();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            db.endTransaction();
-//        }
-//    }
-
     public String GetComment() {
         Cursor c = null;
         String Comment = "";
@@ -638,7 +602,6 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
             c = db.rawQuery("SELECT ROWID AS _id, DATA FROM ORDERS", null);
             if (c.moveToFirst()) {
                 DeliveryDate = c.getString(1);
@@ -653,8 +616,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void ClearOrderHeader() {
         SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.setLockingEnabled(false);
+        db = this.getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("DELETE FROM ORDERS");
@@ -668,8 +630,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void ResetNomen() {
         SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
-        db.setLockingEnabled(false);
+        db = this.getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
@@ -681,11 +642,10 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void ResetNomenPrice(boolean isCopied) {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase(); // Read Data
+    public void ResetNomenPrice(boolean isCopied) throws InterruptedException {
+        SQLiteDatabase db = this.getWritableDatabase();
 
-        new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
@@ -699,6 +659,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     if (isCopied || cCheck.getCount() != 0) {
                         Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0", null);
                         _setNomenPriceWithoutSgi(c);
+
                         Set<String> keys = pricesMap.keySet();
                         for (String key : keys) {
                             float price = pricesMap.get(key);
@@ -708,6 +669,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
                     }
 
+                    cCheck.close();
                     db.setTransactionSuccessful();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -715,7 +677,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     db.endTransaction();
                 }
             }
-        }).start();
+        });
+
+        thread.start();
+        thread.join();
     }
 
     public String GetToolbarContr() {
@@ -723,7 +688,6 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            db.setLockingEnabled(false);
             c = db.rawQuery("SELECT CONTRS.DESCR FROM CONTRS JOIN ORDERS ON ORDERS.CONTR=CONTRS.CODE", null);
             if (c.moveToFirst()) {
                 return c.getString(0).trim();
@@ -861,6 +825,20 @@ public class DBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             db.execSQL("UPDATE Nomen SET PRICE = CASE WHEN PRICE != '0' THEN PRICE ELSE '" + price + "' END WHERE KOD5=" + id);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void putPriceInNomen(long rowid, String price) {
+        SQLiteDatabase db;
+        db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL("UPDATE Nomen SET PRICE = CASE WHEN PRICE != '0' THEN PRICE ELSE '" + price + "' END WHERE rowid=" + rowid);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

@@ -28,11 +28,13 @@
 
     <!--    Fonts-->
     <dimen name="textSizeSettings">14sp</dimen>
-
     <dimen name="heightOfOrdersItem">40dp</dimen>
-
     <dimen name="nomFilterTextSize">16sp</dimen>
 
-    <!-- Heights   -->
+    <!-- Heights  -->
     <dimen name="debetHeightsItem">30dp</dimen>
+    <dimen name="tableHeadersHeight">40dp</dimen>
+
+    <!--  Width  -->
+    <dimen name="dividerHeaderWidth">2dp</dimen>
 </resources>

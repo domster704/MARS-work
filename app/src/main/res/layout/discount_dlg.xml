@@ -10,23 +10,24 @@
         android:weightSum="1">
 
     <EditText
-            android:id="@+id/txtPercent"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/textView7"
-            android:clickable="true"
-            android:digits=".-1234567890"
-            android:ems="4"
-            android:focusable="true"
-            android:gravity="center_vertical|center_horizontal"
-            android:inputType="number|numberDecimal"
-            android:paddingTop="10dp"
-            android:paddingBottom="5dp"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:text="0"
-            android:textColor="#000"
-            android:textSize="10pt" />
+        android:id="@+id/txtPercent"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/textView7"
+        android:clickable="true"
+        android:digits=".-1234567890"
+        android:ems="4"
+        android:focusable="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:inputType="number|numberDecimal"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:text="0"
+        android:textColor="#000"
+        android:textSize="10pt"
+        android:imeOptions="actionDone" />
 
     <TextView
             android:id="@+id/textView7"

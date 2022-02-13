@@ -4,14 +4,14 @@
     android:id="@+id/TabUpdateSrv"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:fillViewport="true"
     android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingTop="10dp"
     android:paddingRight="10dp"
     android:scrollbars="none"
-    tools:ignore="RtlCompat"
-    android:animateLayoutChanges="true">
+    tools:ignore="RtlCompat">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,9 +23,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:orientation="vertical"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,6 +68,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:ems="10"
+                        android:imeOptions="actionDone"
                         android:inputType="text"
                         android:text="91.208.84.67"
                         android:textAlignment="center"
@@ -96,6 +97,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:ems="10"
+                        android:imeOptions="actionDone"
                         android:inputType="textPersonName"
                         android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
@@ -121,6 +123,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:ems="10"
+                        android:imeOptions="actionDone"
                         android:inputType="textPassword"
                         android:textSize="@dimen/textSizeSettings"
                         tools:text="Yjdfz Ptkfylbz.ru" />
@@ -147,23 +150,22 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:ems="10"
+                        android:imeOptions="actionDone"
                         android:inputType="text"
                         android:text="20123"
                         android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/fontLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:orientation="vertical"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -205,6 +207,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:digits="0123456789"
+                        android:imeOptions="actionDone"
                         android:minWidth="35dp"
                         android:textSize="@dimen/textSizeSettings" />
 
@@ -214,22 +217,8 @@
                         android:text="sp"
                         android:textColor="#000"
                         android:textSize="@dimen/mainFontSize" />
-
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
-
     </LinearLayout>
-
-
-<!--    <Button-->
-<!--        android:id="@+id/btSaveSettings"-->
-<!--        android:layout_width="300dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="end|bottom"-->
-<!--        android:layout_margin="20dp"-->
-<!--        android:background="@android:drawable/btn_default"-->
-<!--        android:text="Сохранить" />-->
 </ScrollView>

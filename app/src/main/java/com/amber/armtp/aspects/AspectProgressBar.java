@@ -10,7 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 
 @Aspect
 public class AspectProgressBar {
-    private final String pointCut = "@annotation(com.amber.armtp.interfaces.PGShowing)";
+    private final String pointCut = "@annotation(com.amber.armtp.annotations.PGShowing)";
 
     @Pointcut(pointCut)
     public void setPointCutPG() {
@@ -18,7 +18,7 @@ public class AspectProgressBar {
 
     @Around("setPointCutPG()")
     public void setJoinPointPG(ProceedingJoinPoint joinPoint) throws Throwable {
-        ProgressBarLoading progressBarLoading = new ProgressBarLoading(GlobalVars.CurAc);
+        ProgressBarLoading progressBarLoading = new ProgressBarLoading(GlobalVars.CurAc, GlobalVars.CurFragmentContext);
 
         progressBarLoading.show();
         joinPoint.proceed();

@@ -1,31 +1,24 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.provider.DocumentFile;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
-import com.amber.armtp.Mess;
+import com.amber.armtp.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.ftp.Ping;
-import com.amber.armtp.interfaces.Async;
+import com.amber.armtp.annotations.Async;
 
 import java.util.Objects;
 
@@ -59,7 +52,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         setRetainInstance(true);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 
@@ -138,40 +131,26 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     @Async
     private void changeServerData() {
+        // Меняем данные сервера
         String host = etFtpServer.getText().toString();
         String port = etFtpPort.getText().toString();
         String user = etFtpUser.getText().toString();
         String pass = etFtpPass.getText().toString();
-        if (!new Ping(host, port, user, pass).isReachable()) {
-            Mess.sout("Сервер недоступен. Настройки не были применены");
-            getActivity().runOnUiThread(() -> {
-                try {
-                    etFtpServer.setText(ServerDetails.getInstance().host);
-                    etFtpPass.setText(ServerDetails.getInstance().password);
-                    etFtpUser.setText(ServerDetails.getInstance().user);
-                    etFtpPort.setText(ServerDetails.getInstance().port);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            return;
-        }
 
-        // Меняем данные сервера
-        editor.putString("FtpPhotoSrv", etFtpServer.getText().toString());
-        editor.putString("FtpPhotoPass", etFtpPass.getText().toString());
-        editor.putString("FtpPhotoUser", etFtpUser.getText().toString());
-        editor.putInt("FtpPhotoPort", Integer.parseInt(etFtpPort.getText().toString()));
+        editor.putString("FtpPhotoSrv", host);
+        editor.putString("FtpPhotoPass", pass);
+        editor.putString("FtpPhotoUser", user);
+        editor.putInt("FtpPhotoPort", Integer.parseInt(port));
 
-        editor.putString("FtpServerHost", etFtpServer.getText().toString());
-        editor.putString("FtpServerPass", etFtpPass.getText().toString());
-        editor.putString("FtpServerUser", etFtpUser.getText().toString());
-        editor.putInt("FtpServerPort", Integer.parseInt(etFtpPort.getText().toString()));
+        editor.putString("FtpServerHost", host);
+        editor.putString("FtpServerPass",  pass);
+        editor.putString("FtpServerUser",  user);
+        editor.putInt("FtpServerPort", Integer.parseInt(port));
 
-        ServerDetails.getInstance(etFtpServer.getText().toString(), etFtpPort.getText().toString());
+        ServerDetails.updateInstance(host, port, user, pass);
         editor.commit();
 
-        Mess.sout("Настройки сохранены");
+        Config.sout("Настройки сохранены");
     }
 
     /**
@@ -193,6 +172,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
         settingsEditor.apply();
 
-        Mess.sout( "Размер шрифта изменён на " + nomenDescriptionFontSize);
+        Config.sout( "Размер шрифта изменён на " + nomenDescriptionFontSize);
     }
 }

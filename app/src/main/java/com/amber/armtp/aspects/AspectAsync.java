@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Pointcut;
 
 @Aspect
 public class AspectAsync {
-    private final String pointCut = "@annotation(com.amber.armtp.interfaces.Async)";
+    private final String pointCut = "@annotation(com.amber.armtp.annotations.Async)";
 
     @Pointcut(pointCut)
     public void setPointCutThread() {

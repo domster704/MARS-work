@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,7 +34,7 @@ import java.util.Objects;
  * <p>
  * Updated by domster704 on 27.09.2021
  */
-public class OrderHeadFragment extends Fragment {
+public class OrderHeadFragment extends Fragment implements TBUpdate {
     public GlobalVars glbVars;
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
@@ -45,9 +46,7 @@ public class OrderHeadFragment extends Fragment {
     private String _DATE = "";
     private String _COMMENT = "";
 
-    private SharedPreferences settings;
     private SharedPreferences.Editor editor;
-    private android.support.v4.app.FragmentTransaction fragmentTransaction;
     private android.support.v7.widget.Toolbar toolbar;
 
     public OrderHeadFragment() {
@@ -69,7 +68,7 @@ public class OrderHeadFragment extends Fragment {
         setRetainInstance(true);
         glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
 
         if (getArguments() != null) {
             isCopied = getArguments().getBoolean("isCopied");
@@ -108,12 +107,12 @@ public class OrderHeadFragment extends Fragment {
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-        _setContrAndSum();
+        setContrAndSum(glbVars);
 
         glbVars.LoadTpList();
         glbVars.LoadContrList();
 
-        settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         editor = settings.edit();
 
         glbVars.edContrFilter.addTextChangedListener(new TextWatcher() {
@@ -147,9 +146,7 @@ public class OrderHeadFragment extends Fragment {
             glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
         };
 
-        glbVars.txtDate.setOnClickListener(v -> {
-            new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show();
-        });
+        glbVars.txtDate.setOnClickListener(v -> new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show());
 
         int ContRowid = glbVars.db.GetContrRowID();
 
@@ -185,7 +182,7 @@ public class OrderHeadFragment extends Fragment {
             glbVars.txtDate.setText(DelivDate, TextView.BufferType.EDITABLE);
         }
 
-        _setContrAndSum();
+        setContrAndSum(glbVars);
 
         if (isCopied) {
             int tpID = glbVars.db.GetTPByID(_TP);
@@ -224,7 +221,7 @@ public class OrderHeadFragment extends Fragment {
     public void goToFormOrderFragment() {
         toolbar.setTitle(R.string.form_order);
         Fragment fragment = new FormOrderFragment();
-        fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+        android.support.v4.app.FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
         fragmentTransaction.commit();
     }
@@ -239,14 +236,18 @@ public class OrderHeadFragment extends Fragment {
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.saveHeader:
-                _saveOrderData();
+                try {
+                    _saveOrderData();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return true;
             default:
                 return true;
         }
     }
 
-    private void _saveOrderData() {
+    private void _saveOrderData() throws InterruptedException {
         String ADDR_ID;
 
         glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
@@ -258,10 +259,6 @@ public class OrderHeadFragment extends Fragment {
         String TP_ID = glbVars.spTp.getText().toString();
 
         String CurContr = glbVars.db.GetContrID();
-
-        if (!CurContr.equals(CONTR_ID)) {
-            _setContrAndSum();
-        }
 
         ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
 
@@ -284,32 +281,15 @@ public class OrderHeadFragment extends Fragment {
         }
 
         if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-            _setContrAndSum();
+            setContrAndSum(glbVars);
         } else {
             if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
-                _setContrAndSum();
+                setContrAndSum(glbVars);
             } else {
                 Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
             }
         }
 
         goToFormOrderFragment();
-    }
-
-    private void _setContrAndSum() {
-        String ToolBarContr = glbVars.db.GetToolbarContr();
-        String OrderSum = glbVars.db.getOrderSum();
-        try {
-            if (!OrderSum.equals("")) {
-                if (ToolBarContr.trim().equals("")) {
-                    toolbar.setSubtitle("Заказ на сумму " + OrderSum + " руб.");
-                } else {
-                    toolbar.setSubtitle(ToolBarContr + OrderSum + " руб.");
-                }
-            } else {
-                toolbar.setSubtitle("");
-            }
-        } catch (Exception ignored) {
-        }
     }
 }

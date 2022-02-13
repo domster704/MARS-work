@@ -17,17 +17,18 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
-import com.amber.armtp.Mess;
 import com.amber.armtp.R;
 import com.amber.armtp.ftp.Downloader;
+import com.amber.armtp.interfaces.ServerChecker;
 
 import java.util.Objects;
 
 /**
  * Updated by domster704 on 27.09.2021
  */
-public class UpdateDataFragment extends Fragment implements View.OnClickListener {
+public class UpdateDataFragment extends Fragment implements View.OnClickListener, ServerChecker {
     public GlobalVars glbVars;
     public static UIData[] uiData;
 
@@ -63,7 +64,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         setRetainInstance(true);
         glbVars = (GlobalVars) getActivity().getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
-        glbVars.frContext = getActivity();
+        GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
     }
 
@@ -126,37 +127,47 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnDBUpdate:
-                new Thread(() -> {
-                    if (DebetIsFinished.equals("1") || DebetIsFinished.equals("0") || !Downloader.isServerVerNewer.equals("error")) {
-                        if (!glbVars.isNetworkAvailable()) {
-                            Mess.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
-                            return;
-                        }
-
-                        try {
-                            downloader = new Downloader(glbVars, getActivity());
-                            getActivity().runOnUiThread(() -> {
-                                view.setEnabled(false);
-                                pgDB.setProgress(0);
-                                tvDB.setTextColor(Color.rgb(0, 0, 0));
-                            });
-                            downloader.downloadDB(uiData[0], view, glbVars);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-                break;
-            case R.id.btnAppUpdate:
-                if (Downloader.isServerVerNewer.equals("false")) {
-                    Mess.sout("На сервере нет новой версии");
+            case R.id.btnDBUpdate: {
+                if (!DebetIsFinished.equals("1") && !DebetIsFinished.equals("0")) {
                     return;
                 }
 
-                new Thread(() -> {
+                if (!glbVars.isNetworkAvailable()) {
+                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
+                    return;
+                }
+
+                Thread mainLogic = new Thread(() -> {
                     try {
-                        downloader = new Downloader(glbVars, getActivity());
+                        getActivity().runOnUiThread(() -> {
+                            view.setEnabled(false);
+                            pgDB.setProgress(0);
+                            tvDB.setTextColor(Color.rgb(0, 0, 0));
+                        });
+                        downloader.downloadDB(uiData[0], view, glbVars);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
+                runCheckServerForAvailability(mainLogic);
+                return;
+            }
+            case R.id.btnAppUpdate: {
+                if (!glbVars.isNetworkAvailable()) {
+                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
+                    return;
+                }
+
+                String status = downloader.isServerVersionNewer();
+
+                if (status.equals("false")) {
+                    Config.sout("На сервере нет новой версии");
+                    return;
+                }
+
+                Thread mainLogic = new Thread(() -> {
+                    try {
                         getActivity().runOnUiThread(() -> {
                             view.setEnabled(false);
                             pgApp.setProgress(0);
@@ -167,8 +178,11 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }).start();
+                });
+
+                runCheckServerForAvailability(mainLogic);
                 break;
+            }
         }
     }
 

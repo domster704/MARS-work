@@ -9,17 +9,23 @@
     </style>
 
     <style name="Divider">
-        <item name="android:background">#d3d3d3</item> //you can give your color here. that will change all divider color in your app.
+        <item name="android:background">#d3d3d3</item>
+    </style>
+
+    <style name="DividerRounded">
+        <item name="android:background">@color/dividerColor</item>
+        <item name="cornerRadius">5dp</item>
     </style>
 
     <style name="Divider.Horizontal" parent="Divider">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">2dp</item> // You can change thickness here.
-
+        <item name="android:layout_height">2dp</item>
+<!--        <item name="android:layout_margin">2dp</item>-->
     </style>
 
     <style name="Divider.Vertical" parent="Divider">
-        <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">2dp</item>
+<!--        <item name="android:layout_margin">2dp</item>-->
     </style>
 </resources>

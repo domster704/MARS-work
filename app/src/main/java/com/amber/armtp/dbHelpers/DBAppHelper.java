@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amber.armtp.interfaces.PGShowing;
+import com.amber.armtp.annotations.PGShowing;
 
 public class DBAppHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "appData.db";
