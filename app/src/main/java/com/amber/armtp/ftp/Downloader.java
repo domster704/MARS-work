@@ -36,10 +36,7 @@ public class Downloader {
             FtpFileDownloader ftpFileDownloader;
             try {
                 ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, "app.apk");
-                if (!ftpFileDownloader.download(ui))
-                    return;
-
-                if (activity == null || activity.getApplicationContext() == null)
+                if (!ftpFileDownloader.downloadWithPG(ui))
                     return;
 
                 activity.runOnUiThread(() -> {
@@ -55,6 +52,7 @@ public class Downloader {
                     activity.getApplicationContext().startActivity(intent);
                 });
             } catch (Exception e) {
+                e.printStackTrace();
                 catchErrorInDownloadProcess(view, ui);
             }
         }).start();
@@ -71,7 +69,7 @@ public class Downloader {
             ZipUnpacking zipUnpacking;
             try {
                 ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, "armtp3.zip");
-                if (!ftpFileDownloader.download(ui))
+                if (!ftpFileDownloader.downloadWithPG(ui))
                     return;
 
                 zipUnpacking = new ZipUnpacking(filePath);
@@ -91,6 +89,7 @@ public class Downloader {
                     globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
                 });
             } catch (Exception e) {
+                e.printStackTrace();
                 catchErrorInDownloadProcess(view, ui);
             }
         }).start();

@@ -46,12 +46,12 @@ public class Ftp {
         return client.completePendingCommand();
     }
 
-    public boolean renameFile(String dir) throws IOException {
+    public void renameFile(String dir) throws IOException {
         boolean login = initFtpClient();
         if (login) {
             client.rename(dir, dir.split("temp")[0] + ".dbf");
         }
-        return client.completePendingCommand();
+        client.completePendingCommand();
     }
 
     protected boolean initFtpClient() {

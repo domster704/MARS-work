@@ -12,8 +12,8 @@ import java.io.OutputStream;
 
 public class FtpFileDownloader extends Ftp{
     private final String dir;
-
     private final String filePathInAndroid;
+    private long fileSize;
 
     public FtpFileDownloader(ServerDetails serverDetails, String remoteDir, String localDir, String fileName) {
         super(serverDetails);
@@ -21,7 +21,9 @@ public class FtpFileDownloader extends Ftp{
         this.filePathInAndroid = localDir + fileName;
     }
 
-    public boolean download(final UpdateDataFragment.UIData ui) throws Exception {
+    public boolean downloadWithPG(final UpdateDataFragment.UIData ui) throws Exception {
+        fileSize = getFileSize(dir);
+
         boolean isDownload = false;
         boolean login = initFtpClient();
         if (login) {
@@ -38,12 +40,12 @@ public class FtpFileDownloader extends Ftp{
                 outputStream.write(bytesArray, 0, bytesRead);
 
                 if (ui != null)
-                    changePGData(getFileSize(dir), progressStatus, ui);
+                    changePGData(fileSize, progressStatus, ui);
             }
 
-            isDownload = client.completePendingCommand();
             outputStream.close();
             inputStream.close();
+            isDownload = client.completePendingCommand();
         }
 
         try {
@@ -53,6 +55,7 @@ public class FtpFileDownloader extends Ftp{
             e.printStackTrace();
         }
 
+        System.out.println(isDownload);
         return isDownload;
     }
 
