@@ -29,9 +29,11 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class UpdateDataFragment extends Fragment implements View.OnClickListener, ServerChecker {
-    public GlobalVars glbVars;
     public static UIData[] uiData;
-
+    private final Handler handlerDB = new Handler();
+    private final Handler handlerApp = new Handler();
+    public GlobalVars glbVars;
+    Button btnDBUpdate, btnAppUpdate;
     private String DebetIsFinished = "0";
     private final BroadcastReceiver UpdateDebetWorking = new BroadcastReceiver() {
         @Override
@@ -39,15 +41,9 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
             DebetIsFinished = Objects.requireNonNull(intent.getExtras()).getString("DebetUpdateFinished");
         }
     };
-
-    private final Handler handlerDB = new Handler();
-    private final Handler handlerApp = new Handler();
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
-
     private Downloader downloader;
-
-    Button btnDBUpdate, btnAppUpdate;
 
     @Nullable
     @Override

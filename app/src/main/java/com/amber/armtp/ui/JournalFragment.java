@@ -48,38 +48,11 @@ public class JournalFragment extends Fragment implements ServerChecker {
     private static final int ID_GOBACK = 101;
 
     private final ArrayList<GlobalVars.CheckBoxData> chosenOrders = new ArrayList<>();
-
-    //    private ArrayList<Integer> itemsList;
-    private int[] itemsList;
-
-    Menu mainMenu;
     public GlobalVars glbVars;
+    Menu mainMenu;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
-    private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-            glbVars.layout.setVisibility(View.GONE);
-            ClearAllMenuItems();
-            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
-                    .setIcon(R.drawable.back_arrow)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
-            tvContr = myView.findViewById(R.id.ColOrdContr);
-            tvAddr = myView.findViewById(R.id.ColOrdAddr);
-            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
-            tvStatus = myView.findViewById(R.id.ColOrdStatus);
-
-            glbVars.ordStatus = tvStatus.getText().toString();
-            String ID = tvOrder.getText().toString();
-
-            glbVars.LoadOrdersDetails(ID);
-            glbVars.viewFlipper.setDisplayedChild(1);
-        }
-    };
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
-
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, long id) {
@@ -142,7 +115,32 @@ public class JournalFragment extends Fragment implements ServerChecker {
         }
 
     };
+    //    private ArrayList<Integer> itemsList;
+    private int[] itemsList;
+    private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+            glbVars.layout.setVisibility(View.GONE);
+            ClearAllMenuItems();
+            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
+                    .setIcon(R.drawable.back_arrow)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
+            tvContr = myView.findViewById(R.id.ColOrdContr);
+            tvAddr = myView.findViewById(R.id.ColOrdAddr);
+            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
+            tvStatus = myView.findViewById(R.id.ColOrdStatus);
+
+            glbVars.ordStatus = tvStatus.getText().toString();
+            String ID = tvOrder.getText().toString();
+
+            glbVars.LoadOrdersDetails(ID);
+            glbVars.viewFlipper.setDisplayedChild(1);
+        }
+    };
     private android.support.v7.widget.Toolbar toolbar;
+    private boolean isChecked = false;
 
     public JournalFragment() {
     }
@@ -186,7 +184,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         glbVars.gdOrders = Objects.requireNonNull(getActivity()).findViewById(R.id.listSMS);
-        glbVars.orderdtList = getActivity().findViewById(R.id.listOrdersDt);
+        glbVars.orderDtList = getActivity().findViewById(R.id.listOrdersDt);
 
         glbVars.layout = getActivity().findViewById(R.id.checkboxLayout);
         glbVars.LoadOrders();
@@ -346,7 +344,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
     /**
      * Повторно отправляет заказ со статутосм "Отправлено" (логично)
-     *
      * @param id - поле ROWID в таблице ZAKAZY
      */
     private void sendOrders(int id) {
@@ -364,8 +361,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
             }
         }
     }
-
-    private boolean isChecked = false;
 
     private void selectAllOrders() {
         chosenOrders.clear();
@@ -416,11 +411,13 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 } catch (Exception ignored) {
                 }
 
-                if (checkFileIntegrityOnServer(FileName, secondLocalFile.length()) && ftpClient.completePendingCommand()) {
-                    secondLocalFile.delete();
-                    changeIntegralFile(FileName);
-                    glbVars.dbOrders.setZakazStatus("Отправлен", id);
-                    glbVars.LoadOrders();
+                if (checkFileIntegrityOnServer(FileName, secondLocalFile.length())) {
+                    if (ftpClient.completePendingCommand()) {
+                        secondLocalFile.delete();
+                        changeIntegralFile(FileName);
+                        glbVars.dbOrders.setZakazStatus("Отправлен", id);
+                        glbVars.LoadOrders();
+                    }
                 } else {
                     Config.sout("Сбой отправки");
                 }

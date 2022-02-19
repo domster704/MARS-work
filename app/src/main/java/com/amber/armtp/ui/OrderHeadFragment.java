@@ -35,14 +35,13 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class OrderHeadFragment extends Fragment implements TBUpdate {
-    public GlobalVars glbVars;
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
-
     public static boolean isCopied = false;
+    public static String _ADDR = "";
+    public GlobalVars glbVars;
     private String _TP = "";
     private String _CONTR = "";
-    public static String _ADDR = "";
     private String _DATE = "";
     private String _COMMENT = "";
 

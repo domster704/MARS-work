@@ -3,10 +3,10 @@
     android:id="@+id/view_order_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_marginTop="6dp"
     android:orientation="vertical"
     android:screenOrientation="landscape"
-    android:weightSum="1"
-    android:layout_marginTop="6dp">
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/tvHeadCod"

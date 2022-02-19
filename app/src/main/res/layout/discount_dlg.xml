@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="20dp"
-        android:paddingTop="10dp"
-        android:paddingRight="10dp"
-        android:screenOrientation="landscape"
-        android:weightSum="1">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingTop="10dp"
+    android:paddingRight="10dp"
+    android:screenOrientation="landscape"
+    android:weightSum="1">
 
     <EditText
         android:id="@+id/txtPercent"
@@ -19,6 +19,7 @@
         android:ems="4"
         android:focusable="true"
         android:gravity="center_vertical|center_horizontal"
+        android:imeOptions="actionDone"
         android:inputType="number|numberDecimal"
         android:paddingTop="10dp"
         android:paddingBottom="5dp"
@@ -26,30 +27,29 @@
         android:singleLine="true"
         android:text="0"
         android:textColor="#000"
-        android:textSize="10pt"
-        android:imeOptions="actionDone" />
+        android:textSize="10pt" />
 
     <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/txtPercent"
-            android:layout_alignBottom="@+id/txtPercent"
-            android:layout_alignParentStart="true"
-            android:gravity="center_vertical"
-            android:textSize="10pt"
-            android:paddingTop="10dp"
-            android:paddingBottom="5dp"
-            android:text="@string/nomenSaleMarkup"
-            android:textColor="#000" />
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtPercent"
+        android:layout_alignBottom="@+id/txtPercent"
+        android:layout_alignParentStart="true"
+        android:gravity="center_vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:text="@string/nomenSaleMarkup"
+        android:textColor="#000"
+        android:textSize="10pt" />
 
     <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="%"
-            android:paddingTop="10dp"
-            android:paddingBottom="5dp"
-            android:textSize="10pt"
-            android:textColor="#000"
-            android:layout_toEndOf="@+id/txtPercent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/txtPercent"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:text="%"
+        android:textColor="#000"
+        android:textSize="10pt" />
 </RelativeLayout>

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/goToGroup"
-            android:title="Перейти в группу"
-            android:visible="true"
-            app:showAsAction="always" />
+        android:id="@+id/goToGroup"
+        android:title="Перейти в группу"
+        android:visible="true"
+        app:showAsAction="always" />
     <item
-            android:id="@+id/setBeginPos"
-            android:title="Установить как начальную позицию"
-            android:visible="true"
-            app:showAsAction="always" />
+        android:id="@+id/setBeginPos"
+        android:title="Установить как начальную позицию"
+        android:visible="true"
+        app:showAsAction="always" />
     <item
-            android:id="@+id/setEndPos"
-            android:title="Установить как конечную позицию"
-            android:visible="true"
-            app:showAsAction="always" />
+        android:id="@+id/setEndPos"
+        android:title="Установить как конечную позицию"
+        android:visible="true"
+        app:showAsAction="always" />
     <item
-            android:id="@+id/resetBeginEndPos"
-            android:title="Сбросить начальную/конечную позиции"
-            android:visible="true"
-            app:showAsAction="always" />
+        android:id="@+id/resetBeginEndPos"
+        android:title="Сбросить начальную/конечную позиции"
+        android:visible="true"
+        app:showAsAction="always" />
 </menu>

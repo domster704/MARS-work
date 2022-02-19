@@ -229,11 +229,11 @@
         android:minHeight="30dp"
         android:theme="@android:style/Widget.Holo.Light.Button" />
 
-<!--    <View-->
-<!--        android:id="@+id/divide2"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="2dp"-->
-<!--        android:layout_marginHorizontal="15dp"-->
-<!--        android:layout_below="@+id/ColNomPosition"-->
-<!--        android:background="@color/dividerColorForNomen" />-->
+    <!--    <View-->
+    <!--        android:id="@+id/divide2"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="2dp"-->
+    <!--        android:layout_marginHorizontal="15dp"-->
+    <!--        android:layout_below="@+id/ColNomPosition"-->
+    <!--        android:background="@color/dividerColorForNomen" />-->
 </RelativeLayout>

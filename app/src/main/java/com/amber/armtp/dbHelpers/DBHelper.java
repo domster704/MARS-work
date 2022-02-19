@@ -19,17 +19,15 @@ import java.util.Set;
  * Updated by domster704 on 27.09.2021
  */
 public class DBHelper extends SQLiteOpenHelper {
-    public static HashMap<String, Float> pricesMap = new HashMap<>();
-
     public static final String DATABASE_NAME = "armtp3.db";
-
     private static final String TB_ORDER = "ORDERS";
     private static final String KEY_ORD_TP_ID = "TP";
     private static final String KEY_ORD_CONTR_ID = "CONTR";
     private static final String KEY_ORD_ADDR_ID = "ADDR";
     private static final String KEY_ORD_DATA = "DATA";
     private static final String KEY_ORD_COMMENT = "COMMENT";
-
+    public static HashMap<String, Float> pricesMap = new HashMap<>();
+    public static int limit = 40;
     private final HashSet<String> listOfUpdatedGroups = new HashSet<>();
 
     public DBHelper(Context context) {
@@ -169,8 +167,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static int limit = 40;
-
     public Cursor getNextNomen(
             String SgiID, String GrupID,
             String WCID, String FocusID, String SearchName, int position) {
@@ -194,7 +190,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqlMX += (!GrupID.equals("0")) ? " AND Nomen.GRUPPA='" + GrupID + "'" : "";
 
         if (!SgiID.equals("0") && !GrupID.equals("0")) {
-            return getNomByGroup(SgiID, GrupID, sqlMX);
+            return getNomByGroup(GrupID, SgiID, sqlMX);
         }
 
         String limitS = limit + "";

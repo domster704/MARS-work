@@ -66,7 +66,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             db = this.getReadableDatabase();
             cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, IS_OUTED, OUT_QTY, SUM FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
             return cursor;
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;

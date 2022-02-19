@@ -8,12 +8,11 @@ import org.apache.commons.net.ftp.FTPClient;
 import java.io.IOException;
 
 public class Ftp {
-    protected FTPClient client;
-
     protected final String user;
     protected final String password;
     protected final String host;
     protected final int port;
+    protected FTPClient client;
 
     public Ftp(ServerDetails serverDetails) {
         this.host = serverDetails.host;
@@ -49,9 +48,8 @@ public class Ftp {
     public void renameFile(String dir) throws IOException {
         boolean login = initFtpClient();
         if (login) {
-            client.rename(dir, dir.split("temp")[0] + ".dbf");
+            client.rename(dir, dir.split(".temp")[0] + ".dbf");
         }
-        client.completePendingCommand();
     }
 
     protected boolean initFtpClient() {

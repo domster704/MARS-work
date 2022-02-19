@@ -26,6 +26,7 @@ import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -47,7 +48,6 @@ import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.interfaces.ChooseNomen;
 import com.amber.armtp.interfaces.TBUpdate;
 import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.OrderHeadFragment;
@@ -80,15 +80,14 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public static FragmentActivity CurAc;
     public static Context CurFragmentContext;
-
+    public static String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
+    public int CurVisiblePosition = 0;
     public Context glbContext;
     public Cursor myNom, mySgi, myGrups, Orders, OrdersDt;
     public Cursor curWC, curFocus;
-
     public GlobalVars.NomenAdapter NomenAdapter, PreviewZakazAdapter;
     public JournalAdapter OrdersAdapter;
     public JournalDetailsAdapter OrdersDtAdapter;
-
     public View view;
     public DBHelper db;
     public DBOrdersHelper dbOrders;
@@ -96,18 +95,13 @@ public class GlobalVars extends Application implements TBUpdate {
     public GridView nomenList;
     public android.support.v7.widget.Toolbar toolbar;
     public String SelectGroup = null;
-
     public LinearLayout layout;
-
     public boolean isDiscount = false;
     public float Discount = 0;
-
     public int MultiQty = 0;
     public boolean isMultiSelect = false;
-
     public String frSgi;
     public String frGroup;
-
     public Spinner spSgi, spGrup;
     public Spinner spWC, spFocus;
     public File appDBFolder = new File(GetSDCardPath() + "ARMTP_DB");
@@ -123,26 +117,6 @@ public class GlobalVars extends Application implements TBUpdate {
     public String CurrentTp, CurrentDebTP;
     public Cursor Contr;
     public Cursor Addr;
-
-    public Spinner spinContr, spinAddr, TPList;
-    public Calendar DeliveryDate;
-    public EditText txtDate;
-    public EditText edContrFilter;
-    public EditText txtComment;
-    public TextView spTp, spContr, spAddr;
-    public TextView tvContr, tvTP;
-    public ViewFlipper viewFlipper;
-    public String ordStatus;
-    public GridView gdOrders;
-    public GridView orderdtList;
-    public GridView debetList;
-    public Spinner spTP;
-    public Cursor curDebet, curDebetTp;
-    public int BeginPos = 0, EndPos = 0;
-
-    private static String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
-    private boolean isNewLoaded = false;
-
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -155,7 +129,21 @@ public class GlobalVars extends Application implements TBUpdate {
         public void onNothingSelected(AdapterView<?> arg0) {
         }
     };
-
+    public Spinner spinContr, spinAddr, TPList;
+    public Calendar DeliveryDate;
+    public EditText txtDate;
+    public EditText edContrFilter;
+    public EditText txtComment;
+    public TextView spTp, spContr, spAddr;
+    public TextView tvContr, tvTP;
+    public ViewFlipper viewFlipper;
+    public String ordStatus;
+    public GridView gdOrders;
+    public GridView orderDtList;
+    public GridView debetList;
+    public Spinner spTP;
+    public Cursor curDebet, curDebetTp;
+    public int BeginPos = 0, EndPos = 0;
     public AdapterView.OnItemClickListener GridNomenClick = (myAdapter, myView, position, mylng) -> {
         long viewId = myView.getId();
 
@@ -181,8 +169,8 @@ public class GlobalVars extends Application implements TBUpdate {
             }
         }
     };
-
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
+        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, final int position, long arg3) {
             final String Grup;
@@ -242,26 +230,21 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
+            CurGroup = ItemID;
             if (!ItemID.equals("0")) {
-                SharedPreferences settings = getSharedPreferences("form_order", 0);
-                SharedPreferences.Editor editor = settings.edit();
-
-                editor.putString("ColSgiFID", "");
-                editor.putString("ColGrupFID", "");
-                editor.putString("ColWCID", "");
-                editor.putString("ColFocusID", "");
-
-                editor.apply();
-
-                final String curSgi;
-
                 TextView txtSgi = getView().findViewById(R.id.ColSgiID);
-                curSgi = txtSgi.getText().toString();
+                CurSGI = txtSgi.getText().toString();
+            }
+            if (CurSGI.equals("0"))
+                return;
+            LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, 0);
 
-                FormOrderFragment.filter.setImageResource(R.drawable.filter);
-                LoadNom(ItemID, curSgi);
+            if (GlobalVars.CurGroup.equals("0")) {
+                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setEnabled(false);
+                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
             } else {
-                nomenList.setAdapter(null);
+                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setEnabled(true);
+                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
             }
         }
 
@@ -273,27 +256,42 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
-            if (!ItemID.equals("0")) {
-                SharedPreferences settings = getSharedPreferences("form_order", 0);
-                SharedPreferences.Editor editor = settings.edit();
 
-                editor.putString("ColSgiFID", "");
-                editor.putString("ColGrupFID", "");
-                editor.putString("ColWCID", "");
-                editor.putString("ColFocusID", "");
+            MenuItem sort = FormOrderFragment.mainMenu.findItem(R.id.NomenSort);
 
-                editor.apply();
-                FormOrderFragment.filter.setImageResource(R.drawable.filter);
-                LoadGroups(ItemID);
-                if (SelectGroup != null) {
-                    SetSelectedGrup(SelectGroup);
-                }
+            if (ItemID.equals("0")) {
+                sort.setEnabled(false);
+                sort.setIcon(R.drawable.to_end_disabled);
+                nomenList.setAdapter(null);
+                spGrup.setAdapter(null);
+                return;
+            }
+
+            CurGroup = "0";
+            CurSGI = ItemID;
+
+            LoadGroups(ItemID);
+            if (SelectGroup != null) {
+                SetSelectedGrup(SelectGroup);
+            }
+
+            if (!CurWCID.equals("0") || !CurFocusID.equals("0")) {
+                LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, 0);
+            }
+
+            if (GlobalVars.CurGroup.equals("0")) {
+                sort.setEnabled(false);
+                sort.setIcon(R.drawable.to_end_disabled);
+            } else {
+                sort.setEnabled(true);
+                sort.setIcon(R.drawable.to_end);
             }
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
         }
     };
+
     public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
@@ -377,10 +375,10 @@ public class GlobalVars extends Application implements TBUpdate {
             });
         }
     };
+    public android.support.v4.app.FragmentManager fragManager;
     TextView grupID, sgiID;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-    public android.support.v4.app.FragmentManager fragManager;
     public AdapterView.OnItemLongClickListener PreviewNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
@@ -413,6 +411,8 @@ public class GlobalVars extends Application implements TBUpdate {
             return true;
         }
     };
+    private boolean isNewLoaded = false;
+    private int _previousCursorCount = 0;
 
     public static java.util.Date StrToDbfDate(String Date) {
         java.util.Date return_date = null;
@@ -560,12 +560,13 @@ public class GlobalVars extends Application implements TBUpdate {
                         WCID, FocusID, search, positionSQL);
                 CurAc.runOnUiThread(() -> {
                     nomenList.setAdapter(null);
+                    System.out.println(myNom.getCount());
                     NomenAdapter = getNomenAdapter(myNom);
-                    nomenList.post(() -> nomenList.setAdapter(NomenAdapter));
+                    nomenList.setAdapter(NomenAdapter);
                     nomenList.setOnItemClickListener(GridNomenClick);
                     nomenList.setOnItemLongClickListener(GridNomenLongClick);
-
-                    nomenList.setSelection(positionSQL - 1);
+                    if (positionSQL != 0)
+                        nomenList.setSelection(positionSQL - 1);
                 });
                 isNewLoaded = false;
             }
@@ -625,6 +626,7 @@ public class GlobalVars extends Application implements TBUpdate {
             String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (SgiID.equals(id)) {
                 spSgi.setSelection(i);
+                CurGroup = Grup;
                 SelectGroup = Grup;
                 break;
             }
@@ -1107,7 +1109,6 @@ public class GlobalVars extends Application implements TBUpdate {
         _updateOrdersStatusFromDB();
 
         Orders = dbOrders.getZakazy();
-
         CurAc.runOnUiThread(() -> {
             if (Orders != null)
                 _putCheckBox(Orders);
@@ -1119,11 +1120,11 @@ public class GlobalVars extends Application implements TBUpdate {
     public void LoadOrdersDetails(String ZakazID) {
         _doUpdateQTYByVycherk(ZakazID);
 
-        orderdtList.setAdapter(null);
+        orderDtList.setAdapter(null);
         OrdersDt = dbOrders.getZakazDetails(ZakazID);
         OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
-        orderdtList.setAdapter(OrdersDtAdapter);
-        orderdtList.setOnItemClickListener(OrderDtNomenClick);
+        orderDtList.setAdapter(OrdersDtAdapter);
+        orderDtList.setOnItemClickListener(OrderDtNomenClick);
     }
 
     public String ReadLastUpdate() {
@@ -1180,6 +1181,10 @@ public class GlobalVars extends Application implements TBUpdate {
         db.getWritableDatabase().beginTransaction();
         int tmpVal;
 
+        if (EndRange > CurVisiblePosition) {
+            EndRange = CurVisiblePosition;
+        }
+
         if (BeginRange > EndRange) {
             tmpVal = BeginRange;
             BeginRange = EndRange;
@@ -1192,19 +1197,19 @@ public class GlobalVars extends Application implements TBUpdate {
             stmt.executeUpdateDelete();
             stmt.clearBindings();
         }
+
         db.getWritableDatabase().setTransactionSuccessful();
         db.getWritableDatabase().endTransaction();
         myNom.requery();
         NomenAdapter.notifyDataSetChanged();
 
         for (int i = BeginRange; i <= EndRange; i++) {
-            long pos = NomenAdapter.getItemId(i);
+            long pos = NomenAdapter.getItemId(i - 1);
 
             SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
             Cursor kod5 = sqLiteDatabase.rawQuery("SELECT KOD5 FROM NOMEN WHERE rowid='" + pos + "'", null);
             kod5.moveToNext();
 
-            System.out.println(DBHelper.pricesMap.get(kod5.getString(0)));
             db.putPriceInNomen(pos, "" + DBHelper.pricesMap.get(kod5.getString(0)));
             kod5.close();
         }
@@ -1322,331 +1327,6 @@ public class GlobalVars extends Application implements TBUpdate {
         myNom.requery();
         NomenAdapter.notifyDataSetChanged();
         gdNomen.invalidateViews();
-    }
-
-    public class AddrsAdapter extends SimpleCursorAdapter {
-        public AddrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            Cursor cursor = getCursor();
-            TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
-
-            if (position % 2 != 0) {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-            tvDescr.setText(cursor.getString(2));
-
-            return view;
-        }
-    }
-
-    private int _previousCursorCount = 0;
-
-    public class NomenAdapter extends SimpleCursorAdapter {
-        public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            Cursor cursor = getCursor();
-
-            int resID;
-
-            TextView tvDescr = view.findViewById(R.id.ColNomDescr);
-            TextView tvPrice = view.findViewById(R.id.ColNomPrice);
-            TextView tvPosition = view.findViewById(R.id.ColNomPosition);
-            TextView tvMP = view.findViewById(R.id.ColNomMP);
-            TextView tvGofra = view.findViewById(R.id.ColNomVkorob);
-            TextView tvOst = view.findViewById(R.id.ColNomOst);
-            TextView tvCod = view.findViewById(R.id.ColNomCod);
-            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
-            TextView tvZakaz = view.findViewById(R.id.ColNomZakaz);
-
-            Button btPlus = view.findViewById(R.id.btPlus);
-            Button btMinus = view.findViewById(R.id.btMinus);
-
-            tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
-
-            if (tvPhoto != null) {
-                tvPhoto.setOnClickListener(v -> {
-                    ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-                });
-            }
-
-            btPlus.setOnClickListener(v -> {
-                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-            });
-
-            btMinus.setOnClickListener(v -> {
-                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-            });
-
-            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
-            String price = String.format("%.2f", DBHelper.pricesMap.get(kod5));
-
-            if (!DBHelper.pricesMap.containsKey(kod5))
-                price = "0";
-            else if (price.equals("" + DBHelper.pricesMap.get(kod5)))
-                price = "" + DBHelper.pricesMap.get(kod5);
-
-            if (price.equals("0")) {
-                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
-                if (!cPrice.equals("0") && !cPrice.equals("null")) {
-                    price = cPrice;
-                }
-            }
-            tvPrice.setText(price);
-
-            if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
-                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
-                    resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-                } else {
-                    resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
-                }
-
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(" ").append(" ");
-                builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
-                builder.append(" ");
-                tvPhoto.setText(builder);
-            }
-
-            // Начало расчёта разниы дней
-            long CurrentTime = Calendar.getInstance().getTimeInMillis();
-            String PostData = cursor.getString(cursor.getColumnIndex("POSTDATA"));
-
-            String[] data = PostData.split("\\.");
-            data[2] = "20" + data[2];
-
-            PostData = data[0] + "." + data[1] + "." + data[2];
-
-            DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            long PostDataTime = 0;
-            try {
-                PostDataTime = format.parse(PostData).getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            long daysSubstraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
-            // Конец расчёта разниы дней
-
-            int backgroundColor;
-            if (!tvZakaz.getText().toString().equals("0")) {
-                backgroundColor = getResources().getColor(R.color.selectedNomen);
-            } else {
-                if (position % 2 != 0) {
-                    backgroundColor = getResources().getColor(R.color.gridViewFirstColor);
-                } else {
-                    backgroundColor = getResources().getColor(R.color.gridViewSecondColor);
-                }
-            }
-            view.setBackgroundColor(backgroundColor);
-
-            int color;
-            if (daysSubstraction <= 2) {
-                color = getResources().getColor(R.color.postDataColorRed);
-            } else if (daysSubstraction <= 4) {
-                color = getResources().getColor(R.color.postDataColorGreen);
-            } else {
-                color = getResources().getColor(R.color.black);
-            }
-
-            tvDescr.setTextColor(color);
-            tvPrice.setTextColor(color);
-            tvPosition.setTextColor(color);
-            tvMP.setTextColor(color);
-            tvGofra.setTextColor(color);
-            tvOst.setTextColor(color);
-            tvCod.setTextColor(color);
-
-            int style = Typeface.NORMAL;
-            if (cursor.getInt(cursor.getColumnIndex("ACTION")) == 1) {
-                style = Typeface.BOLD_ITALIC;
-            }
-
-            tvDescr.setTypeface(tvDescr.getTypeface(), style);
-            tvPrice.setTypeface(tvPrice.getTypeface(), style);
-            tvPosition.setTypeface(tvPosition.getTypeface(), style);
-            tvMP.setTypeface(tvMP.getTypeface(), style);
-            tvGofra.setTypeface(tvGofra.getTypeface(), style);
-            tvOst.setTypeface(tvOst.getTypeface(), style);
-            tvCod.setTypeface(tvCod.getTypeface(), style);
-
-            tvPosition.setText(String.valueOf(position + 1));
-            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
-                _previousCursorCount = cursor.getCount();
-                isNewLoaded = true;
-                LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, cursor.getCount());
-                return view;
-            }
-
-            return view;
-        }
-    }
-
-    public static class CheckBoxData {
-        public int id;
-        public CheckBox checkBox;
-        public String status;
-
-        public CheckBoxData(int id, CheckBox checkBox, String status) {
-            this.id = id;
-            this.checkBox = checkBox;
-            this.status = status;
-        }
-    }
-
-    public class JournalAdapter extends SimpleCursorAdapter {
-        public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            TextView tvSum = view.findViewById(R.id.ColOrdSum);
-            _updateTextFormatTo2DecAfterPoint(tvSum);
-
-            TextView tvStatus = view.findViewById(R.id.ColOrdStatus);
-            if (tvStatus.getText().toString().equals("Сохранён"))
-                tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
-
-            if (position % 2 != 0) {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-            return view;
-        }
-    }
-
-    public class JournalDetailsAdapter extends SimpleCursorAdapter {
-        public JournalDetailsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            Cursor cursor = getCursor();
-            View view = super.getView(position, convertView, parent);
-            TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
-
-            TextView tvSum = view.findViewById(R.id.ColOrdDtSum);
-            TextView tvPrice = view.findViewById(R.id.ColOrdDtPrice);
-            _updateTextFormatTo2DecAfterPoint(tvSum);
-            _updateTextFormatTo2DecAfterPoint(tvPrice);
-
-            if (position % 2 != 0) {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-
-            if (cursor.getInt(cursor.getColumnIndex("IS_OUTED")) == 1) {
-                int outQTY = cursor.getInt(cursor.getColumnIndex("OUT_QTY"));
-                int QTY = cursor.getInt(cursor.getColumnIndex("QTY"));
-                tvQty.setText(QTY + "(" + (QTY - outQTY) + ")");
-            }
-
-            return view;
-        }
-    }
-
-    public class TPAdapter extends SimpleCursorAdapter {
-        public TPAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flag) {
-            super(context, layout, c, from, to, flag);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-
-            TextView tvDescr = view.findViewById(R.id.ColTPDescr);
-            if (position % 2 != 0) {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-
-            return view;
-        }
-    }
-
-    public class ContrsAdapter extends SimpleCursorAdapter {
-        public ContrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            Cursor cursor = getCursor();
-            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR")) + "\t\t" + cursor.getString(cursor.getColumnIndex("STATUS"));
-
-            TextView tvDescr = view.findViewById(R.id.ColContrDescr);
-            if (position % 2 != 0) {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-
-            tvDescr.setText(resDescr);
-            return view;
-        }
-    }
-
-    public class DebetAdapter extends SimpleCursorAdapter {
-        public DebetAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            TextView[] tvArray = new TextView[]{
-                    view.findViewById(R.id.ColDebetContr),
-                    view.findViewById(R.id.ColDebetStatus),
-                    view.findViewById(R.id.ColDebetCredit),
-                    view.findViewById(R.id.ColDebetA7),
-                    view.findViewById(R.id.ColDebetA14),
-                    view.findViewById(R.id.ColDebetA21),
-                    view.findViewById(R.id.ColDebetA28),
-                    view.findViewById(R.id.ColDebetA35),
-                    view.findViewById(R.id.ColDebetA42),
-                    view.findViewById(R.id.ColDebetA49),
-                    view.findViewById(R.id.ColDebetA56),
-                    view.findViewById(R.id.ColDebetA63),
-                    view.findViewById(R.id.ColDebetA64),
-                    view.findViewById(R.id.ColDebetDolg),
-                    view.findViewById(R.id.ColDebetOTG30),
-                    view.findViewById(R.id.ColDebetOPL30),
-                    view.findViewById(R.id.ColDebetKOB),
-            };
-
-            if (position % 2 != 0) {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
-
-            for (TextView v : tvArray) {
-                v.setTextColor(Color.rgb(0, 0, 0));
-                _updateTextFormatTo2DecAfterPoint(v);
-            }
-
-            return view;
-        }
     }
 
     public void rewritePriceToMainDB(String DOCID) {
@@ -1873,6 +1553,330 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             return true;
         });
+    }
+
+    public static class CheckBoxData {
+        public int id;
+        public CheckBox checkBox;
+        public String status;
+
+        public CheckBoxData(int id, CheckBox checkBox, String status) {
+            this.id = id;
+            this.checkBox = checkBox;
+            this.status = status;
+        }
+    }
+
+    public class AddrsAdapter extends SimpleCursorAdapter {
+        public AddrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            Cursor cursor = getCursor();
+            TextView tvDescr = view.findViewById(R.id.ColContrAddrDescr);
+
+            if (position % 2 != 0) {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
+            tvDescr.setText(cursor.getString(2));
+
+            return view;
+        }
+    }
+
+    public class NomenAdapter extends SimpleCursorAdapter {
+        public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        public View getView(final int position, View convertView, final ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            Cursor cursor = getCursor();
+            CurVisiblePosition = cursor.getCount();
+
+            int resID;
+
+            TextView tvDescr = view.findViewById(R.id.ColNomDescr);
+            TextView tvPrice = view.findViewById(R.id.ColNomPrice);
+            TextView tvPosition = view.findViewById(R.id.ColNomPosition);
+            TextView tvMP = view.findViewById(R.id.ColNomMP);
+            TextView tvGofra = view.findViewById(R.id.ColNomVkorob);
+            TextView tvOst = view.findViewById(R.id.ColNomOst);
+            TextView tvCod = view.findViewById(R.id.ColNomCod);
+            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
+            TextView tvZakaz = view.findViewById(R.id.ColNomZakaz);
+
+            Button btPlus = view.findViewById(R.id.btPlus);
+            Button btMinus = view.findViewById(R.id.btMinus);
+
+            tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
+
+            if (tvPhoto != null) {
+                tvPhoto.setOnClickListener(v -> {
+                    ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
+                });
+            }
+
+            btPlus.setOnClickListener(v -> {
+                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
+            });
+
+            btMinus.setOnClickListener(v -> {
+                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
+            });
+
+            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
+            String price = String.format("%.2f", DBHelper.pricesMap.get(kod5));
+
+            if (!DBHelper.pricesMap.containsKey(kod5))
+                price = "0";
+            else if (price.equals("" + DBHelper.pricesMap.get(kod5)))
+                price = "" + DBHelper.pricesMap.get(kod5);
+
+            if (price.equals("0")) {
+                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
+                if (!cPrice.equals("0") && !cPrice.equals("null")) {
+                    price = cPrice;
+                }
+            }
+            tvPrice.setText(price);
+
+            if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
+                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
+                    resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
+                } else {
+                    resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
+                }
+
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                builder.append(" ").append(" ");
+                builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
+                builder.append(" ");
+                tvPhoto.setText(builder);
+            }
+
+            // Начало расчёта разниы дней
+            long CurrentTime = Calendar.getInstance().getTimeInMillis();
+            String PostData = cursor.getString(cursor.getColumnIndex("POSTDATA"));
+
+            String[] data = PostData.split("\\.");
+            data[2] = "20" + data[2];
+
+            PostData = data[0] + "." + data[1] + "." + data[2];
+
+            DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            long PostDataTime = 0;
+            try {
+                PostDataTime = format.parse(PostData).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            long daysSubstraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
+            // Конец расчёта разниы дней
+
+            int backgroundColor;
+            if (!tvZakaz.getText().toString().equals("0")) {
+                backgroundColor = getResources().getColor(R.color.selectedNomen);
+            } else {
+                if (position % 2 != 0) {
+                    backgroundColor = getResources().getColor(R.color.gridViewFirstColor);
+                } else {
+                    backgroundColor = getResources().getColor(R.color.gridViewSecondColor);
+                }
+            }
+            view.setBackgroundColor(backgroundColor);
+
+            int color;
+            if (daysSubstraction <= 2) {
+                color = getResources().getColor(R.color.postDataColorRed);
+            } else if (daysSubstraction <= 4) {
+                color = getResources().getColor(R.color.postDataColorGreen);
+            } else {
+                color = getResources().getColor(R.color.black);
+            }
+
+            tvDescr.setTextColor(color);
+            tvPrice.setTextColor(color);
+            tvPosition.setTextColor(color);
+            tvMP.setTextColor(color);
+            tvGofra.setTextColor(color);
+            tvOst.setTextColor(color);
+            tvCod.setTextColor(color);
+
+            int style = Typeface.NORMAL;
+            if (cursor.getInt(cursor.getColumnIndex("ACTION")) == 1) {
+                style = Typeface.BOLD_ITALIC;
+            }
+
+            tvDescr.setTypeface(tvDescr.getTypeface(), style);
+            tvPrice.setTypeface(tvPrice.getTypeface(), style);
+            tvPosition.setTypeface(tvPosition.getTypeface(), style);
+            tvMP.setTypeface(tvMP.getTypeface(), style);
+            tvGofra.setTypeface(tvGofra.getTypeface(), style);
+            tvOst.setTypeface(tvOst.getTypeface(), style);
+            tvCod.setTypeface(tvCod.getTypeface(), style);
+
+            tvPosition.setText(String.valueOf(position + 1));
+            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
+                _previousCursorCount = cursor.getCount();
+                isNewLoaded = true;
+                LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, cursor.getCount());
+                return view;
+            }
+
+            return view;
+        }
+    }
+
+    public class JournalAdapter extends SimpleCursorAdapter {
+        public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            TextView tvSum = view.findViewById(R.id.ColOrdSum);
+            _updateTextFormatTo2DecAfterPoint(tvSum);
+
+            TextView tvStatus = view.findViewById(R.id.ColOrdStatus);
+            if (tvStatus.getText().toString().equals("Сохранён"))
+                tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
+
+//            if (position % 2 != 0) {
+//                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+//            } else {
+            view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+//            }
+            return view;
+        }
+    }
+
+    public class JournalDetailsAdapter extends SimpleCursorAdapter {
+        public JournalDetailsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public View getView(final int position, View convertView, final ViewGroup parent) {
+            Cursor cursor = getCursor();
+            View view = super.getView(position, convertView, parent);
+            TextView tvQty = view.findViewById(R.id.ColOrdDtQty);
+
+            TextView tvSum = view.findViewById(R.id.ColOrdDtSum);
+            TextView tvPrice = view.findViewById(R.id.ColOrdDtPrice);
+            _updateTextFormatTo2DecAfterPoint(tvSum);
+            _updateTextFormatTo2DecAfterPoint(tvPrice);
+
+            if (position % 2 != 0) {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
+
+            if (cursor.getInt(cursor.getColumnIndex("IS_OUTED")) == 1) {
+                int outQTY = cursor.getInt(cursor.getColumnIndex("OUT_QTY"));
+                int QTY = cursor.getInt(cursor.getColumnIndex("QTY"));
+                tvQty.setText(QTY + "(" + (QTY - outQTY) + ")");
+            }
+
+            return view;
+        }
+    }
+
+    public class TPAdapter extends SimpleCursorAdapter {
+        public TPAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flag) {
+            super(context, layout, c, from, to, flag);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+
+            TextView tvDescr = view.findViewById(R.id.ColTPDescr);
+            if (position % 2 != 0) {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
+
+            return view;
+        }
+    }
+
+    public class ContrsAdapter extends SimpleCursorAdapter {
+        public ContrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            Cursor cursor = getCursor();
+            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR")) + "\t\t" + cursor.getString(cursor.getColumnIndex("STATUS"));
+
+            TextView tvDescr = view.findViewById(R.id.ColContrDescr);
+            if (position % 2 != 0) {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
+
+            tvDescr.setText(resDescr);
+            return view;
+        }
+    }
+
+    public class DebetAdapter extends SimpleCursorAdapter {
+        public DebetAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            TextView[] tvArray = new TextView[]{
+                    view.findViewById(R.id.ColDebetContr),
+                    view.findViewById(R.id.ColDebetStatus),
+                    view.findViewById(R.id.ColDebetCredit),
+                    view.findViewById(R.id.ColDebetA7),
+                    view.findViewById(R.id.ColDebetA14),
+                    view.findViewById(R.id.ColDebetA21),
+                    view.findViewById(R.id.ColDebetA28),
+                    view.findViewById(R.id.ColDebetA35),
+                    view.findViewById(R.id.ColDebetA42),
+                    view.findViewById(R.id.ColDebetA49),
+                    view.findViewById(R.id.ColDebetA56),
+                    view.findViewById(R.id.ColDebetA63),
+                    view.findViewById(R.id.ColDebetA64),
+                    view.findViewById(R.id.ColDebetDolg),
+                    view.findViewById(R.id.ColDebetOTG30),
+                    view.findViewById(R.id.ColDebetOPL30),
+                    view.findViewById(R.id.ColDebetKOB),
+            };
+
+            if (position % 2 != 0) {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
+
+            for (TextView v : tvArray) {
+                v.setTextColor(Color.rgb(0, 0, 0));
+                _updateTextFormatTo2DecAfterPoint(v);
+            }
+
+            return view;
+        }
     }
     // Конец обработчиков событий нажатия на NomenLayout
 }

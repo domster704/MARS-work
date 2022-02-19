@@ -123,7 +123,7 @@
                     android:layout_height="@dimen/dividerHeaderWidth"
                     android:layout_below="@+id/textView19"
                     android:layout_marginHorizontal="1dp"
-                    android:background="@color/dividerColor"/>
+                    android:background="@color/dividerColor" />
             </RelativeLayout>
 
             <RelativeLayout

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/saveHeader"
+        android:icon="@drawable/ic_next_white"
         android:title="Далее"
         android:visible="true"
-        android:icon="@drawable/ic_next_white"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

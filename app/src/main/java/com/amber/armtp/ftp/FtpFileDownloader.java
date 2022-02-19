@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FtpFileDownloader extends Ftp{
+public class FtpFileDownloader extends Ftp {
     private final String dir;
     private final String filePathInAndroid;
     private long fileSize;

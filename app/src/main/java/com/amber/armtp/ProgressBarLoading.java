@@ -2,8 +2,6 @@ package com.amber.armtp;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
-import android.support.design.button.MaterialButton;
 import android.support.v4.app.FragmentActivity;
 
 public class ProgressBarLoading {

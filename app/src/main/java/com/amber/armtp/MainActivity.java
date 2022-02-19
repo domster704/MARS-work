@@ -24,10 +24,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
 import com.amber.armtp.ui.JournalFragment;
@@ -47,19 +47,15 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  * Updated by domster704 on 27.09.2021
  */
 public class MainActivity extends AppCompatActivity {
-    public static String filesPathDB;
-    public static String filesPathAPK;
-
+    public static final int SIZE_KB = 1024;
+    public static final int SIZE_MB = SIZE_KB * SIZE_KB;
     //Defining Variables
     private static final int LAYOUT = R.layout.activity_main;
+    public static String filesPathDB;
+    public static String filesPathAPK;
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
-
-    public static final int SIZE_KB = 1024;
-    public static final int SIZE_MB = SIZE_KB * SIZE_KB;
-
-
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -99,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (!_checkAvailableSpaceOnDevice())
             Toast.makeText(getApplication(), "Для работы программы необходимо минимум 100 Мб. Освободите место!", Toast.LENGTH_SHORT).show();
-
 
 
 //      Для нахождения утечки памяти

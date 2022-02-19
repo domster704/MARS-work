@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.amber.armtp.GlobalVars;
 import com.amber.armtp.Config;
+import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
@@ -58,7 +58,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Получение элементов фрагмента и изменение их параметров
-     *
      */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -143,8 +142,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         editor.putInt("FtpPhotoPort", Integer.parseInt(port));
 
         editor.putString("FtpServerHost", host);
-        editor.putString("FtpServerPass",  pass);
-        editor.putString("FtpServerUser",  user);
+        editor.putString("FtpServerPass", pass);
+        editor.putString("FtpServerUser", user);
         editor.putInt("FtpServerPort", Integer.parseInt(port));
 
         ServerDetails.updateInstance(host, port, user, pass);
@@ -172,6 +171,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
         settingsEditor.apply();
 
-        Config.sout( "Размер шрифта изменён на " + nomenDescriptionFontSize);
+        Config.sout("Размер шрифта изменён на " + nomenDescriptionFontSize);
     }
 }

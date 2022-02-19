@@ -20,6 +20,15 @@ public class ZipUnpacking {
         this.fileDir = filePathInAndroid;
     }
 
+    private static void write(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = in.read(buffer)) >= 0)
+            out.write(buffer, 0, len);
+        out.close();
+        in.close();
+    }
+
     private void unZip(File file) throws IOException {
         ZipFile zip = new ZipFile(fileDir);
         Enumeration entries = zip.entries();
@@ -54,14 +63,5 @@ public class ZipUnpacking {
             e.printStackTrace();
             return false;
         }
-    }
-
-    private static void write(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = in.read(buffer)) >= 0)
-            out.write(buffer, 0, len);
-        out.close();
-        in.close();
     }
 }

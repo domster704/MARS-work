@@ -25,6 +25,8 @@ import java.io.File;
 public class Downloader {
     private final GlobalVars globalVars;
     private final Activity activity;
+    // Кол-во попыток, затраченных на скачивание файла
+    private int countOfTrying = 0;
 
     public Downloader(GlobalVars globalVars, Activity activity) {
         this.globalVars = globalVars;
@@ -57,9 +59,6 @@ public class Downloader {
             }
         }).start();
     }
-
-    // Кол-во попыток, затраченных на скачивание файла
-    private int countOfTrying = 0;
 
     public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
         new Thread(() -> {

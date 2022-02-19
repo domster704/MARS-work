@@ -12,8 +12,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="10dp"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical" />
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -31,7 +31,7 @@
                 android:id="@+id/begin"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_toStartOf="@+id/tvContr"/>
+                android:layout_toStartOf="@+id/tvContr" />
 
             <TextView
                 android:id="@+id/tvContr"
@@ -243,7 +243,7 @@
                 android:id="@+id/end"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_toEndOf="@+id/tvKOB"/>
+                android:layout_toEndOf="@+id/tvKOB" />
 
             <GridView
                 android:id="@+id/listContrs"
