@@ -1552,7 +1552,6 @@ public class GlobalVars extends Application implements TBUpdate {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
             CurVisiblePosition = cursor.getCount();
-
             int resID;
 
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
@@ -1565,47 +1564,33 @@ public class GlobalVars extends Application implements TBUpdate {
             TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
             TextView tvZakaz = view.findViewById(R.id.ColNomZakaz);
 
+            TextView[] tvListForChange = new TextView[]{
+                    tvDescr,
+                    tvPrice,
+                    tvPosition,
+                    tvMP,
+                    tvGofra,
+                    tvOst,
+                    tvCod,
+            };
+
             Button btPlus = view.findViewById(R.id.btPlus);
             Button btMinus = view.findViewById(R.id.btMinus);
 
             tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
 
-            if (tvPhoto != null) {
-                tvPhoto.setOnClickListener(v -> {
-                    ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-                });
-            }
+            if (tvPhoto != null)
+                tvPhoto.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
+            btPlus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
+            btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
 
-            btPlus.setOnClickListener(v -> {
-                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-            });
-
-            btMinus.setOnClickListener(v -> {
-                ((GridView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
-            });
-
-            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
-            String price = String.format("%.2f", DBHelper.pricesMap.get(kod5));
-
-            if (!DBHelper.pricesMap.containsKey(kod5))
-                price = "0";
-            else if (price.equals("" + DBHelper.pricesMap.get(kod5)))
-                price = "" + DBHelper.pricesMap.get(kod5);
-
-            if (price.equals("0")) {
-                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
-                if (!cPrice.equals("0") && !cPrice.equals("null")) {
-                    price = cPrice;
-                }
-            }
-            tvPrice.setText(price);
+            tvPrice.setText(_countPrice(cursor));
 
             if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
-                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
+                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1)
                     resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-                } else {
+                else
                     resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
-                }
 
                 SpannableStringBuilder builder = new SpannableStringBuilder();
                 builder.append(" ").append(" ");
@@ -1614,25 +1599,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 tvPhoto.setText(builder);
             }
 
-            // Начало расчёта разниы дней
-            long CurrentTime = Calendar.getInstance().getTimeInMillis();
-            String PostData = cursor.getString(cursor.getColumnIndex("POSTDATA"));
-
-            String[] data = PostData.split("\\.");
-            data[2] = "20" + data[2];
-
-            PostData = data[0] + "." + data[1] + "." + data[2];
-
-            DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            long PostDataTime = 0;
-            try {
-                PostDataTime = format.parse(PostData).getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            long daysSubtraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
-            // Конец расчёта разниы дней
+            long daysSubtraction = _countDaySubtraction(cursor);
 
             int backgroundColor;
             if (!tvZakaz.getText().toString().equals("0")) {
@@ -1652,27 +1619,10 @@ public class GlobalVars extends Application implements TBUpdate {
             } else if (daysSubtraction <= 4) {
                 color = getResources().getColor(R.color.postDataColorGreen);
             }
+            _setTextColorOnTextView(tvListForChange, color);
 
-            tvDescr.setTextColor(color);
-            tvPrice.setTextColor(color);
-            tvPosition.setTextColor(color);
-            tvMP.setTextColor(color);
-            tvGofra.setTextColor(color);
-            tvOst.setTextColor(color);
-            tvCod.setTextColor(color);
-
-            int style = Typeface.NORMAL;
-            if (cursor.getInt(cursor.getColumnIndex("ACTION")) == 1) {
-                style = Typeface.BOLD_ITALIC;
-            }
-
-            tvDescr.setTypeface(Typeface.defaultFromStyle(style));
-            tvPrice.setTypeface(Typeface.defaultFromStyle(style));
-            tvPosition.setTypeface(Typeface.defaultFromStyle(style));
-            tvMP.setTypeface(Typeface.defaultFromStyle(style));
-            tvGofra.setTypeface(Typeface.defaultFromStyle(style));
-            tvOst.setTypeface(Typeface.defaultFromStyle(style));
-            tvCod.setTypeface(Typeface.defaultFromStyle(style));
+            int style = cursor.getInt(cursor.getColumnIndex("ACTION")) == 1 ? Typeface.BOLD_ITALIC : Typeface.NORMAL;
+            _setTypeFaceOnTextView(tvListForChange, style);
 
             tvPosition.setText(String.valueOf(position + 1));
             if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
@@ -1683,6 +1633,55 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             return view;
+        }
+
+        private void _setTextColorOnTextView(TextView[] tvList, int color) {
+            for (TextView tv : tvList) {
+                tv.setTextColor(color);
+            }
+        }
+
+        private void _setTypeFaceOnTextView(TextView[] tvList, int style) {
+            for (TextView tv : tvList) {
+                tv.setTypeface(Typeface.defaultFromStyle(style));
+            }
+        }
+
+        private String _countPrice(Cursor cursor) {
+            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
+            String price = String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5));
+            if (!DBHelper.pricesMap.containsKey(kod5))
+                price = "0";
+            else if (price.equals("" + DBHelper.pricesMap.get(kod5)))
+                price = "" + DBHelper.pricesMap.get(kod5);
+
+            if (price.equals("0")) {
+                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
+                if (!cPrice.equals("0") && !cPrice.equals("null")) {
+                    price = cPrice;
+                }
+            }
+            return price;
+        }
+
+        private long _countDaySubtraction(Cursor cursor) {
+            long CurrentTime = Calendar.getInstance().getTimeInMillis();
+            String PostData = cursor.getString(cursor.getColumnIndex("POSTDATA"));
+
+            String[] data = PostData.split("\\.");
+            data[2] = "20" + data[2];
+
+            PostData = data[0] + "." + data[1] + "." + data[2];
+
+            @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            long PostDataTime = 0;
+            try {
+                PostDataTime = format.parse(PostData).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
         }
     }
 
