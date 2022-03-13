@@ -11,12 +11,13 @@ android {
     }
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
+
     defaultConfig {
         applicationId 'com.amber.armtp'
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 19
-        versionName "2.0.17"
+        versionCode 29
+        versionName "2.0.29"
     }
 
     buildTypes {

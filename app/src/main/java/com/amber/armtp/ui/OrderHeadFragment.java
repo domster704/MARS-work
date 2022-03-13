@@ -2,6 +2,7 @@ package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -37,8 +38,8 @@ import java.util.Objects;
 public class OrderHeadFragment extends Fragment implements TBUpdate {
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
-    public static boolean isCopied = false;
     public static String _ADDR = "";
+    public static boolean isCopied = false;
     public GlobalVars glbVars;
     private String _TP = "";
     private String _CONTR = "";
@@ -47,6 +48,8 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
 
     private SharedPreferences.Editor editor;
     private android.support.v7.widget.Toolbar toolbar;
+    private boolean isCopiedLocal = false;
+    private static final String APP_PREFERENCES_CONTR = "Contr";
 
     public OrderHeadFragment() {
     }
@@ -70,7 +73,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         GlobalVars.CurFragmentContext = getActivity();
 
         if (getArguments() != null) {
-            isCopied = getArguments().getBoolean("isCopied");
+            isCopied = isCopiedLocal = getArguments().getBoolean("isCopied");
             _TP = getArguments().getString("TP");
             _CONTR = getArguments().getString("CONTR");
             _ADDR = getArguments().getString("ADDR");
@@ -84,7 +87,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             getArguments().remove("DOC_DATE");
             getArguments().remove("COMMENT");
         }
-
         GlobalVars.CurAc = getActivity();
     }
 
@@ -97,6 +99,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        _checkAndSetContrIDAfterDestroying();
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.edContrFilter = getActivity().findViewById(R.id.txtContrFilter);
@@ -153,20 +156,20 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
 
         String stTP_ID = settings.getString("TP_ID", "0");
 
-        int TPRowid = glbVars.db.GetTPRowID();
-        int TPDefaultRowid = glbVars.db.GetTPByID(stTP_ID);
+        int TPRowId = glbVars.db.GetTPRowID();
+        int TPDefaultRowId = glbVars.db.GetTPByID(stTP_ID);
 
         if (glbVars.CheckTPLock()) {
-            glbVars.TPList.setSelection(TPDefaultRowid);
+            glbVars.TPList.setSelection(TPDefaultRowId);
         } else {
             assert stTP_ID != null;
             if (stTP_ID.equals("0")) {
-                glbVars.TPList.setSelection(TPRowid);
+                glbVars.TPList.setSelection(TPRowId);
             } else {
-                if (TPRowid != TPDefaultRowid && TPRowid != 0) {
-                    glbVars.TPList.setSelection(TPRowid);
+                if (TPRowId != TPDefaultRowId && TPRowId != 0) {
+                    glbVars.TPList.setSelection(TPRowId);
                 } else {
-                    glbVars.TPList.setSelection(TPDefaultRowid);
+                    glbVars.TPList.setSelection(TPDefaultRowId);
                 }
             }
         }
@@ -187,7 +190,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             int tpID = glbVars.db.GetTPByID(_TP);
             int contrID = glbVars.db.GetContrByID(_CONTR);
 
-            glbVars.LoadContrListWithAddr(_ADDR);
+            glbVars.LoadContrList();
 
             glbVars.TPList.setSelection(tpID);
             glbVars.spinContr.setSelection(contrID);
@@ -233,17 +236,25 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.saveHeader:
-                try {
-                    _saveOrderData();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            default:
-                return true;
+        if (item.getItemId() == R.id.saveHeader) {
+            try {
+                _saveOrderData();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
         }
+        return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(APP_PREFERENCES_CONTR, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("PREVIOUS_CONTR_ID", PREVIOUS_CONTR_ID);
+        editor.putString("CURRENT_CONTR_ID", CONTR_ID);
+        editor.apply();
     }
 
     private void _saveOrderData() throws InterruptedException {
@@ -256,8 +267,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         CONTR_ID = glbVars.spContr.getText().toString();
 
         String TP_ID = glbVars.spTp.getText().toString();
-
-        String CurContr = glbVars.db.GetContrID();
 
         ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
 
@@ -276,7 +285,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             PREVIOUS_CONTR_ID = CONTR_ID;
         } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
             PREVIOUS_CONTR_ID = CONTR_ID;
-            glbVars.db.ResetNomenPrice(isCopied);
+            glbVars.db.ResetNomenPrice(isCopiedLocal);
         }
 
         if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
@@ -290,5 +299,16 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         }
 
         goToFormOrderFragment();
+    }
+
+    private void _checkAndSetContrIDAfterDestroying() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(APP_PREFERENCES_CONTR, Context.MODE_PRIVATE);
+        if (sharedPreferences == null)
+            return;
+        String newPreviousContrID = sharedPreferences.getString("PREVIOUS_CONTR_ID", "");
+        String newContrID = sharedPreferences.getString("CURRENT_CONTR_ID", "");
+
+        PREVIOUS_CONTR_ID = !newPreviousContrID.equals("") ? newPreviousContrID : PREVIOUS_CONTR_ID;
+        CONTR_ID = !newContrID.equals("") ? newContrID : CONTR_ID;
     }
 }

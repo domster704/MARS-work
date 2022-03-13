@@ -130,7 +130,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor getNomByGroup(String GroupID, String SgiID, String sqlCondition) {
+    public Cursor getNomByGroup(String GroupID, String SgiID, String sqlCondition, String searchString) {
         Cursor cursor1;
         Cursor cursor;
         try {
@@ -142,7 +142,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 if (!SgiID.equals("")) {
                     cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
                 } else {
-                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "'", null);
+                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "'" + searchString, null);
                 }
                 _setNomenPriceWithSgi(cursor1, GroupID);
 
@@ -158,7 +158,7 @@ public class DBHelper extends SQLiteOpenHelper {
             // Инфа про Nomen
             cursor = db.rawQuery("SELECT rowid AS _id, KOD5, DESCR, OST," +
                     " PRICE," +
-                    " GRUPPA, ZAKAZ, FOTO, PD, SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen WHERE OST>0 " + sqlCondition + " ORDER BY Nomen.DESCR", null);
+                    " GRUPPA, ZAKAZ, FOTO, PD, SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen WHERE OST>0 " + sqlCondition + searchString + " ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -175,10 +175,10 @@ public class DBHelper extends SQLiteOpenHelper {
         if (!SearchName.equals("")) {
             String[] separated = SearchName.split(" ");
             StringBuilder Condition = new StringBuilder("%" + SearchName + "%");
-            if (separated.length > 1) {
+            if (separated.length >= 1) {
                 Condition = new StringBuilder("%");
                 for (String item : separated) {
-                    Condition.append(item).append("%");
+                    Condition.append(item.toLowerCase(Locale.ROOT)).append("%");
                 }
             }
             searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
@@ -190,7 +190,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqlMX += (!GrupID.equals("0")) ? " AND Nomen.GRUPPA='" + GrupID + "'" : "";
 
         if (!SgiID.equals("0") && !GrupID.equals("0")) {
-            return getNomByGroup(GrupID, SgiID, sqlMX);
+            return getNomByGroup(GrupID, SgiID, sqlMX, searchReq);
         }
 
         String limitS = limit + "";
@@ -211,56 +211,6 @@ public class DBHelper extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 " + sqlMX + searchReq + " ORDER BY Nomen.DESCR " + sqlLimit, null);
             return cursor;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Cursor getSearchNom(String SearchStr) {
-        Cursor cursor;
-        String[] separated = SearchStr.split(" ");
-        StringBuilder Condition = new StringBuilder("%" + SearchStr + "%");
-        if (separated.length > 1) {
-            Condition = new StringBuilder("%");
-            for (String item : separated) {
-                Condition.append(item).append("%");
-            }
-        }
-
-        try {
-            SQLiteDatabase db = this.getReadableDatabase();
-
-            cursor = db.rawQuery("SELECT Nomen.ROWID as _id, Nomen.KOD5 as KOD5, GRUPPA, Nomen.SGI as SGI, PRICE FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "') ORDER BY Nomen.DESCR LIMIT 40", null);
-            _setNomenPriceWithoutSgi(cursor);
-
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, Nomen.SGI, PD, FOTO, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "') ORDER BY Nomen.DESCR LIMIT 40", null);
-            return cursor;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Cursor getSearchNomInGroup(String SearchStr, String Group) {
-        Cursor cursor;
-        String[] separated = SearchStr.split(" ");
-        StringBuilder Condition = new StringBuilder("%" + SearchStr + "%");
-        if (separated.length > 1) {
-            Condition = new StringBuilder("%");
-            for (String item : separated) {
-                Condition.append(item).append("%");
-            }
-        }
-
-        try {
-            SQLiteDatabase db = this.getReadableDatabase();
-
-            cursor = db.rawQuery("SELECT Nomen.ROWID as _id, Nomen.KOD5 as KOD5, GRUPPA, Nomen.SGI as SGI, PRICE FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE Nomen.GRUPPA='" + Group + "' AND OST>0 AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "') ORDER BY Nomen.DESCR LIMIT 50", null);
-            _setNomenPriceWithoutSgi(cursor);
-
-            cursor = db.rawQuery("SELECT Nomen.ROWID as _id, Nomen.KOD5 as KOD5, Nomen.DESCR, OST, ZAKAZ, PRICE, GRUPPA, Nomen.SGI as SGI, PD, FOTO, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE Nomen.GRUPPA='" + Group + "' AND OST>0 AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "') ORDER BY Nomen.DESCR LIMIT 50", null);
-            return cursor;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -652,6 +602,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
                     Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
 
+                    if (!isCopied) {
+                        db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
+                    }
+
                     if (isCopied || cCheck.getCount() != 0) {
                         Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0", null);
                         _setNomenPriceWithoutSgi(c);
@@ -881,8 +835,6 @@ public class DBHelper extends SQLiteOpenHelper {
             } else {
                 cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "'", null);
             }
-            _setNomenPriceWithSgi(cursor1, GroupID);
-
             // Обновление цен по SGI
             if (!SgiID.equals("")) {
                 cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA IS NULL", null);

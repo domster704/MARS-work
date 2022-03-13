@@ -262,6 +262,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
                                             sendOrders(i.id);
                                         }
                                     }
+                                    Config.sout("Заказы отправлены");
                                 }
                             });
 

@@ -70,6 +70,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -259,23 +260,22 @@ public class GlobalVars extends Application implements TBUpdate {
 
             MenuItem sort = FormOrderFragment.mainMenu.findItem(R.id.NomenSort);
 
+            CurGroup = "0";
+            CurSGI = ItemID;
+
             if (ItemID.equals("0")) {
                 sort.setEnabled(false);
                 sort.setIcon(R.drawable.to_end_disabled);
                 nomenList.setAdapter(null);
                 spGrup.setAdapter(null);
-                return;
+            } else {
+                LoadGroups(ItemID);
+                if (SelectGroup != null) {
+                    SetSelectedGrup(SelectGroup);
+                }
             }
 
-            CurGroup = "0";
-            CurSGI = ItemID;
-
-            LoadGroups(ItemID);
-            if (SelectGroup != null) {
-                SetSelectedGrup(SelectGroup);
-            }
-
-            if (!CurWCID.equals("0") || !CurFocusID.equals("0")) {
+            if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
                 LoadNextNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName, 0);
             }
 
@@ -291,6 +291,10 @@ public class GlobalVars extends Application implements TBUpdate {
         public void onNothingSelected(AdapterView<?> arg0) {
         }
     };
+
+    public void s(String text) {
+        System.out.println(CurSGI + " " + CurGroup + " " + CurWCID + " " + CurFocusID + " *" + CurSearchName + "* " + text);
+    }
 
     public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -335,7 +339,7 @@ public class GlobalVars extends Application implements TBUpdate {
             final AlertDialog alertD = alertDialogBuilder.create();
             alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
             WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-            wmlp.gravity = Gravity.TOP | Gravity.LEFT;
+            wmlp.gravity = Gravity.TOP | Gravity.START;
             wmlp.x = 50;
             wmlp.y = 50;
 
@@ -449,7 +453,7 @@ public class GlobalVars extends Application implements TBUpdate {
             CurAc.runOnUiThread(() -> {
                 spSgi = view.findViewById(R.id.SpinSgi);
                 android.widget.SimpleCursorAdapter adapter;
-                adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr});
+                adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr}, 0);
                 spSgi.setAdapter(adapter);
                 spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
             });
@@ -462,7 +466,7 @@ public class GlobalVars extends Application implements TBUpdate {
             CurAc.runOnUiThread(() -> {
                 spGrup = view.findViewById(R.id.SpinGrups);
                 android.widget.SimpleCursorAdapter adapter;
-                adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr});
+                adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
                 spGrup.setAdapter(adapter);
                 spGrup.setOnItemSelectedListener(SelectedGroup);
             });
@@ -472,7 +476,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public void LoadFiltersWC(View vw) {
         curWC = dbApp.getWCs();
         spWC = vw.findViewById(R.id.spinWC);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr});
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr}, 0);
         spWC.setAdapter(adapter);
     }
 
@@ -480,7 +484,7 @@ public class GlobalVars extends Application implements TBUpdate {
         curFocus = db.getFocuses();
         spFocus = vw.findViewById(R.id.spinFocus);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr});
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr}, 0);
         spFocus.setAdapter(adapter);
     }
 
@@ -503,7 +507,7 @@ public class GlobalVars extends Application implements TBUpdate {
             @Override
             @PGShowing
             public void run() {
-                myNom = db.getNomByGroup(GrupID, SgiID);
+                myNom = db.getNomByGroup(CurGroup, CurSGI);
                 CurAc.runOnUiThread(() -> {
                     nomenList.setAdapter(null);
                     NomenAdapter = getNomenAdapter(myNom);
@@ -529,8 +533,8 @@ public class GlobalVars extends Application implements TBUpdate {
             @PGShowing
             public void run() {
                 myNom = db.getNextNomen(
-                        SgiID, GrupID,
-                        WCID, FocusID, CurSearchName, 0);
+                        CurSGI, CurGroup,
+                        CurWCID, CurFocusID, CurSearchName, 0);
                 CurAc.runOnUiThread(() -> {
                     nomenList.setAdapter(null);
                     NomenAdapter = getNomenAdapter(myNom);
@@ -549,18 +553,17 @@ public class GlobalVars extends Application implements TBUpdate {
         CurGroup = GrupID;
         CurWCID = WCID;
         CurFocusID = FocusID;
-        CurSearchName = search;
+        CurSearchName = search.toLowerCase(Locale.ROOT);
 
         new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
                 myNom = db.getNextNomen(
-                        SgiID, GrupID,
-                        WCID, FocusID, search, positionSQL);
+                        CurSGI, CurGroup,
+                        CurWCID, CurFocusID, CurSearchName, positionSQL);
                 CurAc.runOnUiThread(() -> {
                     nomenList.setAdapter(null);
-                    System.out.println(myNom.getCount());
                     NomenAdapter = getNomenAdapter(myNom);
                     nomenList.setAdapter(NomenAdapter);
                     nomenList.setOnItemClickListener(GridNomenClick);
@@ -569,53 +572,6 @@ public class GlobalVars extends Application implements TBUpdate {
                         nomenList.setSelection(positionSQL - 1);
                 });
                 isNewLoaded = false;
-            }
-        }).start();
-    }
-
-    public void SearchNom(final String SearchStr) {
-        CurSGI = "0";
-        CurGroup = "0";
-        CurSearchName = SearchStr;
-
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                myNom = db.getSearchNom(SearchStr);
-                CurAc.runOnUiThread(() -> {
-                    nomenList.setAdapter(null);
-                    NomenAdapter = getNomenAdapter(myNom);
-                    nomenList.post(() -> nomenList.setAdapter(NomenAdapter));
-                    nomenList.setOnItemClickListener(GridNomenClick);
-                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
-                });
-            }
-        }).start();
-    }
-
-    public void SearchNomInGroup(final String SearchStr, final String Group) {
-        SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
-        Cursor c = sqLiteDatabase.rawQuery("SELECT SGI FROM GRUPS WHERE CODE='" + Group + "'", null);
-        c.moveToNext();
-
-        if (c.getCount() != 0) CurSGI = c.getString(c.getColumnIndex("SGI"));
-        CurGroup = Group;
-        CurSearchName = SearchStr;
-
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                myNom = db.getSearchNomInGroup(SearchStr, Group);
-                CurAc.runOnUiThread(() -> {
-                    nomenList.setAdapter(null);
-                    NomenAdapter = getNomenAdapter(myNom);
-                    nomenList.post(() -> nomenList.setAdapter(NomenAdapter));
-                    nomenList.setOnItemClickListener(GridNomenClick);
-                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
-                    c.close();
-                });
             }
         }).start();
     }
@@ -639,6 +595,7 @@ public class GlobalVars extends Application implements TBUpdate {
             String id = value.getString(value.getColumnIndexOrThrow("CODE"));
             if (Grup.equals(id)) {
                 spGrup.setSelection(i);
+                ((SimpleCursorAdapter) spGrup.getAdapter()).notifyDataSetChanged();
                 break;
             }
         }
@@ -752,71 +709,75 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public void DownloadPhoto(final String FileName) {
-        new Thread(() -> {
-            SharedPreferences settings;
-            String ftp_server, ftp_user, ftp_pass;
-            settings = CurAc.getSharedPreferences("apk_version", 0);
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                SharedPreferences settings;
+                String ftp_server, ftp_user, ftp_pass;
+                settings = CurAc.getSharedPreferences("apk_version", 0);
 
-            ftp_server = settings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server));
-            ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
-            ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
+                ftp_server = settings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server));
+                ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
+                ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
-            FTPClient ftpClient;
-            ftpClient = new FTPClient();
-            final String photoDir = getPhotoDir();
-            try {
-                ftpClient.connect(ftp_server);
-
-                ftpClient.login(ftp_user, ftp_pass);
-
-                ftpClient.changeWorkingDirectory("FOTO");
-                ftpClient.enterLocalPassiveMode();
-                ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                FileOutputStream fos = new FileOutputStream(photoDir + "/" + FileName);
-
-                ftpClient.retrieveFile(FileName, fos);
-                fos.close();
-                String isDownloaded = FilenameUtils.removeExtension(FileName);
-                String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
-
+                FTPClient ftpClient;
+                ftpClient = new FTPClient();
+                final String photoDir = getPhotoDir();
                 try {
-                    if (tmpName.equals("_2")) {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
-                    } else {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
+                    ftpClient.connect(ftp_server);
+
+                    ftpClient.login(ftp_user, ftp_pass);
+
+                    ftpClient.changeWorkingDirectory("FOTO");
+                    ftpClient.enterLocalPassiveMode();
+                    ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                    FileOutputStream fos = new FileOutputStream(photoDir + "/" + FileName);
+
+                    ftpClient.retrieveFile(FileName, fos);
+                    fos.close();
+                    String isDownloaded = FilenameUtils.removeExtension(FileName);
+                    String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
+
+                    try {
+                        if (tmpName.equals("_2")) {
+                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
+                        } else {
+                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
+                        }
+                    } catch (Exception ignored) {
                     }
-                } catch (Exception ignored) {
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    ftpClient.disconnect();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                }
-            }
-
-            CurAc.runOnUiThread(() -> {
-                if (!isSecondPhoto) {
-                    ShowNomenPhoto(FileName);
-                    imageView.invalidate();
-                } else {
-                    if (alertPhoto != null) {
-                        imageView.setTag("Фото 2");
-                        alertPhoto.setTitle(FileName);
-                        imageView.setImage(ImageSource.uri(photoDir + "/" + FileName));
-
-                        imageView.invalidate();
+                } finally {
+                    try {
+                        ftpClient.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-                GridView gdNomen = view.findViewById(R.id.listContrs);
-                myNom.requery();
-                NomenAdapter.notifyDataSetChanged();
-                gdNomen.invalidateViews();
-            });
+
+                CurAc.runOnUiThread(() -> {
+                    if (!isSecondPhoto) {
+                        ShowNomenPhoto(FileName);
+                        imageView.invalidate();
+                    } else {
+                        if (alertPhoto != null) {
+                            imageView.setTag("Фото 2");
+                            alertPhoto.setTitle(FileName);
+                            imageView.setImage(ImageSource.uri(photoDir + "/" + FileName));
+
+                            imageView.invalidate();
+                        }
+                    }
+                    GridView gdNomen = view.findViewById(R.id.listContrs);
+                    myNom.requery();
+                    NomenAdapter.notifyDataSetChanged();
+                    gdNomen.invalidateViews();
+                });
+            }
         }).start();
     }
 
@@ -927,17 +888,6 @@ public class GlobalVars extends Application implements TBUpdate {
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
 
-    public void LoadContrListWithAddr(String Addr) {
-        spinContr.setAdapter(null);
-        Contr = db.getContrList();
-        ContrsAdapter adapter;
-        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
-        spinContr.setAdapter(adapter);
-//        spinContr.setOnItemSelectedListener(SelectedContr);
-
-//        SetSelectedAddr(Addr);
-    }
-
     public void LoadFilteredContrList(String FindStr) {
         spinContr.setAdapter(null);
         Contr = db.getContrFilterList(FindStr);
@@ -949,8 +899,8 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public void LoadContrAddr(String ContID) {
         Addr = db.getContrAddress(ContID);
-        AddrsAdapter adapter;
-        adapter = new AddrsAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
+        AddressAdapter adapter;
+        adapter = new AddressAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
         spinAddr.setAdapter(adapter);
 
         String AddrID = db.GetContrAddr();
@@ -1087,8 +1037,8 @@ public class GlobalVars extends Application implements TBUpdate {
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
                 rowData[3] = DOCNO;
-                rowData[4] = DOCDATE;
-                rowData[5] = DELIVERY;
+                rowData[4] = DELIVERY;
+                rowData[5] = DOCDATE;
                 rowData[6] = COMMENT;
                 rowData[7] = NOMEN;
                 rowData[8] = QTY;
@@ -1118,7 +1068,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public void LoadOrdersDetails(String ZakazID) {
-        _doUpdateQTYByVycherk(ZakazID);
+        _doUpdateQTYByOuted(ZakazID);
 
         orderDtList.setAdapter(null);
         OrdersDt = dbOrders.getZakazDetails(ZakazID);
@@ -1303,11 +1253,10 @@ public class GlobalVars extends Application implements TBUpdate {
     public void checkPhotoInDB(String FileName) {
         Cursor cur;
         String isDownloaded = FilenameUtils.removeExtension(FileName);
-        String tmpName = isDownloaded;
         String Sql;
 
-        if (tmpName.equals("_2")) {
-            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'";
+        if (isDownloaded.equals("_2")) {
+            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'";
         } else {
             Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded + "'";
         }
@@ -1315,8 +1264,8 @@ public class GlobalVars extends Application implements TBUpdate {
 
         if (cur.moveToFirst()) {
             if (cur.getInt(0) == 0) {
-                if (tmpName.equals("_2")) {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
+                if (isDownloaded.equals("_2")) {
+                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'");
                 } else {
                     db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
                 }
@@ -1369,20 +1318,23 @@ public class GlobalVars extends Application implements TBUpdate {
             statusInDB.close();
     }
 
-    private void _doUpdateQTYByVycherk(String DocID) {
+    private void _doUpdateQTYByOuted(String DocID) {
         SQLiteDatabase dbApp = dbOrders.getWritableDatabase();
         SQLiteDatabase dbVy = db.getReadableDatabase();
 
         Cursor newQty = dbVy.rawQuery("SELECT NOMEN, KOL FROM VYCHERK WHERE DOCID ='" + DocID + "'", null);
-        Cursor c = null;
+        Cursor cursor = dbApp.rawQuery("SELECT NOMEN, OUT_QTY, IS_OUTED FROM ZAKAZY_DT WHERE ZAKAZ_ID ='" + DocID + "'", null);
+        while (cursor.moveToNext()) {
+            dbApp.execSQL("UPDATE ZAKAZY_DT SET IS_OUTED = 0, OUT_QTY = 0 WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + cursor.getString(0) + "'");
+        }
 
         while (newQty.moveToNext()) {
-            dbApp.execSQL("UPDATE ZAKAZY_DT SET IS_OUTED = 1, OUT_QTY = " + newQty.getInt(newQty.getColumnIndex("KOL")) + " WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
+            int qty = newQty.getInt(newQty.getColumnIndex("KOL"));
+            int IS_OUTED = qty != 0 ? 1 : 0;
+            dbApp.execSQL("UPDATE ZAKAZY_DT SET IS_OUTED = " + IS_OUTED + ", OUT_QTY = " + qty + " WHERE ZAKAZ_ID = '" + DocID + "' AND NOMEN = '" + newQty.getString(0) + "'");
         }
 
         newQty.close();
-        if (c != null)
-            c.close();
     }
 
     private void _putCheckBox(Cursor c) {
@@ -1567,8 +1519,8 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    public class AddrsAdapter extends SimpleCursorAdapter {
-        public AddrsAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+    public class AddressAdapter extends SimpleCursorAdapter {
+        public AddressAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
 
@@ -1679,7 +1631,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 e.printStackTrace();
             }
 
-            long daysSubstraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
+            long daysSubtraction = (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
             // Конец расчёта разниы дней
 
             int backgroundColor;
@@ -1694,13 +1646,11 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             view.setBackgroundColor(backgroundColor);
 
-            int color;
-            if (daysSubstraction <= 2) {
+            int color = getResources().getColor(R.color.black);
+            if (daysSubtraction <= 2) {
                 color = getResources().getColor(R.color.postDataColorRed);
-            } else if (daysSubstraction <= 4) {
+            } else if (daysSubtraction <= 4) {
                 color = getResources().getColor(R.color.postDataColorGreen);
-            } else {
-                color = getResources().getColor(R.color.black);
             }
 
             tvDescr.setTextColor(color);
@@ -1716,13 +1666,13 @@ public class GlobalVars extends Application implements TBUpdate {
                 style = Typeface.BOLD_ITALIC;
             }
 
-            tvDescr.setTypeface(tvDescr.getTypeface(), style);
-            tvPrice.setTypeface(tvPrice.getTypeface(), style);
-            tvPosition.setTypeface(tvPosition.getTypeface(), style);
-            tvMP.setTypeface(tvMP.getTypeface(), style);
-            tvGofra.setTypeface(tvGofra.getTypeface(), style);
-            tvOst.setTypeface(tvOst.getTypeface(), style);
-            tvCod.setTypeface(tvCod.getTypeface(), style);
+            tvDescr.setTypeface(Typeface.defaultFromStyle(style));
+            tvPrice.setTypeface(Typeface.defaultFromStyle(style));
+            tvPosition.setTypeface(Typeface.defaultFromStyle(style));
+            tvMP.setTypeface(Typeface.defaultFromStyle(style));
+            tvGofra.setTypeface(Typeface.defaultFromStyle(style));
+            tvOst.setTypeface(Typeface.defaultFromStyle(style));
+            tvCod.setTypeface(Typeface.defaultFromStyle(style));
 
             tvPosition.setText(String.valueOf(position + 1));
             if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
@@ -1751,11 +1701,7 @@ public class GlobalVars extends Application implements TBUpdate {
             if (tvStatus.getText().toString().equals("Сохранён"))
                 tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
 
-//            if (position % 2 != 0) {
-//                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-//            } else {
             view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-//            }
             return view;
         }
     }
@@ -1879,4 +1825,9 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
     // Конец обработчиков событий нажатия на NomenLayout
+
+    public void resetCurData() {
+        CurGroup = CurWCID = CurFocusID = CurSGI = "0";
+        CurSearchName = "";
+    }
 }

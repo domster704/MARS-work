@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_search"
-        android:actionLayout="@layout/search_layout"
-        android:title="Поиск"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always" />
+            android:id="@+id/menu_search"
+            android:actionLayout="@layout/search_layout"
+            android:title="Поиск"
+            app:actionViewClass="android.support.v7.widget.SearchView"
+            app:showAsAction="always" />
     <item
-        android:id="@+id/ViewOrderId"
-        android:icon="@drawable/view_order_vector"
-        android:title="@string/view_order"
-        app:showAsAction="always" />
+            android:id="@+id/ViewOrderId"
+            android:icon="@drawable/view_order_vector"
+            android:title="@string/view_order"
+            app:showAsAction="always" />
     <item
-        android:id="@+id/NomenDiscount"
-        android:icon="@drawable/sale"
-        android:title="Скидка/наценка в процентах"
-        app:showAsAction="always" />
+            android:id="@+id/NomenDiscount"
+            android:icon="@drawable/sale"
+            android:title="Скидка/наценка в процентах"
+            app:showAsAction="always" />
     <item
-        android:id="@+id/NomenMultiPos"
-        android:icon="@drawable/double_arrow"
-        android:title="Выделение диапазона"
-        app:showAsAction="always" />
+            android:id="@+id/NomenMultiPos"
+            android:icon="@drawable/double_arrow"
+            android:title="Выделение диапазона"
+            app:showAsAction="always" />
 
     <item
-        android:id="@+id/NomenMultiSelect"
-        android:checkable="true"
-        android:icon="@drawable/checkbox_free"
-        android:title="Множественное выделение"
-        app:showAsAction="always" />
+            android:id="@+id/NomenMultiSelect"
+            android:checkable="true"
+            android:icon="@drawable/checkbox_free"
+            android:title="Множественное выделение"
+            app:showAsAction="always" />
 
     <item
-        android:id="@+id/NomenSort"
-        android:icon="@drawable/to_end"
-        android:title="В начало/конец списка"
-        app:showAsAction="always" />
+            android:id="@+id/NomenSort"
+            android:icon="@drawable/to_end"
+            android:title="В начало/конец списка"
+            app:showAsAction="always" />
     <item
-        android:id="@+id/NomenSave"
-        android:icon="@drawable/ic_baseline_save_24"
-        android:title="Сохранить заказ"
-        app:showAsAction="always" />
+            android:id="@+id/NomenSave"
+            android:icon="@drawable/ic_baseline_save_24"
+            android:title="Сохранить заказ"
+            app:showAsAction="always" />
 </menu>

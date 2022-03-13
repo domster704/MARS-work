@@ -55,7 +55,6 @@ public class FtpFileDownloader extends Ftp {
             e.printStackTrace();
         }
 
-        System.out.println(isDownload);
         return isDownload;
     }
 

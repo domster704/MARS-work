@@ -32,6 +32,7 @@ import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.interfaces.TBUpdate;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -56,53 +57,20 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     private final SearchView.OnQueryTextListener searchTextListener =
             new SearchView.OnQueryTextListener() {
-                boolean isSearchClicked = false;
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    String ItemID = "";
-                    if (glbVars.myGrups != null) {
-                        ItemID = glbVars.myGrups.getString(glbVars.myGrups.getColumnIndex("CODE"));
+                    if (newText.equals("") && !GlobalVars.CurSearchName.equals("")) {
+                        glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, newText, 1);
                     }
-
-                    String curSgi;
-                    TextView txtSgi = Objects.requireNonNull(getView()).findViewById(R.id.ColSgiID);
-                    curSgi = txtSgi.getText().toString();
-
-                    if (newText.equals("")) {
-                        if (!isSearchClicked) {
-                            glbVars.LoadNom(ItemID, curSgi);
-                            searchView.clearFocus();
-                            searchView.setIconified(true);
-                        }
-                        return true;
-                    } else {
-                        if (newText.length() >= 1) {
-                            if (!ItemID.equals("0")) {
-                                glbVars.SearchNomInGroup(newText, ItemID);
-                            } else {
-                                glbVars.LoadNom(ItemID, curSgi);
-                            }
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
+                    GlobalVars.CurSearchName = newText;
+                    return true;
                 }
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    if (!query.equals("")) {
-                        glbVars.SearchNom(query);
-                        glbVars.spSgi.setSelection(0);
-                        glbVars.spGrup.setAdapter(null);
-                        isSearchClicked = true;
-                        searchView.clearFocus();
-                        searchView.setIconified(true);
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName, 1);
+                    return true;
                 }
             };
     MenuItem searchItem;
@@ -156,14 +124,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 editor.commit();
 
-                System.out.println(FilterFocus_ID.getText().toString() + " " + FilterWC_ID.getText().toString());
                 if (!FilterFocus_ID.getText().toString().equals("0") || !FilterWC_ID.getText().toString().equals("0")) {
                     filter.setImageResource(R.drawable.filter_activated);
                 }
-//                else if (FilterFocus_ID.getText().toString().equals("0") && FilterWC_ID.getText().toString().equals("0")) {
-//                    alertD.dismiss();
-//                    return;
-//                }
 
                 String SgiId = "0";
                 String GroupID = "0";
@@ -174,8 +137,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 }
 
                 String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
-                glbVars.LoadFilterNomen(SgiId, GroupID,
-                        WC_ID, FilterFocus_ID.getText().toString());
+                glbVars.LoadNextNomen(SgiId, GroupID,
+                        WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName, 0);
 
                 if (isFiltered && GlobalVars.CurGroup.equals("0")) {
                     mainMenu.findItem(R.id.NomenSort).setEnabled(false);
@@ -234,6 +197,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
+        searchView.setOnCloseListener(() -> {
+            glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "", 1);
+            return false;
+        });
 
         if (glbVars.NomenAdapter != null) {
             glbVars.NomenAdapter.notifyDataSetChanged();
@@ -261,7 +228,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     public void SaveOrder() throws ParseException {
         new Thread(() -> {
             Cursor c, c2, c1;
-            String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC;
+            String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC = "";
             String ContrDes, AddrDes;
             String Status = "Сохранён";
             float Sum = 0f;
@@ -270,7 +237,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             SQLiteStatement stmt;
 
             @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-            String curdate = df.format(Calendar.getInstance().getTime());
+            String curDate = df.format(Calendar.getInstance().getTime());
 
             c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
             c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
@@ -297,14 +264,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             c.close();
             c2.close();
 
-            Calendar now = Calendar.getInstance();
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
+            String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
 
-            String hours = now.get(Calendar.HOUR_OF_DAY) >= 10 ? now.get(Calendar.HOUR_OF_DAY) + "" : "0" + now.get(Calendar.HOUR_OF_DAY);
-            String minutes = now.get(Calendar.MINUTE) >= 10 ? now.get(Calendar.MINUTE) + "" : "0" + now.get(Calendar.MINUTE);
-
-            int Docno = glbVars.dbOrders.getDocNumber();
-            IDDOC = Integer.toString(Docno, 36).toUpperCase();
-            IDDOC += "." + TP_ID + "." + Data.replace(".", "") + "_" + hours + minutes;
+//            int docNo = glbVars.dbOrders.getDocNumber();
+//            IDDOC = Integer.toString(docNo, 36).toUpperCase();
+            IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" +dateForIDDOC;
 
             c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
             if (c1.getCount() == 0) {
@@ -323,7 +288,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.bindString(2, TP_ID);
                 stmt.bindString(3, Contr_ID);
                 stmt.bindString(4, Addr_ID);
-                stmt.bindString(5, curdate);
+                stmt.bindString(5, curDate);
                 stmt.bindString(6, Data);
                 stmt.bindString(7, Comment);
                 stmt.bindString(8, Status);
@@ -470,6 +435,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             case R.id.NomenSave:
                 try {
                     isSaved = true;
+                    isFiltered = false;
+
+                    glbVars.resetCurData();
+
                     if (!glbVars.OrderID.equals("")) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
@@ -642,7 +611,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("Pause");
         txtGroup = getActivity().findViewById(R.id.ColGrupID);
         txtSgi = getActivity().findViewById(R.id.ColSgiID);
 
@@ -659,18 +627,18 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("Resume");
 
-        String SgiID = settings.getString("ColSgiID", "0");
-        String GrupID = settings.getString("ColGrupID", "0");
-        int VisiblePos = settings.getInt("ColPosition", 0);
-        glbVars.nomenList.setSelection(VisiblePos);
+//        String SgiID = settings.getString("ColSgiID", "0");
+//        String GrupID = settings.getString("ColGrupID", "0");
+//        int VisiblePos = settings.getInt("ColPosition", 0);
 
-        if (!SgiID.equals("0")) {
-            glbVars.LoadGroups(SgiID);
-            glbVars.SetSelectedSgi(SgiID, GrupID);
-            glbVars.SetSelectedGrup(GrupID);
-        }
+//        if (!SgiID.equals("0")) {
+//            glbVars.SetSelectedSgi(SgiID, GrupID);
+//            glbVars.LoadGroups(SgiID);
+//            glbVars.SetSelectedGrup(GrupID);
+//            glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName, 0);
+//        }
+//        glbVars.nomenList.setSelection(VisiblePos);
         setContrAndSum(glbVars);
     }
 
