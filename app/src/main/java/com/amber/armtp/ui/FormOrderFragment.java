@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.interfaces.TBUpdate;
@@ -46,6 +48,7 @@ import java.util.Objects;
 public class FormOrderFragment extends Fragment implements View.OnClickListener, TBUpdate {
     public static Menu mainMenu;
     public static ImageButton filter;
+    public static ImageButton spinnerClearing;
     public static boolean isSorted = false;
     public GlobalVars glbVars;
 
@@ -57,11 +60,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     private final SearchView.OnQueryTextListener searchTextListener =
             new SearchView.OnQueryTextListener() {
-
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     if (newText.equals("") && !GlobalVars.CurSearchName.equals("")) {
-                        glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, newText, 1);
+                        glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, newText);
                     }
                     GlobalVars.CurSearchName = newText;
                     return true;
@@ -69,7 +71,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName, 1);
+                    glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName);
+                    Config.hideKeyBoard();
                     return true;
                 }
             };
@@ -77,89 +80,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     View thisView;
     TextView txtSgi, txtGroup, tvHeadCod, tvHeadDescr, tvHeadMP, tvHeadZakaz;
     TextView FilterWC_ID, FilterFocus_ID;
-    private boolean isSaved = false;
     private android.support.v7.widget.Toolbar toolbar;
-
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.NomenFilters) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View promptView;
-            promptView = layoutInflater.inflate(R.layout.nom_filters, null);
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-            alertDialogBuilder.setView(promptView);
-
-            alertDialogBuilder
-                    .setCancelable(true)
-                    .setPositiveButton("OK", (dialog, id) -> {
-                    })
-                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel())
-                    .setNeutralButton("Сбросить фильтры", (dialog, id) -> {
-                    });
-
-            AlertDialog alertD = alertDialogBuilder.create();
-            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-            alertD.show();
-            glbVars.LoadFiltersWC(promptView);
-            glbVars.LoadFiltersFocus(promptView);
-
-            String WCID = settings.getString("ColWCID", "0");
-            String FocusID = settings.getString("ColFocusID", "0");
-
-            if (WCID != null && !WCID.equals("0")) {
-                glbVars.SetSelectedFilterWC(WCID);
-            }
-
-            if (FocusID != null && !FocusID.equals("0")) {
-                glbVars.SetSelectedFilterFocus(FocusID);
-            }
-
-            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                isFiltered = true;
-                FilterWC_ID = promptView.findViewById(R.id.ColWCID);
-                FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
-
-                editor.putString("ColWCID", FilterWC_ID.getText().toString());
-                editor.putString("ColFocusID", FilterFocus_ID.getText().toString());
-
-                editor.commit();
-
-                if (!FilterFocus_ID.getText().toString().equals("0") || !FilterWC_ID.getText().toString().equals("0")) {
-                    filter.setImageResource(R.drawable.filter_activated);
-                }
-
-                String SgiId = "0";
-                String GroupID = "0";
-                try {
-                    SgiId = ((TextView) getActivity().findViewById(R.id.ColSgiID)).getText().toString();
-                    GroupID = ((TextView) getActivity().findViewById(R.id.ColGrupID)).getText().toString();
-                } catch (Exception ignored) {
-                }
-
-                String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
-                glbVars.LoadNextNomen(SgiId, GroupID,
-                        WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName, 0);
-
-                if (isFiltered && GlobalVars.CurGroup.equals("0")) {
-                    mainMenu.findItem(R.id.NomenSort).setEnabled(false);
-                    mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
-                }
-
-                alertD.dismiss();
-            });
-
-            alertD.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
-                isFiltered = false;
-                glbVars.SetSelectedFilterWC("0");
-                glbVars.SetSelectedFilterFocus("0");
-                filter.setImageResource(R.drawable.filter);
-
-                boolean isEnabledFilter = !(isFiltered && GlobalVars.CurGroup.equals("0"));
-                mainMenu.findItem(R.id.NomenSort).setEnabled(isEnabledFilter);
-                mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
-            });
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -167,7 +88,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
         thisView = rootView;
-        glbVars.view = rootView;
+        glbVars.CurView = rootView;
 
         return rootView;
     }
@@ -180,6 +101,20 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         glbVars.setContext(getActivity().getApplicationContext());
         GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
+
+        Config.hideKeyBoard();
+
+        if (getArguments() != null) {
+            String Sgi = getArguments().getString("SGI");
+            String Group = getArguments().getString("Group");
+
+            glbVars.resetCurData();
+            glbVars.resetSearchViewData();
+
+            glbVars.SetSelectedSgi(Sgi);
+            glbVars.SetSelectedGrup(Group);
+
+        }
     }
 
     @Override
@@ -198,7 +133,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
         searchView.setOnCloseListener(() -> {
-            glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "", 1);
+            glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             return false;
         });
 
@@ -219,8 +154,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     private void clearChosenGroupSgi() {
         editor.clear().apply();
-        glbVars.frSgi = "";
-        glbVars.frGroup = "";
         txtSgi = null;
         txtGroup = null;
     }
@@ -267,9 +200,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
             String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
 
-//            int docNo = glbVars.dbOrders.getDocNumber();
-//            IDDOC = Integer.toString(docNo, 36).toUpperCase();
-            IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" +dateForIDDOC;
+            IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
 
             c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
             if (c1.getCount() == 0) {
@@ -434,7 +365,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 return true;
             case R.id.NomenSave:
                 try {
-                    isSaved = true;
                     isFiltered = false;
 
                     glbVars.resetCurData();
@@ -611,52 +541,29 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
         super.onPause();
-        txtGroup = getActivity().findViewById(R.id.ColGrupID);
-        txtSgi = getActivity().findViewById(R.id.ColSgiID);
-
-        glbVars.isMultiSelect = false;
-        glbVars.MultiQty = 0;
-        if (txtSgi != null && txtGroup != null && !isSaved) {
-            editor.putString("ColSgiID", txtSgi.getText().toString());
-            editor.putString("ColGrupID", txtGroup.getText().toString());
-            editor.putInt("ColPosition", glbVars.nomenList.getFirstVisiblePosition());
-            editor.commit();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-//        String SgiID = settings.getString("ColSgiID", "0");
-//        String GrupID = settings.getString("ColGrupID", "0");
-//        int VisiblePos = settings.getInt("ColPosition", 0);
-
-//        if (!SgiID.equals("0")) {
-//            glbVars.SetSelectedSgi(SgiID, GrupID);
-//            glbVars.LoadGroups(SgiID);
-//            glbVars.SetSelectedGrup(GrupID);
-//            glbVars.LoadNextNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName, 0);
-//        }
-//        glbVars.nomenList.setSelection(VisiblePos);
         setContrAndSum(glbVars);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        glbVars.resetCurData();
 
         try {
-            editor.putString("ColWCID", "0");
-            editor.putString("ColFocusID", "0");
-
-            editor.commit();
-
             isFiltered = false;
-            glbVars.SetSelectedFilterWC("0");
-            glbVars.SetSelectedFilterFocus("0");
             filter.setImageResource(R.drawable.filter);
-        } catch (Exception ignored) {
+
+            if (glbVars.spWC != null) {
+                glbVars.SetSelectedFilterWC("0");
+                glbVars.SetSelectedFilterFocus("0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -684,6 +591,93 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
         filter = getActivity().findViewById(R.id.NomenFilters);
         filter.setOnClickListener(this);
+
+        spinnerClearing = getActivity().findViewById(R.id.SGIClear);
+        spinnerClearing.setOnClickListener(this);
+
         setContrAndSum(glbVars);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.NomenFilters:
+                LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+                View promptView;
+                promptView = layoutInflater.inflate(R.layout.nom_filters, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                alertDialogBuilder.setView(promptView);
+
+                alertDialogBuilder
+                        .setCancelable(true)
+                        .setPositiveButton("OK", (dialog, id) -> {
+                        })
+                        .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel())
+                        .setNeutralButton("Сбросить фильтры", (dialog, id) -> {
+                        });
+
+                AlertDialog alertD = alertDialogBuilder.create();
+                alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                alertD.show();
+                glbVars.LoadFiltersWC(promptView);
+                glbVars.LoadFiltersFocus(promptView);
+
+                String WCID = glbVars.dbApp.getIDByWC(GlobalVars.CurWCID);
+                String FocusID = GlobalVars.CurFocusID;
+
+                glbVars.SetSelectedFilterWC(WCID);
+                glbVars.SetSelectedFilterFocus(FocusID);
+
+                alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    isFiltered = true;
+                    FilterWC_ID = promptView.findViewById(R.id.ColWCID);
+                    FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
+
+                    if (!FilterFocus_ID.getText().toString().equals("0") || !FilterWC_ID.getText().toString().equals("0")) {
+                        filter.setImageResource(R.drawable.filter_activated);
+                    }
+
+                    String SgiId = "0";
+                    String GroupID = "0";
+//                try {
+//                    SgiId = ((TextView) getActivity().findViewById(R.id.ColSgiID)).getText().toString();
+//                    GroupID = ((TextView) getActivity().findViewById(R.id.ColGrupID)).getText().toString();
+//                } catch (Exception ignored) {
+//                }
+
+                    String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
+                    glbVars.LoadNextNomen(0, SgiId, GroupID,
+                            WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
+                    glbVars.SetSelectedSgi(SgiId);
+
+                    if (isFiltered && GlobalVars.CurGroup.equals("0")) {
+                        mainMenu.findItem(R.id.NomenSort).setEnabled(false);
+                        mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
+                    }
+
+                    alertD.dismiss();
+                });
+
+                alertD.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+                    isFiltered = false;
+                    filter.setImageResource(R.drawable.filter);
+
+                    glbVars.SetSelectedFilterWC("0");
+                    glbVars.SetSelectedFilterFocus("0");
+                    GlobalVars.CurFocusID = GlobalVars.CurWCID = "0";
+
+                    boolean isEnabledFilter = !(isFiltered && GlobalVars.CurGroup.equals("0"));
+                    mainMenu.findItem(R.id.NomenSort).setEnabled(isEnabledFilter);
+                    mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
+                });
+                break;
+            case R.id.SGIClear:
+                glbVars.resetCurData();
+                glbVars.resetAllSpinners();
+                glbVars.resetSearchViewData();
+                glbVars.nomenList.setAdapter(null);
+                Config.hideKeyBoard();
+                break;
+        }
     }
 }

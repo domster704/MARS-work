@@ -28,7 +28,7 @@ public class DefaultFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.default_fragment, container, false);
-        glbVars.view = v;
+        glbVars.CurView = v;
         return v;
     }
 

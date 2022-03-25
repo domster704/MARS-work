@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidConfiguredLogFilters">
+    <filters>
+      <filter>
+        <option name="logLevel" value="verbose" />
+        <option name="logMessagePattern" value="" />
+        <option name="logTagPattern" value="" />
+        <option name="name" value="Unnamed-0" />
+        <option name="packageNamePattern" value="" />
+      </filter>
+      <filter>
+        <option name="logLevel" value="verbose" />
+        <option name="logMessagePattern" value="" />
+        <option name="logTagPattern" value="^(?!(eglCodecCommon|tagToExclude))" />
+        <option name="name" value="xd" />
+        <option name="packageNamePattern" value="" />
+      </filter>
+    </filters>
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config>
+        <device id="tv_1080p" />
+        <device id="wear_round" />
+        <device id="13.5in Freeform" />
+        <device id="pixel_c" />
+        <device id="Huawei MatePad T10" />
+      </config>
+    </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="verbose" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="20864b99-0ed3-464f-bbb6-43a3b052a727" name="Default Changelist" comment="check is connection reachable">
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/GlobalVars.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/GlobalVars.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/Mess.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ServerDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ServerDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/aspects/AspectProgressBar.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/aspects/AspectProgressBar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/dbHelpers/DBHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/dbHelpers/DBHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/dbHelpers/DBOrdersHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/dbHelpers/DBOrdersHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/Downloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/Downloader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/FtpFileDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/FtpFileDownloader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/Ping.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ftp/Ping.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/FormOrderFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/FormOrderFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/JournalFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/JournalFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/OrderHeadFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/OrderHeadFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/SettingFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/SettingFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/UpdateDataFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/amber/armtp/ui/UpdateDataFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/order_head_frargment_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/order_head_frargment_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings_order_header.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings_order_header.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\isupo\.android\avd\MARS_7.0.avd]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="valueResourceFile" />
+        <option value="Interface" />
+        <option value="layoutResourceFile_vertical" />
+        <option value="AnnotationType" />
+        <option value="resourceFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="BUILD_TARGET_KEY" value="apk" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="1ylJUKUz8l0XevRDUF2TdYoeEXH" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ApkExportedModule" value="MARS.app" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="ignore.preview.features.used" value="true" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/layout" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop" />
+    <property name="project.structure.last.edited" value="SDK Location" />
+    <property name="project.structure.proportion" value="0.17" />
+    <property name="project.structure.side.proportion" value="0.25111607" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="PsdUISettings">
+    <option name="MODULE_TAB" value="Properties" />
+    <option name="LAST_EDITED_SIGNING_CONFIG" value="debug" />
+    <option name="LAST_EDITED_BUILD_TYPE" value="release" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\isupo\YandexDisk\Programming\Java\AndroidStudioProjects\MARS\app\src\main\res\layout-v28" />
+      <recent name="C:\Users\isupo\YandexDisk\Programming\Java\AndroidStudioProjects\MARS\app\src\main\res\drawable" />
+      <recent name="C:\Users\isupo\YandexDisk\Programming\Java\AndroidStudioProjects\MARS\app\src\main\res\layout" />
+      <recent name="C:\Users\isupo\GoogleDisk\Programming\Java\AndroidStudioProjects\MARS\app\src\main\res\drawable" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.amber.armtp" />
+      <recent name="com.amber.armtp.ServerWork" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Android App.app">
+    <configuration name="MARS" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="MARS" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Hybrid>
+      <Java />
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Sample Java Methods" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+      <module name="MARS.app" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Hybrid>
+      <Java />
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="true" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Sample Java Methods" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Android App.app" />
+      <item itemvalue="Android App.MARS" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="20864b99-0ed3-464f-bbb6-43a3b052a727" name="Default Changelist" comment="" />
+      <created>1632820258918</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1632820258918</updated>
+    </task>
+    <task id="LOCAL-00001" summary="delete one column from CONTRS table">
+      <created>1632820959004</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1632820959004</updated>
+    </task>
+    <task id="LOCAL-00002" summary="clear order_head_fragment.xml from unnecessary widgets">
+      <created>1633010032767</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1633010032768</updated>
+    </task>
+    <task id="LOCAL-00003" summary="clear code">
+      <created>1633011013622</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1633011013622</updated>
+    </task>
+    <task id="LOCAL-00004" summary="clear code">
+      <created>1633011325225</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1633011325225</updated>
+    </task>
+    <task id="LOCAL-00005" summary="solving several tasks">
+      <created>1633176174902</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1633176174902</updated>
+    </task>
+    <task id="LOCAL-00006" summary="I have done all tasks">
+      <created>1633178385679</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1633178385679</updated>
+    </task>
+    <task id="LOCAL-00007" summary="some commit">
+      <created>1633200774475</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1633200774475</updated>
+    </task>
+    <task id="LOCAL-00008" summary="add possibility to check photo by press appropriate button">
+      <created>1633503919389</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1633503919389</updated>
+    </task>
+    <task id="LOCAL-00009" summary="add easy changing of order">
+      <created>1633529661340</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1633529661340</updated>
+    </task>
+    <task id="LOCAL-00010" summary="something">
+      <created>1633536986830</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1633536986830</updated>
+    </task>
+    <task id="LOCAL-00011" summary="delete unnecessary stuff">
+      <created>1633713760419</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1633713760419</updated>
+    </task>
+    <task id="LOCAL-00012" summary="add possibility to delete several orders in JournalFragment">
+      <created>1633790601453</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1633790601453</updated>
+    </task>
+    <task id="LOCAL-00013" summary="something new">
+      <created>1633849908700</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1633849908700</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fix some shortcomings">
+      <created>1633859135775</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1633859135775</updated>
+    </task>
+    <task id="LOCAL-00015" summary="did all tasks">
+      <created>1634319475496</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1634319475496</updated>
+    </task>
+    <task id="LOCAL-00016" summary="return column (CRT_DATE) in CONTRS">
+      <created>1635165971543</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1635165971543</updated>
+    </task>
+    <task id="LOCAL-00017" summary="deleteMode is working now (I hope)">
+      <created>1636014032634</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1636014032634</updated>
+    </task>
+    <task id="LOCAL-00018" summary="deleteMode is working now (I hope)">
+      <created>1636014216570</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1636014216570</updated>
+    </task>
+    <task id="LOCAL-00019" summary="new mode: send orders by CB">
+      <created>1636988212054</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1636988212054</updated>
+    </task>
+    <task id="LOCAL-00020" summary="сделал обновление одним файлов (armtp3.db)">
+      <created>1640944109491</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1640944109491</updated>
+    </task>
+    <task id="LOCAL-00021" summary="fix some problems and fix settingsFragment">
+      <created>1641202404643</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1641202404643</updated>
+    </task>
+    <task id="LOCAL-00022" summary="fix filter">
+      <created>1641318364203</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1641318364203</updated>
+    </task>
+    <task id="LOCAL-00023" summary="clean up code">
+      <created>1641325956655</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1641325956655</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fix DOCID from ZAKAZY">
+      <created>1641367907337</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1641367907337</updated>
+    </task>
+    <task id="LOCAL-00025" summary="replace save button">
+      <created>1641367939073</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1641367939073</updated>
+    </task>
+    <task id="LOCAL-00026" summary="after unzipping delete zip file">
+      <created>1641367961881</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1641367961881</updated>
+    </task>
+    <task id="LOCAL-00027" summary="delete">
+      <created>1641367970813</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1641367970813</updated>
+    </task>
+    <task id="LOCAL-00028" summary="make pg for updating">
+      <created>1641385331901</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1641385331901</updated>
+    </task>
+    <task id="LOCAL-00029" summary="update system of set nomen price">
+      <created>1642663971891</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1642663971891</updated>
+    </task>
+    <task id="LOCAL-00030" summary="fix vycherk problem">
+      <created>1642964856170</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1642964856170</updated>
+    </task>
+    <task id="LOCAL-00031" summary="fix problems with numeric type in db">
+      <created>1643632863577</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1643632863577</updated>
+    </task>
+    <task id="LOCAL-00032" summary="delete fun SendOrders">
+      <created>1643743713699</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1643743713699</updated>
+    </task>
+    <task id="LOCAL-00033" summary="solve problems with copying order">
+      <created>1643896216218</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1643896216218</updated>
+    </task>
+    <task id="LOCAL-00034" summary="check is connection reachable">
+      <created>1644049403478</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1644049403479</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add easy changing of order" />
+    <MESSAGE value="something" />
+    <MESSAGE value="delete unnecessary stuff" />
+    <MESSAGE value="add possibility to delete several orders in JournalFragment" />
+    <MESSAGE value="something new" />
+    <MESSAGE value="fix some shortcomings" />
+    <MESSAGE value="did all tasks" />
+    <MESSAGE value="return column (CRT_DATE) in CONTRS" />
+    <MESSAGE value="deleteMode is working now (I hope)" />
+    <MESSAGE value="new mode: send orders by CB" />
+    <MESSAGE value="сделал обновление одним файлов (armtp3.db)" />
+    <MESSAGE value="fix some problems and fix settingsFragment" />
+    <MESSAGE value="fix filter" />
+    <MESSAGE value="clean up code" />
+    <MESSAGE value="fix DOCID from ZAKAZY" />
+    <MESSAGE value="replace save button" />
+    <MESSAGE value="after unzipping delete zip file" />
+    <MESSAGE value="delete" />
+    <MESSAGE value="make pg for updating" />
+    <MESSAGE value="update system of set nomen price" />
+    <MESSAGE value="fix vycherk problem" />
+    <MESSAGE value="fix problems with numeric type in db" />
+    <MESSAGE value="delete fun SendOrders" />
+    <MESSAGE value="solve problems with copying order" />
+    <MESSAGE value="check is connection reachable" />
+    <option name="LAST_COMMIT_MESSAGE" value="check is connection reachable" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint suspend="THREAD" type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

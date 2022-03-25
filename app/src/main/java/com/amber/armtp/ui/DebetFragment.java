@@ -35,7 +35,7 @@ public class DebetFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.debet_fragment, container, false);
         Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
-        glbVars.view = rootView;
+        glbVars.CurView = rootView;
         return rootView;
     }
 

@@ -148,7 +148,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.journal_fragment, container, false);
-        glbVars.view = rootView;
+        glbVars.CurView = rootView;
         setHasOptionsMenu(true);
         return rootView;
     }
@@ -241,8 +241,8 @@ public class JournalFragment extends Fragment implements ServerChecker {
             case R.id.SendOrders:
                 AlertDialog.Builder builderSend = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                 builderSend.setMessage("Отправить заказы?")
-                        .setNegativeButton("Нет", (dialogInterface, i) -> dialogInterface.cancel())
-                        .setNeutralButton("Да", (dialogInterface, ii) -> {
+                        .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.cancel())
+                        .setNegativeButton("Да", (dialogInterface, ii) -> {
                             if (!glbVars.isNetworkAvailable()) {
                                 Config.sout("Нет доступного инетрнет соединения. Проверьте соединение с Интернетом");
                                 return;

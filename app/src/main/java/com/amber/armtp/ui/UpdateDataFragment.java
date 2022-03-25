@@ -50,7 +50,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.update_data_fragment_new, container, false);
         v.setKeepScreenOn(true);
-        glbVars.view = v;
+        glbVars.CurView = v;
         return v;
     }
 
@@ -62,6 +62,8 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         glbVars.setContext(getActivity().getApplicationContext());
         GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
+
+        Config.hideKeyBoard();
     }
 
     @Override
@@ -72,6 +74,12 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         } catch (Exception ignored) {
         }
 
+        TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
+        if (downloader.isServerVersionNewer()[0].equals("true")) {
+            tvAppNewVer.setVisibility(View.VISIBLE);
+        } else {
+            tvAppNewVer.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -81,9 +89,9 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
             getActivity().unregisterReceiver(UpdateDebetWorking);
         } catch (Exception ignored) {
         }
-
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -117,6 +125,15 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         }
 
         downloader = new Downloader(glbVars, getActivity());
+        TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
+        String[] versionData = downloader.isServerVersionNewer();
+        if (versionData[0].equals("true")) {
+            tvAppNewVer.setVisibility(View.VISIBLE);
+            tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
+        } else {
+            tvAppNewVer.setText(R.string.newVersionAvailable);
+            tvAppNewVer.setVisibility(View.GONE);
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -155,7 +172,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     return;
                 }
 
-                String status = downloader.isServerVersionNewer();
+                String status = downloader.isServerVersionNewer()[0];
 
                 if (status.equals("false")) {
                     Config.sout("На сервере нет новой версии");

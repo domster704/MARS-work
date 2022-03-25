@@ -69,4 +69,12 @@ public class DBAppHelper extends SQLiteOpenHelper {
         c.moveToNext();
         return c.getString(0);
     }
+
+    public String getIDByWC(String WC) {
+        if (WC.equals("0") || WC.equals("Выберите демографический признак"))
+            return "0";
+        Cursor c = this.getReadableDatabase().rawQuery("SELECT rowid FROM DEMP WHERE DEMP=?", new String[] {WC});
+        c.moveToNext();
+        return c.getString(0);
+    }
 }

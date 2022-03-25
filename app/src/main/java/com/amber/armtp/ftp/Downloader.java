@@ -94,7 +94,7 @@ public class Downloader {
         }).start();
     }
 
-    public String isServerVersionNewer() {
+    public String[] isServerVersionNewer() {
         String ver = BuildConfig.VERSION_NAME;
 
         FTPClient client = new FTPClient();
@@ -119,21 +119,24 @@ public class Downloader {
                 }
             }
 
-            String[] serverVer = serverVersion.split("\\.");
-            String[] curVer = ver.split("\\.");
+            String[] serverVersionsArray = serverVersion.split("\\.");
+            String[] curVersion = ver.split("\\.");
+
+            String newVersion = "";
 
             boolean isNewer = false;
-            for (int i = 0; i < serverVer.length; i++) {
-                if (Integer.parseInt(serverVer[i]) > Integer.parseInt(curVer[i])) {
+            for (int i = 0; i < serverVersionsArray.length; i++) {
+                if (Integer.parseInt(serverVersionsArray[i]) > Integer.parseInt(curVersion[i])) {
+                    newVersion = serverVersion;
                     isNewer = true;
                     break;
                 }
             }
 
-            return String.valueOf(isNewer);
+            return new String[] {String.valueOf(isNewer), newVersion};
         } catch (Exception e) {
             e.printStackTrace();
-            return "error";
+            return new String[]{"error", ""};
         }
     }
 

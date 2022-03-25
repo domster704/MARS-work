@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.interfaces.TBUpdate;
@@ -32,7 +33,7 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
         View rootView = inflater.inflate(R.layout.view_order_fragment, container, false);
         setHasOptionsMenu(true);
         thisView = rootView;
-        glbVars.view = rootView;
+        glbVars.CurView = rootView;
         return rootView;
     }
 
@@ -44,6 +45,8 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
         glbVars.setContext(getActivity().getApplicationContext());
         GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
+
+        Config.hideKeyBoard();
     }
 
     @SuppressLint("CutPasteId")

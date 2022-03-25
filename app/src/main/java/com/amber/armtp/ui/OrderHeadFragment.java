@@ -60,7 +60,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         View rootView = inflater.inflate(R.layout.order_head_frargment_main, container, false);
         Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
-        glbVars.view = rootView;
+        glbVars.CurView = rootView;
         return rootView;
     }
 
@@ -233,7 +233,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         inflater.inflate(R.menu.order_head_menu, menu);
     }
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.saveHeader) {
@@ -265,13 +264,11 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
 
         CONTR_ID = glbVars.spContr.getText().toString();
-
-        String TP_ID = glbVars.spTp.getText().toString();
-
         ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
 
         String DeliveryDate = glbVars.txtDate.getText().toString();
         String Comment = glbVars.txtComment.getText().toString();
+        String TP_ID = glbVars.spTp.getText().toString();
 
         if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
             Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
@@ -297,7 +294,8 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
                 Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
             }
         }
-
+        glbVars.resetCurData();
+        glbVars.putAllPrices();
         goToFormOrderFragment();
     }
 

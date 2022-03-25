@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,14 +20,14 @@
             android:layout_margin="2dp">
 
             <TextView
-                android:id="@+id/chkDB"
-                android:layout_width="@dimen/updateChkWidth"
-                android:layout_height="match_parent"
-                android:layout_alignBottom="@+id/tbDBPerc"
-                android:gravity="center_vertical"
-                android:paddingEnd="10dp"
-                android:text="@string/chkDB"
-                android:textColor="#000" />
+                    android:id="@+id/chkDB"
+                    android:layout_width="@dimen/updateChkWidth"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/tbDBPerc"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="10dp"
+                    android:text="@string/chkDB"
+                    android:textColor="#000" />
 
             <TextView
                 android:id="@+id/tbDBPerc"
@@ -62,13 +63,24 @@
         </RelativeLayout>
 
         <Button
-            android:id="@+id/btnDBUpdate"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="2dp"
-            android:layout_marginStart="100dp"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="Обновить базу данных" />
+                android:id="@+id/btnDBUpdate"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:layout_marginStart="100dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Обновить базу данных" />
+
+        <TextView
+                android:id="@+id/newVerDB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btnDBUpdate"
+                android:layout_marginVertical="2dp"
+                android:layout_marginStart="110dp"
+                android:textColor="@color/black"
+                android:text="Новая версия"
+                android:visibility="gone"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -140,6 +152,17 @@
             android:layout_marginStart="100dp"
             android:gravity="center_horizontal|center_vertical"
             android:text="Обновить Приложение" />
+
+        <TextView
+                android:id="@+id/newVerApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btnDBUpdate"
+                android:layout_marginVertical="2dp"
+                android:layout_marginStart="110dp"
+                android:textColor="@color/postDataColorGreen"
+                android:text="@string/newVersionAvailable"
+                android:visibility="gone"/>
     </LinearLayout>
 
 

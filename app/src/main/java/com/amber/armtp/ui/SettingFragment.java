@@ -41,7 +41,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.setting_fragment, container, false);
-        glbVars.view = v;
+        glbVars.CurView = v;
         setHasOptionsMenu(true);
         return v;
     }

@@ -228,9 +228,6 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initNavigationView();
 
-//        Config.printCursor(globalVariable.db.test());
-//        globalVariable.db.test();
-
         // Initializing NavigationView
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -295,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 initLastUpdate();
             }
         };
+
 
 
         //Setting the actionbarToggle to drawer layout
