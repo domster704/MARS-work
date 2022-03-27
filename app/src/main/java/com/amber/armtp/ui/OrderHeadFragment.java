@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.annotations.DelayedCalled;
+import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.SimpleDateFormat;
@@ -72,7 +74,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         glbVars.setContext(getActivity().getApplicationContext());
         GlobalVars.CurFragmentContext = getActivity();
 
-        if (getArguments() != null) {
+        if (getArguments() != null && getArguments().size() != 0) {
             isCopied = isCopiedLocal = getArguments().getBoolean("isCopied");
             _TP = getArguments().getString("TP");
             _CONTR = getArguments().getString("CONTR");
@@ -80,12 +82,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             _DATE = getArguments().getString("DOC_DATE");
             _COMMENT = getArguments().getString("COMMENT");
 
-            getArguments().remove("isCopied");
-            getArguments().remove("TP");
-            getArguments().remove("CONTR");
-            getArguments().remove("ADDR");
-            getArguments().remove("DOC_DATE");
-            getArguments().remove("COMMENT");
+            getArguments().clear();
         }
         GlobalVars.CurAc = getActivity();
     }
@@ -99,6 +96,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         _checkAndSetContrIDAfterDestroying();
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
@@ -150,9 +148,9 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
 
         glbVars.txtDate.setOnClickListener(v -> new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show());
 
-        int ContRowid = glbVars.db.GetContrRowID();
+        int contrRowId = glbVars.db.GetContrRowID();
 
-        SetSelectedContr(ContRowid);
+        SetSelectedContr(contrRowId);
 
         String stTP_ID = settings.getString("TP_ID", "0");
 
@@ -209,11 +207,11 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         }
     }
 
-    public void SetSelectedContr(int ROWID) {
+    public void SetSelectedContr(int rowId) {
         for (int i = 0; i < glbVars.spinContr.getCount(); i++) {
             Cursor value = (Cursor) glbVars.spinContr.getItemAtPosition(i);
             int id = value.getInt(value.getColumnIndexOrThrow("_id"));
-            if (ROWID == id) {
+            if (rowId == id) {
                 glbVars.spinContr.setSelection(i);
                 break;
             }
@@ -296,6 +294,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         }
         glbVars.resetCurData();
         glbVars.putAllPrices();
+
         goToFormOrderFragment();
     }
 

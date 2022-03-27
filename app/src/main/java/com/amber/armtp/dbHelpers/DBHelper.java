@@ -31,6 +31,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static int limit = 60;
     private final HashSet<String> listOfUpdatedGroups = new HashSet<>();
 
+    public Thread threadResetting;
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
@@ -235,7 +237,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 curPrice += (Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1));
             }
 
-            res = curPrice == 0.0 ? "" : " - " + String.format(Locale.US, "%.2f", curPrice);
+            res = curPrice == 0.0 ? "" : " - " + String.format(Locale.ROOT, "%.2f", curPrice);
 
             return res;
         } catch (Exception e) {
@@ -583,7 +585,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public void ResetNomenPrice(boolean isCopied) throws InterruptedException {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Thread thread = new Thread(new Runnable() {
+        // TODO: make showing progress bar
+        threadResetting = new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
@@ -621,8 +624,8 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         });
 
-        thread.start();
-        thread.join();
+        threadResetting.start();
+        threadResetting.join();
     }
 
     public String GetToolbarContr() {
@@ -798,22 +801,22 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void putAllNomenPrices(String CONTR) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor allSgiAndGroup = db.rawQuery("SELECT SGI, GRUPS.CODE AS [GROUP] FROM SGI JOIN GRUPS ON GRUPS.SGI = SGI.CODE", null);
-        int i = 1;
-        while (allSgiAndGroup.moveToNext()) {
-            String SGI = allSgiAndGroup.getString(0);
-            String GROUP = allSgiAndGroup.getString(1);
-            System.out.println(SGI + " " + GROUP + " " + i);
-            i += 1;
-            Cursor c = db.rawQuery("SELECT NOMEN, CENA * (1 - SKIDKI.SKIDKA / 100) as PRICE, SKIDKI.TIPCEN FROM PRICES JOIN SKIDKI ON PRICES.TIPCEN=SKIDKI.TIPCEN AND SKIDKI.SGI=? AND SKIDKI.KONTR=? AND PRICES.NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA=? AND SGI=?)", new String[]{SGI, CONTR, GROUP, SGI});
-            while (c.moveToNext()) {
-                pricesMap.put(c.getString(0), c.getFloat(1));
-            }
-        }
-    }
+//    public void putAllNomenPrices(String CONTR) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//
+//        Cursor allSgiAndGroup = db.rawQuery("SELECT SGI, GRUPS.CODE AS [GROUP] FROM SGI JOIN GRUPS ON GRUPS.SGI = SGI.CODE", null);
+//        int i = 1;
+//        while (allSgiAndGroup.moveToNext()) {
+//            String SGI = allSgiAndGroup.getString(0);
+//            String GROUP = allSgiAndGroup.getString(1);
+//            System.out.println(SGI + " " + GROUP + " " + i);
+//            i += 1;
+//            Cursor c = db.rawQuery("SELECT NOMEN, CENA * (1 - SKIDKI.SKIDKA / 100) as PRICE, SKIDKI.TIPCEN FROM PRICES JOIN SKIDKI ON PRICES.TIPCEN=SKIDKI.TIPCEN AND SKIDKI.SGI=? AND SKIDKI.KONTR=? AND PRICES.NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA=? AND SGI=?)", new String[]{SGI, CONTR, GROUP, SGI});
+//            while (c.moveToNext()) {
+//                pricesMap.put(c.getString(0), c.getFloat(1));
+//            }
+//        }
+//    }
 
     private void _setNomenPriceWithoutSgi(Cursor cursor) {
         if (cursor.getCount() == 0)

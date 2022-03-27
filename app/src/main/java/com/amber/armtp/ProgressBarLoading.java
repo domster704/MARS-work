@@ -4,32 +4,33 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
+import com.amber.armtp.annotations.AsyncUI;
+
 public class ProgressBarLoading {
-    private final FragmentActivity activity;
     private final Context context;
 
     private AlertDialog dialog;
 
-    public ProgressBarLoading(FragmentActivity activity, Context context) {
-        this.activity = activity;
+    public ProgressBarLoading(Context context) {
         this.context = context;
         _create();
     }
 
+    @AsyncUI
     private void _create() {
-        activity.runOnUiThread(() -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setCancelable(false);
-            builder.setView(R.layout.progress_bar_loading);
-            dialog = builder.create();
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        builder.setView(R.layout.progress_bar_loading);
+        dialog = builder.create();
     }
 
+    @AsyncUI
     public void show() {
-        activity.runOnUiThread(() -> dialog.show());
+        dialog.show();
     }
 
+    @AsyncUI
     public void dismiss() {
-        activity.runOnUiThread(() -> dialog.dismiss());
+        dialog.dismiss();
     }
 }

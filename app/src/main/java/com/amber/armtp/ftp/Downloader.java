@@ -13,6 +13,7 @@ import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.MainActivity;
 import com.amber.armtp.ServerDetails;
+import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
@@ -140,11 +141,10 @@ public class Downloader {
         }
     }
 
+    @AsyncUI
     private void catchErrorInDownloadProcess(View view, UpdateDataFragment.UIData ui) {
         Config.sout("Ошибка во время загрузки", Toast.LENGTH_LONG);
-        activity.runOnUiThread(() -> {
-            view.setEnabled(true);
-            ui.progressBar.setProgress(0);
-        });
+        view.setEnabled(true);
+        ui.progressBar.setProgress(0);
     }
 }

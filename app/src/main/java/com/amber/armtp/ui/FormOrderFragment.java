@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -103,18 +102,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         GlobalVars.CurAc = getActivity();
 
         Config.hideKeyBoard();
-
-        if (getArguments() != null) {
-            String Sgi = getArguments().getString("SGI");
-            String Group = getArguments().getString("Group");
-
-            glbVars.resetCurData();
-            glbVars.resetSearchViewData();
-
-            glbVars.SetSelectedSgi(Sgi);
-            glbVars.SetSelectedGrup(Group);
-
-        }
     }
 
     @Override
@@ -150,6 +137,18 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         MenuItem sort = menu.findItem(R.id.NomenSort);
         sort.setIcon(R.drawable.to_end_disabled);
         sort.setEnabled(false);
+
+        if (getArguments() != null && getArguments().size() != 0) {
+            String Sgi = getArguments().getString("SGI");
+            String Group = getArguments().getString("Group");
+            getArguments().clear();
+
+            glbVars.resetCurData();
+            glbVars.resetSearchViewData();
+
+            glbVars.SetSelectedSgi(Sgi);
+            glbVars.SetSelectedGrup(Group);
+        }
     }
 
     private void clearChosenGroupSgi() {
@@ -225,7 +224,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.bindString(8, Status);
                 stmt.bindString(9, ContrDes);
                 stmt.bindString(10, AddrDes);
-                stmt.bindString(11, String.format(Locale.US, "%.2f", Sum));
+                stmt.bindString(11, String.format(Locale.ROOT, "%.2f", Sum));
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {
@@ -291,7 +290,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                             " ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "'," +
                             " DELIVERY_DATE = '" + cHead.getString(cHead.getColumnIndex("DATA")) + "'," +
                             " COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'," +
-                            " SUM = '" + String.format(Locale.US, "%.2f", Sum) + "' WHERE DOCID='" + OrderID + "'");
+                            " SUM = '" + String.format(Locale.ROOT, "%.2f", Sum) + "' WHERE DOCID='" + OrderID + "'");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -342,7 +341,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
             float sum = Float.parseFloat(PRICE.replace(",", ".")) * Integer.parseInt(ZAKAZ);
             SUM += sum;
-            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.getDefault(), "%.2f", sum) + "')");
+            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
         }
 
         glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
@@ -480,7 +479,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 }
                 return true;
             case R.id.NomenDiscount:
-                glbVars.CalculatePercentSale(mainMenu, 0);
+                glbVars.CalculatePercentSale(mainMenu);
                 return true;
             case R.id.NomenMultiSelect:
                 if (!glbVars.isMultiSelect) {
@@ -565,6 +564,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        glbVars.closeCursors();
     }
 
     @SuppressLint("CutPasteId")
