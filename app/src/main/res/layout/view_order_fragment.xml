@@ -9,26 +9,37 @@
     android:weightSum="1">
 
     <TextView
-        android:id="@+id/tvHeadCod"
-        android:layout_width="100dp"
-        android:layout_height="@dimen/tableHeadersHeight"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/textView30"
-        android:background="@drawable/table_header"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/nomenCod"
-        android:textColor="#000000" />
+            android:id="@+id/tvHeadCod"
+            android:layout_width="100dp"
+            android:layout_height="@dimen/tableHeadersHeight"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/tvPhotoCod"
+            android:background="@drawable/table_header"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/nomenCod"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/tvHeadDescr"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/tableHeadersHeight"
-        android:layout_toStartOf="@id/textView38"
-        android:layout_toEndOf="@+id/tvHeadCod"
-        android:background="@drawable/table_header"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/nomenDescr"
-        android:textColor="#000000" />
+            android:id="@+id/tvPhotoCod"
+            android:layout_width="50dp"
+            android:layout_height="@dimen/tableHeadersHeight"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/textView30"
+            android:background="@drawable/table_header"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/nomenPhoto"
+            android:textColor="#000000" />
+
+    <TextView
+            android:id="@+id/tvHeadDescr"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tableHeadersHeight"
+            android:layout_toStartOf="@id/textView38"
+            android:layout_toEndOf="@+id/tvHeadCod"
+            android:background="@drawable/table_header"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/nomenDescr"
+            android:textColor="#000000" />
 
     <TextView
         android:id="@+id/textView10"
@@ -64,29 +75,29 @@
         android:textColor="#000000" />
 
     <GridView
-        android:id="@+id/listContrs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvHeadCod"
-        android:layout_alignParentStart="true"
-        android:layout_marginHorizontal="3dp"
-        android:layout_marginTop="5dp"
-        android:clickable="true"
-        android:fastScrollEnabled="false"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:longClickable="true" />
+            android:id="@+id/listContrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvHeadCod"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="3dp"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:fastScrollEnabled="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:longClickable="true" />
 
     <TextView
-        android:id="@+id/textView30"
-        android:layout_width="50dp"
-        android:layout_height="@dimen/tableHeadersHeight"
-        android:layout_above="@+id/listContrs"
-        android:layout_alignParentStart="true"
-        android:background="@drawable/table_header"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="NN"
-        android:textColor="#000000" />
+            android:id="@+id/textView30"
+            android:layout_width="50dp"
+            android:layout_height="@dimen/tableHeadersHeight"
+            android:layout_above="@+id/listContrs"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/table_header"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="NN"
+            android:textColor="#000000" />
 
     <TextView
         android:id="@+id/textView35"

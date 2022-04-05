@@ -18,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         String path = getFilesDir().getPath();
         filesPathDB = path.substring(0, path.lastIndexOf("/")) + "/databases/";
         filesPathAPK = path.substring(0, path.lastIndexOf("/")) + "/files/";
+//        filesPathAPK = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/";
+        Log.d("x", filesPathAPK);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);

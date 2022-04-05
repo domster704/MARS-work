@@ -749,7 +749,8 @@ public class GlobalVars extends Application implements TBUpdate {
                     }
                     GridView gdNomen = CurView.findViewById(R.id.listContrs);
                     myNom.requery();
-                    NomenAdapter.notifyDataSetChanged();
+                    if (NomenAdapter != null)
+                        NomenAdapter.notifyDataSetChanged();
                     gdNomen.invalidateViews();
                 });
             }
@@ -1218,7 +1219,8 @@ public class GlobalVars extends Application implements TBUpdate {
         cur.close();
         GridView gdNomen = CurView.findViewById(R.id.listContrs);
         myNom.requery();
-        NomenAdapter.notifyDataSetChanged();
+        if (NomenAdapter != null)
+            NomenAdapter.notifyDataSetChanged();
         gdNomen.invalidateViews();
     }
 
@@ -1268,6 +1270,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
+    private int _previousCursorCount = 0;
     public class NomenAdapter extends SimpleCursorAdapter {
         public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -1354,11 +1357,12 @@ public class GlobalVars extends Application implements TBUpdate {
             tvPosition.setText(String.valueOf(position + 1));
 
             // Условие прогрузки новых товаров в nomenList
-            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit) {
+            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
+                _previousCursorCount = cursor.getCount();
                 isNewLoaded = true;
-                LoadNextNomen(cursor.getCount(), CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
 
                 Config.hideKeyBoard();
+                LoadNextNomen(cursor.getCount(), CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
                 return view;
             }
 

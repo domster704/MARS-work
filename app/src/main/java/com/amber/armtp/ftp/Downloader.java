@@ -14,14 +14,17 @@ import com.amber.armtp.GlobalVars;
 import com.amber.armtp.MainActivity;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.AsyncUI;
+import com.amber.armtp.annotations.DelayedCalled;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Downloader {
     private final GlobalVars globalVars;
@@ -34,26 +37,32 @@ public class Downloader {
         this.activity = activity;
     }
 
-    public void downloadApp(final UpdateDataFragment.UIData ui, View view) {
+    public void downloadApp(final UpdateDataFragment.UIData ui, View view, String ver) {
         new Thread(() -> {
+            if (_checkAlreadyExistedApk(ver))
+                return;
+
             FtpFileDownloader ftpFileDownloader;
             try {
-                ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, "app.apk");
+//                File file = new File(MainActivity.filesPathAPK + "/" + ver + ".apk");
+//                if (file.exists() && !ver.equals("") && _isFirstVersionHigherThanSecond(ver.split("\\."), BuildConfig.VERSION_NAME.split("\\."))) {
+//                    _startInstallApp(ver);
+//                    FileUtils.deleteDirectory(new File(MainActivity.filesPathAPK));
+//                    return;
+//                }
+
+                ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, ver + ".apk");
                 if (!ftpFileDownloader.downloadWithPG(ui))
                     return;
 
                 activity.runOnUiThread(() -> {
                     view.setEnabled(true);
                     ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                    Config.sout("Приложение успешно скачано");
-
-                    File file1 = new File(MainActivity.filesPathAPK + "/app.apk");
-                    Uri uri = FileProvider.getUriForFile(activity.getApplicationContext(), activity.getApplicationContext().getPackageName() + ".provider", file1);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, "application/vnd.android.package-archive");
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    activity.getApplicationContext().startActivity(intent);
                 });
+
+                _startInstallApp(ver);
+                _checkAlreadyExistedApk(ver);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 catchErrorInDownloadProcess(view, ui);
@@ -125,16 +134,18 @@ public class Downloader {
 
             String newVersion = "";
 
-            boolean isNewer = false;
-            for (int i = 0; i < serverVersionsArray.length; i++) {
-                if (Integer.parseInt(serverVersionsArray[i]) > Integer.parseInt(curVersion[i])) {
-                    newVersion = serverVersion;
-                    isNewer = true;
-                    break;
-                }
-            }
+            boolean isNewer = _isFirstVersionHigherThanSecond(serverVersionsArray, curVersion);
+            if (isNewer)
+                newVersion = serverVersion;
+//            for (int i = 0; i < serverVersionsArray.length; i++) {
+//                if (Integer.parseInt(serverVersionsArray[i]) > Integer.parseInt(curVersion[i])) {
+//                    newVersion = serverVersion;
+//                    isNewer = true;
+//                    break;
+//                }
+//            }
 
-            return new String[] {String.valueOf(isNewer), newVersion};
+            return new String[]{String.valueOf(isNewer), newVersion};
         } catch (Exception e) {
             e.printStackTrace();
             return new String[]{"error", ""};
@@ -146,5 +157,47 @@ public class Downloader {
         Config.sout("Ошибка во время загрузки", Toast.LENGTH_LONG);
         view.setEnabled(true);
         ui.progressBar.setProgress(0);
+    }
+
+    private boolean _isFirstVersionHigherThanSecond(String[] first, String[] second) {
+        boolean isNewerLocal = false;
+        for (int i = 0; i < first.length; i++) {
+            if (Integer.parseInt(first[i]) > Integer.parseInt(second[i])) {
+                isNewerLocal = true;
+                break;
+            }
+        }
+        return isNewerLocal;
+    }
+
+    private void _startInstallApp(String name) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            @DelayedCalled(delay = 300)
+            public void run() {
+                File file1 = new File(MainActivity.filesPathAPK + "/" + name + ".apk");
+                Uri uri = FileProvider.getUriForFile(activity.getApplicationContext(), activity.getApplicationContext().getPackageName() + ".provider", file1);
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Config.sout("Приложение успешно скачано");
+                activity.getApplicationContext().startActivity(intent);
+
+            }
+        });
+    }
+
+    private boolean _checkAlreadyExistedApk(String ver) {
+        boolean isExisted = false;
+        File file = new File(MainActivity.filesPathAPK + "/" + ver + ".apk");
+        if (file.exists() && !ver.equals("") && _isFirstVersionHigherThanSecond(ver.split("\\."), BuildConfig.VERSION_NAME.split("\\."))) {
+            _startInstallApp(ver);
+            for (File file1 : new File(MainActivity.filesPathAPK + "/").listFiles()) {
+                file1.deleteOnExit();
+            }
+            isExisted = true;
+        }
+        return isExisted;
     }
 }

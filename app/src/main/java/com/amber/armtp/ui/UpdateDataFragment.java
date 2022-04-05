@@ -44,6 +44,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
     private Downloader downloader;
+    private String[] versionData;
 
     @Nullable
     @Override
@@ -126,7 +127,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
 
         downloader = new Downloader(glbVars, getActivity());
         TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
-        String[] versionData = downloader.isServerVersionNewer();
+        versionData = downloader.isServerVersionNewer();
         if (versionData[0].equals("true")) {
             tvAppNewVer.setVisibility(View.VISIBLE);
             tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
@@ -187,7 +188,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                             tvApp.setTextColor(Color.rgb(0, 0, 0));
                         });
 
-                        downloader.downloadApp(uiData[1], view);
+                        downloader.downloadApp(uiData[1], view, versionData[1]);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

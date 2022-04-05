@@ -216,7 +216,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
