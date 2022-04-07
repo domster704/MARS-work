@@ -79,7 +79,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             _TP = getArguments().getString("TP");
             _CONTR = getArguments().getString("CONTR");
             _ADDR = getArguments().getString("ADDR");
-            _DATE = getArguments().getString("DOC_DATE");
+            _DATE = getArguments().getString("DELIVERY_DATE");
             _COMMENT = getArguments().getString("COMMENT");
 
             getArguments().clear();

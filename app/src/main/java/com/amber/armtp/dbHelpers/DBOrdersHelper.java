@@ -51,7 +51,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " ZAKAZY.DOCID AS DOCID" +
                     " FROM ZAKAZY" +
                     " WHERE" +
-                    " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2)) ORDER BY DOCID DESC", null);
+                    " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2)) ORDER BY _id DESC", null);
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,14 +140,14 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
     public HashMap<String, String> getOrderData(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null);
+        Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null);
         c.moveToNext();
 
         HashMap<String, String> data = new HashMap<>();
         data.put("TP", c.getString(c.getColumnIndex("TP")));
         data.put("CONTR", c.getString(c.getColumnIndex("CONTR")));
         data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
-        data.put("DOC_DATE", c.getString(c.getColumnIndex("DOC_DATE")));
+        data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
         data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
         return data;
     }

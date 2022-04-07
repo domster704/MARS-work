@@ -527,7 +527,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
             args.putString("TP", orderData.get("TP"));
             args.putString("CONTR", orderData.get("CONTR"));
             args.putString("ADDR", orderData.get("ADDR"));
-            args.putString("DOC_DATE", orderData.get("DOC_DATE"));
+            args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
             args.putString("COMMENT", orderData.get("COMMENT"));
             fragment.setArguments(args);
 
