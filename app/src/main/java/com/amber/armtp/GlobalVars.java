@@ -28,7 +28,6 @@ import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -86,6 +85,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public static FragmentActivity CurAc;
     public static Context CurFragmentContext;
     public static String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
+    public static String TypeOfPrice = "";
 
     public int CurVisiblePosition = 0;
 
@@ -110,6 +110,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public boolean isDiscount = false;
     public boolean isMultiSelect = false;
     public boolean isSecondPhoto = false;
+    public boolean isSales = false;
     public float Discount = 0;
     public int MultiQty = 0;
 
@@ -236,10 +237,8 @@ public class GlobalVars extends Application implements TBUpdate {
                         resetAllSpinners();
                         resetSearchViewData();
 
-                        if (!finalCurSgi.equals(Sgi))
-                            SetSelectedSgi(Sgi);
-                        if (!finalCurGroup.equals(Grup))
-                            SetSelectedGrup(Grup);
+                        SetSelectedSgi(Sgi);
+                        SetSelectedGrup(Grup);
 
                         return true;
                 }
@@ -253,6 +252,8 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
+            isSales = false;
+            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
             CurGroup = ItemID;
 
@@ -262,16 +263,7 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             if (CurSGI.equals("0"))
                 return;
-
-            LoadNextNomen(0, CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-
-            if (GlobalVars.CurGroup.equals("0")) {
-                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setEnabled(false);
-                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
-            } else {
-                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setEnabled(true);
-                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
-            }
+            LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -282,16 +274,14 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
+            isSales = false;
+            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
-
-            MenuItem sort = FormOrderFragment.mainMenu.findItem(R.id.NomenSort);
 
             CurGroup = "0";
             CurSGI = ItemID;
 
             if (ItemID.equals("0")) {
-                sort.setEnabled(false);
-                sort.setIcon(R.drawable.to_end_disabled);
                 nomenList.setAdapter(null);
                 spGrup.setAdapter(null);
             } else {
@@ -299,15 +289,7 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
-                LoadNextNomen(0, CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-            }
-
-            if (GlobalVars.CurGroup.equals("0")) {
-                sort.setEnabled(false);
-                sort.setIcon(R.drawable.to_end_disabled);
-            } else {
-                sort.setEnabled(true);
-                sort.setIcon(R.drawable.to_end);
+                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
             }
         }
 
@@ -512,7 +494,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     private GlobalVars.NomenAdapter getNomenAdapter(Cursor cursor) {
-        return new NomenAdapter(glbContext, R.layout.nomen_layout, cursor, new String[]{"_id", "KOD5", "DESCR", "OST", "ZAKAZ", "GRUPPA", "SGI", "FOTO", "GOFRA", "MP", "PRICE"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP, R.id.ColNomPrice}, 0);
+        return new NomenAdapter(glbContext, R.layout.nomen_layout, cursor, new String[]{"_id", "KOD5", "DESCR", "OST", "ZAKAZ", "GRUPPA", "SGI", "FOTO", "GOFRA", "MP", GlobalVars.TypeOfPrice}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP, R.id.ColNomPrice}, 0);
     }
 
     public void LoadNextNomen(final int positionSQL, String... args) {
@@ -549,7 +531,39 @@ public class GlobalVars extends Application implements TBUpdate {
         }).start();
     }
 
-    @DelayedCalled
+    public void LoadNomen(String... args) {
+        String[] formatedArgs = new String[5];
+        System.arraycopy(args, 0, formatedArgs, 0, args.length);
+        for (int i = args.length; i < formatedArgs.length; i++) {
+            formatedArgs[i] = "0";
+        }
+
+        CurSGI = formatedArgs[0].equals("0") ? CurSGI : formatedArgs[0];
+        CurGroup = formatedArgs[1].equals("0") ? CurGroup : formatedArgs[1];
+        CurWCID = formatedArgs[2].equals("0") ? CurWCID : formatedArgs[2];
+        CurFocusID = formatedArgs[3].equals("0") ? CurFocusID : formatedArgs[3];
+        CurSearchName = formatedArgs[4].equals("") ? CurSearchName : formatedArgs[4].toLowerCase(Locale.ROOT);
+
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                myNom = db.getNomen(
+                        CurSGI, CurGroup,
+                        CurWCID, CurFocusID, CurSearchName);
+                CurAc.runOnUiThread(() -> {
+                    nomenList.setAdapter(null);
+                    NomenAdapter = getNomenAdapter(myNom);
+                    nomenList.setAdapter(NomenAdapter);
+                    nomenList.setOnItemClickListener(GridNomenClick);
+                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
+                });
+                isNewLoaded = false;
+            }
+        }).start();
+    }
+
+//    @DelayedCalled
     public void SetSelectedSgi(String SgiID) {
         for (int i = 0; i < spSgi.getCount(); i++) {
             Cursor value = (Cursor) spSgi.getItemAtPosition(i);
@@ -562,7 +576,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    @DelayedCalled(delay = 200)
+    @DelayedCalled
     public void SetSelectedGrup(String Grup) {
         for (int i = 0; i < spGrup.getCount(); i++) {
             Cursor value = (Cursor) spGrup.getItemAtPosition(i);
@@ -1122,15 +1136,16 @@ public class GlobalVars extends Application implements TBUpdate {
         setContrAndSum(GlobalVars.this);
     }
 
-    public void setDiscountIcon(Menu menu, int MenuItem, Boolean vis) {
-        Drawable drawable = menu.getItem(MenuItem).getIcon();
+    @AsyncUI
+    public void setIconColor(Menu menu, int MenuItem, Boolean vis) {
+        Drawable drawable = menu.findItem(MenuItem).getIcon();
         drawable.mutate();
         if (vis) {
             drawable.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
         } else {
             drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         }
-        isDiscount = vis;
+//        isDiscount = vis;
     }
 
     public void CalculatePercentSale(final Menu menu) {
@@ -1155,10 +1170,10 @@ public class GlobalVars extends Application implements TBUpdate {
 
                     if (Discount == 0) {
                         isDiscount = false;
-                        setDiscountIcon(menu, 2, false);
+                        setIconColor(menu, R.id.NomenDiscount, false);
                     } else {
                         isDiscount = true;
-                        setDiscountIcon(menu, 2, true);
+                        setIconColor(menu, R.id.NomenDiscount, true);
                     }
 
                     if (NomenAdapter != null) {
@@ -1236,6 +1251,22 @@ public class GlobalVars extends Application implements TBUpdate {
         orderPrices.close();
     }
 
+    public void calculatePricesByContrDiscount() {
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                db.calcSales(db.GetContrID());
+                CurAc.runOnUiThread(() -> {
+                    if (NomenAdapter != null) {
+                        myNom.requery();
+                        NomenAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+    }
+
     public static class CheckBoxData {
         public int id;
         public CheckBox checkBox;
@@ -1271,6 +1302,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     private int _previousCursorCount = 0;
+
     public class NomenAdapter extends SimpleCursorAdapter {
         public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
@@ -1280,9 +1312,12 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+
             Cursor cursor = getCursor();
             CurVisiblePosition = cursor.getCount();
             int resID;
+
+            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
 
             TextView tvDescr = view.findViewById(R.id.ColNomDescr);
             TextView tvPrice = view.findViewById(R.id.ColNomPrice);
@@ -1314,7 +1349,9 @@ public class GlobalVars extends Application implements TBUpdate {
             btPlus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
             btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
 
-            tvPrice.setText(_countPrice(cursor));
+            if (DBHelper.pricesMap.containsKey(kod5) && isSales) {
+                tvPrice.setText(String.valueOf(DBHelper.pricesMap.get(kod5)));
+            }
 
             if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
                 if (cursor.getInt(cursor.getColumnIndex("PD")) == 1)
@@ -1357,14 +1394,14 @@ public class GlobalVars extends Application implements TBUpdate {
             tvPosition.setText(String.valueOf(position + 1));
 
             // Условие прогрузки новых товаров в nomenList
-            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
-                _previousCursorCount = cursor.getCount();
-                isNewLoaded = true;
-
-                Config.hideKeyBoard();
-                LoadNextNomen(cursor.getCount(), CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-                return view;
-            }
+//            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
+//                _previousCursorCount = cursor.getCount();
+//                isNewLoaded = true;
+//
+//                Config.hideKeyBoard();
+//                LoadNextNomen(cursor.getCount(), CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+//                return view;
+//            }
 
             return view;
         }
@@ -1564,9 +1601,11 @@ public class GlobalVars extends Application implements TBUpdate {
         CurSearchName = "";
 
         Discount = 0f;
+        isSales = false;
         Menu menu = FormOrderFragment.mainMenu;
         if (menu != null && menu.size() > 1) {
-            setDiscountIcon(menu, 2, false);
+            setIconColor(menu, R.id.NomenDiscount, false);
+            setIconColor(menu, R.id.NomenSales, false);
         }
     }
 
@@ -1596,18 +1635,28 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public void closeCursors() {
-        Cursor[] cursors = new Cursor[] {
+        Cursor[] cursors = new Cursor[]{
                 myNom,
                 mySgi,
                 myGrups,
                 curWC,
                 curFocus
         };
-        for (Cursor cursor: cursors) {
+        for (Cursor cursor : cursors) {
             if (cursor != null) {
                 cursor.close();
             }
         }
+    }
+
+    public void updateNomenPrice(boolean isCopied) {
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                db.ResetNomenPrice(isCopied);
+            }
+        });
     }
 
     @SuppressLint("DefaultLocale")
@@ -1692,6 +1741,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
         String price = tvPrice.getText().toString();
         String kod5 = tvKOD5.getText().toString();
+        System.out.println(kod5 + " " + price);
 
         db.putPriceInNomen(kod5, price);
         db.PlusQty(kod5);

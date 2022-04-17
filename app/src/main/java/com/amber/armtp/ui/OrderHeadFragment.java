@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,12 +38,13 @@ import java.util.Objects;
  * <p>
  * Updated by domster704 on 27.09.2021
  */
-public class OrderHeadFragment extends Fragment implements TBUpdate {
+public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClickListener {
     public static String CONTR_ID;
     public static String PREVIOUS_CONTR_ID = "";
     public static String _ADDR = "";
     public static boolean isCopied = false;
     public GlobalVars glbVars;
+
     private String _TP = "";
     private String _CONTR = "";
     private String _DATE = "";
@@ -53,9 +55,10 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
     private boolean isCopiedLocal = false;
     private static final String APP_PREFERENCES_CONTR = "Contr";
 
+    private Button returnMoneyButton;
+
     public OrderHeadFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -106,6 +109,9 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         glbVars.spinContr = getActivity().findViewById(R.id.SpinContr);
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
+
+        returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
+        returnMoneyButton.setOnClickListener(this);
 
         setContrAndSum(glbVars);
 
@@ -176,6 +182,11 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         String DelivDate = glbVars.db.GetDeliveryDate();
         if (!Comment.equals("")) {
             glbVars.txtComment.setText(Comment, TextView.BufferType.EDITABLE);
+        }
+
+        if (glbVars.txtComment.getText().toString().contains("Вернуть деньги")) {
+            returnMoneyButton.setEnabled(false);
+            returnMoneyButton.setTextColor(getResources().getColor(R.color.colorSecondaryText));
         }
 
         if (!DelivDate.equals("")) {
@@ -254,6 +265,18 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
         editor.apply();
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.returnMoneyButton) {
+            String currentText = glbVars.txtComment.getText().toString();
+            if (!currentText.equals("")) {
+                currentText = ", " + currentText;
+            }
+            glbVars.txtComment.setText("Вернуть деньги" + currentText);
+            view.setEnabled(false);
+        }
+    }
+
     private void _saveOrderData() throws InterruptedException {
         String ADDR_ID;
 
@@ -280,8 +303,11 @@ public class OrderHeadFragment extends Fragment implements TBUpdate {
             PREVIOUS_CONTR_ID = CONTR_ID;
         } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
             PREVIOUS_CONTR_ID = CONTR_ID;
-            glbVars.db.ResetNomenPrice(isCopiedLocal);
+            glbVars.updateNomenPrice(isCopiedLocal);
         }
+
+        GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
+        System.out.println(GlobalVars.TypeOfPrice);
 
         if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
             setContrAndSum(glbVars);

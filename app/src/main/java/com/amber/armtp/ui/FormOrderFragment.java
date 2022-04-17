@@ -62,7 +62,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     if (newText.equals("") && !GlobalVars.CurSearchName.equals("")) {
-                        glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, newText);
+                        glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, newText);
                     }
                     GlobalVars.CurSearchName = newText;
                     return true;
@@ -70,7 +70,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName);
+                    glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, GlobalVars.CurSearchName);
                     Config.hideKeyBoard();
                     return true;
                 }
@@ -120,7 +120,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
         searchView.setOnCloseListener(() -> {
-            glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
+//            glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
+            glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             return false;
         });
 
@@ -133,10 +134,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             glbVars.isDiscount = false;
             glbVars.Discount = 0;
         }
-
-        MenuItem sort = menu.findItem(R.id.NomenSort);
-        sort.setIcon(R.drawable.to_end_disabled);
-        sort.setEnabled(false);
 
         if (getArguments() != null && getArguments().size() != 0) {
             String Sgi = getArguments().getString("SGI");
@@ -174,13 +171,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
             c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
             if (c.getCount() == 0) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show());
+                Config.sout("Не заполнена шапка заказа");
                 return;
             }
             c2.moveToFirst();
 
             if (c2.getInt(1) == 0) {
-                getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show());
+                Config.sout("Нет ни одного добавленного товара для заказа");
                 return;
             }
 
@@ -201,7 +198,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
             IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
 
-            c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen where ZAKAZ<>0", null);
+            c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] FROM Nomen where ZAKAZ<>0", null);
             if (c1.getCount() == 0) {
                 c1.close();
                 return;
@@ -329,28 +326,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }).start();
     }
 
-    private float _insertIntoZakazyDT(String docid, float SUM) {
-        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ<>0", null);
-
-        glbVars.dbOrders.getWritableDatabase().beginTransaction();
-        for (int i = 0; i < nomenData.getCount(); i++) {
-            nomenData.moveToNext();
-            String KOD5 = nomenData.getString(nomenData.getColumnIndex("KOD5"));
-            String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
-            String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
-            String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
-            float sum = Float.parseFloat(PRICE.replace(",", ".")) * Integer.parseInt(ZAKAZ);
-            SUM += sum;
-            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
-        }
-
-        glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
-        glbVars.dbOrders.getWritableDatabase().endTransaction();
-        glbVars.db.ClearOrderHeader();
-        glbVars.db.ResetNomen();
-        nomenData.close();
-        return SUM;
-    }
+    private String localSGI = "", localGroup = "", localWC = "", localFocus = "", localSearch = "";
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -460,14 +436,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 return true;
             case R.id.NomenSort:
-                boolean isEnabledFilter = !(isFiltered && GlobalVars.CurGroup.equals("0"));
-                item.setEnabled(isEnabledFilter);
-
-                if (!isEnabledFilter) {
-                    item.setIcon(R.drawable.to_end_disabled);
-                    return true;
-                }
-
                 if (!isSorted) {
                     item.setIcon(R.drawable.to_top);
                     glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
@@ -532,11 +500,51 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 }
 
                 return true;
+            case R.id.NomenSales:
+                glbVars.isSales = !glbVars.isSales;
+
+                boolean isDifferent = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
+                localSGI = GlobalVars.CurSGI;
+                localGroup = GlobalVars.CurGroup;
+                localWC = GlobalVars.CurWCID;
+                localFocus = GlobalVars.CurFocusID;
+                localSearch = GlobalVars.CurSearchName;
+
+                glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
+                if (glbVars.isSales && isDifferent) {
+                    glbVars.calculatePricesByContrDiscount();
+                    return true;
+                }
+
+                if (glbVars.NomenAdapter != null) {
+                    glbVars.myNom.requery();
+                    glbVars.NomenAdapter.notifyDataSetChanged();
+                }
+
+//                setContrAndSum(glbVars);
+//                if (glbVars.isDiscount) {
+//                    glbVars.isDiscount = false;
+//                    glbVars.Discount = 0;
+//                    mainMenu.findItem(R.id.NomenDiscount).setEnabled(false);
+//                    glbVars.setDiscountIcon(mainMenu, R.id.NomenDiscount, false);
+//                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private boolean checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
+        if (!localSGI.equals(GlobalVars.CurSGI))
+            return true;
+        if (!localGroup.equals(GlobalVars.CurGroup))
+            return true;
+        if (!localWC.equals(GlobalVars.CurWCID))
+            return true;
+        if (!localFocus.equals(GlobalVars.CurFocusID))
+            return true;
+        return !localSearch.equals(GlobalVars.CurSearchName);
+    }
     @Override
     public void onPause() {
         super.onPause();
@@ -647,14 +655,16 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 //                }
 
                     String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
-                    glbVars.LoadNextNomen(0, SgiId, GroupID,
+//                    glbVars.LoadNextNomen(0, SgiId, GroupID,
+//                            WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
+                    glbVars.LoadNomen(SgiId, GroupID,
                             WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
                     glbVars.SetSelectedSgi(SgiId);
 
-                    if (isFiltered && GlobalVars.CurGroup.equals("0")) {
-                        mainMenu.findItem(R.id.NomenSort).setEnabled(false);
-                        mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
-                    }
+//                    if (isFiltered && GlobalVars.CurGroup.equals("0")) {
+//                        mainMenu.findItem(R.id.NomenSort).setEnabled(false);
+//                        mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
+//                    }
 
                     alertD.dismiss();
                 });
@@ -668,8 +678,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     GlobalVars.CurFocusID = GlobalVars.CurWCID = "0";
 
                     boolean isEnabledFilter = !(isFiltered && GlobalVars.CurGroup.equals("0"));
-                    mainMenu.findItem(R.id.NomenSort).setEnabled(isEnabledFilter);
-                    mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
+//                    mainMenu.findItem(R.id.NomenSort).setEnabled(isEnabledFilter);
+//                    mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
                 });
                 break;
             case R.id.SGIClear:
@@ -680,5 +690,28 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 Config.hideKeyBoard();
                 break;
         }
+    }
+
+    private float _insertIntoZakazyDT(String docid, float SUM) {
+        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE FROM Nomen WHERE ZAKAZ<>0", null);
+
+        glbVars.dbOrders.getWritableDatabase().beginTransaction();
+        for (int i = 0; i < nomenData.getCount(); i++) {
+            nomenData.moveToNext();
+            String KOD5 = nomenData.getString(nomenData.getColumnIndex("KOD5"));
+            String DESCR = nomenData.getString(nomenData.getColumnIndex("DESCR"));
+            String ZAKAZ = nomenData.getString(nomenData.getColumnIndex("ZAKAZ"));
+            String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
+            float sum = Float.parseFloat(PRICE.replace(",", ".")) * Integer.parseInt(ZAKAZ);
+            SUM += sum;
+            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
+        }
+
+        glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+        glbVars.dbOrders.getWritableDatabase().endTransaction();
+        glbVars.db.ClearOrderHeader();
+        glbVars.db.ResetNomen();
+        nomenData.close();
+        return SUM;
     }
 }

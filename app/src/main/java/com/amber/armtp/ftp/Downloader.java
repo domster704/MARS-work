@@ -75,13 +75,12 @@ public class Downloader {
             String filePath = MainActivity.filesPathDB + "armtp3.zip";
 
             FtpFileDownloader ftpFileDownloader;
-            ZipUnpacking zipUnpacking;
             try {
                 ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, "armtp3.zip");
                 if (!ftpFileDownloader.downloadWithPG(ui))
                     return;
 
-                zipUnpacking = new ZipUnpacking(filePath);
+                ZipUnpacking zipUnpacking = new ZipUnpacking(filePath);
                 if (!zipUnpacking.doUnpacking() && countOfTrying < 3) {
                     countOfTrying++;
                     downloadDB(ui, view, globalVars);

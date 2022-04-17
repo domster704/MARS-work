@@ -8,9 +8,14 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.amber.armtp.Config;
+import com.amber.armtp.GlobalVars;
+import com.amber.armtp.annotations.Async;
+import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.ui.OrderHeadFragment;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -30,8 +35,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static HashMap<String, Float> pricesMap = new HashMap<>();
     public static int limit = 60;
     private final HashSet<String> listOfUpdatedGroups = new HashSet<>();
-
-    public Thread threadResetting;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -154,6 +157,44 @@ public class DBHelper extends SQLiteOpenHelper {
             cursor = db.rawQuery("SELECT rowid AS _id, KOD5, DESCR, OST," +
                     " PRICE," +
                     " GRUPPA, ZAKAZ, FOTO, PD, SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen WHERE OST>0 " + sqlCondition + searchString + " ORDER BY Nomen.DESCR", null);
+            return cursor;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Cursor getNomen(String SgiID, String GrupID,
+                           String WCID, String FocusID, String SearchName) {
+        Cursor cursor;
+        String sqlMX = "", searchReq = "";
+        if (!SearchName.equals("")) {
+            String[] separated = SearchName.split(" ");
+            StringBuilder Condition = new StringBuilder("%" + SearchName + "%");
+            if (separated.length >= 1) {
+                Condition = new StringBuilder("%");
+                for (String item : separated) {
+                    Condition.append(item.toLowerCase(Locale.ROOT)).append("%");
+                }
+            }
+            searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
+        }
+
+        sqlMX += (!WCID.equals("0") && !WCID.equals("Выберите демографический признак") && !WCID.equals("Не использовать") && !WCID.equals("!Не определено") && !WCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + WCID + "'" : "";
+        sqlMX += (!FocusID.equals("0")) ? " AND Nomen.FOKUS='" + FocusID + "'" : "";
+        sqlMX += (!SgiID.equals("0")) ? " AND Nomen.SGI='" + SgiID + "'" : "";
+        sqlMX += (!GrupID.equals("0")) ? " AND Nomen.GRUPPA='" + GrupID + "'" : "";
+
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+//            if (!listOfUpdatedGroups.contains(GrupID)) {
+//                cursor = db.rawQuery("SELECT Nomen.KOD5, GRUPPA, NOMEN.SGI as SGI FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 " + sqlMX + searchReq + " ORDER BY Nomen.GRUPPA", null);
+//                _setNomenPriceWithoutSgi(cursor);
+//            }
+
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [" + GlobalVars.TypeOfPrice + "], [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 " + sqlMX + searchReq + " ORDER BY Nomen.GRUPPA", null);
             return cursor;
 
         } catch (Exception e) {
@@ -582,50 +623,35 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void ResetNomenPrice(boolean isCopied) throws InterruptedException {
+    public void ResetNomenPrice(boolean isCopied) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // TODO: make showing progress bar
-        threadResetting = new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                try {
-                    db.beginTransaction();
-                    pricesMap.clear();
-                    listOfUpdatedGroups.clear();
+        db.beginTransaction();
+        pricesMap.clear();
+        listOfUpdatedGroups.clear();
 
-                    Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
+        Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
 
-                    if (!isCopied) {
-                        db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
-                    }
+        if (!isCopied) {
+            db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
+        }
 
-                    if (isCopied || cCheck.getCount() != 0) {
-                        Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0 ORDER BY GRUPPA", null);
-                        _setNomenPriceWithoutSgi(c);
+        if (isCopied || cCheck.getCount() != 0) {
+            Cursor c = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE PRICE <> 0 ORDER BY GRUPPA", null);
+            _setNomenPriceWithoutSgi(c);
 
-                        Set<String> keys = pricesMap.keySet();
-                        for (String key : keys) {
-                            float price = pricesMap.get(key);
-                            db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + key + "'");
-                        }
-                    } else {
-                        db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
-                    }
-
-                    cCheck.close();
-                    db.setTransactionSuccessful();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    db.endTransaction();
-                }
+            Set<String> keys = pricesMap.keySet();
+            for (String key : keys) {
+                float price = pricesMap.get(key);
+                db.execSQL("UPDATE NOMEN SET PRICE = '" + price + "' WHERE KOD5 = '" + key + "'");
             }
-        });
+        } else {
+            db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
+        }
 
-        threadResetting.start();
-        threadResetting.join();
+        cCheck.close();
+        db.setTransactionSuccessful();
     }
 
     public String GetToolbarContr() {
@@ -675,40 +701,6 @@ public class DBHelper extends SQLiteOpenHelper {
                     "DEBET.SCHET AS FIRMA, \n" +
                     "DEBET.DOGOVOR AS CRT_DATE \n" +
                     "FROM DEBET " + Sql + " ORDER BY DEBET.KONTR", null);
-            return cursor;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Cursor SearchInDebet(String Contr) {
-        Cursor cursor;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT DISTINCT\n" +
-                    "DEBET.ROWID AS _id ,\n" +
-                    "DEBET.KONTR AS DESCR, \n" +
-                    "DEBET.STATUS AS STATUS, \n" +
-                    "DEBET.KREDIT, \n" +
-                    "DEBET.DOLG AS SALDO,\n" +
-                    "DEBET.A7 AS A7, \n" +
-                    "DEBET.A14 AS A14, \n" +
-                    "DEBET.A21 AS A21, \n" +
-                    "DEBET.A28 AS A28, \n" +
-                    "DEBET.A35 AS A35, \n" +
-                    "DEBET.A42 AS A42, \n" +
-                    "DEBET.A49 AS A49, \n" +
-                    "DEBET.A56 AS A56, \n" +
-                    "DEBET.A63 AS A63, \n" +
-                    "DEBET.A64 AS A64, \n" +
-                    "DEBET.OTGR30 AS OTG30, \n" +
-                    "DEBET.OPL30 AS OPL30, \n" +
-                    "DEBET.K_OROB AS KOB, \n" +
-                    "DEBET.SCHET AS FIRMA, \n" +
-                    "DEBET.DOGOVOR AS CRT_DATE \n" +
-                    "FROM DEBET WHERE LOWER(DESCR) LIKE '%" + Contr.toLowerCase() + "%' ORDER BY DESCR", null);
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();
@@ -769,7 +761,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET PRICE = CASE WHEN PRICE != '0' THEN PRICE ELSE '" + price + "' END WHERE KOD5=" + id);
+            db.execSQL("UPDATE Nomen SET PRICE = '" + price + "' WHERE KOD5=" + id);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -778,12 +770,12 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void putPriceInNomen(long rowid, String price) {
+    public void putPriceInNomen(long rowID, String price) {
         SQLiteDatabase db;
         db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET PRICE = CASE WHEN PRICE != '0' THEN PRICE ELSE '" + price + "' END WHERE rowid=" + rowid);
+            db.execSQL("UPDATE Nomen SET PRICE = CASE WHEN PRICE != '0' THEN PRICE ELSE '" + price + "' END WHERE rowid=" + rowID);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -801,44 +793,23 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-//    public void putAllNomenPrices(String CONTR) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        Cursor allSgiAndGroup = db.rawQuery("SELECT SGI, GRUPS.CODE AS [GROUP] FROM SGI JOIN GRUPS ON GRUPS.SGI = SGI.CODE", null);
-//        int i = 1;
-//        while (allSgiAndGroup.moveToNext()) {
-//            String SGI = allSgiAndGroup.getString(0);
-//            String GROUP = allSgiAndGroup.getString(1);
-//            System.out.println(SGI + " " + GROUP + " " + i);
-//            i += 1;
-//            Cursor c = db.rawQuery("SELECT NOMEN, CENA * (1 - SKIDKI.SKIDKA / 100) as PRICE, SKIDKI.TIPCEN FROM PRICES JOIN SKIDKI ON PRICES.TIPCEN=SKIDKI.TIPCEN AND SKIDKI.SGI=? AND SKIDKI.KONTR=? AND PRICES.NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA=? AND SGI=?)", new String[]{SGI, CONTR, GROUP, SGI});
-//            while (c.moveToNext()) {
-//                pricesMap.put(c.getString(0), c.getFloat(1));
-//            }
-//        }
-//    }
+    public String getPriceType(String ContrID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT PRICE FROM CONTRS WHERE CODE=?", new String[]{ContrID});
+        c.moveToNext();
+        String priceType = c.getString(0);
+        c.close();
+        return priceType;
+    }
 
     private void _setNomenPriceWithoutSgi(Cursor cursor) {
         if (cursor.getCount() == 0)
             return;
-//        SQLiteDatabase db = this.getWritableDatabase();
 
         while (cursor.moveToNext()) {
             if (pricesMap.containsKey(cursor.getString(cursor.getColumnIndex("KOD5"))))
                 continue;
-//            String SGI = cursor.getString(cursor.getColumnIndex("SGI"));
-//            String GROUP = cursor.getString(cursor.getColumnIndex("GRUPPA"));
-//
-//            System.out.println(SGI + " " + GROUP);
-//
-//            if (listOfUpdatedGroups.contains(GROUP))
-//                continue;
-//
-//            Cursor c = db.rawQuery("SELECT NOMEN, CENA * (1 - SKIDKI.SKIDKA / 100) as PRICE, SKIDKI.TIPCEN FROM PRICES JOIN SKIDKI ON PRICES.TIPCEN=SKIDKI.TIPCEN AND SKIDKI.SGI=? AND SKIDKI.KONTR=? AND PRICES.NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA=? AND SGI=?)", new String[]{SGI, OrderHeadFragment.CONTR_ID, GROUP, SGI});
-//            while (c.moveToNext()) {
-//                pricesMap.put(c.getString(0), c.getFloat(1));
-//            }
-//            listOfUpdatedGroups.add(GROUP);
+
             String groupID = cursor.getString(cursor.getColumnIndex("GRUPPA"));
             String sgiID = cursor.getString(cursor.getColumnIndex("SGI"));
             if (!listOfUpdatedGroups.contains(groupID))
@@ -902,5 +873,90 @@ public class DBHelper extends SQLiteOpenHelper {
             listOfUpdatedGroups.add(GroupID);
 
         cursor.close();
+    }
+
+    @AsyncUI
+    public float getRealPrice(String nomenCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor sgiAndGroup = db.rawQuery("SELECT SGI, GRUPPA FROM NOMEN WHERE KOD5='" + nomenCode + "'", null);
+
+        sgiAndGroup.moveToNext();
+
+        String SgiID = sgiAndGroup.getString(sgiAndGroup.getColumnIndex("SGI"));
+        String GroupID = sgiAndGroup.getString(sgiAndGroup.getColumnIndex("GRUPPA"));
+        Cursor tipcenCursor = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
+
+        tipcenCursor.moveToNext();
+        System.out.println(nomenCode);
+
+        Cursor c = db.rawQuery("SELECT NOMEN, CENA, TIPCEN FROM PRICES WHERE TIPCEN = '" + tipcenCursor.getString(tipcenCursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
+        c.moveToNext();
+
+        float price = Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(tipcenCursor.getString(tipcenCursor.getColumnIndex("SKIDKA"))) / 100);
+        sgiAndGroup.close();
+        tipcenCursor.close();
+        c.close();
+        return price;
+    }
+
+    public void calcSales(String ContrID) {
+        if (pricesMap.size() > 0 && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals("") && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals(ContrID)) {
+            resetContrPrices();
+        }
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+        updatePrices(c);
+        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+        updatePrices(c);
+    }
+
+    private void updatePrices(Cursor c) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        while (c.moveToNext()) {
+            String nomen = c.getString(c.getColumnIndex("NOMEN"));
+            float price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(c.getString(c.getColumnIndex("SKIDKA"))) / 100)).replace(",", "."));
+            if (pricesMap.containsKey(nomen) && pricesMap.get(nomen) == price) {
+                continue;
+            }
+
+            pricesMap.put(nomen, price);
+
+        }
+        c.close();
+    }
+
+    private void resetContrPrices() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        pricesMap.clear();
+        db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE>0");
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private String generateSQLRequestByCurrentData() {
+        String sqlMX = "", searchReq = "";
+        if (!GlobalVars.CurSearchName.equals("")) {
+            String[] separated = GlobalVars.CurSearchName.split(" ");
+            StringBuilder Condition = new StringBuilder("%" + GlobalVars.CurSearchName + "%");
+            if (separated.length >= 1) {
+                Condition = new StringBuilder("%");
+                for (String item : separated) {
+                    Condition.append(item.toLowerCase(Locale.ROOT)).append("%");
+                }
+            }
+            searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
+        }
+
+        sqlMX += (!GlobalVars.CurWCID.equals("0") && !GlobalVars.CurWCID.equals("Выберите демографический признак") && !GlobalVars.CurWCID.equals("Не использовать") && !GlobalVars.CurWCID.equals("!Не определено") && !GlobalVars.CurWCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + GlobalVars.CurWCID + "'" : "";
+        sqlMX += (!GlobalVars.CurFocusID.equals("0")) ? " AND Nomen.FOKUS='" + GlobalVars.CurFocusID + "'" : "";
+        sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
+        sqlMX += (!GlobalVars.CurGroup.equals("0")) ? " AND Nomen.GRUPPA='" + GlobalVars.CurGroup + "'" : "";
+        return sqlMX + searchReq;
     }
 }
