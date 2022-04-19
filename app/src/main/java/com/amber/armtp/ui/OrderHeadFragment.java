@@ -55,8 +55,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     private boolean isCopiedLocal = false;
     private static final String APP_PREFERENCES_CONTR = "Contr";
 
-    private Button returnMoneyButton;
-
     public OrderHeadFragment() {
     }
 
@@ -110,7 +108,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-        returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
+        Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
         returnMoneyButton.setOnClickListener(this);
 
         setContrAndSum(glbVars);
@@ -184,10 +182,10 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
             glbVars.txtComment.setText(Comment, TextView.BufferType.EDITABLE);
         }
 
-        if (glbVars.txtComment.getText().toString().contains("Вернуть деньги")) {
-            returnMoneyButton.setEnabled(false);
-            returnMoneyButton.setTextColor(getResources().getColor(R.color.colorSecondaryText));
-        }
+//        if (glbVars.txtComment.getText().toString().contains(getResources().getString(R.string.takeOutMoney))) {
+//            returnMoneyButton.setEnabled(false);
+//            returnMoneyButton.setTextColor(getResources().getColor(R.color.colorSecondaryText));
+//        }
 
         if (!DelivDate.equals("")) {
             glbVars.txtDate.setText(DelivDate, TextView.BufferType.EDITABLE);
@@ -269,11 +267,17 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     public void onClick(View view) {
         if (view.getId() == R.id.returnMoneyButton) {
             String currentText = glbVars.txtComment.getText().toString();
-            if (!currentText.equals("")) {
-                currentText = ", " + currentText;
+            if (currentText.equals("")) {
+                glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney));
+            } else {
+                glbVars.txtComment.setText(currentText + ", " + getResources().getString(R.string.takeOutMoney).toLowerCase());
             }
-            glbVars.txtComment.setText("Вернуть деньги" + currentText);
-            view.setEnabled(false);
+//            String currentText = glbVars.txtComment.getText().toString();
+//            if (!currentText.equals("")) {
+//                currentText = ", " + currentText;
+//            }
+//            glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney) + currentText);
+//            view.setEnabled(false);
         }
     }
 

@@ -5,4 +5,6 @@
     <string name="resPort">Порт</string>
     <string name="resLogin">Логин</string>
     <string name="resPass">Пароль</string>
+    
+    <string name="takeOutMoney">Забрать деньги</string>
 </resources>

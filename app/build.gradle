@@ -16,8 +16,8 @@ android {
         applicationId 'com.amber.armtp'
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode      48
-        versionName "2.0.48"
+        versionCode      50
+        versionName "2.0.50"
     }
 
     buildTypes {

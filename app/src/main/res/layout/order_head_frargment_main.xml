@@ -175,7 +175,7 @@
                 android:id="@+id/returnMoneyButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Вернуть деньги"
+                android:text="@string/takeOutMoney"
                 android:layout_marginStart="@dimen/editTextParentWidth"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/black"

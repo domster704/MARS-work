@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         filesPathDB = path.substring(0, path.lastIndexOf("/")) + "/databases/";
         filesPathAPK = path.substring(0, path.lastIndexOf("/")) + "/files/";
 //        filesPathAPK = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/";
-        Log.d("x", filesPathAPK);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -113,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         // For ftp-server
         SharedPreferences serverSettings = getSharedPreferences("apk_version", 0);
 
+//        Config.sout(1);
+
         String host = serverSettings.getString("FtpServerHost", getResources().getString(R.string.host));
         String port = "" + serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)));
         String dirDB = getResources().getString(R.string.fileDirectoryDB);
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         String password = serverSettings.getString("FtpServerPass", getResources().getString(R.string.password));
 
         // It's singleton instance for future using
-        ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);
+        ServerDetails serverDetails = ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);
 
         globalVariable = (GlobalVars) getApplicationContext();
 

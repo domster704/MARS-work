@@ -8,7 +8,6 @@ import com.amber.armtp.annotations.AsyncUI;
 
 public class ProgressBarLoading {
     private final Context context;
-
     private AlertDialog dialog;
 
     public ProgressBarLoading(Context context) {
