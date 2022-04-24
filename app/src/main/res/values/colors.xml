@@ -15,6 +15,7 @@
     <color name="yellow">#ffff00</color>
     <color name="blue">#0000ff</color>
     <color name="black">#000000</color>
+    <color name="systemColor">#0D9380</color>
 
     <color name="postDataColorRed">#c90000</color>
     <color name="postDataColorGreen">#53ad2f</color>

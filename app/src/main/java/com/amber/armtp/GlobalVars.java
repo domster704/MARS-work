@@ -149,6 +149,8 @@ public class GlobalVars extends Application implements TBUpdate {
     public Spinner spTP;
     public int BeginPos = 0, EndPos = 0;
 
+    public static Thread downloadPhotoTread;
+
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -181,7 +183,8 @@ public class GlobalVars extends Application implements TBUpdate {
             int count = Integer.parseInt(tvNomenCount.getText().toString());
 
             if (isMultiSelect) {
-                _multiSelect(ID, ost, count);
+//                _multiSelect(ID, ost, count);
+                _multiSelect(ID, ost);
             } else {
                 _fillNomenDataFromAlertDialog(ID, ost);
             }
@@ -497,40 +500,6 @@ public class GlobalVars extends Application implements TBUpdate {
         return new NomenAdapter(glbContext, R.layout.nomen_layout, cursor, new String[]{"_id", "KOD5", "DESCR", "OST", "ZAKAZ", "GRUPPA", "SGI", "FOTO", "GOFRA", "MP", GlobalVars.TypeOfPrice}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP, R.id.ColNomPrice}, 0);
     }
 
-    public void LoadNextNomen(final int positionSQL, String... args) {
-        String[] formatedArgs = new String[5];
-        System.arraycopy(args, 0, formatedArgs, 0, args.length);
-        for (int i = args.length; i < formatedArgs.length; i++) {
-            formatedArgs[i] = "0";
-        }
-
-        CurSGI = formatedArgs[0].equals("0") ? CurSGI : formatedArgs[0];
-        CurGroup = formatedArgs[1].equals("0") ? CurGroup : formatedArgs[1];
-        CurWCID = formatedArgs[2].equals("0") ? CurWCID : formatedArgs[2];
-        CurFocusID = formatedArgs[3].equals("0") ? CurFocusID : formatedArgs[3];
-        CurSearchName = formatedArgs[4].equals("") ? CurSearchName : formatedArgs[4].toLowerCase(Locale.ROOT);
-
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                myNom = db.getNextNomen(
-                        CurSGI, CurGroup,
-                        CurWCID, CurFocusID, CurSearchName, positionSQL);
-                CurAc.runOnUiThread(() -> {
-                    nomenList.setAdapter(null);
-                    NomenAdapter = getNomenAdapter(myNom);
-                    nomenList.setAdapter(NomenAdapter);
-                    nomenList.setOnItemClickListener(GridNomenClick);
-                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
-                    if (positionSQL != 0)
-                        nomenList.setSelection(positionSQL - 1);
-                });
-                isNewLoaded = false;
-            }
-        }).start();
-    }
-
     public void LoadNomen(String... args) {
         String[] formatedArgs = new String[5];
         System.arraycopy(args, 0, formatedArgs, 0, args.length);
@@ -563,7 +532,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }).start();
     }
 
-//    @DelayedCalled
+    //    @DelayedCalled
     public void SetSelectedSgi(String SgiID) {
         for (int i = 0; i < spSgi.getCount(); i++) {
             Cursor value = (Cursor) spSgi.getItemAtPosition(i);
@@ -698,9 +667,9 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public void DownloadPhoto(final String FileName) {
-        new Thread(new Runnable() {
+        downloadPhotoTread = new Thread(new Runnable() {
             @Override
-            @PGShowing
+            @PGShowing(isCanceled = true)
             public void run() {
                 SharedPreferences settings;
                 String ftp_server, ftp_user, ftp_pass;
@@ -739,6 +708,7 @@ public class GlobalVars extends Application implements TBUpdate {
                     } catch (Exception ignored) {
                     }
                 } catch (Exception e) {
+                    System.out.println();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -748,27 +718,30 @@ public class GlobalVars extends Application implements TBUpdate {
                     }
                 }
 
-                CurAc.runOnUiThread(() -> {
-                    if (!isSecondPhoto) {
-                        ShowNomenPhoto(FileName);
-                        imageView.invalidate();
-                    } else {
-                        if (alertPhoto != null) {
-                            imageView.setTag("Фото 2");
-                            alertPhoto.setTitle(FileName);
-                            imageView.setImage(ImageSource.uri(photoDir + "/" + FileName));
-
+                if (!Thread.currentThread().isInterrupted()) {
+                    CurAc.runOnUiThread(() -> {
+                        if (!isSecondPhoto) {
+                            ShowNomenPhoto(FileName);
                             imageView.invalidate();
+                        } else {
+                            if (alertPhoto != null) {
+                                imageView.setTag("Фото 2");
+                                alertPhoto.setTitle(FileName);
+                                imageView.setImage(ImageSource.uri(photoDir + "/" + FileName));
+
+                                imageView.invalidate();
+                            }
                         }
-                    }
-                    GridView gdNomen = CurView.findViewById(R.id.listContrs);
-                    myNom.requery();
-                    if (NomenAdapter != null)
-                        NomenAdapter.notifyDataSetChanged();
-                    gdNomen.invalidateViews();
-                });
+                        GridView gdNomen = CurView.findViewById(R.id.listContrs);
+                        myNom.requery();
+                        if (NomenAdapter != null)
+                            NomenAdapter.notifyDataSetChanged();
+                        gdNomen.invalidateViews();
+                    });
+                }
             }
-        }).start();
+        });
+        downloadPhotoTread.start();
     }
 
     public void ShowNomenPhoto(final String PhotoFileName) {
@@ -1800,12 +1773,8 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    private void _multiSelect(String ID, int ost, int chosenNomenCount) {
-        if (MultiQty == 0) {
-            db.UpdateQty(ID, MultiQty, ost);
-        } else {
-            db.UpdateQty(ID, MultiQty + chosenNomenCount, ost);
-        }
+    private void _multiSelect(String ID, int ost) {
+        db.UpdateQty(ID, MultiQty, ost);
         myNom.requery();
         NomenAdapter.notifyDataSetChanged();
 
