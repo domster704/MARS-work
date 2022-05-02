@@ -36,7 +36,9 @@ import com.amber.armtp.interfaces.TBUpdate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -120,7 +122,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         searchView.setQueryHint("Поиск номенклатуры");
         searchView.setOnQueryTextListener(searchTextListener);
         searchView.setOnCloseListener(() -> {
-//            glbVars.LoadNextNomen(1, GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             return false;
         });
@@ -512,7 +513,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 }
 
                 localSGI = GlobalVars.CurSGI;
-                localGroup = GlobalVars.CurGroup;
                 localWC = GlobalVars.CurWCID;
                 localFocus = GlobalVars.CurFocusID;
                 localSearch = GlobalVars.CurSearchName;
@@ -622,6 +622,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                     isFiltered = true;
+//                    glbVars.isNeedingTobeLoadingBySgi = false;
                     FilterWC_ID = promptView.findViewById(R.id.ColWCID);
                     FilterFocus_ID = promptView.findViewById(R.id.ColFocusID);
 
@@ -637,7 +638,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     glbVars.LoadNomen(SgiId, GroupID,
                             WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
                     glbVars.SetSelectedSgi(SgiId);
-
                     alertD.dismiss();
                 });
 
@@ -654,6 +654,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 glbVars.resetCurData();
                 glbVars.resetAllSpinners();
                 glbVars.resetSearchViewData();
+//                resetLocalData();
                 glbVars.nomenList.setAdapter(null);
                 Config.hideKeyBoard();
                 break;
@@ -692,7 +693,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    private static String localSGI = "", localGroup = "", localWC = "", localFocus = "", localSearch = "";
+    private static String localSGI = "";
+    private static String localGroup = "";
+    private static String localWC = "";
+    private static String localFocus = "";
+    private static String localSearch = "";
+
+    private static HashSet<String> SgiList = new HashSet<>();
 
     private static void updateData() {
         localSGI = GlobalVars.CurSGI;
@@ -700,23 +707,27 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         localWC = GlobalVars.CurWCID;
         localFocus = GlobalVars.CurFocusID;
         localSearch = GlobalVars.CurSearchName;
+
+        if (!localSGI.equals("0") && localFocus.equals("0") && localWC.equals("0") && localGroup.equals("0"))
+            SgiList.add(localSGI);
     }
 
     private static void resetLocalData() {
-        localSGI = "0";
-        localGroup = "0";
-        localWC = "0";
-        localFocus = "0";
+        localSGI = "";
+        localGroup = "";
+        localWC = "";
+        localFocus = "";
         localSearch = "";
     }
 
     private static boolean checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
-//        System.out.println(isFiltered);
-//        System.out.println("WC: " + localWC + " * " + GlobalVars.CurWCID);
-//        System.out.println("Focus: " + localFocus + " * " + GlobalVars.CurFocusID);
-//        System.out.println("SGI: " + localSGI + " * " + GlobalVars.CurSGI);
-//        System.out.println("Group: " + localGroup + " * " + GlobalVars.CurGroup);
-//        System.out.println("Search: " + localSearch + " * " + GlobalVars.CurSearchName);
+        System.out.println(isFiltered);
+        System.out.println("WC: " + localWC + " * " + GlobalVars.CurWCID);
+        System.out.println("Focus: " + localFocus + " * " + GlobalVars.CurFocusID);
+        System.out.println("SGI: " + localSGI + " * " + GlobalVars.CurSGI);
+        System.out.println("Group: " + localGroup + " * " + GlobalVars.CurGroup);
+        System.out.println("Search: " + localSearch + " * " + GlobalVars.CurSearchName);
+        System.out.println("SgiList: " + SgiList.toString());
 
         boolean isDifferent;
         if (GlobalVars.CurSGI.equals("0") && !isFiltered && !localSearch.equals(GlobalVars.CurSearchName)) {
@@ -725,6 +736,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             isDifferent = !localWC.equals(GlobalVars.CurWCID) || !localFocus.equals(GlobalVars.CurFocusID);
         } else {
             isDifferent = !localSGI.equals(GlobalVars.CurSGI);
+        }
+
+        if (SgiList.contains(GlobalVars.CurSGI)) {
+            isDifferent = false;
         }
 
         updateData();

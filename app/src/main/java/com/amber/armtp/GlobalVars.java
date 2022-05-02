@@ -111,6 +111,8 @@ public class GlobalVars extends Application implements TBUpdate {
     public boolean isMultiSelect = false;
     public boolean isSecondPhoto = false;
     public boolean isSales = false;
+    public boolean isNeedingTobeLoadingBySgi = true;
+
     public float Discount = 0;
     public int MultiQty = 0;
 
@@ -255,8 +257,6 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
-//            isSales = false;
-//            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
             CurGroup = ItemID;
 
@@ -266,6 +266,9 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             if (CurSGI.equals("0"))
                 return;
+
+//            if (!CurGroup.equals("0") && !CurWCID.equals("0") && !CurFocusID.equals("0") && !CurSearchName.equals(""))
+//            System.out.println(2);
             LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
         }
 
@@ -277,8 +280,6 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
-//            isSales = false;
-//            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
 
             CurGroup = "0";
@@ -289,7 +290,13 @@ public class GlobalVars extends Application implements TBUpdate {
                 spGrup.setAdapter(null);
             } else {
                 LoadGroups(ItemID);
+//                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
             }
+
+//            if (!isNeedingTobeLoadingBySgi) {
+//                isNeedingTobeLoadingBySgi = true;
+//                return;
+//            }
 
             if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
                 LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
@@ -505,16 +512,27 @@ public class GlobalVars extends Application implements TBUpdate {
             formatedArgs[i] = "0";
         }
 
-        CurSGI = formatedArgs[0].equals("0") ? CurSGI : formatedArgs[0];
-        CurGroup = formatedArgs[1].equals("0") ? CurGroup : formatedArgs[1];
-        CurWCID = formatedArgs[2].equals("0") ? CurWCID : formatedArgs[2];
-        CurFocusID = formatedArgs[3].equals("0") ? CurFocusID : formatedArgs[3];
-        CurSearchName = formatedArgs[4].equals("") ? CurSearchName : formatedArgs[4].toLowerCase(Locale.ROOT);
+//        CurSGI = formatedArgs[0].equals("0") ? CurSGI : formatedArgs[0];
+//        CurGroup = formatedArgs[1].equals("0") ? CurGroup : formatedArgs[1];
+//        CurWCID = formatedArgs[2].equals("0") ? CurWCID : formatedArgs[2];
+//        CurFocusID = formatedArgs[3].equals("0") ? CurFocusID : formatedArgs[3];
+//        CurSearchName = formatedArgs[4].equals("") ? CurSearchName : formatedArgs[4].toLowerCase(Locale.ROOT);
+
+        CurSGI = formatedArgs[0];
+        CurGroup = formatedArgs[1];
+        CurWCID = formatedArgs[2];
+        CurFocusID = formatedArgs[3];
+        CurSearchName = formatedArgs[4].toLowerCase(Locale.ROOT);
 
         new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
+                System.out.println(CurSGI + " " + CurGroup + " " + CurWCID + " " + CurFocusID);
+//                myNom = db.getNomen(
+//                        CurSGI, CurGroup,
+//                        CurWCID, CurFocusID, CurSearchName);
+//                Config.printCursor(myNom);
                 myNom = db.getNomen(
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
@@ -525,6 +543,7 @@ public class GlobalVars extends Application implements TBUpdate {
                     nomenList.setOnItemClickListener(GridNomenClick);
                     nomenList.setOnItemLongClickListener(GridNomenLongClick);
 
+//                    myNom.requery();
                     // needs to call notifyDataSetChanged in NomenAdapter class
                     NomenAdapter.notifyDataSetChanged();
                 });
@@ -1419,14 +1438,15 @@ public class GlobalVars extends Application implements TBUpdate {
             return (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
         }
 
+        // TODO: fix it
         @Override
         public void notifyDataSetChanged() {
             super.notifyDataSetChanged();
 
             // check isSales and if true, then set real prices from contractor
             if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
-                FormOrderFragment.setRealPrices(GlobalVars.this);
                 hasBeenAlreadyNoChanged = false;
+                FormOrderFragment.setRealPrices(GlobalVars.this);
             }
         }
     }
@@ -1573,9 +1593,9 @@ public class GlobalVars extends Application implements TBUpdate {
     public void resetCurData() {
         CurGroup = CurWCID = CurFocusID = CurSGI = "0";
         CurSearchName = "";
+        isNeedingTobeLoadingBySgi = true;
 
         Discount = 0f;
-//        isSales = false;
         Menu menu = FormOrderFragment.mainMenu;
         if (menu != null && menu.size() > 1) {
             setIconColor(menu, R.id.NomenDiscount, false);
