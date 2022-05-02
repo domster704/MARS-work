@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
@@ -272,7 +273,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT PRICE, ZAKAZ FROM Nomen WHERE ZAKAZ <> 0", null);
+            cursor = db.rawQuery("SELECT [" + GlobalVars.TypeOfPrice + "], ZAKAZ FROM Nomen WHERE ZAKAZ <> 0", null);
             float curPrice = 0;
             while (cursor.moveToNext()) {
                 curPrice += (Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1));
@@ -795,7 +796,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public String getPriceType(String ContrID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT PRICE FROM CONTRS WHERE CODE=?", new String[]{ContrID});
+        Cursor c;
+        try {
+            c = db.rawQuery("SELECT PRICE FROM CONTRS WHERE CODE=?", new String[]{ContrID});
+        } catch (Exception e) {
+            return "";
+        }
         c.moveToNext();
         String priceType = c.getString(0);
         c.close();
@@ -887,7 +893,6 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor tipcenCursor = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
 
         tipcenCursor.moveToNext();
-        System.out.println(nomenCode);
 
         Cursor c = db.rawQuery("SELECT NOMEN, CENA, TIPCEN FROM PRICES WHERE TIPCEN = '" + tipcenCursor.getString(tipcenCursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
         c.moveToNext();
@@ -900,14 +905,22 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void calcSales(String ContrID) {
+        Cursor c;
         if (pricesMap.size() > 0 && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals("") && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals(ContrID)) {
             resetContrPrices();
         }
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+//        Log.d("xd", ContrID);
+//        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+//                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+//        Config.printCursor(c);
+        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
         updatePrices(c);
+//        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+//                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+//        Config.printCursor(c);
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
         updatePrices(c);
@@ -923,7 +936,6 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
             pricesMap.put(nomen, price);
-
         }
         c.close();
     }

@@ -255,8 +255,8 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
-            isSales = false;
-            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
+//            isSales = false;
+//            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
             CurGroup = ItemID;
 
@@ -277,8 +277,8 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             resetSearchViewData();
-            isSales = false;
-            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
+//            isSales = false;
+//            setIconColor(FormOrderFragment.mainMenu, R.id.NomenSales, false);
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
 
             CurGroup = "0";
@@ -411,8 +411,6 @@ public class GlobalVars extends Application implements TBUpdate {
                     args.putString("SGI", Sgi);
                     args.putString("Group", Grup);
 
-                    System.out.println(Sgi + " " + Grup);
-
                     fragment.setArguments(args);
                     fragmentTransaction = fragManager.beginTransaction();
                     fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
@@ -526,6 +524,9 @@ public class GlobalVars extends Application implements TBUpdate {
                     nomenList.setAdapter(NomenAdapter);
                     nomenList.setOnItemClickListener(GridNomenClick);
                     nomenList.setOnItemLongClickListener(GridNomenLongClick);
+
+                    // needs to call notifyDataSetChanged in NomenAdapter class
+                    NomenAdapter.notifyDataSetChanged();
                 });
                 isNewLoaded = false;
             }
@@ -615,55 +616,60 @@ public class GlobalVars extends Application implements TBUpdate {
         ConnectivityManager connectivityManager = (ConnectivityManager) glbContext.getSystemService(CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeNetworkInfo == null) {
-            Toast.makeText(glbContext, "Нет доступной сотовой сети", Toast.LENGTH_LONG).show();
-            return false;
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            return true;
         }
-        if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            return activeNetworkInfo.isConnectedOrConnecting();
-        } else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-            switch (activeNetworkInfo.getSubtype()) {
-                case TelephonyManager.NETWORK_TYPE_1xRTT:
-                case TelephonyManager.NETWORK_TYPE_EDGE:
-                    return false; // ~ 50-100 kbps
-                case TelephonyManager.NETWORK_TYPE_CDMA:
-                    return false; // ~ 14-64 kbps
-                case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                    return true; // ~ 400-1000 kbps
-                case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                    return true; // ~ 600-1400 kbps
-                case TelephonyManager.NETWORK_TYPE_GPRS:
-                    return false; // ~ 100 kbps
-                case TelephonyManager.NETWORK_TYPE_HSDPA:
-                    return true; // ~ 2-14 Mbps
-                case TelephonyManager.NETWORK_TYPE_HSPA:
-                    return true; // ~ 700-1700 kbps
-                case TelephonyManager.NETWORK_TYPE_HSUPA:
-                    return true; // ~ 1-23 Mbps
-                case TelephonyManager.NETWORK_TYPE_UMTS:
-                    return true; // ~ 400-7000 kbps
-                /*
-                 * Above API level 7, make sure to set android:targetSdkVersion
-                 * to appropriate level to use these
-                 */
-                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
-                    return true; // ~ 1-2 Mbps
-                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
-                    return true; // ~ 5 Mbps
-                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
-                    return true; // ~ 10-20 Mbps
-                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
-                    return false; // ~25 kbps
-                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
-                    return true; // ~ 10+ Mbps
-                // Unknown
-                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-                default:
-                    return false;
-            }
-        } else {
-            return false;
-        }
+        Config.sout("Нет доступа к интернету");
+        return false;
+//        if (activeNetworkInfo == null) {
+//            Toast.makeText(glbContext, "Нет доступной сотовой сети", Toast.LENGTH_LONG).show();
+//            return false;
+//        }
+//        if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+//            return activeNetworkInfo.isConnectedOrConnecting();
+//        } else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+//            switch (activeNetworkInfo.getSubtype()) {
+//                case TelephonyManager.NETWORK_TYPE_1xRTT:
+//                case TelephonyManager.NETWORK_TYPE_EDGE:
+//                    return false; // ~ 50-100 kbps
+//                case TelephonyManager.NETWORK_TYPE_CDMA:
+//                    return false; // ~ 14-64 kbps
+//                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+//                    return true; // ~ 400-1000 kbps
+//                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+//                    return true; // ~ 600-1400 kbps
+//                case TelephonyManager.NETWORK_TYPE_GPRS:
+//                    return false; // ~ 100 kbps
+//                case TelephonyManager.NETWORK_TYPE_HSDPA:
+//                    return true; // ~ 2-14 Mbps
+//                case TelephonyManager.NETWORK_TYPE_HSPA:
+//                    return true; // ~ 700-1700 kbps
+//                case TelephonyManager.NETWORK_TYPE_HSUPA:
+//                    return true; // ~ 1-23 Mbps
+//                case TelephonyManager.NETWORK_TYPE_UMTS:
+//                    return true; // ~ 400-7000 kbps
+//                /*
+//                 * Above API level 7, make sure to set android:targetSdkVersion
+//                 * to appropriate level to use these
+//                 */
+//                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
+//                    return true; // ~ 1-2 Mbps
+//                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
+//                    return true; // ~ 5 Mbps
+//                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
+//                    return true; // ~ 10-20 Mbps
+//                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
+//                    return false; // ~25 kbps
+//                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
+//                    return true; // ~ 10+ Mbps
+//                // Unknown
+//                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+//                default:
+//                    return false;
+//            }
+//        } else {
+//            return false;
+//        }
     }
 
     public void DownloadPhoto(final String FileName) {
@@ -708,7 +714,6 @@ public class GlobalVars extends Application implements TBUpdate {
                     } catch (Exception ignored) {
                     }
                 } catch (Exception e) {
-                    System.out.println();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -900,7 +905,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
         c = dbOrders.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, ZAKAZY.DOCID as DOCID, ZAKAZY.DOC_DATE as DOC_DATE, ZAKAZY.DELIVERY_DATE as DEL_DATE, ZAKAZY.COMMENT as COMMENT, ZAKAZY_DT.NOMEN as NOMEN, ZAKAZY_DT.DESCR as DES, ZAKAZY_DT.QTY as QTY, ZAKAZY_DT.PRICE as PRICE FROM ZAKAZY JOIN ZAKAZY_DT ON ZAKAZY.DOCID = ZAKAZY_DT.ZAKAZ_ID WHERE ZAKAZY.ROWID='" + ID + "'", null);
         if (c.getCount() == 0) {
-            Toast.makeText(CurAc, "В таблице заказов нет записей для отправки", Toast.LENGTH_LONG).show();
+            Config.sout("В таблице заказов нет записей для отправки");
             return "";
         }
 
@@ -984,7 +989,6 @@ public class GlobalVars extends Application implements TBUpdate {
         fields[index].setDataType(DBFField.FIELD_TYPE_C);
         fields[index].setFieldLength(15);
         Table.setFields(fields);
-
 
         try {
             while (c.moveToNext()) {
@@ -1111,6 +1115,8 @@ public class GlobalVars extends Application implements TBUpdate {
 
     @AsyncUI
     public void setIconColor(Menu menu, int MenuItem, Boolean vis) {
+        if (menu.findItem(MenuItem) == null)
+            return;
         Drawable drawable = menu.findItem(MenuItem).getIcon();
         drawable.mutate();
         if (vis) {
@@ -1277,6 +1283,8 @@ public class GlobalVars extends Application implements TBUpdate {
     private int _previousCursorCount = 0;
 
     public class NomenAdapter extends SimpleCursorAdapter {
+        private boolean hasBeenAlreadyNoChanged = true;
+
         public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
@@ -1285,6 +1293,10 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+
+//            if (isSales) {
+//                this.notifyDataSetChanged();
+//            }
 
             Cursor cursor = getCursor();
             CurVisiblePosition = cursor.getCount();
@@ -1316,14 +1328,20 @@ public class GlobalVars extends Application implements TBUpdate {
             Button btMinus = view.findViewById(R.id.btMinus);
 
             tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
+            tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString())));
 
             if (tvPhoto != null)
                 tvPhoto.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
+
             btPlus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
             btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
 
             if (DBHelper.pricesMap.containsKey(kod5) && isSales) {
-                tvPrice.setText(String.valueOf(DBHelper.pricesMap.get(kod5)));
+                tvPrice.setText(String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5)));
+            }
+
+            if (isDiscount) {
+                tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString()) * (1 - Discount / 100f)));
             }
 
             if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
@@ -1366,16 +1384,6 @@ public class GlobalVars extends Application implements TBUpdate {
 
             tvPosition.setText(String.valueOf(position + 1));
 
-            // Условие прогрузки новых товаров в nomenList
-//            if (position == cursor.getCount() - 1 && CurGroup.equals("0") && !isNewLoaded && cursor.getCount() >= DBHelper.limit && _previousCursorCount != cursor.getCount()) {
-//                _previousCursorCount = cursor.getCount();
-//                isNewLoaded = true;
-//
-//                Config.hideKeyBoard();
-//                LoadNextNomen(cursor.getCount(), CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-//                return view;
-//            }
-
             return view;
         }
 
@@ -1389,24 +1397,6 @@ public class GlobalVars extends Application implements TBUpdate {
             for (TextView tv : tvList) {
                 tv.setTypeface(Typeface.defaultFromStyle(style));
             }
-        }
-
-        private String _countPrice(Cursor cursor) {
-            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
-            String price = String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5));
-            if (!DBHelper.pricesMap.containsKey(kod5))
-                price = "0";
-            else if (price.equals("" + DBHelper.pricesMap.get(kod5)))
-                price = "" + DBHelper.pricesMap.get(kod5);
-
-            if (price.equals("0")) {
-                String cPrice = cursor.getString(cursor.getColumnIndex("PRICE"));
-                if (!cPrice.equals("0") && !cPrice.equals("null")) {
-                    price = cPrice;
-                }
-            }
-
-            return String.format(Locale.ROOT, "%.2f", Float.parseFloat(price.replace(",", ".")) * (1 - Discount / 100f));
         }
 
         private long _countDaySubtraction(Cursor cursor) {
@@ -1427,6 +1417,17 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             return (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+
+            // check isSales and if true, then set real prices from contractor
+            if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
+                FormOrderFragment.setRealPrices(GlobalVars.this);
+                hasBeenAlreadyNoChanged = false;
+            }
         }
     }
 
@@ -1574,11 +1575,10 @@ public class GlobalVars extends Application implements TBUpdate {
         CurSearchName = "";
 
         Discount = 0f;
-        isSales = false;
+//        isSales = false;
         Menu menu = FormOrderFragment.mainMenu;
         if (menu != null && menu.size() > 1) {
             setIconColor(menu, R.id.NomenDiscount, false);
-            setIconColor(menu, R.id.NomenSales, false);
         }
     }
 
@@ -1714,7 +1714,6 @@ public class GlobalVars extends Application implements TBUpdate {
 
         String price = tvPrice.getText().toString();
         String kod5 = tvKOD5.getText().toString();
-        System.out.println(kod5 + " " + price);
 
         db.putPriceInNomen(kod5, price);
         db.PlusQty(kod5);

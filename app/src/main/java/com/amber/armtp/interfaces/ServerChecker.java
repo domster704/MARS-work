@@ -7,20 +7,24 @@ import com.amber.armtp.ftp.Ping;
 
 public interface ServerChecker {
     default void runCheckServerForAvailability(Thread t) {
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                try {
-                    if (!new Ping(ServerDetails.getInstance()).isReachable()) {
-                        Config.sout("Сервер недоступен");
-                    } else {
-                        t.start();
+        try {
+            new Thread(new Runnable() {
+                @Override
+                @PGShowing
+                public void run() {
+                    try {
+                        if (!new Ping(ServerDetails.getInstance()).isReachable()) {
+                            Config.sout("Сервер недоступен");
+                        } else {
+                            t.start();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-        }).start();
+            }).start();
+        } catch (Exception e) {
+            Config.sout(e);
+        }
     }
 }

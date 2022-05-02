@@ -98,17 +98,21 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 view.setElevation(0f);
             });
 
-            if (Status.equals("Удален") || Status.equals("Отменен")) {
+            if (!Status.equals("Сохранён")) {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
             }
 
-            if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-            }
-
-            if (Status.equals("Отправлен")) {
-                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-            }
+//            if (Status.equals("Удален") || Status.equals("Отменен")) {
+//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+//            }
+//
+//            if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
+//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+//            }
+//
+//            if (Status.equals("Отправлен")) {
+//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
+//            }
 
             nomPopupMenu.show();
             return true;
@@ -205,17 +209,17 @@ public class JournalFragment extends Fragment implements ServerChecker {
     /**
      * Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
      */
-    public void deleteExtraOrders() {
+    public void  deleteExtraOrders() {
         if (glbVars.gdOrders.getCount() > 100) {
-            for (int i = 0; i < glbVars.gdOrders.getCount() - 100; i++) {
+            for (int i = 100; i < glbVars.gdOrders.getCount(); i++) {
                 int id = GlobalVars.allOrders.get(i).id;
                 glbVars.dbOrders.deleteOrderByID(id);
             }
-            GlobalVars.allOrders.subList(0, glbVars.gdOrders.getCount() - 100).clear();
+            GlobalVars.allOrders.subList(100, glbVars.gdOrders.getCount()).clear();
             glbVars.LoadOrders();
 
             toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из возможных 100");
+            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из 100");
         }
     }
 
@@ -297,7 +301,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
                             glbVars.LoadOrders();
                             toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-                            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount());
+                            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из 100");
                         });
 
                 AlertDialog alertDlgDel = builderDel.create();
@@ -345,6 +349,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
     /**
      * Повторно отправляет заказ со статутосм "Отправлено" (логично)
+     *
      * @param id - поле ROWID в таблице ZAKAZY
      */
     private void sendOrders(int id) {
@@ -358,7 +363,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
             if (!FileName.equals("")) {
                 SendDBFFile(FileName, id);
             } else {
-                Config.sout("Неверное имя файла для отправки");
+                Config.sout("Ошибка при отправке");
             }
         }
     }
@@ -387,8 +392,8 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 e.printStackTrace();
             }
 
-            FTPClient ftpClient = new FTPClient();
             try {
+                FTPClient ftpClient = new FTPClient();
                 ftpClient.connect(server, 21);
                 ftpClient.login(username, password);
                 ftpClient.enterLocalPassiveMode();
@@ -487,6 +492,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
             glbVars.db.getWritableDatabase().endTransaction();
 
             glbVars.rewritePriceToMainDB(OrderID);
+            GlobalVars.TypeOfPrice = glbVars.db.getPriceType(OrderHeadFragment.CONTR_ID);
 
             Fragment fragment = new FormOrderFragment();
             assert a != null;

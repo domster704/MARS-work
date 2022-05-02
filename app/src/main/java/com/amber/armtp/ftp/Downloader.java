@@ -38,69 +38,57 @@ public class Downloader {
     }
 
     public void downloadApp(final UpdateDataFragment.UIData ui, View view, String ver) {
-        new Thread(() -> {
-            if (_checkAlreadyExistedApk(ver))
+        if (_checkAlreadyExistedApk(ver))
+            return;
+
+        try {
+            FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, ver + ".apk");
+            if (!ftpFileDownloader.downloadWithPG(ui))
                 return;
 
-            FtpFileDownloader ftpFileDownloader;
-            try {
-//                File file = new File(MainActivity.filesPathAPK + "/" + ver + ".apk");
-//                if (file.exists() && !ver.equals("") && _isFirstVersionHigherThanSecond(ver.split("\\."), BuildConfig.VERSION_NAME.split("\\."))) {
-//                    _startInstallApp(ver);
-//                    FileUtils.deleteDirectory(new File(MainActivity.filesPathAPK));
-//                    return;
-//                }
+            activity.runOnUiThread(() -> {
+                view.setEnabled(true);
+                ui.tvData.setTextColor(Color.rgb(3, 103, 0));
+            });
 
-                ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, ver + ".apk");
-                if (!ftpFileDownloader.downloadWithPG(ui))
-                    return;
+            _startInstallApp(ver);
+            _checkAlreadyExistedApk(ver);
 
-                activity.runOnUiThread(() -> {
-                    view.setEnabled(true);
-                    ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                });
-
-                _startInstallApp(ver);
-                _checkAlreadyExistedApk(ver);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                catchErrorInDownloadProcess(view, ui);
-            }
-        }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            catchErrorInDownloadProcess(view, ui);
+        }
     }
 
     public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
-        new Thread(() -> {
-            String filePath = MainActivity.filesPathDB + "armtp3.zip";
+        String filePath = MainActivity.filesPathDB + "armtp3.zip";
 
-            FtpFileDownloader ftpFileDownloader;
-            try {
-                ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, "armtp3.zip");
-                if (!ftpFileDownloader.downloadWithPG(ui))
-                    return;
+        try {
+            FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, "armtp3.zip");
+            if (!ftpFileDownloader.downloadWithPG(ui))
+                return;
 
-                ZipUnpacking zipUnpacking = new ZipUnpacking(filePath);
-                if (!zipUnpacking.doUnpacking() && countOfTrying < 3) {
-                    countOfTrying++;
-                    downloadDB(ui, view, globalVars);
-                } else if (countOfTrying >= 3) {
-                    return;
-                }
-
-                activity.runOnUiThread(() -> {
-                    globalVariable.db = new DBHelper(activity.getApplicationContext());
-
-                    view.setEnabled(true);
-                    ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                    Config.sout("База данных успешно обновлена");
-                    globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                catchErrorInDownloadProcess(view, ui);
+            Thread.sleep(1000);
+            ZipUnpacking zipUnpacking = new ZipUnpacking(filePath);
+            if (!zipUnpacking.doUnpacking() && countOfTrying < 3) {
+                countOfTrying++;
+                downloadDB(ui, view, globalVars);
+            } else if (countOfTrying >= 3) {
+                return;
             }
-        }).start();
+
+            activity.runOnUiThread(() -> {
+                globalVariable.db = new DBHelper(activity.getApplicationContext());
+
+                view.setEnabled(true);
+                ui.tvData.setTextColor(Color.rgb(3, 103, 0));
+                Config.sout("База данных успешно обновлена");
+                globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            catchErrorInDownloadProcess(view, ui);
+        }
     }
 
     public String[] isServerVersionNewer() {

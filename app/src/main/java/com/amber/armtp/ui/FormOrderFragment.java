@@ -156,6 +156,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     public void SaveOrder() throws ParseException {
         new Thread(() -> {
+//            for (int i = 0; i < 100; i++) {
             Cursor c, c2, c1;
             String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC = "";
             String ContrDes, AddrDes;
@@ -230,9 +231,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
                 glbVars.dbOrders.getWritableDatabase().endTransaction();
             }
+//            }
 
             getActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_SHORT).show();
+                Config.sout("Заказ сохранён");
                 glbVars.spinContr.setSelection(0);
                 glbVars.spinAddr.setSelection(0);
                 glbVars.spinAddr.setAdapter(null);
@@ -325,8 +327,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             });
         }).start();
     }
-
-    private String localSGI = "", localGroup = "", localWC = "", localFocus = "", localSearch = "";
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -438,10 +438,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             case R.id.NomenSort:
                 if (!isSorted) {
                     item.setIcon(R.drawable.to_top);
+                    glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
                     glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
                     isSorted = true;
                 } else {
                     item.setIcon(R.drawable.to_end);
+                    glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
                     glbVars.nomenList.setSelection(0);
                     isSorted = false;
                 }
@@ -502,49 +504,25 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 return true;
             case R.id.NomenSales:
                 glbVars.isSales = !glbVars.isSales;
-
-                boolean isDifferent = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
-                localSGI = GlobalVars.CurSGI;
-                localGroup = GlobalVars.CurGroup;
-                localWC = GlobalVars.CurWCID;
-                localFocus = GlobalVars.CurFocusID;
-                localSearch = GlobalVars.CurSearchName;
-
                 glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
-                if (glbVars.isSales && isDifferent) {
-                    glbVars.calculatePricesByContrDiscount();
-                    return true;
-                }
 
                 if (glbVars.NomenAdapter != null) {
                     glbVars.myNom.requery();
                     glbVars.NomenAdapter.notifyDataSetChanged();
                 }
 
-//                setContrAndSum(glbVars);
-//                if (glbVars.isDiscount) {
-//                    glbVars.isDiscount = false;
-//                    glbVars.Discount = 0;
-//                    mainMenu.findItem(R.id.NomenDiscount).setEnabled(false);
-//                    glbVars.setDiscountIcon(mainMenu, R.id.NomenDiscount, false);
-//                }
+                localSGI = GlobalVars.CurSGI;
+                localGroup = GlobalVars.CurGroup;
+                localWC = GlobalVars.CurWCID;
+                localFocus = GlobalVars.CurFocusID;
+                localSearch = GlobalVars.CurSearchName;
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
-        if (!localSGI.equals(GlobalVars.CurSGI))
-            return true;
-        if (!localGroup.equals(GlobalVars.CurGroup))
-            return true;
-        if (!localWC.equals(GlobalVars.CurWCID))
-            return true;
-        if (!localFocus.equals(GlobalVars.CurFocusID))
-            return true;
-        return !localSearch.equals(GlobalVars.CurSearchName);
-    }
     @Override
     public void onPause() {
         super.onPause();
@@ -560,6 +538,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     public void onDestroy() {
         super.onDestroy();
         glbVars.resetCurData();
+
+        glbVars.setIconColor(mainMenu, R.id.NomenSales, false);
+        glbVars.isSales = false;
+        resetLocalData();
 
         try {
             isFiltered = false;
@@ -607,6 +589,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         setContrAndSum(glbVars);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -648,23 +631,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     String SgiId = "0";
                     String GroupID = "0";
-//                try {
-//                    SgiId = ((TextView) getActivity().findViewById(R.id.ColSgiID)).getText().toString();
-//                    GroupID = ((TextView) getActivity().findViewById(R.id.ColGrupID)).getText().toString();
-//                } catch (Exception ignored) {
-//                }
 
                     String WC_ID = glbVars.dbApp.getWCByID(FilterWC_ID.getText().toString());
-//                    glbVars.LoadNextNomen(0, SgiId, GroupID,
-//                            WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
+
                     glbVars.LoadNomen(SgiId, GroupID,
                             WC_ID, FilterFocus_ID.getText().toString(), GlobalVars.CurSearchName);
                     glbVars.SetSelectedSgi(SgiId);
-
-//                    if (isFiltered && GlobalVars.CurGroup.equals("0")) {
-//                        mainMenu.findItem(R.id.NomenSort).setEnabled(false);
-//                        mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end_disabled);
-//                    }
 
                     alertD.dismiss();
                 });
@@ -676,10 +648,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     glbVars.SetSelectedFilterWC("0");
                     glbVars.SetSelectedFilterFocus("0");
                     GlobalVars.CurFocusID = GlobalVars.CurWCID = "0";
-
-                    boolean isEnabledFilter = !(isFiltered && GlobalVars.CurGroup.equals("0"));
-//                    mainMenu.findItem(R.id.NomenSort).setEnabled(isEnabledFilter);
-//                    mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
                 });
                 break;
             case R.id.SGIClear:
@@ -713,5 +681,53 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         glbVars.db.ResetNomen();
         nomenData.close();
         return SUM;
+    }
+
+    public static void setRealPrices(GlobalVars glbVars) {
+        boolean isDifferent = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
+
+        glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
+        if (glbVars.isSales && isDifferent) {
+            glbVars.calculatePricesByContrDiscount();
+        }
+    }
+
+    private static String localSGI = "", localGroup = "", localWC = "", localFocus = "", localSearch = "";
+
+    private static void updateData() {
+        localSGI = GlobalVars.CurSGI;
+        localGroup = GlobalVars.CurGroup;
+        localWC = GlobalVars.CurWCID;
+        localFocus = GlobalVars.CurFocusID;
+        localSearch = GlobalVars.CurSearchName;
+    }
+
+    private static void resetLocalData() {
+        localSGI = "0";
+        localGroup = "0";
+        localWC = "0";
+        localFocus = "0";
+        localSearch = "";
+    }
+
+    private static boolean checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
+//        System.out.println(isFiltered);
+//        System.out.println("WC: " + localWC + " * " + GlobalVars.CurWCID);
+//        System.out.println("Focus: " + localFocus + " * " + GlobalVars.CurFocusID);
+//        System.out.println("SGI: " + localSGI + " * " + GlobalVars.CurSGI);
+//        System.out.println("Group: " + localGroup + " * " + GlobalVars.CurGroup);
+//        System.out.println("Search: " + localSearch + " * " + GlobalVars.CurSearchName);
+
+        boolean isDifferent;
+        if (GlobalVars.CurSGI.equals("0") && !isFiltered && !localSearch.equals(GlobalVars.CurSearchName)) {
+            isDifferent = true;
+        } else if (isFiltered) {
+            isDifferent = !localWC.equals(GlobalVars.CurWCID) || !localFocus.equals(GlobalVars.CurFocusID);
+        } else {
+            isDifferent = !localSGI.equals(GlobalVars.CurSGI);
+        }
+
+        updateData();
+        return isDifferent;
     }
 }

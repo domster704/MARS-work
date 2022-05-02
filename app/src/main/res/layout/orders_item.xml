@@ -48,27 +48,28 @@
         android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdContr"
-        android:layout_width="200dp"
-        android:layout_height="@dimen/heightOfOrdersItem"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/ColOrdDeliveryDate"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdContr"
+            android:layout_width="200dp"
+            android:layout_height="@dimen/heightOfOrdersItem"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/ColOrdDeliveryDate"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
-        android:id="@+id/ColOrdAddr"
-        android:layout_width="@dimen/buttonWidth"
-        android:layout_height="@dimen/heightOfOrdersItem"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/ColOrdSum"
-        android:layout_toEndOf="@+id/ColOrdContr"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#000000" />
+            android:id="@+id/ColOrdAddr"
+            android:layout_width="@dimen/buttonWidth"
+            android:layout_height="@dimen/heightOfOrdersItem"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/ColOrdSum"
+            android:layout_toEndOf="@+id/ColOrdContr"
+            android:gravity="start|center_vertical"
+            android:paddingStart="15dp"
+            android:maxLines="2"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000" />
 
     <TextView
         android:id="@+id/ColOrdSum"

@@ -111,6 +111,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
         returnMoneyButton.setOnClickListener(this);
 
+        GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
         setContrAndSum(glbVars);
 
         glbVars.LoadTpList();
@@ -311,7 +312,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         }
 
         GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
-        System.out.println(GlobalVars.TypeOfPrice);
 
         if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
             setContrAndSum(glbVars);
