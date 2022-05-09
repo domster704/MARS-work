@@ -159,6 +159,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                             tvDB.setTextColor(Color.rgb(0, 0, 0));
                         });
                         downloader.downloadDB(uiData[0], view, glbVars);
+                        glbVars.db.updatePDDataInTable(glbVars.getPhotoDir());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -174,7 +175,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                 }
 
                 String status = downloader.isServerVersionNewer()[0];
-
                 if (status.equals("false")) {
                     Config.sout("На сервере нет новой версии");
                     return;

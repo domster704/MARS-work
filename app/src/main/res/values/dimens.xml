@@ -37,4 +37,5 @@
 
     <!--  Width  -->
     <dimen name="dividerHeaderWidth">2dp</dimen>
+    <dimen name="settingsWidthAfterMargin">70dp</dimen>
 </resources>

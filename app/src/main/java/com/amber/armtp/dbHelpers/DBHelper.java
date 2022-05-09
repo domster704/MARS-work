@@ -15,6 +15,7 @@ import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.ui.OrderHeadFragment;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -258,7 +259,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST,[" + GlobalVars.TypeOfPrice + "] AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -279,11 +280,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 curPrice += (Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1));
             }
 
-            res = curPrice == 0.0 ? "" : " - " + String.format(Locale.ROOT, "%.2f", curPrice);
+            res = curPrice == 0.0 ? "" : String.format(Locale.ROOT, "%.2f", curPrice);
 
             return res;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return res;
         } finally {
             if (cursor != null) {
@@ -674,8 +675,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Cursor getDebet(String TP_ID) {
         Cursor cursor;
-        String Sql;
-        Sql = " WHERE DEBET.TP='" + TP_ID + "'";
+        String Sql = "";
+        if (!TP_ID.equals("0"))
+            Sql = " WHERE DEBET.TP='" + TP_ID + "'";
 
         try {
             SQLiteDatabase db;
@@ -796,16 +798,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public String getPriceType(String ContrID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c;
         try {
+            Cursor c;
             c = db.rawQuery("SELECT PRICE FROM CONTRS WHERE CODE=?", new String[]{ContrID});
+            c.moveToNext();
+            String priceType = c.getString(0);
+            c.close();
+            return priceType;
         } catch (Exception e) {
             return "";
         }
-        c.moveToNext();
-        String priceType = c.getString(0);
-        c.close();
-        return priceType;
     }
 
     private void _setNomenPriceWithoutSgi(Cursor cursor) {
@@ -904,7 +906,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return price;
     }
 
-    public void calcSales(String ContrID) {
+    public void calcSales(String ContrID, String data) {
         Cursor c;
         if (pricesMap.size() > 0 && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals("") && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals(ContrID)) {
             resetContrPrices();
@@ -916,14 +918,43 @@ public class DBHelper extends SQLiteOpenHelper {
 //                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
 //        Config.printCursor(c);
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(data), new String[]{ContrID});
         updatePrices(c);
 //        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
 //                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
 //        Config.printCursor(c);
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(data), new String[]{ContrID});
         updatePrices(c);
+    }
+
+    public void clearOrder() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        db.execSQL("UPDATE NOMEN SET ZAKAZ = 0 WHERE ZAKAZ <> 0");
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    public void clearPhoto() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        db.execSQL("UPDATE NOMEN SET PD = 0 WHERE PD <> 0");
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    public void updatePDDataInTable(String path) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        File file = new File(path);
+        for (File elem: file.listFiles()) {
+            db.execSQL("UPDATE NOMEN SET PD = 1 WHERE FOTO=?", new Object[]{elem.getName()});
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     private void updatePrices(Cursor c) {
@@ -951,7 +982,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.endTransaction();
     }
 
-    private String generateSQLRequestByCurrentData() {
+    private String generateSQLRequestByCurrentData(String data) {
         String sqlMX = "", searchReq = "";
         if (!GlobalVars.CurSearchName.equals("")) {
             String[] separated = GlobalVars.CurSearchName.split(" ");
@@ -965,10 +996,14 @@ public class DBHelper extends SQLiteOpenHelper {
             searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
         }
 
-        sqlMX += (!GlobalVars.CurWCID.equals("0") && !GlobalVars.CurWCID.equals("Выберите демографический признак") && !GlobalVars.CurWCID.equals("Не использовать") && !GlobalVars.CurWCID.equals("!Не определено") && !GlobalVars.CurWCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + GlobalVars.CurWCID + "'" : "";
-        sqlMX += (!GlobalVars.CurFocusID.equals("0")) ? " AND Nomen.FOKUS='" + GlobalVars.CurFocusID + "'" : "";
-        sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
-        sqlMX += (!GlobalVars.CurGroup.equals("0")) ? " AND Nomen.GRUPPA='" + GlobalVars.CurGroup + "'" : "";
+        if (data.equals("sgi")) {
+            sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
+        } else {
+            sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
+            sqlMX += (!GlobalVars.CurWCID.equals("0") && !GlobalVars.CurWCID.equals("Выберите демографический признак") && !GlobalVars.CurWCID.equals("Не использовать") && !GlobalVars.CurWCID.equals("!Не определено") && !GlobalVars.CurWCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + GlobalVars.CurWCID + "'" : "";
+            sqlMX += (!GlobalVars.CurFocusID.equals("0")) ? " AND Nomen.FOKUS='" + GlobalVars.CurFocusID + "'" : "";
+            sqlMX += (!GlobalVars.CurGroup.equals("0")) ? " AND Nomen.GRUPPA='" + GlobalVars.CurGroup + "'" : "";
+        }
         return sqlMX + searchReq;
     }
 }

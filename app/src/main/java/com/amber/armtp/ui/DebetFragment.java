@@ -114,7 +114,7 @@ public class DebetFragment extends Fragment {
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.clearTP) {
             glbVars.spTP.setSelection(0);
-            glbVars.debetList.setAdapter(null);
+//            glbVars.debetList.setAdapter(null);
             return true;
         }
         return true;

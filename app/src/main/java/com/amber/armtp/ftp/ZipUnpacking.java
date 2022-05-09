@@ -3,8 +3,12 @@ package com.amber.armtp.ftp;
 
 import android.util.Log;
 
+import org.apache.commons.io.FileSystemUtils;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +16,7 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class ZipUnpacking {
     private final String fileDir;
@@ -20,28 +25,21 @@ public class ZipUnpacking {
         this.fileDir = filePathInAndroid;
     }
 
-    private static void write(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = in.read(buffer)) >= 0)
-            out.write(buffer, 0, len);
-        out.close();
-        in.close();
-    }
-
     private void unZip(File file) throws IOException {
-        ZipFile zip = new ZipFile(fileDir);
-        Enumeration entries = zip.entries();
-
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-
+        ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileDir)));
+        byte[] buffer = new byte[2048];
+        ZipEntry entry;
+        while ((entry = zip.getNextEntry()) != null) {
             if (entry.isDirectory()) {
                 new File(file.getParent(), entry.getName()).mkdirs();
             } else {
-                write(zip.getInputStream(entry),
-                        new BufferedOutputStream(new FileOutputStream(
-                                new File(file.getParent(), entry.getName()))));
+                System.out.println(entry.getName() + " " + file.getPath());
+                try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File(file.getParent(), entry.getName())));) {
+                    int len;
+                    while ((len = zip.read(buffer)) > 0) {
+                        output.write(buffer, 0, len);
+                    }
+                }
             }
         }
 

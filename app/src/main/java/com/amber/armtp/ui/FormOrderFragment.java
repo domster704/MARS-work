@@ -36,7 +36,6 @@ import com.amber.armtp.interfaces.TBUpdate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Locale;
@@ -137,15 +136,15 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
 
         if (getArguments() != null && getArguments().size() != 0) {
-            String Sgi = getArguments().getString("SGI");
-            String Group = getArguments().getString("Group");
-            getArguments().clear();
-
+//            String Sgi = getArguments().getString("SGI");
+//            String Group = getArguments().getString("Group");
+//            getArguments().clear();
+//
             glbVars.resetCurData();
             glbVars.resetSearchViewData();
-
-            glbVars.SetSelectedSgi(Sgi);
-            glbVars.SetSelectedGrup(Group);
+//
+//            glbVars.SetSelectedSgi(Sgi);
+//            glbVars.SetSelectedGrup(Group);
         }
     }
 
@@ -518,6 +517,20 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 localSearch = GlobalVars.CurSearchName;
 
                 return true;
+            case R.id.clear_whole_order:
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Вы уверены?")
+                        .setMessage("Вы уверены, что хотите очистить текущий заказ?")
+                        .setPositiveButton("Да", (dialogInterface, i) -> {
+                            glbVars.db.clearOrder();
+                            if (glbVars.NomenAdapter != null) {
+                                glbVars.NomenAdapter.notifyDataSetChanged();
+                                glbVars.myNom.requery();
+                            }
+                            setContrAndSum(glbVars);
+                        })
+                        .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -547,10 +560,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             isFiltered = false;
             filter.setImageResource(R.drawable.filter);
 
-            if (glbVars.spWC != null) {
-                glbVars.SetSelectedFilterWC("0");
-                glbVars.SetSelectedFilterFocus("0");
-            }
+//            if (glbVars.spWC != null) {
+//                glbVars.SetSelectedFilterWC("0");
+//                glbVars.SetSelectedFilterFocus("0");
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -621,6 +634,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 glbVars.SetSelectedFilterFocus(FocusID);
 
                 alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+//                    GlobalVars.isGoneInGroup = false;
                     isFiltered = true;
 //                    glbVars.isNeedingTobeLoadingBySgi = false;
                     FilterWC_ID = promptView.findViewById(R.id.ColWCID);
@@ -685,11 +699,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     }
 
     public static void setRealPrices(GlobalVars glbVars) {
-        boolean isDifferent = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
+        Object[] data = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
 
         glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
-        if (glbVars.isSales && isDifferent) {
-            glbVars.calculatePricesByContrDiscount();
+        if (glbVars.isSales && Boolean.parseBoolean(data[0].toString())) {
+            glbVars.calculatePricesByContrDiscount(data[1].toString());
         }
     }
 
@@ -701,15 +715,24 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     private static HashSet<String> SgiList = new HashSet<>();
 
-    private static void updateData() {
+    private static void updateData(boolean isDifferent, String data) {
         localSGI = GlobalVars.CurSGI;
         localGroup = GlobalVars.CurGroup;
         localWC = GlobalVars.CurWCID;
         localFocus = GlobalVars.CurFocusID;
         localSearch = GlobalVars.CurSearchName;
 
-        if (!localSGI.equals("0") && localFocus.equals("0") && localWC.equals("0") && localGroup.equals("0"))
+        if (!localSGI.equals("0") && localFocus.equals("0") && localWC.equals("0") && localGroup.equals("0") && isDifferent || data.equals("sgi")) {
+            System.out.println("----------------------------");
+            System.out.println("WC: " + localWC);
+            System.out.println("Focus: " + localFocus);
+            System.out.println("SGI: " + localSGI);
+            System.out.println("Group: " + localGroup);
+            System.out.println("Search: " + localSearch);
+            System.out.println("----------------------------");
             SgiList.add(localSGI);
+        }
+//        GlobalVars.isGoneInGroup = false;
     }
 
     private static void resetLocalData() {
@@ -720,7 +743,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         localSearch = "";
     }
 
-    private static boolean checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
+    private static Object[] checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
         System.out.println(isFiltered);
         System.out.println("WC: " + localWC + " * " + GlobalVars.CurWCID);
         System.out.println("Focus: " + localFocus + " * " + GlobalVars.CurFocusID);
@@ -729,8 +752,14 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         System.out.println("Search: " + localSearch + " * " + GlobalVars.CurSearchName);
         System.out.println("SgiList: " + SgiList.toString());
 
+//        String[] specialData = null;
+        String specialData = "";
         boolean isDifferent;
-        if (GlobalVars.CurSGI.equals("0") && !isFiltered && !localSearch.equals(GlobalVars.CurSearchName)) {
+        if (!SgiList.contains(GlobalVars.CurSGI) && !localGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
+            isDifferent = true;
+            specialData = "sgi";
+            System.out.println(specialData);
+        } else if (GlobalVars.CurSGI.equals("0") && !isFiltered && !localSearch.equals(GlobalVars.CurSearchName)) {
             isDifferent = true;
         } else if (isFiltered) {
             isDifferent = !localWC.equals(GlobalVars.CurWCID) || !localFocus.equals(GlobalVars.CurFocusID);
@@ -741,8 +770,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         if (SgiList.contains(GlobalVars.CurSGI)) {
             isDifferent = false;
         }
-
-        updateData();
-        return isDifferent;
+        updateData(isDifferent, specialData);
+        return new Object[]{isDifferent, specialData};
     }
 }

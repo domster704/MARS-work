@@ -1,222 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/TabUpdateSrv"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:fillViewport="true"
-    android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingTop="10dp"
-    android:paddingRight="10dp"
-    android:scrollbars="none"
-    tools:ignore="RtlCompat">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/TabUpdateSrv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:fillViewport="true"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:scrollbars="none"
+        tools:ignore="RtlCompat">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/ftpServerLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:clickable="true"
-            android:focusable="true"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+        <LinearLayout
+                android:id="@+id/ftpServerLayoutMain"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="5dp"
-                android:text="FTP-сервер"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="FTP-сервер"
+                    android:textColor="#000"
+                    android:textSize="16sp" />
 
             <View style="@style/Divider.Horizontal" />
 
             <LinearLayout
-                android:id="@+id/ftpServerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
+                    android:id="@+id/ftpServerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginStart="100dp"
+                    android:visibility="gone">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/tvServer"
-                        android:layout_width="160dp"
-                        android:layout_height="match_parent"
-                        android:gravity="end|center_vertical"
-                        android:paddingEnd="8dp"
-                        android:text="@string/resUpdateServer"
-                        android:textAlignment="center"
-                        android:textColor="#000"
-                        android:textSize="@dimen/textSizeSettings"
-                        tools:text="Сервер" />
+                            android:id="@+id/tvServer"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="end|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/resUpdateServer"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="@dimen/textSizeSettings"
+                            tools:text="Сервер" />
 
                     <EditText
-                        android:id="@+id/edFtpServer"
-                        android:layout_width="398dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:ems="10"
-                        android:imeOptions="actionDone"
-                        android:inputType="text"
-                        android:text="91.208.84.67"
-                        android:textAlignment="center"
-                        android:textSize="@dimen/textSizeSettings"
-                        tools:text="91.208.84.67" />
+                            android:id="@+id/edFtpServer"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:text="91.208.84.67"
+                            android:textAlignment="center"
+                            android:textSize="@dimen/textSizeSettings"
+                            tools:text="91.208.84.67" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/tvLogin"
-                        android:layout_width="160dp"
-                        android:layout_height="match_parent"
-                        android:gravity="end|center_vertical"
-                        android:paddingEnd="8dp"
-                        android:text="@string/resLogin"
-                        android:textAlignment="center"
-                        android:textColor="#000"
-                        android:textSize="12sp" />
+                            android:id="@+id/tvLogin"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="end|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/resLogin"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="12sp" />
 
                     <EditText
-                        android:id="@+id/edFtpUser"
-                        android:layout_width="398dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:ems="10"
-                        android:imeOptions="actionDone"
-                        android:inputType="textPersonName"
-                        android:textSize="@dimen/textSizeSettings" />
+                            android:id="@+id/edFtpUser"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPersonName"
+                            android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/tvPass"
-                        android:layout_width="160dp"
-                        android:layout_height="match_parent"
-                        android:gravity="end|center_vertical"
-                        android:paddingEnd="8dp"
-                        android:text="@string/resPass"
-                        android:textAlignment="center"
-                        android:textColor="#000"
-                        android:textSize="12sp" />
+                            android:id="@+id/tvPass"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="end|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/resPass"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="12sp" />
 
                     <EditText
-                        android:id="@+id/edFtpPass"
-                        android:layout_width="398dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:ems="10"
-                        android:imeOptions="actionDone"
-                        android:inputType="textPassword"
-                        android:textSize="@dimen/textSizeSettings"
-                        tools:text="Yjdfz Ptkfylbz.ru" />
+                            android:id="@+id/edFtpPass"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:textSize="@dimen/textSizeSettings"
+                            tools:text="Yjdfz Ptkfylbz.ru" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/tvPort"
-                        android:layout_width="160dp"
-                        android:layout_height="match_parent"
-                        android:gravity="end|center_vertical"
-                        android:paddingEnd="8dp"
-                        android:text="@string/resPort"
-                        android:textAlignment="center"
-                        android:textColor="#000"
-                        android:textSize="12sp" />
+                            android:id="@+id/tvPort"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="end|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/resPort"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="12sp" />
 
                     <EditText
-                        android:id="@+id/edFtpPort"
-                        android:layout_width="398dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:ems="10"
-                        android:imeOptions="actionDone"
-                        android:inputType="text"
-                        android:text="20123"
-                        android:textSize="@dimen/textSizeSettings" />
+                            android:id="@+id/edFtpPort"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:text="20123"
+                            android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/fontLayoutMain"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical">
+                android:id="@+id/fontLayoutMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="5dp"
-                android:text="Шрифт"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="Шрифт"
+                    android:textColor="#000"
+                    android:textSize="16sp" />
 
             <View style="@style/Divider.Horizontal" />
 
             <LinearLayout
-                android:id="@+id/fontLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
+                    android:id="@+id/fontLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/dividerSettings">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="100dp"
+                        android:layout_below="@+id/dividerSettings">
 
                     <TextView
-                        android:layout_width="160dp"
-                        android:layout_height="match_parent"
-                        android:gravity="end|center_vertical"
-                        android:paddingEnd="8dp"
-                        android:text="Шрифт"
-                        android:textAlignment="center"
-                        android:textColor="#000"
-                        android:textSize="@dimen/textSizeSettings" />
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="end|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="Шрифт"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="@dimen/textSizeSettings" />
 
                     <EditText
-                        android:id="@+id/fontSize"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:digits="0123456789"
-                        android:imeOptions="actionDone"
-                        android:minWidth="35dp"
-                        android:textSize="@dimen/textSizeSettings" />
+                            android:id="@+id/fontSize"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:digits="0123456789"
+                            android:imeOptions="actionDone"
+                            android:minWidth="35dp"
+                            android:textSize="@dimen/textSizeSettings" />
 
                     <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="sp"
+                            android:textColor="#000"
+                            android:textSize="@dimen/mainFontSize" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/photoLayoutsMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="Фотографии"
+                    android:textColor="#000"
+                    android:textSize="16sp" />
+
+            <View style="@style/Divider.Horizontal" />
+
+            <LinearLayout
+                    android:id="@+id/photoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="sp"
-                        android:textColor="#000"
-                        android:textSize="@dimen/mainFontSize" />
+                        android:layout_below="@+id/dividerSettings"
+                        android:layout_marginStart="100dp">
+
+                    <Button
+                            android:id="@+id/buttonClearAllPhoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Очистить фото"
+                            android:textColor="#000"
+                            android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

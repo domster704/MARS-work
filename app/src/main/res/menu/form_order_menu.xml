@@ -45,4 +45,9 @@
             android:icon="@drawable/ic_baseline_save_24"
             android:title="Сохранить заказ"
             app:showAsAction="always" />
+    <item
+            android:id="@+id/clear_whole_order"
+            android:title="Очистить заказ"
+            android:icon="@drawable/delete_outline_white"
+            app:showAsAction="always"/>
 </menu>

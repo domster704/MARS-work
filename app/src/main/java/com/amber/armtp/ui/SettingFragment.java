@@ -1,6 +1,8 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.amber.armtp.Config;
@@ -19,7 +22,10 @@ import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
+import com.amber.armtp.annotations.AsyncUI;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 /**
@@ -90,25 +96,62 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         getActivity().findViewById(R.id.ftpServerLayoutMain).setOnClickListener(this);
         getActivity().findViewById(R.id.fontLayoutMain).setOnClickListener(this);
+        getActivity().findViewById(R.id.photoLayoutsMain).setOnClickListener(this);
+
+        getActivity().findViewById(R.id.buttonClearAllPhoto).setOnClickListener(this);
     }
 
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.photoLayoutsMain:
+            case R.id.fontLayoutMain:
             case R.id.ftpServerLayoutMain:
-                if (view.findViewById(R.id.ftpServerLayout).getVisibility() == View.GONE) {
-                    view.findViewById(R.id.ftpServerLayout).setVisibility(View.VISIBLE);
-                } else {
-                    view.findViewById(R.id.ftpServerLayout).setVisibility(View.GONE);
+                LinearLayout layout = (LinearLayout) view;
+                for (int i = 0; i < layout.getChildCount(); i++) {
+                    if (layout.getChildAt(i) instanceof LinearLayout) {
+                        LinearLayout layoutInside = (LinearLayout) layout.getChildAt(i);
+                        if (layoutInside.getVisibility() == View.GONE) {
+                            layoutInside.setVisibility(View.VISIBLE);
+                        } else {
+                            layoutInside.setVisibility(View.GONE);
+                        }
+                        break;
+                    }
                 }
                 break;
-            case R.id.fontLayoutMain:
-                if (view.findViewById(R.id.fontLayout).getVisibility() == View.GONE) {
-                    view.findViewById(R.id.fontLayout).setVisibility(View.VISIBLE);
-                } else {
-                    view.findViewById(R.id.fontLayout).setVisibility(View.GONE);
-                }
+            case R.id.buttonClearAllPhoto:
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Удалить все фотографии")
+                        .setMessage("Вы уверены, что хотите удалить все фотографии с этого устройства?")
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            @Async
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                File file = new File(glbVars.getPhotoDir());
+                                int countOfFiles = file.listFiles().length;
+                                for (File elem : file.listFiles()) {
+                                    boolean isDeleted = elem.delete();
+                                    if (!isDeleted) {
+                                        try {
+                                            throw new FileNotFoundException("Файл не найден");
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                                if (countOfFiles != 0) {
+                                    Config.sout("Фотографии успешно удалены");
+                                    glbVars.db.clearPhoto();
+                                }
+                                else {
+                                    Config.sout("Отсутствуют фотографии на устройстве");
+                                }
+                            }
+                        })
+                        .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
                 break;
         }
     }
@@ -120,7 +163,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar actions click
         if (item.getItemId() == R.id.SettingsSave) {
             changeServerData();
             changeFontSize();
@@ -130,7 +172,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     @Async
     private void changeServerData() {
-        // Меняем данные сервера
         String host = etFtpServer.getText().toString();
         String port = etFtpPort.getText().toString();
         String user = etFtpUser.getText().toString();
@@ -157,7 +198,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
      */
     @Async
     private void changeFontSize() {
-        // Меняем шрифт в приложении
         if (Integer.parseInt(fontSize.getText().toString()) == settings.getInt("fontSize", -1)) {
             return;
         }

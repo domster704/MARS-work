@@ -121,6 +121,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public GridView orderDtList;
     public GridView debetList;
 
+//    public android.support.v7.widget.Toolbar toolbar;
     public android.support.v7.widget.Toolbar toolbar;
     public LinearLayout layout;
 
@@ -192,6 +193,8 @@ public class GlobalVars extends Application implements TBUpdate {
             }
         }
     };
+
+//    public static boolean isGoneInGroup = false;
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @SuppressLint("NonConstantResourceId")
         @Override
@@ -238,8 +241,9 @@ public class GlobalVars extends Application implements TBUpdate {
                         EndPos = position + 1;
                         return true;
                     case R.id.goToGroup:
-                        resetCurData();
+//                        isGoneInGroup = true;
                         resetAllSpinners();
+                        resetCurData();
                         resetSearchViewData();
 
                         SetSelectedSgi(Sgi);
@@ -266,10 +270,18 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             if (CurSGI.equals("0"))
                 return;
+//            if (CurGroup.equals("0")) {
+//                FormOrderFragment.setRealPrices(GlobalVars.this, true);
+//            }
 
-//            if (!CurGroup.equals("0") && !CurWCID.equals("0") && !CurFocusID.equals("0") && !CurSearchName.equals(""))
-//            System.out.println(2);
-            LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+
+//            if (!isJustSettingAdapter) {
+                System.out.println("Group & SGI: " + CurGroup + " " + CurSGI);
+                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+//            }
+
+//            if (isJustSettingAdapter)
+//                isJustSettingAdapter = false;
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -290,15 +302,10 @@ public class GlobalVars extends Application implements TBUpdate {
                 spGrup.setAdapter(null);
             } else {
                 LoadGroups(ItemID);
-//                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
             }
 
-//            if (!isNeedingTobeLoadingBySgi) {
-//                isNeedingTobeLoadingBySgi = true;
-//                return;
-//            }
-
             if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
+                System.out.println(1 + " " + CurWCID + " " + CurFocusID + " " + CurSearchName);
                 LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
             }
         }
@@ -474,12 +481,15 @@ public class GlobalVars extends Application implements TBUpdate {
         spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
     }
 
+//    private boolean isJustSettingAdapter = false;
     @AsyncUI
     public void LoadGroups(final String SgiID) {
         myGrups = db.getGrupBySgi(SgiID);
         spGrup = CurView.findViewById(R.id.SpinGrups);
         android.widget.SimpleCursorAdapter adapter;
         adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
+
+//        isJustSettingAdapter = true;
         spGrup.setAdapter(adapter);
         spGrup.setOnItemSelectedListener(SelectedGroup);
     }
@@ -528,7 +538,7 @@ public class GlobalVars extends Application implements TBUpdate {
             @Override
             @PGShowing
             public void run() {
-                System.out.println(CurSGI + " " + CurGroup + " " + CurWCID + " " + CurFocusID);
+//                System.out.println(CurSGI + " " + CurGroup + " " + CurWCID + " " + CurFocusID);
 //                myNom = db.getNomen(
 //                        CurSGI, CurGroup,
 //                        CurWCID, CurFocusID, CurSearchName);
@@ -559,7 +569,7 @@ public class GlobalVars extends Application implements TBUpdate {
             String id = value.getString(value.getColumnIndex("CODE"));
             if (SgiID.equals(id)) {
                 spSgi.setSelection(i);
-                LoadGroups(SgiID);
+//                LoadGroups(SgiID);
                 return;
             }
         }
@@ -707,6 +717,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 FTPClient ftpClient;
                 ftpClient = new FTPClient();
                 final String photoDir = getPhotoDir();
+                System.out.println(photoDir);
                 try {
                     ftpClient.connect(ftp_server);
 
@@ -768,6 +779,7 @@ public class GlobalVars extends Application implements TBUpdate {
         downloadPhotoTread.start();
     }
 
+    // TODO
     public void ShowNomenPhoto(final String PhotoFileName) {
         alertPhoto = null;
         String photoDir = getPhotoDir();
@@ -789,47 +801,25 @@ public class GlobalVars extends Application implements TBUpdate {
         imageView.setMaxScale(3f);
         imageView.setDoubleTapZoomScale(1F);
 
-        if (imgFile.exists()) {
-            imageView.setImage(ImageSource.uri(photoDir + "/" + PhotoFileName));
-            imageView.setTag("Фото 1");
-            imageView.setOnClickListener(v -> {
-                checkPhotoInDB(PhotoFileName);
-                String LoadingFile = PhotoFileName;
-                if (imageView.getTag().toString().equals("Фото 1")) {
-                    if (imgFile2.exists() && imgFile2.length() != 0) {
-                        imageView.setTag("Фото 2");
-                        LoadingFile = FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg";
-                        checkPhotoInDB(LoadingFile);
-                        alertPhoto.setTitle(LoadingFile);
-                    } else {
-                        if (!myNom.getString(10).equals("")) {
-                            isSecondPhoto = true;
-                            if (isNetworkAvailable()) {
-                                DownloadPhoto(FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg");
-                                if (imgFile2.length() != 0) {
-                                    LoadingFile = FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg";
-                                    checkPhotoInDB(LoadingFile);
-                                    imageView.setTag("Фото 2");
-                                    alertPhoto.setTitle(LoadingFile);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    LoadingFile = PhotoFileName;
-                    imageView.setTag("Фото 1");
+        imageView.setImage(ImageSource.uri(photoDir + "/" + PhotoFileName));
+        imageView.setTag("Фото 1");
+
+        imageView.setOnClickListener(v -> {
+            checkPhotoInDB(PhotoFileName);
+            String LoadingFile = PhotoFileName;
+            if (imageView.getTag().toString().equals("Фото 1")) {
+                if (imgFile2.exists() && imgFile2.length() != 0) {
+                    imageView.setTag("Фото 2");
+                    LoadingFile = FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg";
+                    checkPhotoInDB(LoadingFile);
+                    alertPhoto.setTitle(LoadingFile);
                 }
-                imageView.setImage(ImageSource.uri(photoDir + "/" + LoadingFile));
-            });
-        } else {
-            DownloadPhoto(PhotoFileName);
-            if (imgFile.length() != 0) {
-                imageView.setImage(ImageSource.uri(photoDir + "/" + PhotoFileName));
-                imageView.setTag("Фото 1");
             } else {
-                Config.sout("Файл с именем " + PhotoFileName + " на сервере не найден");
+                LoadingFile = PhotoFileName;
+                imageView.setTag("Фото 1");
             }
-        }
+            imageView.setImage(ImageSource.uri(photoDir + "/" + LoadingFile));
+        });
     }
 
     @AsyncUI
@@ -1249,12 +1239,12 @@ public class GlobalVars extends Application implements TBUpdate {
         orderPrices.close();
     }
 
-    public void calculatePricesByContrDiscount() {
+    public void calculatePricesByContrDiscount(String data) {
         new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
-                db.calcSales(db.GetContrID());
+                db.calcSales(db.GetContrID(), data);
                 CurAc.runOnUiThread(() -> {
                     if (NomenAdapter != null) {
                         myNom.requery();
@@ -1299,8 +1289,6 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    private int _previousCursorCount = 0;
-
     public class NomenAdapter extends SimpleCursorAdapter {
         private boolean hasBeenAlreadyNoChanged = true;
 
@@ -1312,10 +1300,6 @@ public class GlobalVars extends Application implements TBUpdate {
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
-
-//            if (isSales) {
-//                this.notifyDataSetChanged();
-//            }
 
             Cursor cursor = getCursor();
             CurVisiblePosition = cursor.getCount();
@@ -1347,10 +1331,13 @@ public class GlobalVars extends Application implements TBUpdate {
             Button btMinus = view.findViewById(R.id.btMinus);
 
             tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
-            tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString())));
-
-            if (tvPhoto != null)
+            if (tvPhoto != null) {
                 tvPhoto.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
+            }
+
+            if (tvPrice != null && !tvPrice.getText().toString().equals("null")) {
+                tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString())));
+            }
 
             btPlus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
             btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
@@ -1359,7 +1346,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 tvPrice.setText(String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5)));
             }
 
-            if (isDiscount) {
+            if (isDiscount && tvPhoto != null) {
                 tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString()) * (1 - Discount / 100f)));
             }
 
@@ -1611,6 +1598,7 @@ public class GlobalVars extends Application implements TBUpdate {
             spFocus.setSelection(0);
         }
         FormOrderFragment.filter.setImageResource(R.drawable.filter);
+        FormOrderFragment.isFiltered = false;
     }
 
     public void resetSearchViewData() {
@@ -1650,6 +1638,10 @@ public class GlobalVars extends Application implements TBUpdate {
                 db.ResetNomenPrice(isCopied);
             }
         });
+    }
+
+    public static String[] getCurrentData() {
+        return new String[] {CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName};
     }
 
     @SuppressLint("DefaultLocale")
@@ -1784,6 +1776,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
             }
         } else {
+            //TODO: сюда заходит
             try {
                 ShowNomenPhoto(FileName);
             } catch (Exception e) {
