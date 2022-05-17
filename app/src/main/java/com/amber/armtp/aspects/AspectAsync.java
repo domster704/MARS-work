@@ -17,12 +17,14 @@ public class AspectAsync {
 
     @Around("setPointCutThread()")
     public void setJoinPointThread(final ProceedingJoinPoint joinPoint) {
-        new Thread(() -> {
+        Thread th = new Thread(() -> {
             try {
                 joinPoint.proceed();
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
-        }).start();
+        });
+        th.setPriority(10);
+        th.start();
     }
 }

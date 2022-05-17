@@ -25,12 +25,12 @@ public class DBAppHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public synchronized SQLiteDatabase getReadableDatabase() {
+    public SQLiteDatabase getReadableDatabase() {
         return super.getReadableDatabase();
     }
 
     @Override
-    public synchronized SQLiteDatabase getWritableDatabase() {
+    public SQLiteDatabase getWritableDatabase() {
         return super.getWritableDatabase();
     }
 

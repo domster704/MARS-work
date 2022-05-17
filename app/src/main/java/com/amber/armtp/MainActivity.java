@@ -40,6 +40,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,9 +97,14 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        for (File elem: new File(filesPathAPK).listFiles()) {
+            if (elem.exists()) {
+                elem.delete();
+            }
+        }
+
         if (!_checkAvailableSpaceOnDevice())
             Toast.makeText(getApplication(), "Для работы программы необходимо минимум 100 Мб. Освободите место!", Toast.LENGTH_SHORT).show();
-
 
 //      Для нахождения утечки памяти
 //        if (BuildConfig.DEBUG) {
@@ -293,7 +300,10 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
                 super.onDrawerOpened(drawerView);
-                initLastUpdate();
+                try {
+                    initLastUpdate();
+                } catch (Exception e) {
+                }
             }
         };
 

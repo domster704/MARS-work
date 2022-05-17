@@ -38,8 +38,8 @@ public class Downloader {
     }
 
     public void downloadApp(final UpdateDataFragment.UIData ui, View view, String ver) {
-        if (_checkAlreadyExistedApk(ver))
-            return;
+//        if (_checkAlreadyExistedApk(ver))
+//            return;
 
         try {
             FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, ver + ".apk");
@@ -52,8 +52,7 @@ public class Downloader {
             });
 
             _startInstallApp(ver);
-            _checkAlreadyExistedApk(ver);
-
+//            _checkAlreadyExistedApk(ver);
         } catch (Exception e) {
             e.printStackTrace();
             catchErrorInDownloadProcess(view, ui);
@@ -84,6 +83,7 @@ public class Downloader {
                 ui.tvData.setTextColor(Color.rgb(3, 103, 0));
                 Config.sout("База данных успешно обновлена");
                 globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
+//                globalVariable.db.updatePDDataInTable(globalVariable.getPhotoDir());
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,9 +168,7 @@ public class Downloader {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(uri, "application/vnd.android.package-archive");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Config.sout("Приложение успешно скачано");
                 activity.getApplicationContext().startActivity(intent);
-
             }
         });
     }

@@ -17,7 +17,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
     }
 
     @Override
@@ -26,12 +25,12 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public synchronized SQLiteDatabase getReadableDatabase() {
+    public SQLiteDatabase getReadableDatabase() {
         return super.getReadableDatabase();
     }
 
     @Override
-    public synchronized SQLiteDatabase getWritableDatabase() {
+    public SQLiteDatabase getWritableDatabase() {
         return super.getWritableDatabase();
     }
 
@@ -51,7 +50,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " ZAKAZY.DOCID AS DOCID" +
                     " FROM ZAKAZY" +
                     " WHERE" +
-                    " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2)) ORDER BY _id DESC", null);
+                    " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))" +
+                    " ORDER BY _id DESC", null);
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();

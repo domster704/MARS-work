@@ -22,7 +22,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
-import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.view.Gravity;
@@ -90,7 +89,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public int CurVisiblePosition = 0;
 
     public Context glbContext;
-    public Cursor myNom, mySgi, myGrups, Orders, OrdersDt;
+    public Cursor myNom = null, mySgi, myGrups, Orders, OrdersDt;
     public Cursor curWC, curFocus;
     public Cursor Contr;
     public Cursor Addr;
@@ -111,7 +110,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public boolean isMultiSelect = false;
     public boolean isSecondPhoto = false;
     public boolean isSales = false;
-    public boolean isNeedingTobeLoadingBySgi = true;
+    public boolean isNeededToBeLoadingBySgi = true;
 
     public float Discount = 0;
     public int MultiQty = 0;
@@ -121,7 +120,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public GridView orderDtList;
     public GridView debetList;
 
-//    public android.support.v7.widget.Toolbar toolbar;
+    //    public android.support.v7.widget.Toolbar toolbar;
     public android.support.v7.widget.Toolbar toolbar;
     public LinearLayout layout;
 
@@ -153,6 +152,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public int BeginPos = 0, EndPos = 0;
 
     public static Thread downloadPhotoTread;
+    public boolean isNeededToResetSearchView = true;
 
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -194,7 +194,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     };
 
-//    public static boolean isGoneInGroup = false;
+    //    public static boolean isGoneInGroup = false;
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @SuppressLint("NonConstantResourceId")
         @Override
@@ -270,18 +270,9 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             if (CurSGI.equals("0"))
                 return;
-//            if (CurGroup.equals("0")) {
-//                FormOrderFragment.setRealPrices(GlobalVars.this, true);
-//            }
 
-
-//            if (!isJustSettingAdapter) {
-                System.out.println("Group & SGI: " + CurGroup + " " + CurSGI);
-                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-//            }
-
-//            if (isJustSettingAdapter)
-//                isJustSettingAdapter = false;
+            System.out.println("Group & SGI: " + CurGroup + " " + CurSGI);
+            LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -291,7 +282,10 @@ public class GlobalVars extends Application implements TBUpdate {
     public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            resetSearchViewData();
+            if (isNeededToResetSearchView) {
+                resetSearchViewData();
+            }
+            isNeededToResetSearchView = true;
             String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
 
             CurGroup = "0";
@@ -305,7 +299,6 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
-                System.out.println(1 + " " + CurWCID + " " + CurFocusID + " " + CurSearchName);
                 LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
             }
         }
@@ -481,7 +474,7 @@ public class GlobalVars extends Application implements TBUpdate {
         spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
     }
 
-//    private boolean isJustSettingAdapter = false;
+    //    private boolean isJustSettingAdapter = false;
     @AsyncUI
     public void LoadGroups(final String SgiID) {
         myGrups = db.getGrupBySgi(SgiID);
@@ -522,12 +515,6 @@ public class GlobalVars extends Application implements TBUpdate {
             formatedArgs[i] = "0";
         }
 
-//        CurSGI = formatedArgs[0].equals("0") ? CurSGI : formatedArgs[0];
-//        CurGroup = formatedArgs[1].equals("0") ? CurGroup : formatedArgs[1];
-//        CurWCID = formatedArgs[2].equals("0") ? CurWCID : formatedArgs[2];
-//        CurFocusID = formatedArgs[3].equals("0") ? CurFocusID : formatedArgs[3];
-//        CurSearchName = formatedArgs[4].equals("") ? CurSearchName : formatedArgs[4].toLowerCase(Locale.ROOT);
-
         CurSGI = formatedArgs[0];
         CurGroup = formatedArgs[1];
         CurWCID = formatedArgs[2];
@@ -538,7 +525,6 @@ public class GlobalVars extends Application implements TBUpdate {
             @Override
             @PGShowing
             public void run() {
-//                System.out.println(CurSGI + " " + CurGroup + " " + CurWCID + " " + CurFocusID);
 //                myNom = db.getNomen(
 //                        CurSGI, CurGroup,
 //                        CurWCID, CurFocusID, CurSearchName);
@@ -546,16 +532,19 @@ public class GlobalVars extends Application implements TBUpdate {
                 myNom = db.getNomen(
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
-                CurAc.runOnUiThread(() -> {
-                    nomenList.setAdapter(null);
-                    NomenAdapter = getNomenAdapter(myNom);
-                    nomenList.setAdapter(NomenAdapter);
-                    nomenList.setOnItemClickListener(GridNomenClick);
-                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
+                NomenAdapter = getNomenAdapter(myNom);
+                CurAc.runOnUiThread(new Runnable() {
+                    @Override
+//                    @DelayedCalled(delay = 150)
+                    public void run() {
+                        nomenList.setAdapter(null);
+                        nomenList.setAdapter(NomenAdapter);
+                        nomenList.setOnItemClickListener(GridNomenClick);
+                        nomenList.setOnItemLongClickListener(GridNomenLongClick);
 
-//                    myNom.requery();
-                    // needs to call notifyDataSetChanged in NomenAdapter class
-                    NomenAdapter.notifyDataSetChanged();
+                        // needs to call notifyDataSetChanged in NomenAdapter class
+                        NomenAdapter.notifyDataSetChanged();
+                    }
                 });
                 isNewLoaded = false;
             }
@@ -1036,20 +1025,22 @@ public class GlobalVars extends Application implements TBUpdate {
         return DBF_FileName;
     }
 
-    @AsyncUI
     public void LoadOrders() {
         _updateOrdersStatusFromDB();
-
+        gdOrders.setAdapter(null);
         Orders = dbOrders.getZakazy();
+        OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
         if (Orders != null)
             _putCheckBox(Orders);
-        OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
         gdOrders.setAdapter(OrdersAdapter);
     }
 
     @AsyncUI
     public void LoadOrdersDetails(String ZakazID) {
         _doUpdateQTYByOuted(ZakazID);
+
+        GlobalVars.allOrders.clear();
+        layout.removeAllViews();
 
         orderDtList.setAdapter(null);
         OrdersDt = dbOrders.getZakazDetails(ZakazID);
@@ -1080,46 +1071,57 @@ public class GlobalVars extends Application implements TBUpdate {
         spTP.setAdapter(adapter);
     }
 
-    public void UpdateNomenRange(int BeginRange, int EndRange, int Qty) {
-        String sql_update = "UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - " + Qty + ") >= 0 THEN " + Qty + " ELSE OST END WHERE ROWID=?";
-        SQLiteStatement stmt = db.getWritableDatabase().compileStatement(sql_update);
-        db.getWritableDatabase().beginTransaction();
-        int tmpVal;
+    public void UpdateNomenRange(int _BeginRange, int _EndRange, int _Qty) {
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                int EndRange = _EndRange;
+                int BeginRange = _BeginRange;
+                int Qty = _Qty;
+                String sql_update = "UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - " + Qty + ") >= 0 THEN " + Qty + " ELSE OST END WHERE ROWID=?";
+                SQLiteStatement stmt = db.getWritableDatabase().compileStatement(sql_update);
+                db.getWritableDatabase().beginTransaction();
+                int tmpVal;
 
-        if (EndRange > CurVisiblePosition) {
-            EndRange = CurVisiblePosition;
-        }
+                if (EndRange > CurVisiblePosition) {
+                    EndRange = CurVisiblePosition;
+                }
 
-        if (BeginRange > EndRange) {
-            tmpVal = BeginRange;
-            BeginRange = EndRange;
-            EndRange = tmpVal;
-        }
+                if (BeginRange > EndRange) {
+                    tmpVal = BeginRange;
+                    BeginRange = EndRange;
+                    EndRange = tmpVal;
+                }
 
-        for (int i = BeginRange - 1; i <= EndRange - 1; i++) {
-            stmt.clearBindings();
-            stmt.bindLong(1, NomenAdapter.getItemId(i));
-            stmt.executeUpdateDelete();
-            stmt.clearBindings();
-        }
+                for (int i = BeginRange - 1; i <= EndRange - 1; i++) {
+                    stmt.clearBindings();
+                    stmt.bindLong(1, NomenAdapter.getItemId(i));
+                    stmt.executeUpdateDelete();
+                    stmt.clearBindings();
+                }
 
-        db.getWritableDatabase().setTransactionSuccessful();
-        db.getWritableDatabase().endTransaction();
-        myNom.requery();
-        NomenAdapter.notifyDataSetChanged();
+                db.getWritableDatabase().setTransactionSuccessful();
+                db.getWritableDatabase().endTransaction();
 
-        for (int i = BeginRange; i <= EndRange; i++) {
-            long pos = NomenAdapter.getItemId(i - 1);
+                for (int i = BeginRange; i <= EndRange; i++) {
+                    long pos = NomenAdapter.getItemId(i - 1);
 
-            SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
-            Cursor kod5 = sqLiteDatabase.rawQuery("SELECT KOD5 FROM NOMEN WHERE rowid='" + pos + "'", null);
-            kod5.moveToNext();
+                    SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
+                    Cursor kod5 = sqLiteDatabase.rawQuery("SELECT KOD5 FROM NOMEN WHERE rowid='" + pos + "'", null);
+                    kod5.moveToNext();
 
-            db.putPriceInNomen(pos, "" + DBHelper.pricesMap.get(kod5.getString(0)));
-            kod5.close();
-        }
+                    db.putPriceInNomen(pos, "" + DBHelper.pricesMap.get(kod5.getString(0)));
+                    kod5.close();
+                }
 
-        setContrAndSum(GlobalVars.this);
+                CurAc.runOnUiThread(() -> {
+                    myNom.requery();
+                    NomenAdapter.notifyDataSetChanged();
+                    setContrAndSum(GlobalVars.this);
+                });
+            }
+        }).start();
     }
 
     @AsyncUI
@@ -1580,7 +1582,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public void resetCurData() {
         CurGroup = CurWCID = CurFocusID = CurSGI = "0";
         CurSearchName = "";
-        isNeedingTobeLoadingBySgi = true;
+        isNeededToBeLoadingBySgi = true;
 
         Discount = 0f;
         Menu menu = FormOrderFragment.mainMenu;
@@ -1641,7 +1643,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public static String[] getCurrentData() {
-        return new String[] {CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName};
+        return new String[]{CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName};
     }
 
     @SuppressLint("DefaultLocale")
@@ -1658,12 +1660,12 @@ public class GlobalVars extends Application implements TBUpdate {
         Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
         Cursor statusInDB = null;
         while (statusInApp.moveToNext()) {
-            String DOCID = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
-            statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + DOCID + "'", null);
+            String docId = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
+            statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + docId + "'", null);
             if (statusInDB.getCount() != 0) {
                 statusInDB.moveToNext();
                 String Status = statusInDB.getString(statusInDB.getColumnIndex("STATUS"));
-                dbOrd.execSQL("UPDATE ZAKAZY SET STATUS = '" + Status + "' WHERE DOCID='" + DOCID + "'");
+                dbOrd.execSQL("UPDATE ZAKAZY SET STATUS = '" + Status + "' WHERE DOCID='" + docId + "'");
             }
         }
 
@@ -1700,8 +1702,7 @@ public class GlobalVars extends Application implements TBUpdate {
         int id;
         String status;
 
-        c.moveToFirst();
-        do {
+        while (c.moveToNext()) {
             id = c.getInt(c.getColumnIndex("_id"));
             status = c.getString(c.getColumnIndex("STATUS"));
 
@@ -1715,7 +1716,7 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             GlobalVars.allOrders.add(new CheckBoxData(id, checkBox, status));
-        } while (c.moveToNext());
+        }
     }
 
     // Начадл обработчиков событий нажатия на NomenLayout

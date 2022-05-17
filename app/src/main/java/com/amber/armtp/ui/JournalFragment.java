@@ -53,6 +53,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
+
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, long id) {
@@ -70,7 +71,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 switch (menuItem.getItemId()) {
                     case R.id.CtxOrdEdit:
                         glbVars.OrderID = ID;
-                        // Use the Builder class for convenient dialog construction
                         builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                         builder.setMessage("Вы уверены?")
                                 .setNegativeButton("Нет", (dialog, id1) -> {
@@ -102,24 +102,12 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
             }
 
-//            if (Status.equals("Удален") || Status.equals("Отменен")) {
-//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-//            }
-//
-//            if (Status.equals("Оформлен") || Status.equals("Оформлен(-)") || Status.equals("Собран(-)") || Status.equals("Собран") || Status.equals("Получен")) {
-//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-//            }
-//
-//            if (Status.equals("Отправлен")) {
-//                nomPopupMenu.getMenu().findItem(R.id.CtxOrdEdit).setEnabled(false);
-//            }
-
             nomPopupMenu.show();
             return true;
         }
 
     };
-    //    private ArrayList<Integer> itemsList;
+
     private int[] itemsList;
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -165,7 +153,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
     @Override
     public void onResume() {
         super.onResume();
-        deleteExtraOrders();
     }
 
     @Override
@@ -177,7 +164,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
+        glbVars = (GlobalVars) getActivity().getApplicationContext();
         glbVars.setContext(getActivity().getApplicationContext());
         GlobalVars.CurFragmentContext = getActivity();
         GlobalVars.CurAc = getActivity();
@@ -204,12 +191,16 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
         ScrollView view = getActivity().findViewById(R.id.scrollViewJ);
         view.fullScroll(View.FOCUS_DOWN);
+
+        if (getArguments() != null && getArguments().getBoolean("isStartDeletingExtraOrders")) {
+            deleteExtraOrders();
+        }
     }
 
     /**
      * Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
      */
-    public void  deleteExtraOrders() {
+    public void deleteExtraOrders() {
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 100; i < glbVars.gdOrders.getCount(); i++) {
                 int id = GlobalVars.allOrders.get(i).id;
@@ -218,8 +209,10 @@ public class JournalFragment extends Fragment implements ServerChecker {
             GlobalVars.allOrders.subList(100, glbVars.gdOrders.getCount()).clear();
             glbVars.LoadOrders();
 
-            toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-            toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из 100");
+            GlobalVars.CurAc.runOnUiThread(() -> {
+                toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+                toolbar.setSubtitle("Всего заказов: " + glbVars.gdOrders.getCount() + " из 100");
+            });
         }
     }
 
@@ -503,43 +496,47 @@ public class JournalFragment extends Fragment implements ServerChecker {
     }
 
     private void CopyOrder(final String OrderID) {
-        new Thread(() -> {
-            Cursor cursor;
-            glbVars.db.getWritableDatabase().beginTransaction();
-            glbVars.db.ResetNomen();
-            cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
-            try {
-                while (cursor.moveToNext()) {
-                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cursor.getString(cursor.getColumnIndex("PRICE")) + "', ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                Cursor cursor;
+                glbVars.db.getWritableDatabase().beginTransaction();
+                glbVars.db.ResetNomen();
+                cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                try {
+                    while (cursor.moveToNext()) {
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cursor.getString(cursor.getColumnIndex("PRICE")) + "', ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+
+                cursor.close();
+
+                glbVars.db.getWritableDatabase().execSQL("DELETE FROM ORDERS");
+                glbVars.db.getWritableDatabase().setTransactionSuccessful();
+                glbVars.db.getWritableDatabase().endTransaction();
+
+                glbVars.rewritePriceToMainDB(OrderID);
+
+                HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
+
+                Fragment fragment = new OrderHeadFragment();
+
+                Bundle args = new Bundle();
+                args.putBoolean("isCopied", true);
+                args.putString("TP", orderData.get("TP"));
+                args.putString("CONTR", orderData.get("CONTR"));
+                args.putString("ADDR", orderData.get("ADDR"));
+                args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
+                args.putString("COMMENT", orderData.get("COMMENT"));
+                fragment.setArguments(args);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                fragmentTransaction.commit();
             }
-
-            cursor.close();
-
-            glbVars.db.getWritableDatabase().execSQL("DELETE FROM ORDERS");
-            glbVars.db.getWritableDatabase().setTransactionSuccessful();
-            glbVars.db.getWritableDatabase().endTransaction();
-
-            glbVars.rewritePriceToMainDB(OrderID);
-
-            HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
-
-            Fragment fragment = new OrderHeadFragment();
-
-            Bundle args = new Bundle();
-            args.putBoolean("isCopied", true);
-            args.putString("TP", orderData.get("TP"));
-            args.putString("CONTR", orderData.get("CONTR"));
-            args.putString("ADDR", orderData.get("ADDR"));
-            args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
-            args.putString("COMMENT", orderData.get("COMMENT"));
-            fragment.setArguments(args);
-
-            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-            fragmentTransaction.commit();
         }).start();
     }
 }

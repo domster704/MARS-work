@@ -25,17 +25,15 @@ public class ProgressBarLoading {
 
     @AsyncUI
     private void _create() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(false);
-        builder.setView(R.layout.progress_bar_loading);
-
-        dialog = builder.create();
+        dialog = new AlertDialog.Builder(context)
+                .setCancelable(false)
+                .setView(R.layout.progress_bar_loading)
+                .create();
     }
 
     /**
-     *
      * @param isCanceled - параметр, указывающий на необходимость создания кнопки "Отменить"
-     * @param thread - поток, который необходимо прервать
+     * @param thread     - поток, который необходимо прервать
      */
     @AsyncUI
     private void _create(boolean isCanceled, Thread thread) {

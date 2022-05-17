@@ -55,7 +55,7 @@
                             android:id="@+id/tvServer"
                             android:layout_width="@dimen/settingsWidthAfterMargin"
                             android:layout_height="match_parent"
-                            android:gravity="end|center_vertical"
+                            android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
                             android:text="@string/resUpdateServer"
                             android:textAlignment="center"
@@ -85,12 +85,12 @@
                             android:id="@+id/tvLogin"
                             android:layout_width="@dimen/settingsWidthAfterMargin"
                             android:layout_height="match_parent"
-                            android:gravity="end|center_vertical"
+                            android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
                             android:text="@string/resLogin"
                             android:textAlignment="center"
                             android:textColor="#000"
-                            android:textSize="12sp" />
+                            android:textSize="@dimen/textSizeSettings" />
 
                     <EditText
                             android:id="@+id/edFtpUser"
@@ -111,12 +111,12 @@
                             android:id="@+id/tvPass"
                             android:layout_width="@dimen/settingsWidthAfterMargin"
                             android:layout_height="match_parent"
-                            android:gravity="end|center_vertical"
+                            android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
                             android:text="@string/resPass"
                             android:textAlignment="center"
                             android:textColor="#000"
-                            android:textSize="12sp" />
+                            android:textSize="@dimen/textSizeSettings" />
 
                     <EditText
                             android:id="@+id/edFtpPass"
@@ -138,12 +138,12 @@
                             android:id="@+id/tvPort"
                             android:layout_width="@dimen/settingsWidthAfterMargin"
                             android:layout_height="match_parent"
-                            android:gravity="end|center_vertical"
+                            android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
                             android:text="@string/resPort"
                             android:textAlignment="center"
                             android:textColor="#000"
-                            android:textSize="12sp" />
+                            android:textSize="@dimen/textSizeSettings" />
 
                     <EditText
                             android:id="@+id/edFtpPort"
@@ -196,7 +196,7 @@
                     <TextView
                             android:layout_width="@dimen/settingsWidthAfterMargin"
                             android:layout_height="match_parent"
-                            android:gravity="end|center_vertical"
+                            android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
                             android:text="Шрифт"
                             android:textAlignment="center"
@@ -255,7 +255,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/dividerSettings"
-                        android:layout_marginStart="100dp">
+                        android:layout_marginStart="100dp"
+                        android:orientation="horizontal">
 
                     <Button
                             android:id="@+id/buttonClearAllPhoto"

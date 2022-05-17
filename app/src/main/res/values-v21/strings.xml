@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="resUpdateServer">Сервер обновлений</string>
+    <string name="resUpdateServer">Сервер</string>
     <string name="resSaveSettings" />
     <string name="resPort">Порт</string>
     <string name="resLogin">Логин</string>

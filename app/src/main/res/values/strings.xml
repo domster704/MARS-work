@@ -22,7 +22,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="resUpdateServer">Сервер обновлений</string>
+    <string name="resUpdateServer">Сервер</string>
     <string name="resSaveSettings" />
     <string name="resPort">Порт</string>
     <string name="resLogin">Логин</string>

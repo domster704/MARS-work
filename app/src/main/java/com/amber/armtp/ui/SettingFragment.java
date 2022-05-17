@@ -124,7 +124,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             case R.id.buttonClearAllPhoto:
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Удалить все фотографии")
-                        .setMessage("Вы уверены, что хотите удалить все фотографии с этого устройства?")
+                        .setMessage("Вы уверены, что хотите удалить все фотографии товаров с этого устройства?")
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Async
                             @Override

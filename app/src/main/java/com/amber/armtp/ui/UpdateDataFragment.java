@@ -159,7 +159,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                             tvDB.setTextColor(Color.rgb(0, 0, 0));
                         });
                         downloader.downloadDB(uiData[0], view, glbVars);
-                        glbVars.db.updatePDDataInTable(glbVars.getPhotoDir());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

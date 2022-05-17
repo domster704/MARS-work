@@ -3,8 +3,6 @@ package com.amber.armtp.ftp;
 
 import android.util.Log;
 
-import org.apache.commons.io.FileSystemUtils;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,11 +10,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class ZipUnpacking {
     private final String fileDir;
@@ -33,8 +31,8 @@ public class ZipUnpacking {
             if (entry.isDirectory()) {
                 new File(file.getParent(), entry.getName()).mkdirs();
             } else {
-                System.out.println(entry.getName() + " " + file.getPath());
-                try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File(file.getParent(), entry.getName())));) {
+                ZipEntry newEntry = new ZipEntry(entry);
+                try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File(file.getParent(), newEntry.getName())));) {
                     int len;
                     while ((len = zip.read(buffer)) > 0) {
                         output.write(buffer, 0, len);
@@ -45,6 +43,28 @@ public class ZipUnpacking {
 
         zip.close();
     }
+
+//    private void unZip(File inputFile) throws IOException {
+//        File outputFile = new File(inputFile.getPath().split("\\.")[0] + ".db");
+//        ZipFile zip = new ZipFile(fileDir);
+//        ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(outputFile));
+//        Enumeration entries = zip.entries();
+//        byte[] buffer = new byte[2048];
+//        while (entries.hasMoreElements()) {
+//            ZipEntry entry = (ZipEntry) entries.nextElement();
+//            outputStream.putNextEntry(entry);
+//            InputStream in = zip.getInputStream(entry);
+//            while (0 < in.available()) {
+//                int read = in.read(buffer);
+//                if (read > 0) {
+//                    outputStream.write(buffer, 0, read);
+//                }
+//            }
+//            in.close();
+//            outputStream.closeEntry();
+//        }
+//        outputStream.close();
+//    }
 
     public boolean doUnpacking() {
         File file = new File(fileDir);
