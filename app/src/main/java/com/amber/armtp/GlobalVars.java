@@ -72,6 +72,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
 
 /**
@@ -90,7 +91,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public Context glbContext;
     public Cursor myNom = null, mySgi, myGrups, Orders, OrdersDt;
-    public Cursor curWC, curFocus;
+    public Cursor curWC = null, curFocus = null;
     public Cursor Contr;
     public Cursor Addr;
     public Cursor TP;
@@ -154,11 +155,13 @@ public class GlobalVars extends Application implements TBUpdate {
     public static Thread downloadPhotoTread;
     public boolean isNeededToResetSearchView = true;
 
+    private HashSet<String> listOfOutedDocId;
+
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             String ItemID = Contr.getString(Contr.getColumnIndex("CODE"));
-            if (!ItemID.equals("0") && !OrderHeadFragment.isCopied) {
+            if (!ItemID.equals("0") && !OrderHeadFragment.isOrderEditedOrCopied) {
                 LoadContrAddr(ItemID);
             }
         }
@@ -171,11 +174,11 @@ public class GlobalVars extends Application implements TBUpdate {
         long viewId = myView.getId();
 
         if (viewId == R.id.ColNomPhoto) {
-            _showPhoto(myView, position, myAdapter);
+            showPhoto(myView, position, myAdapter);
         } else if (viewId == R.id.btPlus) {
-            _plusQTY(myView);
+            plusQTY(myView);
         } else if (viewId == R.id.btMinus) {
-            _minusQTY(myView);
+            minusQTY(myView);
         } else {
             TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
             TextView tvOST = myView.findViewById(R.id.ColNomOst);
@@ -186,10 +189,9 @@ public class GlobalVars extends Application implements TBUpdate {
             int count = Integer.parseInt(tvNomenCount.getText().toString());
 
             if (isMultiSelect) {
-//                _multiSelect(ID, ost, count);
-                _multiSelect(ID, ost);
+                multiSelect(ID, ost);
             } else {
-                _fillNomenDataFromAlertDialog(ID, ost);
+                fillNomenDataFromAlertDialog(ID, ost);
             }
         }
     };
@@ -226,8 +228,6 @@ public class GlobalVars extends Application implements TBUpdate {
                 nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + EndPos + ")");
             }
 
-            String finalCurSgi = curSgi;
-            String finalCurGroup = curGroup;
             nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
                 switch (menuItem.getItemId()) {
                     case R.id.resetBeginEndPos:
@@ -241,14 +241,12 @@ public class GlobalVars extends Application implements TBUpdate {
                         EndPos = position + 1;
                         return true;
                     case R.id.goToGroup:
-//                        isGoneInGroup = true;
                         resetAllSpinners();
                         resetCurData();
                         resetSearchViewData();
 
                         SetSelectedSgi(Sgi);
                         SetSelectedGrup(Grup);
-
                         return true;
                 }
                 return true;
@@ -398,15 +396,12 @@ public class GlobalVars extends Application implements TBUpdate {
     public AdapterView.OnItemLongClickListener PreviewNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
-            final String Grup;
-            final String Sgi;
-
             grupID = myView.findViewById(R.id.ColNomGRUPID);
             sgiID = myView.findViewById(R.id.ColNomSGIID);
 
             Cursor c = myNom;
-            Grup = c.getString(c.getColumnIndex("GRUPPA"));
-            Sgi = c.getString(c.getColumnIndex("SGI"));
+            final String Grup = c.getString(c.getColumnIndex("GRUPPA"));
+            final String Sgi = c.getString(c.getColumnIndex("SGI"));
 
             nomPopupMenu = new PopupMenu(CurAc, myView);
             nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
@@ -415,6 +410,7 @@ public class GlobalVars extends Application implements TBUpdate {
                     fragment = new FormOrderFragment();
 
                     Bundle args = new Bundle();
+                    System.out.println(Sgi + " " + Grup);
                     args.putString("SGI", Sgi);
                     args.putString("Group", Grup);
 
@@ -464,7 +460,7 @@ public class GlobalVars extends Application implements TBUpdate {
         glbContext = context;
     }
 
-    @AsyncUI
+//    @AsyncUI
     public void LoadSgi() {
         mySgi = db.getAllSgi();
         spSgi = CurView.findViewById(R.id.SpinSgi);
@@ -475,7 +471,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     //    private boolean isJustSettingAdapter = false;
-    @AsyncUI
+//    @AsyncUI
     public void LoadGroups(final String SgiID) {
         myGrups = db.getGrupBySgi(SgiID);
         spGrup = CurView.findViewById(R.id.SpinGrups);
@@ -533,38 +529,33 @@ public class GlobalVars extends Application implements TBUpdate {
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
                 NomenAdapter = getNomenAdapter(myNom);
-                CurAc.runOnUiThread(new Runnable() {
-                    @Override
-//                    @DelayedCalled(delay = 150)
-                    public void run() {
-                        nomenList.setAdapter(null);
-                        nomenList.setAdapter(NomenAdapter);
-                        nomenList.setOnItemClickListener(GridNomenClick);
-                        nomenList.setOnItemLongClickListener(GridNomenLongClick);
+                CurAc.runOnUiThread(() -> {
+                    nomenList.setAdapter(null);
+                    nomenList.setAdapter(NomenAdapter);
+                    nomenList.setOnItemClickListener(GridNomenClick);
+                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
 
-                        // needs to call notifyDataSetChanged in NomenAdapter class
-                        NomenAdapter.notifyDataSetChanged();
-                    }
+                    // needs to call notifyDataSetChanged in NomenAdapter class
+                    NomenAdapter.notifyDataSetChanged();
                 });
                 isNewLoaded = false;
             }
         }).start();
     }
 
-    //    @DelayedCalled
+    @DelayedCalled()
     public void SetSelectedSgi(String SgiID) {
         for (int i = 0; i < spSgi.getCount(); i++) {
             Cursor value = (Cursor) spSgi.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
             if (SgiID.equals(id)) {
                 spSgi.setSelection(i);
-//                LoadGroups(SgiID);
                 return;
             }
         }
     }
 
-    @DelayedCalled
+    @DelayedCalled(delay = 300)
     public void SetSelectedGrup(String Grup) {
         for (int i = 0; i < spGrup.getCount(); i++) {
             Cursor value = (Cursor) spGrup.getItemAtPosition(i);
@@ -706,7 +697,6 @@ public class GlobalVars extends Application implements TBUpdate {
                 FTPClient ftpClient;
                 ftpClient = new FTPClient();
                 final String photoDir = getPhotoDir();
-                System.out.println(photoDir);
                 try {
                     ftpClient.connect(ftp_server);
 
@@ -1025,14 +1015,19 @@ public class GlobalVars extends Application implements TBUpdate {
         return DBF_FileName;
     }
 
+    @AsyncUI
     public void LoadOrders() {
-        _updateOrdersStatusFromDB();
-        gdOrders.setAdapter(null);
-        Orders = dbOrders.getZakazy();
-        OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
-        if (Orders != null)
-            _putCheckBox(Orders);
-        gdOrders.setAdapter(OrdersAdapter);
+        try {
+            updateOutedPositionInZakazyTable();
+            updateOrdersStatusFromDB();
+            Orders = dbOrders.getZakazy();
+            if (Orders != null)
+                putCheckBox(Orders);
+            OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
+            gdOrders.setAdapter(OrdersAdapter);
+        } catch (Exception e) {
+            Config.sout(e.getMessage(), Toast.LENGTH_LONG);
+        }
     }
 
     @AsyncUI
@@ -1058,7 +1053,6 @@ public class GlobalVars extends Application implements TBUpdate {
     public void LoadDebet(final String TP_ID) {
         curDebet = db.getDebet(TP_ID);
         debetList.setAdapter(null);
-
         DebetAdapter adapter = new DebetAdapter(CurAc, R.layout.debet_layout, curDebet, new String[]{"DESCR", "STATUS", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE"}, new int[]{R.id.ColDebetContr, R.id.ColDebetStatus, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor}, 0);
         debetList.setAdapter(adapter);
     }
@@ -1071,15 +1065,15 @@ public class GlobalVars extends Application implements TBUpdate {
         spTP.setAdapter(adapter);
     }
 
-    public void UpdateNomenRange(int _BeginRange, int _EndRange, int _Qty) {
+    public void UpdateNomenRange(int beginRange, int endRange, int qty) {
         new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
-                int EndRange = _EndRange;
-                int BeginRange = _BeginRange;
-                int Qty = _Qty;
-                String sql_update = "UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - " + Qty + ") >= 0 THEN " + Qty + " ELSE OST END WHERE ROWID=?";
+                int EndRange = endRange;
+                int BeginRange = beginRange;
+//                String sql_update = "UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - " + qty + ") >= 0 THEN " + qty + " ELSE OST END WHERE ROWID=?";
+                String sql_update = "UPDATE Nomen SET ZAKAZ = " + qty + " WHERE ROWID=?";
                 SQLiteStatement stmt = db.getWritableDatabase().compileStatement(sql_update);
                 db.getWritableDatabase().beginTransaction();
                 int tmpVal;
@@ -1110,7 +1104,8 @@ public class GlobalVars extends Application implements TBUpdate {
                     SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
                     Cursor kod5 = sqLiteDatabase.rawQuery("SELECT KOD5 FROM NOMEN WHERE rowid='" + pos + "'", null);
                     kod5.moveToNext();
-
+                    if (kod5.getCount() == 0)
+                        continue;
                     db.putPriceInNomen(pos, "" + DBHelper.pricesMap.get(kod5.getString(0)));
                     kod5.close();
                 }
@@ -1229,9 +1224,9 @@ public class GlobalVars extends Application implements TBUpdate {
         gdNomen.invalidateViews();
     }
 
-    public void rewritePriceToMainDB(String DOCID) {
+    public void rewritePriceToMainDB(String docId) {
         Cursor orderPrices;
-        orderPrices = dbOrders.getReadableDatabase().rawQuery("SELECT PRICE, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + DOCID + "'", null);
+        orderPrices = dbOrders.getReadableDatabase().rawQuery("SELECT PRICE, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + docId + "'", null);
 
         while (orderPrices.moveToNext()) {
             DBHelper.pricesMap.remove(orderPrices.getString(1));
@@ -1255,6 +1250,46 @@ public class GlobalVars extends Application implements TBUpdate {
                 });
             }
         }).start();
+    }
+
+    public void updateOutedPositionInZakazyTable() {
+        try {
+            listOfOutedDocId = new HashSet<>();
+
+            SQLiteDatabase sqLiteDatabaseOrders = dbOrders.getReadableDatabase();
+            SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
+
+//        Cursor c = sqLiteDatabaseOrders.rawQuery("SELECT DISTINCT ZAKAZ_ID FROM ZAKAZY_DT WHERE IS_OUTED=1", null);
+//        while (c.moveToNext()) {
+//            listOfOutedDocId.add(c.getString(0));
+//        }
+//        c.close();
+
+            Cursor ordersId = sqLiteDatabaseOrders.rawQuery("SELECT DISTINCT ZAKAZ_ID FROM ZAKAZY_DT", null);
+            while (ordersId.moveToNext()) {
+                String orderID = ordersId.getString(0);
+                Cursor allOrdersDetails = sqLiteDatabaseOrders.rawQuery("SELECT NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID=?", new String[]{orderID});
+                if (allOrdersDetails.getCount() == 0)
+                    continue;
+
+                StringBuilder s = new StringBuilder();
+                while (allOrdersDetails.moveToNext()) {
+                    s.append(allOrdersDetails.getString(0)).append(",");
+                }
+                String s2 = s.substring(0, s.length() - 1);
+
+                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID = ? AND NOMEN in (" + s2 + ")", new String[]{orderID});
+
+                if (c.getCount() != 0) {
+                    listOfOutedDocId.add(orderID);
+                }
+                allOrdersDetails.close();
+                c.close();
+            }
+            ordersId.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static class CheckBoxData {
@@ -1433,10 +1468,10 @@ public class GlobalVars extends Application implements TBUpdate {
             super.notifyDataSetChanged();
 
             // check isSales and if true, then set real prices from contractor
-            if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
-                hasBeenAlreadyNoChanged = false;
-                FormOrderFragment.setRealPrices(GlobalVars.this);
-            }
+//            if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
+//                hasBeenAlreadyNoChanged = false;
+//                FormOrderFragment.setRealPrices(GlobalVars.this);
+//            }
         }
     }
 
@@ -1447,9 +1482,17 @@ public class GlobalVars extends Application implements TBUpdate {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView tvSum = view.findViewById(R.id.ColOrdSum);
-            _updateTextFormatTo2DecAfterPoint(tvSum);
+            updateTextFormatTo2DecAfterPoint(tvSum);
+
+            try {
+                if (listOfOutedDocId != null && listOfOutedDocId.contains(cursor.getString(cursor.getColumnIndex("DOCID")))) {
+                    tvSum.setText(tvSum.getText().toString() + " (-)");
+                }
+            } catch (Exception ignore) {
+            }
 
             TextView tvStatus = view.findViewById(R.id.ColOrdStatus);
             if (tvStatus.getText().toString().equals("Сохранён"))
@@ -1474,8 +1517,8 @@ public class GlobalVars extends Application implements TBUpdate {
 
             TextView tvSum = view.findViewById(R.id.ColOrdDtSum);
             TextView tvPrice = view.findViewById(R.id.ColOrdDtPrice);
-            _updateTextFormatTo2DecAfterPoint(tvSum);
-            _updateTextFormatTo2DecAfterPoint(tvPrice);
+            updateTextFormatTo2DecAfterPoint(tvSum);
+            updateTextFormatTo2DecAfterPoint(tvPrice);
 
             if (position % 2 != 0) {
                 view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
@@ -1543,6 +1586,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView[] tvArray = new TextView[]{
                     view.findViewById(R.id.ColDebetContr),
@@ -1571,8 +1615,7 @@ public class GlobalVars extends Application implements TBUpdate {
             }
 
             for (TextView v : tvArray) {
-                v.setTextColor(Color.rgb(0, 0, 0));
-                _updateTextFormatTo2DecAfterPoint(v);
+                updateTextFormatTo2DecAfterPoint(v);
             }
 
             return view;
@@ -1614,7 +1657,19 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public void putAllPrices() {
-//        db.putAllNomenPrices(OrderHeadFragment.CONTR_ID);
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+                db.putAllNomenPrices(OrderHeadFragment.CONTR_ID);
+                CurAc.runOnUiThread(() -> {
+                    if (NomenAdapter != null) {
+                        myNom.requery();
+                        NomenAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
     }
 
     public void closeCursors() {
@@ -1646,19 +1701,24 @@ public class GlobalVars extends Application implements TBUpdate {
         return new String[]{CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName};
     }
 
-    @SuppressLint("DefaultLocale")
-    private void _updateTextFormatTo2DecAfterPoint(TextView v) {
+    private void updateTextFormatTo2DecAfterPoint(TextView v) {
         try {
-            v.setText(String.format("%.2f", Float.parseFloat(v.getText().toString())));
+//            int len = v.getText().toString().split("\\.")[0].length();
+//            v.setText(v.getText().toString().substring(0, len + 2));
+
+//            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+//            v.setText(decimalFormat.format(v.getText().toString()));
+
+            v.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(v.getText().toString().replace(",", "."))));
         } catch (Exception ignored) {
         }
     }
 
-    private void _updateOrdersStatusFromDB() {
+    private void updateOrdersStatusFromDB() {
         SQLiteDatabase dbApp = db.getReadableDatabase();
         SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
         Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
-        Cursor statusInDB = null;
+        Cursor statusInDB;
         while (statusInApp.moveToNext()) {
             String docId = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
             statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + docId + "'", null);
@@ -1667,11 +1727,12 @@ public class GlobalVars extends Application implements TBUpdate {
                 String Status = statusInDB.getString(statusInDB.getColumnIndex("STATUS"));
                 dbOrd.execSQL("UPDATE ZAKAZY SET STATUS = '" + Status + "' WHERE DOCID='" + docId + "'");
             }
+            statusInDB.close();
         }
 
         statusInApp.close();
-        if (statusInDB != null)
-            statusInDB.close();
+//        if (statusInDB != null)
+//            statusInDB.close();
     }
 
     private void _doUpdateQTYByOuted(String DocID) {
@@ -1691,9 +1752,10 @@ public class GlobalVars extends Application implements TBUpdate {
         }
 
         newQty.close();
+        cursor.close();
     }
 
-    private void _putCheckBox(Cursor c) {
+    private void putCheckBox(Cursor c) {
         GlobalVars.allOrders.clear();
         layout.removeAllViews();
 
@@ -1720,7 +1782,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     // Начадл обработчиков событий нажатия на NomenLayout
-    private void _plusQTY(View myView) {
+    private void plusQTY(View myView) {
         View parent = (View) myView.getParent();
         TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
         TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
@@ -1741,7 +1803,7 @@ public class GlobalVars extends Application implements TBUpdate {
         setContrAndSum(GlobalVars.this);
     }
 
-    private void _minusQTY(View myView) {
+    private void minusQTY(View myView) {
         View parent = (View) myView.getParent();
         TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
         String kod5 = tvKOD5.getText().toString();
@@ -1759,7 +1821,7 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     @AsyncUI
-    private void _showPhoto(View myView, int position, AdapterView<?> myAdapter) {
+    private void showPhoto(View myView, int position, AdapterView<?> myAdapter) {
         if (((TextView) myView).getText() == null || ((TextView) myView).getText().toString().equals(""))
             return;
 
@@ -1769,6 +1831,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
         String FileName = db.GetCod(ID);
         File imgFile = new File(photoDir + "/" + FileName);
+//        DownloadPhoto(FileName);
         if (!imgFile.exists() || imgFile.length() == 0) {
             AsyncFileName = FileName;
             if (isNetworkAvailable()) {
@@ -1786,7 +1849,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    private void _multiSelect(String ID, int ost) {
+    private void multiSelect(String ID, int ost) {
         db.UpdateQty(ID, MultiQty, ost);
         myNom.requery();
         NomenAdapter.notifyDataSetChanged();
@@ -1795,11 +1858,8 @@ public class GlobalVars extends Application implements TBUpdate {
         setContrAndSum(GlobalVars.this);
     }
 
-    /**
-     * Если режим выбора нескольких позиций выключен
-     */
     @AsyncUI
-    private void _fillNomenDataFromAlertDialog(String ID, int ost) {
+    private void fillNomenDataFromAlertDialog(String ID, int ost) {
         LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
         View promptView = layoutInflater.inflate(R.layout.change_qty, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurFragmentContext);
@@ -1815,7 +1875,11 @@ public class GlobalVars extends Application implements TBUpdate {
         txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
         txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
         txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
-        txtGrup.setText(myNom.getString(myNom.getColumnIndex("GRUPPA")));
+
+        Cursor c = db.getReadableDatabase().rawQuery("SELECT DESCR FROM GRUPS WHERE CODE=?", new String[]{myNom.getString(myNom.getColumnIndex("GRUPPA"))});
+        c.moveToNext();
+        String groupDescription = c.getString(c.getColumnIndex("DESCR"));
+        txtGrup.setText(groupDescription);
 
         alertDialogBuilder
                 .setCancelable(true)

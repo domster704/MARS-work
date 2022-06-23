@@ -12,25 +12,22 @@ import com.amber.armtp.BuildConfig;
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.MainActivity;
+import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.DelayedCalled;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.UpdateDataFragment;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Downloader {
     private final GlobalVars globalVars;
     private final Activity activity;
-    // Кол-во попыток, затраченных на скачивание файла
-    private int countOfTrying = 0;
 
     public Downloader(GlobalVars globalVars, Activity activity) {
         this.globalVars = globalVars;
@@ -38,57 +35,58 @@ public class Downloader {
     }
 
     public void downloadApp(final UpdateDataFragment.UIData ui, View view, String ver) {
-//        if (_checkAlreadyExistedApk(ver))
-//            return;
-
         try {
             FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirAPK, MainActivity.filesPathAPK, ver + ".apk");
-            if (!ftpFileDownloader.downloadWithPG(ui))
-                return;
-
-            activity.runOnUiThread(() -> {
-                view.setEnabled(true);
-                ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-            });
-
-            _startInstallApp(ver);
-//            _checkAlreadyExistedApk(ver);
-        } catch (Exception e) {
-            e.printStackTrace();
-            catchErrorInDownloadProcess(view, ui);
-        }
-    }
-
-    public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
-        String filePath = MainActivity.filesPathDB + "armtp3.zip";
-
-        try {
-            FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, "armtp3.zip");
-            if (!ftpFileDownloader.downloadWithPG(ui))
-                return;
-
-            Thread.sleep(1000);
-            ZipUnpacking zipUnpacking = new ZipUnpacking(filePath);
-            if (!zipUnpacking.doUnpacking() && countOfTrying < 3) {
-                countOfTrying++;
-                downloadDB(ui, view, globalVars);
-            } else if (countOfTrying >= 3) {
+            if (ftpFileDownloader.downloadWithPG(ui)) {
+                catchErrorInDownloadProcess(view, ui);
                 return;
             }
 
             activity.runOnUiThread(() -> {
-                globalVariable.db = new DBHelper(activity.getApplicationContext());
-
                 view.setEnabled(true);
                 ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                Config.sout("База данных успешно обновлена");
-                globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
-//                globalVariable.db.updatePDDataInTable(globalVariable.getPhotoDir());
+                ftpFileDownloader.changePGData(1, 1, ui, true);
             });
+
+            _startInstallApp(ver);
         } catch (Exception e) {
-            e.printStackTrace();
             catchErrorInDownloadProcess(view, ui);
+            e.printStackTrace();
         }
+    }
+
+    public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
+        String fileName = "armtp3.rar";
+        String filePath = MainActivity.filesPathDB + fileName;
+
+//        while (true) {
+            try {
+                FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, fileName);
+                if (ftpFileDownloader.downloadWithPG(ui) || !new ZipUnpacking(filePath).doUnpacking()) {
+                    catchErrorInDownloadProcess(view, ui);
+                    return;
+                }
+
+//            if () {
+//                catchErrorInDownloadProcess(view, ui);
+//                return;
+//            }
+
+                activity.runOnUiThread(() -> {
+                    globalVariable.db = new DBHelper(activity.getApplicationContext());
+
+                    view.setEnabled(true);
+                    ui.tvData.setTextColor(Color.rgb(3, 103, 0));
+                    System.out.println(activity.getResources().getString(R.string.successInDownloadingProcess));
+                    Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
+                    ftpFileDownloader.changePGData(1, 1, ui, true);
+                    globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
+                });
+            } catch (Exception e) {
+                catchErrorInDownloadProcess(view, ui);
+                e.printStackTrace();
+            }
+//        }
     }
 
     public String[] isServerVersionNewer() {
@@ -124,13 +122,6 @@ public class Downloader {
             boolean isNewer = _isFirstVersionHigherThanSecond(serverVersionsArray, curVersion);
             if (isNewer)
                 newVersion = serverVersion;
-//            for (int i = 0; i < serverVersionsArray.length; i++) {
-//                if (Integer.parseInt(serverVersionsArray[i]) > Integer.parseInt(curVersion[i])) {
-//                    newVersion = serverVersion;
-//                    isNewer = true;
-//                    break;
-//                }
-//            }
 
             return new String[]{String.valueOf(isNewer), newVersion};
         } catch (Exception e) {
@@ -141,7 +132,8 @@ public class Downloader {
 
     @AsyncUI
     private void catchErrorInDownloadProcess(View view, UpdateDataFragment.UIData ui) {
-        Config.sout("Ошибка во время загрузки", Toast.LENGTH_LONG);
+        System.out.println(activity.getResources().getString(R.string.errorInDownloadingProcess));
+        Config.sout(activity.getResources().getString(R.string.errorInDownloadingProcess), Toast.LENGTH_LONG);
         view.setEnabled(true);
         ui.progressBar.setProgress(0);
     }

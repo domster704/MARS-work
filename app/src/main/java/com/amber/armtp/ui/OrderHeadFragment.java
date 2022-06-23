@@ -23,8 +23,6 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
-import com.amber.armtp.annotations.DelayedCalled;
-import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.SimpleDateFormat;
@@ -39,10 +37,11 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClickListener {
-    public static String CONTR_ID;
+    public static String CONTR_ID = "";
     public static String PREVIOUS_CONTR_ID = "";
     public static String _ADDR = "";
-    public static boolean isCopied = false;
+    public static boolean isOrderEditedOrCopied = false;
+    public static boolean isNeededToUpdateOrderTable = false;
     public GlobalVars glbVars;
 
     private String _TP = "";
@@ -76,7 +75,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         GlobalVars.CurFragmentContext = getActivity();
 
         if (getArguments() != null && getArguments().size() != 0) {
-            isCopied = isCopiedLocal = getArguments().getBoolean("isCopied");
+            isOrderEditedOrCopied = isCopiedLocal = getArguments().getBoolean("isOrderEditedOrCopied");
             _TP = getArguments().getString("TP");
             _CONTR = getArguments().getString("CONTR");
             _ADDR = getArguments().getString("ADDR");
@@ -98,7 +97,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        _checkAndSetContrIDAfterDestroying();
+//        _checkAndSetContrIDAfterDestroying();
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.edContrFilter = getActivity().findViewById(R.id.txtContrFilter);
@@ -194,7 +193,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
         setContrAndSum(glbVars);
 
-        if (isCopied) {
+        if (isOrderEditedOrCopied) {
             int tpID = glbVars.db.GetTPByID(_TP);
             int contrID = glbVars.db.GetContrByID(_CONTR);
 
@@ -213,7 +212,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
             glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
             glbVars.txtComment.setText(_COMMENT);
 
-            OrderHeadFragment.isCopied = false;
+            isOrderEditedOrCopied = false;
         }
     }
 
@@ -306,9 +305,13 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
         if (PREVIOUS_CONTR_ID.equals("")) {
             PREVIOUS_CONTR_ID = CONTR_ID;
+            FormOrderFragment.isContrIdDifferent = true;
         } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
+            FormOrderFragment.isContrIdDifferent = true;
             PREVIOUS_CONTR_ID = CONTR_ID;
             glbVars.updateNomenPrice(isCopiedLocal);
+        } else {
+            FormOrderFragment.isContrIdDifferent = false;
         }
 
         GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
@@ -323,7 +326,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
             }
         }
         glbVars.resetCurData();
-        glbVars.putAllPrices();
+//        glbVars.putAllPrices();
 
         goToFormOrderFragment();
     }

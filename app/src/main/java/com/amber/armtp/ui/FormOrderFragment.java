@@ -32,13 +32,13 @@ import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.annotations.PGShowing;
+import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -51,6 +51,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     public static ImageButton filter;
     public static ImageButton spinnerClearing;
     public static boolean isSorted = false;
+    public static boolean isContrIdDifferent = false;
     public GlobalVars glbVars;
 
     SharedPreferences settings;
@@ -74,6 +75,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 public boolean onQueryTextSubmit(String query) {
                     glbVars.LoadNomen(GlobalVars.getCurrentData());
                     Config.hideKeyBoard();
+                    searchView.clearFocus();
                     return true;
                 }
             };
@@ -82,6 +84,50 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     TextView txtSgi, txtGroup, tvHeadCod, tvHeadDescr, tvHeadMP, tvHeadZakaz;
     TextView FilterWC_ID, FilterFocus_ID;
     private android.support.v7.widget.Toolbar toolbar;
+
+    @SuppressLint("CutPasteId")
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
+
+        glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
+        glbVars.spSgi = getActivity().findViewById(R.id.SpinSgi);
+        glbVars.spGrup = getActivity().findViewById(R.id.SpinGrups);
+
+        tvHeadCod = getActivity().findViewById(R.id.tvHeadCod);
+        tvHeadDescr = getActivity().findViewById(R.id.tvHeadDescr);
+        tvHeadMP = getActivity().findViewById(R.id.tvHeadMP);
+        tvHeadZakaz = getActivity().findViewById(R.id.tvHeadZakaz);
+
+        settings = getActivity().getSharedPreferences("form_order", 0);
+        editor = settings.edit();
+
+        glbVars.LoadSgi();
+
+        filter = getActivity().findViewById(R.id.NomenFilters);
+        filter.setOnClickListener(this);
+
+        spinnerClearing = getActivity().findViewById(R.id.SGIClear);
+        spinnerClearing.setOnClickListener(this);
+
+        setContrAndSum(glbVars);
+        if (getArguments() != null && getArguments().size() != 0 && getArguments().containsKey("SGI")) {
+            String sgi = getArguments().getString("SGI");
+            String group = getArguments().getString("Group");
+
+            glbVars.resetCurData();
+            glbVars.resetSearchViewData();
+
+            glbVars.SetSelectedSgi(sgi);
+            glbVars.SetSelectedGrup(group);
+
+            getArguments().remove("SGI");
+            getArguments().remove("Group");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -125,6 +171,18 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             return false;
         });
+//        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean b) {
+//                System.out.println(b);
+//                if (!b) {
+//                    view.
+////                    searchView.requestFocus();
+////                    view.clearFocus();
+////                    searchView.onActionViewCollapsed();
+//                }
+//            }
+//        });
 
         if (glbVars.NomenAdapter != null) {
             glbVars.NomenAdapter.notifyDataSetChanged();
@@ -134,11 +192,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         if (glbVars.isDiscount) {
             glbVars.isDiscount = false;
             glbVars.Discount = 0;
-        }
-
-        if (getArguments() != null && getArguments().size() != 0) {
-            glbVars.resetCurData();
-            glbVars.resetSearchViewData();
         }
     }
 
@@ -195,7 +248,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     c1.close();
                     return;
                 } else {
-                    Sum = _insertIntoZakazyDT(IDDOC, Sum);
+                    Sum = insertIntoZakazyDT(IDDOC, Sum);
                 }
 
                 sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
@@ -238,9 +291,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     Fragment fragment = new JournalFragment();
 
-                    Bundle args = new Bundle();
-                    args.putBoolean("isStartDeletingExtraOrders", true);
-                    fragment.setArguments(args);
+//                    Bundle args = new Bundle();
+//                    args.putBoolean("isStartDeletingExtraOrders", true);
+//                    fragment.setArguments(args);
 
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
@@ -256,49 +309,84 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             @Override
             @PGShowing
             public void run() {
-                Cursor cHead, c, c2;
                 float Sum = 0f;
+                OrderHeadFragment.isNeededToUpdateOrderTable = false;
 
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR, ORDERS.DATA, ORDERS.COMMENT, TORG_PRED.CODE AS TP, CONTRS.CODE AS CONTR, ADDRS.CODE AS ADDR FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                Cursor c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                 if (c.getCount() == 0) {
-                    getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Не заполнена шапка заказа", Toast.LENGTH_LONG).show());
+                    Config.sout("Не заполнена шапка заказа", Toast.LENGTH_LONG);
                     return;
                 }
-
-                c2.moveToFirst();
-
-                if (c2.getInt(1) == 0) {
-                    getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG).show());
-                    return;
-                }
+                c.moveToFirst();
+                String TP_ID = c.getString(c.getColumnIndex("TP_ID")),
+                        Data = c.getString(c.getColumnIndex("DATA")),
+                        Comment = c.getString(c.getColumnIndex("COMMENT")),
+                        Contr_ID = c.getString(c.getColumnIndex("CONTR_ID")),
+                        Addr_ID = c.getString(c.getColumnIndex("ADDR_ID")),
+                        ContrDes = c.getString(c.getColumnIndex("C_DES")),
+                        AddrDes = c.getString(c.getColumnIndex("A_DES"));
 
                 c.close();
+
+                Cursor c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                c2.moveToFirst();
+                if (c2.getInt(1) == 0) {
+                    Config.sout("Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG);
+                    return;
+                }
                 c2.close();
 
-                glbVars.db.getWritableDatabase().beginTransaction();
-                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DATA, COMMENT FROM ORDERS", null);
-                if (cHead.moveToNext()) {
-                    try {
-                        glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-                        Sum = _insertIntoZakazyDT(OrderID, Sum);
 
-                        glbVars.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "'," +
-                                " CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "'," +
-                                " ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "'," +
-                                " DELIVERY_DATE = '" + cHead.getString(cHead.getColumnIndex("DATA")) + "'," +
-                                " COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'," +
-                                " SUM = '" + String.format(Locale.ROOT, "%.2f", Sum) + "' WHERE DOCID='" + OrderID + "'");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+                Sum = insertIntoZakazyDT(OrderID, Sum);
 
-                    cHead.close();
-                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.db.getWritableDatabase().endTransaction();
-                    glbVars.db.ClearOrderHeader();
-                    glbVars.OrderID = "";
+                String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?  WHERE DOCID='" + OrderID + "'";
+                SQLiteStatement stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
+                glbVars.dbOrders.getWritableDatabase().beginTransaction();
+                try {
+                    stmt.clearBindings();
+                    stmt.bindString(1, TP_ID);
+                    stmt.bindString(2, Contr_ID);
+                    stmt.bindString(3, Addr_ID);
+                    stmt.bindString(4, Data);
+                    stmt.bindString(5, Comment);
+                    stmt.bindString(6, ContrDes);
+                    stmt.bindString(7, AddrDes);
+                    stmt.bindString(8, String.format(Locale.ROOT, "%.2f", Sum));
+                    stmt.executeInsert();
+                    stmt.clearBindings();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                    glbVars.dbOrders.getWritableDatabase().endTransaction();
                 }
+
+//                glbVars.db.getWritableDatabase().beginTransaction();
+//                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DATA, COMMENT FROM ORDERS", null);
+//                if (cHead.moveToNext()) {
+//                    try {
+//                        glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+//                        Sum = insertIntoZakazyDT(OrderID, Sum);
+//
+//                        glbVars.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "'," +
+//                                " CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "'," +
+//                                " ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "'," +
+//                                " DELIVERY_DATE = '" + cHead.getString(cHead.getColumnIndex("DATA")) + "'," +
+//                                " COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'," +
+//                                " CONTR_DES = '" + ContrDes + "'," +
+//                                " ADDR_DES = '" + AddrDes + "'," +
+//                                " SUM = '" + String.format(Locale.ROOT, "%.2f", Sum) + "' WHERE DOCID='" + OrderID + "'");
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    cHead.close();
+//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
+//                    glbVars.db.getWritableDatabase().endTransaction();
+//                    glbVars.db.ClearOrderHeader();
+//                    glbVars.OrderID = "";
+//                }
 
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
@@ -346,7 +434,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     glbVars.resetCurData();
 
-                    if (!glbVars.OrderID.equals("")) {
+                    if (OrderHeadFragment.isNeededToUpdateOrderTable) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
                         SaveOrder();
@@ -400,6 +488,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 immPP.showSoftInput(edInput, InputMethodManager.SHOW_IMPLICIT);
 
                 alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    if (glbVars.NomenAdapter == null || glbVars.myNom == null || glbVars.myNom.getCount() == 0) {
+                        Config.sout("Таблица товаров пуста");
+                        alertDlg.dismiss();
+                        return;
+                    }
+                    System.out.println(glbVars.NomenAdapter + " * " + glbVars.myNom + " * " + glbVars.myNom.getCount());
                     if (!edBeginPP.getText().toString().equals("") && !edEndPP.getText().toString().equals("") && !edPPQty.getText().toString().equals("")) {
                         glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
                         glbVars.BeginPos = 0;
@@ -505,18 +599,24 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 return true;
             case R.id.NomenSales:
+                // ИП Лужбина Н.М.
+                // ИП Беляев В.В.
+
                 glbVars.isSales = !glbVars.isSales;
                 glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
 
-                if (glbVars.NomenAdapter != null) {
+                if (isContrIdDifferent || DBHelper.pricesMap.size() == 0) {
+                    isContrIdDifferent = false;
+                    glbVars.putAllPrices();
+                } else if (glbVars.NomenAdapter != null) {
                     glbVars.myNom.requery();
                     glbVars.NomenAdapter.notifyDataSetChanged();
                 }
 
-                pastSGI = GlobalVars.CurSGI;
-                pastWC = GlobalVars.CurWCID;
-                pastFocus = GlobalVars.CurFocusID;
-                pastSearch = GlobalVars.CurSearchName;
+//                pastSGI = GlobalVars.CurSGI;
+//                pastWC = GlobalVars.CurWCID;
+//                pastFocus = GlobalVars.CurFocusID;
+//                pastSearch = GlobalVars.CurSearchName;
 
                 return true;
             case R.id.clear_whole_order:
@@ -556,7 +656,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
         glbVars.setIconColor(mainMenu, R.id.NomenSales, false);
         glbVars.isSales = false;
-        resetLocalData();
+        glbVars.MultiQty = 0;
+//        resetLocalData();
 
         try {
             isFiltered = false;
@@ -566,37 +667,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
 
         glbVars.closeCursors();
-    }
-
-    @SuppressLint("CutPasteId")
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-
-        glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
-        glbVars.spSgi = getActivity().findViewById(R.id.SpinSgi);
-        glbVars.spGrup = getActivity().findViewById(R.id.SpinGrups);
-
-        tvHeadCod = getActivity().findViewById(R.id.tvHeadCod);
-        tvHeadDescr = getActivity().findViewById(R.id.tvHeadDescr);
-        tvHeadMP = getActivity().findViewById(R.id.tvHeadMP);
-        tvHeadZakaz = getActivity().findViewById(R.id.tvHeadZakaz);
-
-        settings = getActivity().getSharedPreferences("form_order", 0);
-        editor = settings.edit();
-
-        glbVars.LoadSgi();
-
-        filter = getActivity().findViewById(R.id.NomenFilters);
-        filter.setOnClickListener(this);
-
-        spinnerClearing = getActivity().findViewById(R.id.SGIClear);
-        spinnerClearing.setOnClickListener(this);
-
-        setContrAndSum(glbVars);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -666,13 +736,16 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 glbVars.isNeededToResetSearchView = false;
                 glbVars.resetAllSpinners();
 
+                glbVars.nomenList.setAdapter(null);
+                glbVars.myNom = null;
+
                 GlobalVars.CurSearchName = localSearchName;
                 searchView.setQuery(localSearchName, true);
                 break;
         }
     }
 
-    private float _insertIntoZakazyDT(String docid, float SUM) {
+    private float insertIntoZakazyDT(String docID, float SUM) {
         Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE FROM Nomen WHERE ZAKAZ<>0", null);
 
         glbVars.dbOrders.getWritableDatabase().beginTransaction();
@@ -684,7 +757,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             String PRICE = nomenData.getString(nomenData.getColumnIndex("PRICE"));
             float sum = Float.parseFloat(PRICE.replace(",", ".")) * Integer.parseInt(ZAKAZ);
             SUM += sum;
-            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docid + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
+            glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docID + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
         }
 
         glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
@@ -695,89 +768,107 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         return SUM;
     }
 
-    public static void setRealPrices(GlobalVars glbVars) {
-        Object[] data = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
+//    public static void setRealPrices(GlobalVars glbVars) {
+//        Object[] data = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
+//
+//        glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
+//        if (glbVars.isSales && Boolean.parseBoolean(data[0].toString())) {
+//            glbVars.calculatePricesByContrDiscount(data[1].toString());
+//        }
+//    }
 
-        glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
-        if (glbVars.isSales && Boolean.parseBoolean(data[0].toString())) {
-            glbVars.calculatePricesByContrDiscount(data[1].toString());
-        }
-    }
+//    private static String pastSGI = "0";
+//    private static String pastGroup = "0";
+//    private static String pastWC = "0";
+//    private static String pastFocus = "0";
+//    private static String pastSearch = "";
+//
+//    private static final HashSet<String> SgiList = new HashSet<>();
 
-    private static String pastSGI = "";
-    private static String pastGroup = "";
-    private static String pastWC = "";
-    private static String pastFocus = "";
-    private static String pastSearch = "";
+//    private static void updateData(boolean isDifferent, String data) {
+//        pastSGI = GlobalVars.CurSGI;
+//        pastGroup = GlobalVars.CurGroup;
+//        pastWC = GlobalVars.CurWCID;
+//        pastFocus = GlobalVars.CurFocusID;
+//        pastSearch = GlobalVars.CurSearchName;
+//
+////        if (!pastSGI.equals("0") && pastFocus.equals("0") && pastWC.equals("0") && pastGroup.equals("0") && isDifferent || data.equals("sgi")) {
+////            System.out.println("----------------------------");
+////            System.out.println("WC: " + pastWC);
+////            System.out.println("Focus: " + pastFocus);
+////            System.out.println("SGI: " + pastSGI);
+////            System.out.println("Group: " + pastGroup);
+////            System.out.println("Search: " + pastSearch);
+////            System.out.println("----------------------------");
+////            SgiList.add(pastSGI);
+////        }
+//    }
 
-    private static HashSet<String> SgiList = new HashSet<>();
-
-    private static void updateData(boolean isDifferent, String data) {
-        pastSGI = GlobalVars.CurSGI;
-        pastGroup = GlobalVars.CurGroup;
-        pastWC = GlobalVars.CurWCID;
-        pastFocus = GlobalVars.CurFocusID;
-        pastSearch = GlobalVars.CurSearchName;
-
-        if (!pastSGI.equals("0") && pastFocus.equals("0") && pastWC.equals("0") && pastGroup.equals("0") && isDifferent || data.equals("sgi")) {
-            System.out.println("----------------------------");
-            System.out.println("WC: " + pastWC);
-            System.out.println("Focus: " + pastFocus);
-            System.out.println("SGI: " + pastSGI);
-            System.out.println("Group: " + pastGroup);
-            System.out.println("Search: " + pastSearch);
-            System.out.println("----------------------------");
-            SgiList.add(pastSGI);
-        }
-    }
-
-    private static void resetLocalData() {
-        pastSGI = "";
-        pastGroup = "";
-        pastWC = "";
-        pastFocus = "";
-        pastSearch = "";
-    }
-
-    private static Object[] checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
-        System.out.println(isFiltered);
-        System.out.println("WC: " + pastWC + " * " + GlobalVars.CurWCID);
-        System.out.println("Focus: " + pastFocus + " * " + GlobalVars.CurFocusID);
-        System.out.println("SGI: " + pastSGI + " * " + GlobalVars.CurSGI);
-        System.out.println("Group: " + pastGroup + " * " + GlobalVars.CurGroup);
-        System.out.println("Search: " + pastSearch + " * " + GlobalVars.CurSearchName);
-        System.out.println("SgiList: " + SgiList.toString());
-
-        // Анализируем прошлое стостояние isFiltered, для очистки past данных, чтобы шёл процесс загрузки реальных цен.
-        // Если этого не сделать, то если зайти в [фильтр > муж > СГИ 7.2 > Группа CONTE ЧНИ DIWARI > в поиске active > включить реальные цены], то всё будет нормально, но
-        // если убрать фильтр и зайти в ту же группу и включить рельные цены, то процесс не пойдёт (некоторые позиции будут иметь правильные цены, но не все, что нас не устраивает)
-        boolean previousIsFiltered = !pastWC.equals(GlobalVars.CurWCID) || !pastFocus.equals(GlobalVars.CurFocusID);
-        if (previousIsFiltered) {
-            pastSGI = "0";
-            pastGroup = "0";
-            pastSearch = "0";
-        }
-
-        String specialData = "";
-        boolean isDifferent;
-        if (!SgiList.contains(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
-            // Запуск, если запустили процесс в группе, а не в сги
-            isDifferent = true;
-            specialData = "sgi";
-        } else if (GlobalVars.CurSGI.equals("0") && !isFiltered && !pastSearch.equals(GlobalVars.CurSearchName)) {
-            // Запуск, если запустили процесс во время "глобального" поиска
-            isDifferent = true;
-        } else if (isFiltered) {
-            // Запуск, если запустили процесс во время фильтрации
-            isDifferent = !pastWC.equals(GlobalVars.CurWCID) || !pastFocus.equals(GlobalVars.CurFocusID);
-        } else {
-            isDifferent = !pastSGI.equals(GlobalVars.CurSGI);
-        }
-
-        if (SgiList.contains(GlobalVars.CurSGI)) {
-            isDifferent = false;
-        }
-        updateData(isDifferent, specialData);
-        return new Object[]{isDifferent, specialData};
-    }
+//    private static void resetLocalData() {
+//        pastSGI = "0";
+//        pastGroup = "0";
+//        pastWC = "0";
+//        pastFocus = "0";
+//        pastSearch = "";
+//    }
+//
+//    private static Object[] checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
+////        System.out.println("-----------------");
+////        System.out.println(isFiltered);
+////        System.out.println("WC: " + pastWC + " * " + GlobalVars.CurWCID);
+////        System.out.println("Focus: " + pastFocus + " * " + GlobalVars.CurFocusID);
+////        System.out.println("SGI: " + pastSGI + " * " + GlobalVars.CurSGI);
+////        System.out.println("Group: " + pastGroup + " * " + GlobalVars.CurGroup);
+////        System.out.println("Search: " + pastSearch + " * " + GlobalVars.CurSearchName);
+////        System.out.println("SgiList: " + SgiList);
+//
+//        // Анализируем прошлое стостояние isFiltered, для очистки past данных, чтобы шёл процесс загрузки реальных цен.
+//        // Если этого не сделать, то если зайти в [фильтр > муж > СГИ 7.2 > Группа CONTE ЧНИ DIWARI > в поиске active > включить реальные цены], то всё будет нормально, но
+//        // если убрать фильтр и зайти в ту же группу и включить рельные цены, то процесс не пойдёт (некоторые позиции будут иметь правильные цены, но не все, что нас не устраивает)
+////        boolean previousIsFiltered = !pastWC.equals(GlobalVars.CurWCID) && !pastWC.equals("0") || !pastFocus.equals(GlobalVars.CurFocusID) && !pastFocus.equals("0");
+////        if (previousIsFiltered) {
+////            pastSGI = "0";
+////            pastGroup = "0";
+////            pastSearch = "0";
+////        }
+//        String specialData = "";
+//        boolean isDifferent = true;
+////        System.out.println(isFiltered + " " + previousIsFiltered);
+////        if (isFiltered && previousIsFiltered) {
+////            isDifferent = false;
+////        } else
+////        if (pastSGI.equals(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup)) {
+////            isDifferent = false;
+////        }
+////        if (pastSGI.equals(GlobalVars.CurSGI) && SgiList.contains(GlobalVars.CurSGI)) {
+////            isDifferent = true;
+////        }
+//
+////        if (!SgiList.contains(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
+////            // Запуск, если запустили процесс в группе, а не в сги
+////            isDifferent = true;
+////            specialData = "sgi";
+////        }
+//
+////        if (!SgiList.contains(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
+////            // Запуск, если запустили процесс в группе, а не в сги
+////            isDifferent = true;
+////            specialData = "sgi";
+////        } else if (GlobalVars.CurSGI.equals("0") && !isFiltered && !pastSearch.equals(GlobalVars.CurSearchName)) {
+////            // Запуск, если запустили процесс во время "глобального" поиска
+////            isDifferent = true;
+////        } else if (isFiltered) {
+////            // Запуск, если запустили процесс во время фильтрации
+////            isDifferent = !pastWC.equals(GlobalVars.CurWCID) || !pastFocus.equals(GlobalVars.CurFocusID);
+////        } else {
+////            isDifferent = !pastSGI.equals(GlobalVars.CurSGI);
+////        }
+////
+////        if (SgiList.contains(GlobalVars.CurSGI)) {
+////            isDifferent = false;
+////        }
+////        updateData(isDifferent, specialData);
+//        return new Object[]{isDifferent, specialData};
+//
+//    }
 }

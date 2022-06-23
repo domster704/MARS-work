@@ -53,7 +53,7 @@ public class DBAppHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 as _id, 'Выберите демографический признак' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
+            cursor = db.rawQuery("SELECT 0 as _id, 'Выберите' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
 
             return cursor;
         } catch (Exception e) {
@@ -64,14 +64,14 @@ public class DBAppHelper extends SQLiteOpenHelper {
 
     public String getWCByID(String id) {
         if (id.equals("0"))
-            return "Выберите демографический признак";
+            return "Выберите";
         Cursor c = this.getReadableDatabase().rawQuery("SELECT DEMP FROM DEMP WHERE rowid ='" + id + "'", null);
         c.moveToNext();
         return c.getString(0);
     }
 
     public String getIDByWC(String WC) {
-        if (WC.equals("0") || WC.equals("Выберите демографический признак"))
+        if (WC.equals("0") || WC.equals("Выберите"))
             return "0";
         Cursor c = this.getReadableDatabase().rawQuery("SELECT rowid FROM DEMP WHERE DEMP=?", new String[] {WC});
         c.moveToNext();

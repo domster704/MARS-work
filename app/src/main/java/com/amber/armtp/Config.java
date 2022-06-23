@@ -41,7 +41,7 @@ public class Config {
         SearchView searchView = GlobalVars.CurAc.findViewById(R.id.menu_search);
         if (searchView != null) {
             searchView.clearFocus();
-            searchView.requestFocus();
+//            searchView.requestFocus();
         }
     }
 }

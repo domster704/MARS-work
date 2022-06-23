@@ -6,18 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
-import com.amber.armtp.annotations.Async;
 import com.amber.armtp.annotations.AsyncUI;
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -79,7 +74,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите Фокус' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM FOKUS", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, '0' AS CODE, 'Выберите' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM FOKUS", null);
 
             return cursor;
         } catch (Exception e) {
@@ -183,7 +178,7 @@ public class DBHelper extends SQLiteOpenHelper {
             searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
         }
 
-        sqlMX += (!WCID.equals("0") && !WCID.equals("Выберите демографический признак") && !WCID.equals("Не использовать") && !WCID.equals("!Не определено") && !WCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + WCID + "'" : "";
+        sqlMX += (!WCID.equals("0") && !WCID.equals("Выберите") && !WCID.equals("Не использовать") && !WCID.equals("!Не определено") && !WCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + WCID + "'" : "";
         sqlMX += (!FocusID.equals("0")) ? " AND Nomen.FOKUS='" + FocusID + "'" : "";
         sqlMX += (!SgiID.equals("0")) ? " AND Nomen.SGI='" + SgiID + "'" : "";
         sqlMX += (!GrupID.equals("0")) ? " AND Nomen.GRUPPA='" + GrupID + "'" : "";
@@ -222,7 +217,7 @@ public class DBHelper extends SQLiteOpenHelper {
             searchReq = " AND (LOWER(Nomen.DESCR) LIKE '" + Condition + "' OR LOWER(Nomen.KOD5) LIKE '" + Condition + "')";
         }
 
-        sqlMX += (!WCID.equals("0") && !WCID.equals("Выберите демографический признак") && !WCID.equals("Не использовать") && !WCID.equals("!Не определено") && !WCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + WCID + "'" : "";
+        sqlMX += (!WCID.equals("0") && !WCID.equals("Выберите") && !WCID.equals("Не использовать") && !WCID.equals("!Не определено") && !WCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + WCID + "'" : "";
         sqlMX += (!FocusID.equals("0")) ? " AND Nomen.FOKUS='" + FocusID + "'" : "";
         sqlMX += (!SgiID.equals("0")) ? " AND Nomen.SGI='" + SgiID + "'" : "";
         sqlMX += (!GrupID.equals("0")) ? " AND Nomen.GRUPPA='" + GrupID + "'" : "";
@@ -341,7 +336,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
-            if (Qty > OST) Qty = OST;
+//            if (Qty > OST) Qty = OST;
             db.execSQL("UPDATE NOMEN SET ZAKAZ = '" + Qty + "' WHERE KOD5 = '" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -378,7 +373,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
-            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - ZAKAZ) <= 0 THEN ZAKAZ ELSE ZAKAZ + 1 END WHERE KOD5=" + ID);
+//            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - ZAKAZ) <= 0 THEN ZAKAZ ELSE ZAKAZ + 1 END WHERE KOD5=" + ID);
+            db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5=" + ID);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -392,6 +388,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase(); // Read Data
         db.beginTransaction();
         try {
+//            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
             db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -682,27 +679,27 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT DISTINCT\n" +
-                    "DEBET.ROWID AS _id ,\n" +
-                    "DEBET.KONTR AS DESCR, \n" +
-                    "DEBET.STATUS AS STATUS, \n" +
-                    "DEBET.KREDIT, \n" +
-                    "DEBET.DOLG AS SALDO,\n" +
-                    "DEBET.A7 AS A7, \n" +
-                    "DEBET.A14 AS A14, \n" +
-                    "DEBET.A21 AS A21, \n" +
-                    "DEBET.A28 AS A28, \n" +
-                    "DEBET.A35 AS A35, \n" +
-                    "DEBET.A42 AS A42, \n" +
-                    "DEBET.A49 AS A49, \n" +
-                    "DEBET.A56 AS A56, \n" +
-                    "DEBET.A63 AS A63, \n" +
-                    "DEBET.A64 AS A64, \n" +
-                    "DEBET.OTGR30 AS OTG30, \n" +
-                    "DEBET.OPL30 AS OPL30, \n" +
-                    "DEBET.K_OBOR AS KOB, \n" +
-                    "DEBET.SCHET AS FIRMA, \n" +
-                    "DEBET.DOGOVOR AS CRT_DATE \n" +
+            cursor = db.rawQuery("SELECT DISTINCT " +
+                    "DEBET.ROWID AS _id ," +
+                    "DEBET.KONTR AS DESCR," +
+                    "DEBET.STATUS AS STATUS," +
+                    "DEBET.KREDIT," +
+                    "DEBET.DOLG AS SALDO," +
+                    "DEBET.A7 AS A7," +
+                    "DEBET.A14 AS A14," +
+                    "DEBET.A21 AS A21," +
+                    "DEBET.A28 AS A28," +
+                    "DEBET.A35 AS A35," +
+                    "DEBET.A42 AS A42," +
+                    "DEBET.A49 AS A49," +
+                    "DEBET.A56 AS A56," +
+                    "DEBET.A63 AS A63," +
+                    "DEBET.A64 AS A64," +
+                    "DEBET.OTGR30 AS OTG30," +
+                    "DEBET.OPL30 AS OPL30," +
+                    "DEBET.K_OBOR AS KOB," +
+                    "DEBET.SCHET AS FIRMA," +
+                    "DEBET.DOGOVOR AS CRT_DATE " +
                     "FROM DEBET " + Sql + " ORDER BY DEBET.KONTR", null);
             return cursor;
         } catch (Exception e) {
@@ -751,12 +748,12 @@ public class DBHelper extends SQLiteOpenHelper {
             return "";
 
         Cursor c = db.rawQuery("SELECT DATA FROM CONFIG WHERE NAME='" + "TIME_UPDATE" + "'", null);
+        String res = null;
         if (c.moveToNext()) {
-            return c.getString(c.getColumnIndex("DATA"));
-        } else {
-            c.close();
-            return null;
+            res = c.getString(c.getColumnIndex("DATA"));
         }
+        c.close();
+        return res;
     }
 
     public void putPriceInNomen(String id, String price) {
@@ -913,16 +910,10 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         SQLiteDatabase db = this.getWritableDatabase();
-//        Log.d("xd", ContrID);
-//        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-//                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
-//        Config.printCursor(c);
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(data), new String[]{ContrID});
         updatePrices(c);
-//        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-//                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(), new String[]{ContrID});
-//        Config.printCursor(c);
+
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=? " + generateSQLRequestByCurrentData(data), new String[]{ContrID});
         updatePrices(c);
@@ -949,7 +940,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
 
         File file = new File(path);
-        for (File elem: file.listFiles()) {
+        for (File elem : file.listFiles()) {
             db.execSQL("UPDATE NOMEN SET PD = 1 WHERE FOTO=?", new Object[]{elem.getName()});
         }
 
@@ -1000,10 +991,34 @@ public class DBHelper extends SQLiteOpenHelper {
             sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
         } else {
             sqlMX += (!GlobalVars.CurSGI.equals("0")) ? " AND Nomen.SGI='" + GlobalVars.CurSGI + "'" : "";
-            sqlMX += (!GlobalVars.CurWCID.equals("0") && !GlobalVars.CurWCID.equals("Выберите демографический признак") && !GlobalVars.CurWCID.equals("Не использовать") && !GlobalVars.CurWCID.equals("!Не определено") && !GlobalVars.CurWCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + GlobalVars.CurWCID + "'" : "";
+            sqlMX += (!GlobalVars.CurWCID.equals("0") && !GlobalVars.CurWCID.equals("Выберите") && !GlobalVars.CurWCID.equals("Не использовать") && !GlobalVars.CurWCID.equals("!Не определено") && !GlobalVars.CurWCID.equals("Не имеет значения")) ? " AND Nomen.DEMP='" + GlobalVars.CurWCID + "'" : "";
             sqlMX += (!GlobalVars.CurFocusID.equals("0")) ? " AND Nomen.FOKUS='" + GlobalVars.CurFocusID + "'" : "";
             sqlMX += (!GlobalVars.CurGroup.equals("0")) ? " AND Nomen.GRUPPA='" + GlobalVars.CurGroup + "'" : "";
         }
         return sqlMX + searchReq;
+    }
+
+    public void addOuted(String docId, String id, int count) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        db.execSQL("INSERT INTO VYCHERK (DOCID, NOMEN, KOL) VALUES(?, ?, ?)", new Object[]{docId, id, count});
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void putAllNomenPrices(String CONTR) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+        updatePrices(c);
+
+        c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+        updatePrices(c);
+//        AtomicInteger k = new AtomicInteger();
+//        pricesMap.forEach((el, key) -> {
+//            System.out.println(k.getAndIncrement() + " " + el + " " + key);
+//        });
     }
 }

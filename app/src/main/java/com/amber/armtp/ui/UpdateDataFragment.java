@@ -127,14 +127,17 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
 
         downloader = new Downloader(glbVars, getActivity());
         TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
-        versionData = downloader.isServerVersionNewer();
-        if (versionData[0].equals("true")) {
-            tvAppNewVer.setVisibility(View.VISIBLE);
-            tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
-        } else {
-            tvAppNewVer.setText(R.string.newVersionAvailable);
-            tvAppNewVer.setVisibility(View.GONE);
-        }
+        getActivity().runOnUiThread(() -> {
+            versionData = downloader.isServerVersionNewer();
+            if (versionData[0].equals("true")) {
+                tvAppNewVer.setVisibility(View.VISIBLE);
+                tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
+            } else {
+                tvAppNewVer.setText(R.string.newVersionAvailable);
+                tvAppNewVer.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     @SuppressLint("NonConstantResourceId")

@@ -4,7 +4,7 @@
     <string name="user">amberftp</string>
     <string name="password">201002</string>
     <string name="port">21</string>
-    <string name="fileDirectoryDB">/EXCHANGE/OUT/MARS/armtp3.zip</string>
+    <string name="fileDirectoryDB">/EXCHANGE/OUT/MARS/armtp3.rar</string>
     <string name="fileDirectoryApk">/EXCHANGE/OUT/MARS/UPDATE/mars.apk</string>
     <string name="fileName">armtp3.zip</string>
 </resources>

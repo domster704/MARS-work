@@ -77,10 +77,10 @@ public class JournalFragment extends Fragment implements ServerChecker {
                                 })
                                 .setPositiveButton("Да", (dialog, id1) -> {
                                     EditOrder(ID);
-                                    Fragment fragment = new FormOrderFragment();
-                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                    fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
-                                    fragmentTransaction.commit();
+//                                    Fragment fragment = new FormOrderFragment();
+//                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                                    fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+//                                    fragmentTransaction.commit();
                                 });
                         builder.create();
                         builder.show();
@@ -180,6 +180,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
         glbVars.layout = getActivity().findViewById(R.id.checkboxLayout);
         glbVars.LoadOrders();
 
+
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
@@ -192,9 +193,9 @@ public class JournalFragment extends Fragment implements ServerChecker {
         ScrollView view = getActivity().findViewById(R.id.scrollViewJ);
         view.fullScroll(View.FOCUS_DOWN);
 
-        if (getArguments() != null && getArguments().getBoolean("isStartDeletingExtraOrders")) {
-            deleteExtraOrders();
-        }
+//        if (getArguments() != null && getArguments().getBoolean("isStartDeletingExtraOrders")) {
+        deleteExtraOrders();
+//        }
     }
 
     /**
@@ -441,57 +442,78 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
     private void EditOrder(final String OrderID) {
         FragmentActivity a = getActivity();
-        new Thread(() -> {
-            Cursor cNom, cHead;
-            glbVars.db.getWritableDatabase().beginTransaction();
-            cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
-            if (cHead.moveToNext()) {
-                OrderHeadFragment.CONTR_ID = cHead.getString(cHead.getColumnIndex("CONTR"));
-                try {
-                    if (glbVars.db.getCount() == 0) {
-                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DATA,COMMENT) VALUES (" +
-                                "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
-                                "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "')");
-                    } else {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
-                                "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
-                                "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
-                                "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
-                                "DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
-                                "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        new Thread(new Runnable() {
+            @Override
+            @PGShowing
+            public void run() {
+//            Cursor cNom, cHead;
+//            glbVars.db.getWritableDatabase().beginTransaction();
+//            cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DOC_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null);
+//            if (cHead.moveToNext()) {
+//                OrderHeadFragment.CONTR_ID = cHead.getString(cHead.getColumnIndex("CONTR"));
+//                try {
+//                    if (glbVars.db.getCount() == 0) {
+//                        glbVars.db.getWritableDatabase().execSQL("INSERT INTO ORDERS(TP,CONTR,ADDR,DATA,COMMENT) VALUES (" +
+//                                "'" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+//                                "'" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+//                                "'" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+//                                "'" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
+//                                "'" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "')");
+//                    } else {
+//                        glbVars.db.getWritableDatabase().execSQL("UPDATE ORDERS SET " +
+//                                "TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "', " +
+//                                "CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "', " +
+//                                "ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "', " +
+//                                "DATA = '" + cHead.getString(cHead.getColumnIndex("DOC_DATE")) + "', " +
+//                                "COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'");
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//                cHead.close();
+//            }
 
-                cHead.close();
-            }
-
-            glbVars.db.ResetNomen();
-            cNom = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT PRICE, QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
-            try {
+                glbVars.db.ResetNomen();
+                Cursor cNom = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT PRICE, QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                glbVars.db.getWritableDatabase().beginTransaction();
+//            try {
                 while (cNom.moveToNext()) {
-                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cNom.getString(cNom.getColumnIndex("PRICE")) + "', ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
+                    glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
+                cNom.close();
+                glbVars.db.getWritableDatabase().setTransactionSuccessful();
+                glbVars.db.getWritableDatabase().endTransaction();
+
+//            glbVars.rewritePriceToMainDB(OrderID);
+//            GlobalVars.TypeOfPrice = glbVars.db.getPriceType(OrderHeadFragment.CONTR_ID);
+//            Fragment fragment = new FormOrderFragment();
+//            assert a != null;
+//            FragmentTransaction fragmentTransaction = a.getSupportFragmentManager().beginTransaction();
+//            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
+//            fragmentTransaction.commit();
+                OrderHeadFragment.isNeededToUpdateOrderTable = true;
+                HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
+
+                Fragment fragment = new OrderHeadFragment();
+
+                Bundle args = new Bundle();
+                args.putBoolean("isOrderEditedOrCopied", true);
+                args.putString("TP", orderData.get("TP"));
+                args.putString("CONTR", orderData.get("CONTR"));
+                args.putString("ADDR", orderData.get("ADDR"));
+                args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
+                args.putString("COMMENT", orderData.get("COMMENT"));
+                fragment.setArguments(args);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                fragmentTransaction.commit();
             }
-
-            cNom.close();
-            glbVars.db.getWritableDatabase().setTransactionSuccessful();
-            glbVars.db.getWritableDatabase().endTransaction();
-
-            glbVars.rewritePriceToMainDB(OrderID);
-            GlobalVars.TypeOfPrice = glbVars.db.getPriceType(OrderHeadFragment.CONTR_ID);
-
-            Fragment fragment = new FormOrderFragment();
-            assert a != null;
-            FragmentTransaction fragmentTransaction = a.getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
-            fragmentTransaction.commit();
         }).start();
     }
 
@@ -500,13 +522,12 @@ public class JournalFragment extends Fragment implements ServerChecker {
             @Override
             @PGShowing
             public void run() {
-                Cursor cursor;
                 glbVars.db.getWritableDatabase().beginTransaction();
                 glbVars.db.ResetNomen();
-                cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
+                Cursor cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);
                 try {
                     while (cursor.moveToNext()) {
-                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET PRICE='" + cursor.getString(cursor.getColumnIndex("PRICE")) + "', ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
+                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -518,14 +539,14 @@ public class JournalFragment extends Fragment implements ServerChecker {
                 glbVars.db.getWritableDatabase().setTransactionSuccessful();
                 glbVars.db.getWritableDatabase().endTransaction();
 
-                glbVars.rewritePriceToMainDB(OrderID);
+//                glbVars.rewritePriceToMainDB(OrderID);
 
                 HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
 
                 Fragment fragment = new OrderHeadFragment();
 
                 Bundle args = new Bundle();
-                args.putBoolean("isCopied", true);
+                args.putBoolean("isOrderEditedOrCopied", true);
                 args.putString("TP", orderData.get("TP"));
                 args.putString("CONTR", orderData.get("CONTR"));
                 args.putString("ADDR", orderData.get("ADDR"));

@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DelayedCalled {
-    int delay() default 100;
+    int delay() default 200;
 }
