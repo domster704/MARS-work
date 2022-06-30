@@ -34,7 +34,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -80,7 +79,7 @@ import java.util.Locale;
  * Updated by domster704 on 27.09.2021
  */
 public class GlobalVars extends Application implements TBUpdate {
-    public static ArrayList<CheckBoxData> allOrders = new ArrayList<>();
+    public static ArrayList<ChosenOrdersData> allOrders = new ArrayList<>();
 
     public static FragmentActivity CurAc;
     public static Context CurFragmentContext;
@@ -460,7 +459,7 @@ public class GlobalVars extends Application implements TBUpdate {
         glbContext = context;
     }
 
-//    @AsyncUI
+    //    @AsyncUI
     public void LoadSgi() {
         mySgi = db.getAllSgi();
         spSgi = CurView.findViewById(R.id.SpinSgi);
@@ -1018,8 +1017,6 @@ public class GlobalVars extends Application implements TBUpdate {
     @AsyncUI
     public void LoadOrders() {
         try {
-            updateOutedPositionInZakazyTable();
-            updateOrdersStatusFromDB();
             Orders = dbOrders.getZakazy();
             if (Orders != null)
                 putCheckBox(Orders);
@@ -1264,43 +1261,70 @@ public class GlobalVars extends Application implements TBUpdate {
 //            listOfOutedDocId.add(c.getString(0));
 //        }
 //        c.close();
-
-            Cursor ordersId = sqLiteDatabaseOrders.rawQuery("SELECT DISTINCT ZAKAZ_ID FROM ZAKAZY_DT", null);
+            sqLiteDatabaseOrders.beginTransaction();
+            Cursor ordersId = sqLiteDatabaseOrders.rawQuery("SELECT DOCID FROM ZAKAZY", null);
             while (ordersId.moveToNext()) {
                 String orderID = ordersId.getString(0);
-                Cursor allOrdersDetails = sqLiteDatabaseOrders.rawQuery("SELECT NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID=?", new String[]{orderID});
-                if (allOrdersDetails.getCount() == 0)
-                    continue;
+                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID=?", new String[]{orderID});
 
-                StringBuilder s = new StringBuilder();
-                while (allOrdersDetails.moveToNext()) {
-                    s.append(allOrdersDetails.getString(0)).append(",");
-                }
-                String s2 = s.substring(0, s.length() - 1);
+//                String orderID = ordersId.getString(0);
+//                Cursor allOrdersDetails = sqLiteDatabaseOrders.rawQuery("SELECT NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID=?", new String[]{orderID});
+//                if (allOrdersDetails.getCount() == 0)
+//                    continue;
 
-                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID = ? AND NOMEN in (" + s2 + ")", new String[]{orderID});
+//                StringBuilder s = new StringBuilder();
+//                while (allOrdersDetails.moveToNext()) {
+//                    s.append(allOrdersDetails.getString(0)).append(",");
+//                }
+//                String s2 = s.substring(0, s.length() - 1);
+
+//                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID = ? AND NOMEN in (" + s2 + ")", new String[]{orderID});
 
                 if (c.getCount() != 0) {
-                    listOfOutedDocId.add(orderID);
+                    sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=1 WHERE DOCID='" + orderID + "'");
+                } else {
+                    sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=0 WHERE DOCID='" + orderID + "'");
                 }
-                allOrdersDetails.close();
+//                allOrdersDetails.close();
                 c.close();
             }
+            sqLiteDatabaseOrders.setTransactionSuccessful();
+            sqLiteDatabaseOrders.endTransaction();
             ordersId.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static class CheckBoxData {
-        public int id;
-        public CheckBox checkBox;
-        public String status;
+    public static class ChosenOrdersData {
+        private int id;
+        private boolean isChecked;
+        private final String status;
 
-        public CheckBoxData(int id, CheckBox checkBox, String status) {
+        public ChosenOrdersData(int id, boolean isChecked, String status) {
             this.id = id;
-            this.checkBox = checkBox;
+            this.isChecked = isChecked;
             this.status = status;
+        }
+
+        public boolean isChecked() {
+            return isChecked;
+        }
+
+        public void setChecked(boolean checked) {
+            isChecked = checked;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
     }
 
@@ -1487,18 +1511,27 @@ public class GlobalVars extends Application implements TBUpdate {
             TextView tvSum = view.findViewById(R.id.ColOrdSum);
             updateTextFormatTo2DecAfterPoint(tvSum);
 
-            try {
-                if (listOfOutedDocId != null && listOfOutedDocId.contains(cursor.getString(cursor.getColumnIndex("DOCID")))) {
-                    tvSum.setText(tvSum.getText().toString() + " (-)");
-                }
-            } catch (Exception ignore) {
+            if (cursor.getInt(cursor.getColumnIndex("OUTED")) == 1) {
+                tvSum.setText(tvSum.getText().toString() + " (-)");
             }
+//            try {
+//                if (listOfOutedDocId != null && listOfOutedDocId.contains(cursor.getString(cursor.getColumnIndex("DOCID")))) {
+//                }
+//            } catch (Exception ignore) {
+//            }
 
             TextView tvStatus = view.findViewById(R.id.ColOrdStatus);
             if (tvStatus.getText().toString().equals("Сохранён"))
                 tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
 
-            view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+//            String status = cursor.getString(cursor.getColumnIndex("STATUS"));
+//            boolean isChecked = status.equals("Сохранён");
+//            System.out.println(position);
+            if (allOrders.size() != 0 && allOrders.get(position).isChecked) {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+            } else {
+                view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+            }
             return view;
         }
     }
@@ -1714,7 +1747,7 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     }
 
-    private void updateOrdersStatusFromDB() {
+    public void updateOrdersStatusFromDB() {
         SQLiteDatabase dbApp = db.getReadableDatabase();
         SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
         Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
@@ -1763,21 +1796,19 @@ public class GlobalVars extends Application implements TBUpdate {
 
         int id;
         String status;
+        boolean isChecked;
 
         while (c.moveToNext()) {
             id = c.getInt(c.getColumnIndex("_id"));
             status = c.getString(c.getColumnIndex("STATUS"));
+            isChecked = status.equals("Сохранён");
 
-            CheckBox checkBox = new CheckBox(layout.getContext());
-            float height = getResources().getDimension(R.dimen.heightOfOrdersItem);
-            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) height));
-            layout.addView(checkBox);
+//            CheckBox checkBox = new CheckBox(layout.getContext());
+//            float height = getResources().getDimension(R.dimen.heightOfOrdersItem);
+//            checkBox.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) height));
+//            layout.addView(checkBox);
 
-            if (status.equals("Сохранён")) {
-                checkBox.setChecked(true);
-            }
-
-            GlobalVars.allOrders.add(new CheckBoxData(id, checkBox, status));
+            GlobalVars.allOrders.add(new ChosenOrdersData(id, isChecked, status));
         }
     }
 

@@ -12,7 +12,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "order.db";
 
     public DBOrdersHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 2);
     }
 
     @Override
@@ -20,8 +20,12 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         onCreate(sqLiteDatabase);
+//        System.out.println(oldVersion + " " + newVersion);
+        if (newVersion > oldVersion) {
+            sqLiteDatabase.execSQL("ALTER TABLE ZAKAZY ADD COLUMN OUTED INTEGER DEFAULT 0");
+        }
     }
 
     @Override
@@ -47,7 +51,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " ZAKAZY.DELIVERY_DATE AS DELIVERY," +
                     " ZAKAZY.STATUS AS STATUS," +
                     " ZAKAZY.SUM as SUM," +
-                    " ZAKAZY.DOCID AS DOCID" +
+                    " ZAKAZY.DOCID AS DOCID," +
+                    " ZAKAZY.OUTED AS OUTED" +
                     " FROM ZAKAZY" +
                     " WHERE" +
                     " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))" +

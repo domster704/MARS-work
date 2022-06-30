@@ -55,38 +55,37 @@ public class Downloader {
         }
     }
 
-    public void downloadDB(final UpdateDataFragment.UIData ui, View view, GlobalVars globalVariable) {
+    public void downloadDB(final UpdateDataFragment.UIData ui, View view) {
         String fileName = "armtp3.rar";
         String filePath = MainActivity.filesPathDB + fileName;
 
-//        while (true) {
-            try {
-                FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, fileName);
-                if (ftpFileDownloader.downloadWithPG(ui) || !new ZipUnpacking(filePath).doUnpacking()) {
-                    catchErrorInDownloadProcess(view, ui);
-                    return;
-                }
-
-//            if () {
-//                catchErrorInDownloadProcess(view, ui);
-//                return;
-//            }
-
-                activity.runOnUiThread(() -> {
-                    globalVariable.db = new DBHelper(activity.getApplicationContext());
-
-                    view.setEnabled(true);
-                    ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                    System.out.println(activity.getResources().getString(R.string.successInDownloadingProcess));
-                    Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
-                    ftpFileDownloader.changePGData(1, 1, ui, true);
-                    globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
-                });
-            } catch (Exception e) {
+        try {
+            FtpFileDownloader ftpFileDownloader = new FtpFileDownloader(ServerDetails.getInstance(), ServerDetails.getInstance().dirDB, MainActivity.filesPathDB, fileName);
+            if (ftpFileDownloader.downloadWithPG(ui) || !new ZipUnpacking(filePath).doUnpacking()) {
                 catchErrorInDownloadProcess(view, ui);
-                e.printStackTrace();
+                return;
             }
-//        }
+
+
+            activity.runOnUiThread(() -> {
+                globalVars.db = new DBHelper(activity.getApplicationContext());
+
+                view.setEnabled(true);
+                ui.tvData.setTextColor(Color.rgb(3, 103, 0));
+                System.out.println(activity.getResources().getString(R.string.successInDownloadingProcess));
+                Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
+                ftpFileDownloader.changePGData(1, 1, ui, true);
+                globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
+
+//                globalVars.db.addOuted("ISG63_30062022_135230964", "62377", 1);
+
+                globalVars.updateOutedPositionInZakazyTable();
+                globalVars.updateOrdersStatusFromDB();
+            });
+        } catch (Exception e) {
+            catchErrorInDownloadProcess(view, ui);
+            e.printStackTrace();
+        }
     }
 
     public String[] isServerVersionNewer() {

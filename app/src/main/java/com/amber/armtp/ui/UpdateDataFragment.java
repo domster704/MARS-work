@@ -161,7 +161,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                             pgDB.setProgress(0);
                             tvDB.setTextColor(Color.rgb(0, 0, 0));
                         });
-                        downloader.downloadDB(uiData[0], view, glbVars);
+                        downloader.downloadDB(uiData[0], view);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

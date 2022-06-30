@@ -998,10 +998,18 @@ public class DBHelper extends SQLiteOpenHelper {
         return sqlMX + searchReq;
     }
 
-    public void addOuted(String docId, String id, int count) {
+    public void addOuted(String docId, String id,int count) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         db.execSQL("INSERT INTO VYCHERK (DOCID, NOMEN, KOL) VALUES(?, ?, ?)", new Object[]{docId, id, count});
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    public void removeOuted(String docId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        db.execSQL("DELETE FROM VYCHERK WHERE DOCID=?", new Object[]{docId});
         db.setTransactionSuccessful();
         db.endTransaction();
     }

@@ -47,7 +47,7 @@ import java.util.Objects;
 public class JournalFragment extends Fragment implements ServerChecker {
     private static final int ID_GOBACK = 101;
 
-    private final ArrayList<GlobalVars.CheckBoxData> chosenOrders = new ArrayList<>();
+    private final ArrayList<GlobalVars.ChosenOrdersData> chosenOrders = new ArrayList<>();
     public GlobalVars glbVars;
     Menu mainMenu;
     TextView tvOrder, tvContr, tvAddr, tvDocDate, tvStatus;
@@ -88,6 +88,24 @@ public class JournalFragment extends Fragment implements ServerChecker {
                     case R.id.CtxOrdCopy:
                         CopyOrder(ID);
                         return true;
+                    case R.id.CtxOrdShow:
+                        glbVars.layout.setVisibility(View.GONE);
+                        ClearAllMenuItems();
+                        mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
+                                .setIcon(R.drawable.back_arrow)
+                                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                        tvOrder = view.findViewById(R.id.ColOrdDocNo);
+                        tvContr = view.findViewById(R.id.ColOrdContr);
+                        tvAddr = view.findViewById(R.id.ColOrdAddr);
+                        tvDocDate = view.findViewById(R.id.ColOrdDocDate);
+                        tvStatus = view.findViewById(R.id.ColOrdStatus);
+
+                        glbVars.ordStatus = tvStatus.getText().toString();
+//                        String ID = tvOrder.getText().toString();
+
+                        glbVars.LoadOrdersDetails(ID);
+                        glbVars.viewFlipper.setDisplayedChild(1);
                     default:
                         return true;
                 }
@@ -112,23 +130,9 @@ public class JournalFragment extends Fragment implements ServerChecker {
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-            glbVars.layout.setVisibility(View.GONE);
-            ClearAllMenuItems();
-            mainMenu.add(Menu.NONE, ID_GOBACK, Menu.NONE, "Вернуться назад")
-                    .setIcon(R.drawable.back_arrow)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            tvOrder = myView.findViewById(R.id.ColOrdDocNo);
-            tvContr = myView.findViewById(R.id.ColOrdContr);
-            tvAddr = myView.findViewById(R.id.ColOrdAddr);
-            tvDocDate = myView.findViewById(R.id.ColOrdDocDate);
-            tvStatus = myView.findViewById(R.id.ColOrdStatus);
-
-            glbVars.ordStatus = tvStatus.getText().toString();
-            String ID = tvOrder.getText().toString();
-
-            glbVars.LoadOrdersDetails(ID);
-            glbVars.viewFlipper.setDisplayedChild(1);
+            boolean isCheckedNow = GlobalVars.allOrders.get(position).isChecked();
+            GlobalVars.allOrders.get(position).setChecked(!isCheckedNow);
+            glbVars.OrdersAdapter.notifyDataSetChanged();
         }
     };
     private android.support.v7.widget.Toolbar toolbar;
@@ -180,7 +184,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
         glbVars.layout = getActivity().findViewById(R.id.checkboxLayout);
         glbVars.LoadOrders();
 
-
         glbVars.gdOrders.setOnItemClickListener(GridOrdersClick);
         glbVars.gdOrders.setOnItemLongClickListener(GridOrdersLongClick);
 
@@ -204,11 +207,13 @@ public class JournalFragment extends Fragment implements ServerChecker {
     public void deleteExtraOrders() {
         if (glbVars.gdOrders.getCount() > 100) {
             for (int i = 100; i < glbVars.gdOrders.getCount(); i++) {
-                int id = GlobalVars.allOrders.get(i).id;
-                glbVars.dbOrders.deleteOrderByID(id);
+                glbVars.dbOrders.deleteOrderByID(GlobalVars.allOrders.get(i).getId());
             }
             GlobalVars.allOrders.subList(100, glbVars.gdOrders.getCount()).clear();
-            glbVars.LoadOrders();
+
+            glbVars.Orders.requery();
+            glbVars.OrdersAdapter.notifyDataSetChanged();
+//            glbVars.LoadOrders();
 
             GlobalVars.CurAc.runOnUiThread(() -> {
                 toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
@@ -255,9 +260,9 @@ public class JournalFragment extends Fragment implements ServerChecker {
                                 public void run() {
                                     isChecked = false;
 
-                                    for (GlobalVars.CheckBoxData i : chosenOrders) {
-                                        if (i.status.equals("Сохранён") || i.status.equals("Отправлен")) {
-                                            sendOrders(i.id);
+                                    for (GlobalVars.ChosenOrdersData i : chosenOrders) {
+                                        if (i.getStatus().equals("Сохранён") || i.getStatus().equals("Отправлен")) {
+                                            sendOrders(i.getId());
                                         }
                                     }
                                     Config.sout("Заказы отправлены");
@@ -288,8 +293,8 @@ public class JournalFragment extends Fragment implements ServerChecker {
                         .setNeutralButton("Да", (dialogInterface, i) -> {
                             isChecked = false;
 
-                            for (GlobalVars.CheckBoxData data : chosenOrders) {
-                                glbVars.dbOrders.deleteOrderByID(data.id);
+                            for (GlobalVars.ChosenOrdersData data : chosenOrders) {
+                                glbVars.dbOrders.deleteOrderByID(data.getId());
                             }
                             chosenOrders.clear();
 
@@ -318,9 +323,9 @@ public class JournalFragment extends Fragment implements ServerChecker {
      */
     private void checkCB() {
         chosenOrders.clear();
-        for (GlobalVars.CheckBoxData i : GlobalVars.allOrders) {
-            if (i.checkBox.isChecked()) {
-                chosenOrders.add(new GlobalVars.CheckBoxData(i.id, i.checkBox, i.status));
+        for (GlobalVars.ChosenOrdersData i : GlobalVars.allOrders) {
+            if (i.isChecked()) {
+                chosenOrders.add(new GlobalVars.ChosenOrdersData(i.getId(), true, i.getStatus()));
             }
         }
     }
@@ -365,10 +370,11 @@ public class JournalFragment extends Fragment implements ServerChecker {
     private void selectAllOrders() {
         chosenOrders.clear();
         for (int i = 0; i < GlobalVars.allOrders.size(); i++) {
-            GlobalVars.allOrders.get(i).checkBox.setChecked(!isChecked);
+            GlobalVars.allOrders.get(i).setChecked(!isChecked);
             chosenOrders.add(GlobalVars.allOrders.get(i));
         }
         isChecked = !isChecked;
+        glbVars.OrdersAdapter.notifyDataSetChanged();
     }
 
     private void SendDBFFile(String FileName, int id) {

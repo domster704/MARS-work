@@ -198,6 +198,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+//        globalVariable.db.addOuted("ISG63_30062022_135437933", "285424", 1);
+//        globalVariable.db.removeOuted("ISG63_30062022_135437933");
+
         // order.db
         try {
             globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT, SUM FLOAT)");
@@ -205,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
+//        globalVariable.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET OUTED=0");
 
         // appData.db
         try {

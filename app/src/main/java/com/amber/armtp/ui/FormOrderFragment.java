@@ -171,18 +171,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             glbVars.LoadNomen(GlobalVars.CurSGI, GlobalVars.CurGroup, GlobalVars.CurWCID, GlobalVars.CurFocusID, "");
             return false;
         });
-//        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View view, boolean b) {
-//                System.out.println(b);
-//                if (!b) {
-//                    view.
-////                    searchView.requestFocus();
-////                    view.clearFocus();
-////                    searchView.onActionViewCollapsed();
-//                }
-//            }
-//        });
 
         if (glbVars.NomenAdapter != null) {
             glbVars.NomenAdapter.notifyDataSetChanged();
@@ -276,6 +264,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     glbVars.dbOrders.getWritableDatabase().endTransaction();
                 }
 //                }
+                glbVars.db.ClearOrderHeader();
+                glbVars.db.ResetNomen();
 
                 getActivity().runOnUiThread(() -> {
                     Config.sout("Заказ сохранён");
@@ -387,6 +377,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 //                    glbVars.db.ClearOrderHeader();
 //                    glbVars.OrderID = "";
 //                }
+
+                glbVars.db.ClearOrderHeader();
+                glbVars.db.ResetNomen();
 
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
@@ -747,6 +740,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     private float insertIntoZakazyDT(String docID, float SUM) {
         Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE FROM Nomen WHERE ZAKAZ<>0", null);
+//        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT SUM([" + GlobalVars.TypeOfPrice + "] * ZAKAZ) as SUM1 FROM Nomen WHERE ZAKAZ<>0", null);
+//        nomenData.moveToNext();
+//        String sum = nomenData.getString(nomenData.getColumnIndex("SUM1"));
+//        SUM = Float.parseFloat(sum.replace(",", "."));
 
         glbVars.dbOrders.getWritableDatabase().beginTransaction();
         for (int i = 0; i < nomenData.getCount(); i++) {
@@ -759,116 +756,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             SUM += sum;
             glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docID + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
         }
+//        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) SELECT '" + docID + "', KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE, PRICE * ZAKAZ FROM Nomen WHERE ZAKAZ>0");
+
 
         glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
         glbVars.dbOrders.getWritableDatabase().endTransaction();
-        glbVars.db.ClearOrderHeader();
-        glbVars.db.ResetNomen();
         nomenData.close();
         return SUM;
     }
-
-//    public static void setRealPrices(GlobalVars glbVars) {
-//        Object[] data = checkAreThereDifferencesBetweenCurrentDataAndPreviousData();
-//
-//        glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
-//        if (glbVars.isSales && Boolean.parseBoolean(data[0].toString())) {
-//            glbVars.calculatePricesByContrDiscount(data[1].toString());
-//        }
-//    }
-
-//    private static String pastSGI = "0";
-//    private static String pastGroup = "0";
-//    private static String pastWC = "0";
-//    private static String pastFocus = "0";
-//    private static String pastSearch = "";
-//
-//    private static final HashSet<String> SgiList = new HashSet<>();
-
-//    private static void updateData(boolean isDifferent, String data) {
-//        pastSGI = GlobalVars.CurSGI;
-//        pastGroup = GlobalVars.CurGroup;
-//        pastWC = GlobalVars.CurWCID;
-//        pastFocus = GlobalVars.CurFocusID;
-//        pastSearch = GlobalVars.CurSearchName;
-//
-////        if (!pastSGI.equals("0") && pastFocus.equals("0") && pastWC.equals("0") && pastGroup.equals("0") && isDifferent || data.equals("sgi")) {
-////            System.out.println("----------------------------");
-////            System.out.println("WC: " + pastWC);
-////            System.out.println("Focus: " + pastFocus);
-////            System.out.println("SGI: " + pastSGI);
-////            System.out.println("Group: " + pastGroup);
-////            System.out.println("Search: " + pastSearch);
-////            System.out.println("----------------------------");
-////            SgiList.add(pastSGI);
-////        }
-//    }
-
-//    private static void resetLocalData() {
-//        pastSGI = "0";
-//        pastGroup = "0";
-//        pastWC = "0";
-//        pastFocus = "0";
-//        pastSearch = "";
-//    }
-//
-//    private static Object[] checkAreThereDifferencesBetweenCurrentDataAndPreviousData() {
-////        System.out.println("-----------------");
-////        System.out.println(isFiltered);
-////        System.out.println("WC: " + pastWC + " * " + GlobalVars.CurWCID);
-////        System.out.println("Focus: " + pastFocus + " * " + GlobalVars.CurFocusID);
-////        System.out.println("SGI: " + pastSGI + " * " + GlobalVars.CurSGI);
-////        System.out.println("Group: " + pastGroup + " * " + GlobalVars.CurGroup);
-////        System.out.println("Search: " + pastSearch + " * " + GlobalVars.CurSearchName);
-////        System.out.println("SgiList: " + SgiList);
-//
-//        // Анализируем прошлое стостояние isFiltered, для очистки past данных, чтобы шёл процесс загрузки реальных цен.
-//        // Если этого не сделать, то если зайти в [фильтр > муж > СГИ 7.2 > Группа CONTE ЧНИ DIWARI > в поиске active > включить реальные цены], то всё будет нормально, но
-//        // если убрать фильтр и зайти в ту же группу и включить рельные цены, то процесс не пойдёт (некоторые позиции будут иметь правильные цены, но не все, что нас не устраивает)
-////        boolean previousIsFiltered = !pastWC.equals(GlobalVars.CurWCID) && !pastWC.equals("0") || !pastFocus.equals(GlobalVars.CurFocusID) && !pastFocus.equals("0");
-////        if (previousIsFiltered) {
-////            pastSGI = "0";
-////            pastGroup = "0";
-////            pastSearch = "0";
-////        }
-//        String specialData = "";
-//        boolean isDifferent = true;
-////        System.out.println(isFiltered + " " + previousIsFiltered);
-////        if (isFiltered && previousIsFiltered) {
-////            isDifferent = false;
-////        } else
-////        if (pastSGI.equals(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup)) {
-////            isDifferent = false;
-////        }
-////        if (pastSGI.equals(GlobalVars.CurSGI) && SgiList.contains(GlobalVars.CurSGI)) {
-////            isDifferent = true;
-////        }
-//
-////        if (!SgiList.contains(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
-////            // Запуск, если запустили процесс в группе, а не в сги
-////            isDifferent = true;
-////            specialData = "sgi";
-////        }
-//
-////        if (!SgiList.contains(GlobalVars.CurSGI) && !pastGroup.equals(GlobalVars.CurGroup) && !isFiltered) {
-////            // Запуск, если запустили процесс в группе, а не в сги
-////            isDifferent = true;
-////            specialData = "sgi";
-////        } else if (GlobalVars.CurSGI.equals("0") && !isFiltered && !pastSearch.equals(GlobalVars.CurSearchName)) {
-////            // Запуск, если запустили процесс во время "глобального" поиска
-////            isDifferent = true;
-////        } else if (isFiltered) {
-////            // Запуск, если запустили процесс во время фильтрации
-////            isDifferent = !pastWC.equals(GlobalVars.CurWCID) || !pastFocus.equals(GlobalVars.CurFocusID);
-////        } else {
-////            isDifferent = !pastSGI.equals(GlobalVars.CurSGI);
-////        }
-////
-////        if (SgiList.contains(GlobalVars.CurSGI)) {
-////            isDifferent = false;
-////        }
-////        updateData(isDifferent, specialData);
-//        return new Object[]{isDifferent, specialData};
-//
-//    }
 }
