@@ -525,6 +525,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 return true;
             case R.id.NomenSort:
+                if (glbVars.NomenAdapter == null)
+                    return true;
+
                 if (!isSorted) {
                     item.setIcon(R.drawable.to_top);
                     glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
@@ -602,7 +605,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     isContrIdDifferent = false;
                     glbVars.putAllPrices();
                 } else if (glbVars.NomenAdapter != null) {
-                    glbVars.myNom.requery();
                     glbVars.NomenAdapter.notifyDataSetChanged();
                 }
 
@@ -619,8 +621,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         .setPositiveButton("Да", (dialogInterface, i) -> {
                             glbVars.db.clearOrder();
                             if (glbVars.NomenAdapter != null) {
-                                glbVars.myNom.requery();
                                 glbVars.NomenAdapter.notifyDataSetChanged();
+                            }
+                            if (glbVars.myNom != null) {
+                                glbVars.myNom.requery();
                             }
                             setContrAndSum(glbVars);
                         })

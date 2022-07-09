@@ -77,7 +77,7 @@ public class Downloader {
                 ftpFileDownloader.changePGData(1, 1, ui, true);
                 globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
 
-//                globalVars.db.addOuted("ISG63_30062022_135230964", "62377", 1);
+                globalVars.db.addOuted("ISG63_30062022_175629694", "338793", 1);
 
                 globalVars.updateOutedPositionInZakazyTable();
                 globalVars.updateOrdersStatusFromDB();

@@ -304,89 +304,90 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     };
 
-    public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-
-            if (ordStatus.equals("Отправлен") || ordStatus.equals("Удален")) {
-                Toast.makeText(CurAc, "Данный заказ уже отправлен или удаен и не может быть изменен", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
-            TextView c3 = myView.findViewById(R.id.ColOrdDtCod);
-            TextView c4 = myView.findViewById(R.id.ColOrdDtDescr);
-            TextView c6 = myView.findViewById(R.id.ColOrdDtZakazID);
-
-            String Zakaz_id = c6.getText().toString();
-
-            LayoutInflater layoutInflater = LayoutInflater.from(CurAc);
-            View promptView = layoutInflater.inflate(R.layout.change_qty, null);
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurAc);
-            alertDialogBuilder.setView(promptView);
-
-            EditText input = promptView.findViewById(R.id.edPPQty);
-            TextView txtCod = promptView.findViewById(R.id.txtNomCode);
-            TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
-            TextView txtOst = promptView.findViewById(R.id.txtNomOst);
-
-            input.setText(c1.getText());
-            txtCod.setText(c3.getText());
-            txtDescr.setText(c4.getText());
-
-            String ID = txtCod.getText().toString();
-            final String Ost = db.getNomenOst(ID);
-            txtOst.setText(Ost);
-
-            alertDialogBuilder
-                    .setCancelable(true)
-                    .setPositiveButton("OK", (dialog, id) -> {
-                    })
-                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-
-            final AlertDialog alertD = alertDialogBuilder.create();
-            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-            WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-            wmlp.gravity = Gravity.TOP | Gravity.START;
-            wmlp.x = 50;
-            wmlp.y = 50;
-
-            alertD.show();
-            input.requestFocus();
-            input.selectAll();
-            input.performClick();
-            input.setPressed(true);
-            input.invalidate();
-            InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(INPUT_METHOD_SERVICE);
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-
-            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                Boolean wantToCloseDialog = false;
-                if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
-                    dbOrders.updateOrderQty(Zakaz_id, ID, Integer.parseInt(input.getText().toString()));
-                    c1.setText(input.getText());
-                    OrdersDt.requery();
-                    wantToCloseDialog = true;
-                } else {
-                    input.selectAll();
-                    input.requestFocus();
-                    input.performClick();
-                    input.setPressed(true);
-                    input.invalidate();
-                    Toast.makeText(CurAc, "На остатках всего " + Ost + "шт. Вы заказываете " + input.getText().toString() + " шт.", Toast.LENGTH_LONG).show();
-                }
-                if (wantToCloseDialog)
-                    alertD.dismiss();
-            });
-
-            input.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                }
-                return true;
-            });
-        }
-    };
+//    public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
+//        @Override
+//        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+//
+//            if (ordStatus.equals("Отправлен") || ordStatus.equals("Удален")) {
+//                Toast.makeText(CurAc, "Данный заказ уже отправлен или удаен и не может быть изменен", Toast.LENGTH_LONG).show();
+//                return;
+//            }
+//
+//            TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
+//            TextView c3 = myView.findViewById(R.id.ColOrdDtCod);
+//            TextView c4 = myView.findViewById(R.id.ColOrdDtDescr);
+//            TextView c6 = myView.findViewById(R.id.ColOrdDtZakazID);
+//
+//            String Zakaz_id = c6.getText().toString();
+//
+//            LayoutInflater layoutInflater = LayoutInflater.from(CurAc);
+//            View promptView = layoutInflater.inflate(R.layout.change_qty, null);
+//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurAc);
+//            alertDialogBuilder.setView(promptView);
+//
+//            EditText input = promptView.findViewById(R.id.edPPQty);
+//            TextView txtCod = promptView.findViewById(R.id.txtNomCode);
+//            TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
+//            TextView txtOst = promptView.findViewById(R.id.txtNomOst);
+//
+//            input.setText(c1.getText());
+//            txtCod.setText(c3.getText());
+//            txtDescr.setText(c4.getText());
+//
+//            String ID = txtCod.getText().toString();
+//            final String Ost = db.getNomenOst(ID);
+//            txtOst.setText(Ost);
+//
+//            alertDialogBuilder
+//                    .setCancelable(true)
+//                    .setPositiveButton("OK", (dialog, id) -> {
+//                    })
+//                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
+//
+//            final AlertDialog alertD = alertDialogBuilder.create();
+//            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+//            WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
+//            wmlp.gravity = Gravity.TOP | Gravity.START;
+//            wmlp.x = 50;
+//            wmlp.y = 50;
+//
+//            alertD.show();
+//            input.requestFocus();
+//            input.selectAll();
+//            input.performClick();
+//            input.setPressed(true);
+//            input.invalidate();
+//            InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(INPUT_METHOD_SERVICE);
+//            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+//
+//            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+//                boolean wantToCloseDialog = false;
+//                if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
+//                    int newQuantityOfOrder = Integer.parseInt(input.getText().toString());
+//                    dbOrders.updateOrderQty(Zakaz_id, ID, newQuantityOfOrder);
+//                    c1.setText(newQuantityOfOrder);
+//                    OrdersDt.requery();
+//                    wantToCloseDialog = true;
+//                } else {
+//                    input.selectAll();
+//                    input.requestFocus();
+//                    input.performClick();
+//                    input.setPressed(true);
+//                    input.invalidate();
+//                    Toast.makeText(CurAc, "На остатках всего " + Ost + "шт. Вы заказываете " + input.getText().toString() + " шт.", Toast.LENGTH_LONG).show();
+//                }
+//                if (wantToCloseDialog)
+//                    alertD.dismiss();
+//            });
+//
+//            input.setOnEditorActionListener((v, actionId, event) -> {
+//                if (actionId == EditorInfo.IME_ACTION_DONE) {
+//                    alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+//                }
+//                return true;
+//            });
+//        }
+//    };
 
     public android.support.v4.app.FragmentManager fragManager;
     TextView grupID, sgiID;
@@ -1038,7 +1039,7 @@ public class GlobalVars extends Application implements TBUpdate {
         OrdersDt = dbOrders.getZakazDetails(ZakazID);
         OrdersDtAdapter = new JournalDetailsAdapter(CurAc, R.layout.orderdt_item, OrdersDt, new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
         orderDtList.setAdapter(OrdersDtAdapter);
-        orderDtList.setOnItemClickListener(OrderDtNomenClick);
+//        orderDtList.setOnItemClickListener(OrderDtNomenClick);
     }
 
     public String ReadLastUpdate() {
@@ -1697,7 +1698,6 @@ public class GlobalVars extends Application implements TBUpdate {
                 db.putAllNomenPrices(OrderHeadFragment.CONTR_ID);
                 CurAc.runOnUiThread(() -> {
                     if (NomenAdapter != null) {
-                        myNom.requery();
                         NomenAdapter.notifyDataSetChanged();
                     }
                 });
