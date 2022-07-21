@@ -59,4 +59,11 @@
 
     <string name="errorInDownloadingProcess">Ошибка во время загрузки</string>
     <string name="successInDownloadingProcess">База данных успешно обновлена</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="reportFirstTab">Продажи</string>
+    <string name="reportSecondTab">Акции</string>
+    <string name="reportThirdTab">KPI</string>
 </resources>

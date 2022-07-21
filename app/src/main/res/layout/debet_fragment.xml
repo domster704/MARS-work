@@ -246,21 +246,21 @@
                 android:layout_toEndOf="@+id/tvKOB" />
 
             <GridView
-                android:id="@+id/listContrs"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/tvContr"
-                android:layout_alignEnd="@+id/tvKOB"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="5dp"
-                android:clickable="true"
-                android:fastScrollAlwaysVisible="false"
-                android:fastScrollEnabled="false"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:longClickable="true"
-                android:nestedScrollingEnabled="true" />
+                    android:id="@+id/listContrs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/tvContr"
+                    android:layout_alignEnd="@+id/tvKOB"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="5dp"
+                    android:clickable="true"
+                    android:fastScrollAlwaysVisible="false"
+                    android:fastScrollEnabled="false"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:longClickable="true"
+                    android:nestedScrollingEnabled="true" />
 
             <View
                 android:id="@+id/divide1"

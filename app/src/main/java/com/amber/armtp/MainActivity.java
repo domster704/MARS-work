@@ -32,6 +32,7 @@ import com.amber.armtp.ui.JournalFragment;
 import com.amber.armtp.ui.OrderHeadFragment;
 import com.amber.armtp.ui.SettingFragment;
 import com.amber.armtp.ui.UpdateDataFragment;
+import com.amber.armtp.ui.report.ReportFragment;
 
 import org.apache.commons.io.FileUtils;
 
@@ -269,7 +270,11 @@ public class MainActivity extends AppCompatActivity {
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_admin:
-                        DisplayFragment(new SettingFragment(), "frag_admin");
+                        DisplayFragment(new SettingFragment(), "frag_set");
+                        setToolbarTitle(menuItem.getTitle());
+                        return true;
+                    case R.id.nav_report:
+                        DisplayFragment(new ReportFragment(), "frag_report");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_exit:
@@ -387,6 +392,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean _checkAvailableSpaceOnDevice() {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
         long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / SIZE_MB;
-        return availableSpace > 100;
+        return availableSpace > 200;
     }
 }

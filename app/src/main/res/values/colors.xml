@@ -27,4 +27,6 @@
 
     <color name="dividerColor">#d3d3d3</color>
     <color name="dividerColorForNomen">#ddd</color>
+
+    <color name="tabBackgroundColor">#eee</color>
 </resources>

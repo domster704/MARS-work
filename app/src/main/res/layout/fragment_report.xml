@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        tools:context=".ui.report.ReportPageAdapter">
+
+    <android.support.design.widget.TabLayout
+            android:id="@+id/reportTab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="3dp"
+            android:background="@color/tabBackgroundColor"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabMaxWidth="1000dp"
+            app:tabPaddingStart="10dp"
+            app:tabPaddingEnd="10dp">
+    </android.support.design.widget.TabLayout>
+
+    <android.support.v4.view.ViewPager
+            android:id="@+id/reportViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/reportTab"/>
+</RelativeLayout>

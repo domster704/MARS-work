@@ -38,4 +38,14 @@
     <!--  Width  -->
     <dimen name="dividerHeaderWidth">2dp</dimen>
     <dimen name="settingsWidthAfterMargin">80dp</dimen>
+
+    <dimen name="reportElemHeight">40dp</dimen>
+
+
+    <dimen name="tvWidthReportFragment">200dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="reportResultBigFieldWidth">350dp</dimen>
+    <dimen name="reportResultMediumFieldWidth">150dp</dimen>
+    <dimen name="reportResultSmallFieldWidth">50dp</dimen>
+    <dimen name="heightOfReportResultViews">50dp</dimen>
 </resources>

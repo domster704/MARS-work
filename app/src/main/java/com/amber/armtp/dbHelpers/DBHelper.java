@@ -96,33 +96,13 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor getNomByGroup(String GroupID, String SgiID) {
-        Cursor cursor1;
+    public Cursor getAllGroups() {
         Cursor cursor;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-
-            if (!listOfUpdatedGroups.contains(GroupID)) {
-                // Обновление цен по GROUP
-                if (!SgiID.equals("")) {
-                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
-                    _setNomenPriceWithSgi(cursor1, GroupID);
-                }
-
-                // Обновление цен по SGI
-                if (!SgiID.equals("")) {
-                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA IS NULL", null);
-                    _setNomenPriceWithSgi(cursor1, GroupID);
-                }
-            }
-
-            // Инфа про Nomen
-            cursor = db.rawQuery("SELECT rowid AS _id, KOD5, DESCR, OST," +
-                    " PRICE," +
-                    " GRUPPA, ZAKAZ, FOTO, PD, SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen WHERE OST>0 AND Nomen.GRUPPA='" + GroupID + "' ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM GRUPS", null);
             return cursor;
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -374,7 +354,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
 //            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - ZAKAZ) <= 0 THEN ZAKAZ ELSE ZAKAZ + 1 END WHERE KOD5=" + ID);
-            db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5=" + ID);
+            db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -389,7 +369,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
 //            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
-            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5=" + ID);
+            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1029,4 +1009,9 @@ public class DBHelper extends SQLiteOpenHelper {
 //            System.out.println(k.getAndIncrement() + " " + el + " " + key);
 //        });
     }
+
+//    public Cursor getBuyer() {
+//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+////        Cursor cursor = sqLiteDatabase.rawQuery("SELECT ");
+//    }
 }

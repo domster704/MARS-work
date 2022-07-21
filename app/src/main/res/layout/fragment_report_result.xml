@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.report.ReportResultFragment">
+
+    <TextView
+            android:id="@+id/headerTemp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+
+    <View
+            android:id="@+id/divide1"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dividerHeaderWidth"
+            android:layout_marginHorizontal="10dp"
+            android:background="@color/dividerColor"
+            android:layout_marginTop="5dp" />
+
+    <LinearLayout
+            android:id="@+id/headersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:layout_below="@+id/divide1"
+            android:paddingVertical="3dp"
+            android:layout_marginHorizontal="10dp" />
+
+    <View
+            android:id="@+id/divide2"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dividerHeaderWidth"
+            android:layout_below="@+id/headersLayout"
+            android:layout_marginHorizontal="10dp"
+            android:background="@color/dividerColor" />
+
+    <GridView
+            android:id="@+id/reportResultGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/divide2"
+            android:stretchMode="columnWidth"
+            android:layout_marginHorizontal="10dp"
+            android:horizontalSpacing="10dp"/>
+
+</RelativeLayout>

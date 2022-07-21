@@ -696,10 +696,16 @@ public class GlobalVars extends Application implements TBUpdate {
 
                 FTPClient ftpClient;
                 ftpClient = new FTPClient();
+                int timeout = 2 * 1000;
+                ftpClient.setDefaultTimeout(timeout);
+                ftpClient.setDataTimeout(timeout);
+                ftpClient.setConnectTimeout(timeout);
+                ftpClient.setControlKeepAliveTimeout(timeout);
+                ftpClient.setControlKeepAliveReplyTimeout(timeout);
+
                 final String photoDir = getPhotoDir();
                 try {
                     ftpClient.connect(ftp_server);
-
                     ftpClient.login(ftp_user, ftp_pass);
 
                     ftpClient.changeWorkingDirectory("FOTO");
@@ -724,6 +730,8 @@ public class GlobalVars extends Application implements TBUpdate {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Config.sout("Сервер недоступен");
+                    return;
                 } finally {
                     try {
                         ftpClient.disconnect();
