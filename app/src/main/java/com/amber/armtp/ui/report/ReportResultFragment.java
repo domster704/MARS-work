@@ -73,9 +73,10 @@ public class ReportResultFragment extends Fragment {
         }
 
         ArrayList<String> details = getArguments().getStringArrayList("details");
+        String[] dateData = getArguments().getStringArray("dateData");
         tradeRepresentative = getArguments().getString("tradeRepresentative");
 
-        Cursor cursor = getResultCursor(details);
+        Cursor cursor = getResultCursor(details, dateData);
 
 //        details.add(0, "_id");
         details.add("SUMMA");
@@ -122,7 +123,7 @@ public class ReportResultFragment extends Fragment {
         }
     }
 
-    private Cursor getResultCursor(ArrayList<String> arrayList) {
+    private Cursor getResultCursor(ArrayList<String> arrayList, String[] dateData) {
         StringBuilder sqlRequest = new StringBuilder(", ");
         for (String i : arrayList) {
             sqlRequest.append("TRIM(").append(i).append(".DESCR) as ").append(i).append(",");
@@ -141,7 +142,8 @@ public class ReportResultFragment extends Fragment {
         }
 
         DBHelper dbHelper = new DBHelper(getActivity());
-        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? GROUP BY _id, " + resGroupBy + " ORDER BY SUMMA DESC", new String[]{tradeRepresentative});
+        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, DATA, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND DATA BETWEEN ? and ? GROUP BY _id, " + resGroupBy + " ORDER BY SUMMA DESC",
+                new String[]{tradeRepresentative, dateData[0], dateData[1]});
     }
 
     private static class HeaderView extends android.support.v7.widget.AppCompatTextView {

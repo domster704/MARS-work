@@ -34,6 +34,7 @@ public class SalesFragment extends Fragment {
             this.name = name;
         }
     }
+
     private DataForDetails[] dataForDetails;
 
     public SalesFragment() {
@@ -57,13 +58,14 @@ public class SalesFragment extends Fragment {
         dateFrom.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateFrom), DeliveryDate.get(Calendar.YEAR), DeliveryDate.get(Calendar.MONTH), DeliveryDate.get(Calendar.DAY_OF_MONTH)).show());
         dateTo.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateTo), DeliveryDate.get(Calendar.YEAR), DeliveryDate.get(Calendar.MONTH), DeliveryDate.get(Calendar.DAY_OF_MONTH)).show());
 
-        dataForDetails = new DataForDetails[] {
+        dataForDetails = new DataForDetails[]{
                 new DataForDetails(getActivity().findViewById(R.id.isBuyer), "CONTRS"),
                 new DataForDetails(getActivity().findViewById(R.id.isGoodsGroups), "GRUPS")
         };
 
         Button button = getActivity().findViewById(R.id.showReport);
         button.setOnClickListener(view -> {
+            // TODO: check existing db
             if (isAnyCheckBoxChecked()) {
                 ArrayList<String> args = getAllChosenCheckBox();
                 ReportResultFragment fragment = new ReportResultFragment();
@@ -73,11 +75,14 @@ public class SalesFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putStringArrayList("details", args);
                 bundle.putString("tradeRepresentative", tradeRepresentativeID);
+                bundle.putStringArray("dateData", new String[]{
+                        dateFrom.getText().toString().replaceAll("\\.", "/"),
+                        dateTo.getText().toString().replaceAll("\\.", "/")
+                });
 
                 fragment.setArguments(bundle);
                 fragmentTransaction.commit();
             } else {
-                // TODO:
             }
         });
     }
@@ -101,7 +106,7 @@ public class SalesFragment extends Fragment {
         dateFrom.setText(sdf.format(calendarFrom.getTime()));
 
         // Filling dateToPicker by last day of this month
-        Calendar calendarTo= Calendar.getInstance();
+        Calendar calendarTo = Calendar.getInstance();
         calendarTo.set(Calendar.YEAR, calendarTo.get(Calendar.YEAR));
         calendarTo.set(Calendar.MONTH, calendarTo.get(Calendar.MONTH));
         calendarTo.set(Calendar.DAY_OF_MONTH, calendarTo.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -122,7 +127,7 @@ public class SalesFragment extends Fragment {
     }
 
     private boolean isAnyCheckBoxChecked() {
-        for (DataForDetails details: dataForDetails) {
+        for (DataForDetails details : dataForDetails) {
             if (details.checkBox.isChecked()) {
                 return true;
             }
@@ -132,7 +137,7 @@ public class SalesFragment extends Fragment {
 
     private ArrayList<String> getAllChosenCheckBox() {
         ArrayList<String> arrayList = new ArrayList<>();
-        for (DataForDetails details: dataForDetails) {
+        for (DataForDetails details : dataForDetails) {
             if (details.checkBox.isChecked()) {
                 arrayList.add(details.name);
             }
