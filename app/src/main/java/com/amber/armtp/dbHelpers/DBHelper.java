@@ -487,6 +487,23 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    public String getNameOfTpById(String ID) {
+        Cursor c = null;
+        try {
+            SQLiteDatabase db;
+            db = this.getReadableDatabase();
+            c = db.rawQuery("SELECT DESCR FROM TORG_PRED WHERE CODE='" + ID + "'", null);
+            if (c.moveToFirst()) {
+                return c.getString(0);
+            }
+            return "";
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
     public int GetContrByID(String ID) {
         Cursor c = null;
         try {
@@ -927,6 +944,16 @@ public class DBHelper extends SQLiteOpenHelper {
         db.setTransactionSuccessful();
         db.endTransaction();
     }
+
+    public String countSumInRealTableById(String tpID, String[] dateData) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(SUMMA) AS SUMMA FROM REAL WHERE TORG_PRED=? AND DATA BETWEEN ? and ?", new String[]{tpID, dateData[0], dateData[1]});
+        cursor.moveToNext();
+        String res = cursor.getString(0);
+        cursor.close();
+        return res == null || res.equals("") ? "0.00": String.format(Locale.ROOT, "%.2f", Float.parseFloat(res.replace(",", ".")));
+    }
+
 
     private void updatePrices(Cursor c) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");

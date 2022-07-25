@@ -92,7 +92,7 @@ public class Downloader {
         String ver = BuildConfig.VERSION_NAME;
 
         FTPClient client = new FTPClient();
-        int timeout = 2 * 1000;
+        int timeout = 1 * 1000;
         client.setDefaultTimeout(timeout);
         client.setDataTimeout(timeout);
         client.setConnectTimeout(timeout);

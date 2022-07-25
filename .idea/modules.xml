@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS-work.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS-work.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS-work.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS-work.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS-work.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS-work.app.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS-work.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS-work.app.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS-work.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS-work.app.unitTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS-work.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS-work.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS-work.test.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS-work.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" />
     </modules>
   </component>
 </project>

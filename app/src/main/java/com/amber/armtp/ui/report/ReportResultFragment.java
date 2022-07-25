@@ -62,7 +62,7 @@ public class ReportResultFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         headersName = new HashMap<String, ViewWidthByName>() {{
-            put("_id", new ViewWidthByName("NN",  R.id.reportResultPos, getResources().getDimension(R.dimen.reportResultSmallFieldWidth)));
+            put("_id", new ViewWidthByName("NN", R.id.reportResultPos, getResources().getDimension(R.dimen.reportResultSmallFieldWidth)));
             put("CONTRS", new ViewWidthByName("Производитель", R.id.contr, getResources().getDimension(R.dimen.reportResultBigFieldWidth)));
             put("GRUPS", new ViewWidthByName("Название группы", R.id.groups, getResources().getDimension(R.dimen.reportResultBigFieldWidth)));
             put("SUMMA", new ViewWidthByName("Сумма", R.id.sum, getResources().getDimension(R.dimen.reportResultMediumFieldWidth)));
@@ -78,7 +78,7 @@ public class ReportResultFragment extends Fragment {
 
         Cursor cursor = getResultCursor(details, dateData);
 
-//        details.add(0, "_id");
+        details.add(0, "_id");
         details.add("SUMMA");
 
         String[] chosenColumnsInCursor = details.toArray(new String[0]);
@@ -111,7 +111,22 @@ public class ReportResultFragment extends Fragment {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
 
+            TextView tvPosition = view.findViewById(R.id.reportResultPos);
             TextView tvSum = view.findViewById(R.id.sum);
+            TextView tvContr = view.findViewById(R.id.contr);
+            TextView tvGroup = view.findViewById(R.id.groups);
+
+            TextView[] listTVThatNeededToChangePadding = new TextView[]{tvContr, tvGroup};
+            float scale = getResources().getDisplayMetrics().density;
+            int paddingValue = 10;
+            for (TextView tv : listTVThatNeededToChangePadding) {
+                if (!tv.getText().toString().equals("")) {
+                    tv.setPadding((int) scale * paddingValue, tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
+                }
+            }
+
+            tvPosition.setText(String.valueOf(position));
+
             float sum = Float.parseFloat(cursor.getString(cursor.getColumnIndex("SUMMA")).replace(",", "."));
             tvSum.setText(String.format(Locale.ROOT, "%.2f", sum));
 
@@ -163,7 +178,7 @@ public class ReportResultFragment extends Fragment {
         LinearLayout layout = getActivity().findViewById(R.id.headersLayout);
 
         for (ViewWidthByName header : headersList) {
-            TextView tv = new HeaderView(getContext(), header);
+            HeaderView tv = new HeaderView(getContext(), header);
             layout.addView(tv);
         }
     }

@@ -1,6 +1,8 @@
 package com.amber.armtp.ui.report;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +17,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.amber.armtp.R;
+import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.ui.SettingFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,8 +26,10 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class SalesFragment extends Fragment {
+
     private final Calendar DeliveryDate = Calendar.getInstance();
-    private static String tradeRepresentativeID = "IXXX26";
+    private DBHelper dbHelper;
+    private String tradeRepresentativeID = ""; // IXXX26
 
     private static class DataForDetails {
         public CheckBox checkBox;
@@ -51,6 +57,36 @@ public class SalesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        SharedPreferences settings = getActivity().getSharedPreferences("apk_version", 0);
+        tradeRepresentativeID = settings.getString("ReportTPId", "");
+
+        dbHelper = new DBHelper(getActivity());
+        String tpName = dbHelper.getNameOfTpById(tradeRepresentativeID);
+
+        System.out.println(tradeRepresentativeID + " * " + tpName);
+        if (tradeRepresentativeID.equals("") || tpName.equals("")) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Непраивльный идентификатор")
+                    .setMessage("Неправильно введен или отсутсвует ID торгового представителя")
+                    .setCancelable(false)
+                    .setPositiveButton("Ввести ID", (dialogInterface, i) -> {
+                        SettingFragment fragment = new SettingFragment();
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putIntArray("Layouts", new int[]{R.id.reportLayoutsMain});
+
+                        fragment.setArguments(bundle);
+                        fragmentTransaction.replace(R.id.frame, fragment);
+                        fragmentTransaction.commit();
+                    })
+                    .show();
+        }
+
+
+        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle(tpName);
+
         EditText dateFrom = getActivity().findViewById(R.id.dateFrom);
         EditText dateTo = getActivity().findViewById(R.id.dateTo);
         fillDatePicker(dateFrom, dateTo);
@@ -67,6 +103,7 @@ public class SalesFragment extends Fragment {
         button.setOnClickListener(view -> {
             // TODO: check existing db
             if (isAnyCheckBoxChecked()) {
+                System.out.println(tradeRepresentativeID);
                 ArrayList<String> args = getAllChosenCheckBox();
                 ReportResultFragment fragment = new ReportResultFragment();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -83,6 +120,17 @@ public class SalesFragment extends Fragment {
                 fragment.setArguments(bundle);
                 fragmentTransaction.commit();
             } else {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Сумма")
+                        .setMessage(dbHelper.countSumInRealTableById(tradeRepresentativeID,
+                                new String[]{dateFrom.getText().toString().replaceAll("\\.", "/"),
+                                             dateTo.getText().toString().replaceAll("\\.", "/")
+                        }))
+                        .setPositiveButton("Закрыть", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                        })
+                        .setCancelable(true)
+                        .show();
             }
         });
     }

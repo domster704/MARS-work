@@ -22,7 +22,6 @@ import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
-import com.amber.armtp.annotations.AsyncUI;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,6 +41,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
     private EditText fontSize;
     private EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort;
+    private EditText etTpSetting;
 
     @Nullable
     @Override
@@ -80,7 +80,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             settingsEditor.apply();
         }
 
-        etFtpServer = getActivity().findViewById(R.id.edFtpServer);
+        etFtpServer = getActivity().findViewById(R.id.etFtpServer);
         etFtpPass = getActivity().findViewById(R.id.edFtpPass);
         etFtpUser = getActivity().findViewById(R.id.edFtpUser);
         etFtpPort = getActivity().findViewById(R.id.edFtpPort);
@@ -94,17 +94,39 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         fontSize = getActivity().findViewById(R.id.fontSize);
         fontSize.setText(String.valueOf(nomenDescriptionFontSize));
 
+        etTpSetting = getActivity().findViewById(R.id.etTpSetting);
+        etTpSetting.setText(serverSettings.getString("ReportTPId", ""));
+
         getActivity().findViewById(R.id.ftpServerLayoutMain).setOnClickListener(this);
         getActivity().findViewById(R.id.fontLayoutMain).setOnClickListener(this);
         getActivity().findViewById(R.id.photoLayoutsMain).setOnClickListener(this);
+        getActivity().findViewById(R.id.reportLayoutsMain).setOnClickListener(this);
 
         getActivity().findViewById(R.id.buttonClearAllPhoto).setOnClickListener(this);
+
+        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Настройки");
+
+        if (getArguments() == null)
+            return;
+
+        int[] layoutsNeededToOpen = getArguments().getIntArray("Layouts");
+        for (int id: layoutsNeededToOpen) {
+            LinearLayout layout = (LinearLayout) getActivity().findViewById(id);
+            for (int i = 0; i < layout.getChildCount(); i++) {
+                if (layout.getChildAt(i) instanceof LinearLayout) {
+                    layout.getChildAt(i).setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.reportLayoutsMain:
             case R.id.photoLayoutsMain:
             case R.id.fontLayoutMain:
             case R.id.ftpServerLayoutMain:
@@ -164,8 +186,10 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.SettingsSave) {
+            Config.hideKeyBoard();
             changeServerData();
             changeFontSize();
+            setTpInSalesFragment();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -212,5 +236,10 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         settingsEditor.apply();
 
         Config.sout("Размер шрифта изменён на " + nomenDescriptionFontSize);
+    }
+
+    private void setTpInSalesFragment() {
+        editor.putString("ReportTPId", etTpSetting.getText().toString());
+        editor.apply();
     }
 }
