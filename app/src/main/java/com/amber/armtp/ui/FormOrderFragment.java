@@ -486,7 +486,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         alertDlg.dismiss();
                         return;
                     }
-                    System.out.println(glbVars.NomenAdapter + " * " + glbVars.myNom + " * " + glbVars.myNom.getCount());
                     if (!edBeginPP.getText().toString().equals("") && !edEndPP.getText().toString().equals("") && !edPPQty.getText().toString().equals("")) {
                         glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
                         glbVars.BeginPos = 0;
@@ -606,6 +605,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     glbVars.putAllPrices();
                 } else if (glbVars.NomenAdapter != null) {
                     glbVars.NomenAdapter.notifyDataSetChanged();
+                } else {
+                    Config.sout("Ошибка считывания таблицы заказов");
                 }
 
 //                pastSGI = GlobalVars.CurSGI;

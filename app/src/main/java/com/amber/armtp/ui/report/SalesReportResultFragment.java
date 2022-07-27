@@ -6,8 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.Dimension;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -18,12 +22,16 @@ import android.widget.TextView;
 import com.amber.armtp.R;
 import com.amber.armtp.dbHelpers.DBHelper;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class ReportResultFragment extends Fragment {
+public class SalesReportResultFragment extends Fragment {
     private String tradeRepresentative;
 //    private Map<String, Integer> fields = new HashMap<String, Integer>() {{
 //        put("_id", R.id.reportResultPos);
@@ -33,6 +41,8 @@ public class ReportResultFragment extends Fragment {
 //    }};
 
     private Map<String, ViewWidthByName> headersName;
+    private String[] chosenCheckBoxInSalesFragment;
+    private String[] dateInSalesFragment;
 
     private static class ViewWidthByName {
         public String name;
@@ -49,11 +59,13 @@ public class ReportResultFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_report_result, container, false);
     }
 
@@ -73,10 +85,18 @@ public class ReportResultFragment extends Fragment {
         }
 
         ArrayList<String> details = getArguments().getStringArrayList("details");
+        chosenCheckBoxInSalesFragment = details.toArray(new String[0]);
+
         String[] dateData = getArguments().getStringArray("dateData");
+        dateInSalesFragment = dateData.clone();
         tradeRepresentative = getArguments().getString("tradeRepresentative");
 
-        Cursor cursor = getResultCursor(details, dateData);
+        Cursor cursor = null;
+        try {
+            cursor = getResultCursor(details, dateData);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         details.add(0, "_id");
         details.add("SUMMA");
@@ -96,6 +116,34 @@ public class ReportResultFragment extends Fragment {
         gridView.setAdapter(adapter);
 
         fillHeaderLayout(chosenHeadersInHeadersLayout);
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(getArguments().getString("tpName"));
+        toolbar.setSubtitle(getArguments().getString("wholeSum"));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        System.out.println(menu.findItem(R.id.backToSales));
+        inflater.inflate(R.menu.sales_report_result_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.backToSales) {
+            Bundle bundle = new Bundle();
+            bundle.putStringArray("chosenCheckBox", chosenCheckBoxInSalesFragment);
+            bundle.putStringArray("date", dateInSalesFragment);
+
+            Fragment fragment = new ReportFragment();
+            fragment.setArguments(bundle);
+
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame, fragment)
+                    .commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class ReportResultAdapter extends SimpleCursorAdapter {
@@ -125,20 +173,32 @@ public class ReportResultFragment extends Fragment {
                 }
             }
 
-            tvPosition.setText(String.valueOf(position));
+            tvPosition.setText(String.valueOf(position + 1));
 
-            float sum = Float.parseFloat(cursor.getString(cursor.getColumnIndex("SUMMA")).replace(",", "."));
+            double sum = cursor.getDouble(cursor.getColumnIndex("SUMMA"));
             tvSum.setText(String.format(Locale.ROOT, "%.2f", sum));
 
             for (String i : chosenHeaders) {
                 TextView textView = view.findViewById(headersName.get(i).id);
                 textView.setLayoutParams(new LinearLayout.LayoutParams((int) headersName.get(i).width, (int) getResources().getDimension(R.dimen.heightOfReportResultViews)));
             }
+
+            int backgroundColor;
+            if (position % 2 != 0) {
+                backgroundColor = getResources().getColor(R.color.gridViewFirstColor);
+            } else {
+                backgroundColor = getResources().getColor(R.color.gridViewSecondColor);
+            }
+            view.setBackgroundColor(backgroundColor);
+
+
+//            System.out.println(position + " " + tvContr.getText().toString() + " " + tvContr.getWidth());
+
             return view;
         }
     }
 
-    private Cursor getResultCursor(ArrayList<String> arrayList, String[] dateData) {
+    private Cursor getResultCursor(ArrayList<String> arrayList, String[] dateData) throws ParseException {
         StringBuilder sqlRequest = new StringBuilder(", ");
         for (String i : arrayList) {
             sqlRequest.append("TRIM(").append(i).append(".DESCR) as ").append(i).append(",");
@@ -157,8 +217,27 @@ public class ReportResultFragment extends Fragment {
         }
 
         DBHelper dbHelper = new DBHelper(getActivity());
-        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, DATA, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND DATA BETWEEN ? and ? GROUP BY _id, " + resGroupBy + " ORDER BY SUMMA DESC",
-                new String[]{tradeRepresentative, dateData[0], dateData[1]});
+
+        String[] dateFrom = dateData[0].split("\\.");
+        ArrayUtils.swap(dateFrom, 0, 2);
+        dateFrom[0] = dateFrom[0].substring(2);
+        String df = StringUtils.join(dateFrom, "");
+
+        String[] dateTo = dateData[1].split("\\.");
+        ArrayUtils.swap(dateTo, 0, 2);
+        dateTo[0] = dateTo[0].substring(2);
+        String dt = StringUtils.join(dateTo, "");
+
+//        System.out.println(df + " " + dt);
+        System.out.println("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as convertedData, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED='" + tradeRepresentative + "' AND (convertedData >= '" + df + "' and convertedData <= '" + dt + "') GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC");
+//        Cursor c = dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as convertedData, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (convertedData >= '" + df + "' and convertedData <= '" + dt + "') GROUP BY _id, " + resGroupBy + " ORDER BY SUMMA DESC",
+//                new String[]{tradeRepresentative});
+//        c.moveToNext();
+//        System.out.println(c.getDouble(c.getColumnIndex("SUMMA")));
+//        Config.printCursor(c);
+        //        SELECT CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x from REAL WHERE x>= 220715 and x<=220816 ORDER BY x DESC
+        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (x >= " + df + " and x <= " + dt + ") GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC",
+                new String[]{tradeRepresentative});
     }
 
     private static class HeaderView extends android.support.v7.widget.AppCompatTextView {
@@ -174,7 +253,6 @@ public class ReportResultFragment extends Fragment {
     }
 
     private void fillHeaderLayout(ViewWidthByName[] headersList) {
-
         LinearLayout layout = getActivity().findViewById(R.id.headersLayout);
 
         for (ViewWidthByName header : headersList) {

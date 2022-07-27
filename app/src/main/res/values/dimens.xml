@@ -44,8 +44,8 @@
 
     <dimen name="tvWidthReportFragment">200dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="reportResultBigFieldWidth">350dp</dimen>
-    <dimen name="reportResultMediumFieldWidth">150dp</dimen>
-    <dimen name="reportResultSmallFieldWidth">60dp</dimen>
-    <dimen name="heightOfReportResultViews">50dp</dimen>
+    <dimen name="reportResultBigFieldWidth">260dp</dimen>
+    <dimen name="reportResultMediumFieldWidth">100dp</dimen>
+    <dimen name="reportResultSmallFieldWidth">50dp</dimen>
+    <dimen name="heightOfReportResultViews">30dp</dimen>
 </resources>

@@ -3,49 +3,74 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.report.ReportResultFragment">
+        tools:context=".ui.report.SalesReportResultFragment">
 
-    <TextView
-            android:id="@+id/headerTemp"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@color/black"/>
+<!--    <HorizontalScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:fillViewport="true"-->
+<!--            android:layout_alignParentStart="true"-->
+<!--            android:layout_alignParentBottom="true">-->
+<!--        <RelativeLayout-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="match_parent">-->
 
-    <View
-            android:id="@+id/divide1"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerHeaderWidth"
-            android:layout_marginHorizontal="10dp"
-            android:background="@color/dividerColor"
-            android:layout_marginTop="5dp" />
+            <TextView
+                    android:id="@+id/begin"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp" />
 
-    <LinearLayout
-            android:id="@+id/headersLayout"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:layout_below="@+id/divide1"
-            android:paddingVertical="3dp"
-            android:layout_marginHorizontal="10dp" />
+            <View
+                    android:id="@+id/divide1"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dividerHeaderWidth"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_toStartOf="@+id/end"
+                    android:layout_toEndOf="@+id/begin"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/dividerColor" />
 
-    <View
-            android:id="@+id/divide2"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dividerHeaderWidth"
-            android:layout_below="@+id/headersLayout"
-            android:layout_marginHorizontal="10dp"
-            android:background="@color/dividerColor" />
+            <LinearLayout
+                    android:id="@+id/headersLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/divide1"
+                    android:paddingVertical="3dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_alignParentEnd="true" />
 
-    <GridView
-            android:id="@+id/reportResultGrid"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/divide2"
-            android:stretchMode="columnWidth"
-            android:layout_marginHorizontal="10dp"
-            android:horizontalSpacing="10dp"/>
+            <View
+                    android:id="@+id/divide2"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dividerHeaderWidth"
+                    android:layout_below="@+id/headersLayout"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_toStartOf="@+id/end"
+                    android:layout_toEndOf="@+id/begin"
+                    android:background="@color/dividerColor" />
 
+            <GridView
+                    android:id="@+id/reportResultGrid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_below="@+id/divide2"
+                    android:clickable="true"
+                    android:fastScrollAlwaysVisible="false"
+                    android:fastScrollEnabled="false"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:longClickable="true"
+                    android:nestedScrollingEnabled="true"
+                    android:layout_alignParentEnd="true"/>
+
+            <TextView
+                    android:id="@+id/end"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_toEndOf="@+id/headersLayout" />
+<!--        </RelativeLayout>-->
+<!--    </HorizontalScrollView>-->
 </RelativeLayout>

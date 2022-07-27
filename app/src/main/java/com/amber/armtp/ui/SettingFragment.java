@@ -106,6 +106,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("Настройки");
+        toolbar.setSubtitle("");
 
         if (getArguments() == null)
             return;

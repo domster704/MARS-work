@@ -3,9 +3,6 @@ package com.amber.armtp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
-import android.view.View;
-import android.widget.TextView;
 
 import com.amber.armtp.annotations.AsyncUI;
 
@@ -15,16 +12,16 @@ public class ProgressBarLoading {
 
     public ProgressBarLoading(Context context) {
         this.context = context;
-        _create();
+        create();
     }
 
     public ProgressBarLoading(Context context, boolean isCreatedCancelButton, Thread thread) {
         this.context = context;
-        _create(isCreatedCancelButton, thread);
+        create(isCreatedCancelButton, thread);
     }
 
     @AsyncUI
-    private void _create() {
+    private void create() {
         dialog = new AlertDialog.Builder(context)
                 .setCancelable(false)
                 .setView(R.layout.progress_bar_loading)
@@ -36,7 +33,7 @@ public class ProgressBarLoading {
      * @param thread     - поток, который необходимо прервать
      */
     @AsyncUI
-    private void _create(boolean isCanceled, Thread thread) {
+    private void create(boolean isCanceled, Thread thread) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setView(R.layout.progress_bar_loading);

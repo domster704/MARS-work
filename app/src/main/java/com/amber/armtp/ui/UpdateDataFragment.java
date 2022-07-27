@@ -1,10 +1,6 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,8 +19,6 @@ import com.amber.armtp.R;
 import com.amber.armtp.ftp.Downloader;
 import com.amber.armtp.interfaces.ServerChecker;
 
-import java.util.Objects;
-
 /**
  * Updated by domster704 on 27.09.2021
  */
@@ -34,13 +28,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     private final Handler handlerApp = new Handler();
     public GlobalVars glbVars;
     Button btnDBUpdate, btnAppUpdate;
-    private String DebetIsFinished = "0";
-    private final BroadcastReceiver UpdateDebetWorking = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            DebetIsFinished = Objects.requireNonNull(intent.getExtras()).getString("DebetUpdateFinished");
-        }
-    };
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
     private Downloader downloader;
@@ -50,7 +37,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.update_data_fragment_new, container, false);
-        v.setKeepScreenOn(true);
+//        v.setKeepScreenOn(true);
         glbVars.CurView = v;
         return v;
     }
@@ -70,26 +57,11 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
-        } catch (Exception ignored) {
-        }
-
-        TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
-        if (downloader.isServerVersionNewer()[0].equals("true")) {
-            tvAppNewVer.setVisibility(View.VISIBLE);
-        } else {
-            tvAppNewVer.setVisibility(View.GONE);
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        try {
-            getActivity().unregisterReceiver(UpdateDebetWorking);
-        } catch (Exception ignored) {
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -98,7 +70,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         super.onActivityCreated(savedInstanceState);
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.toolbar.setSubtitle("");
-        setRetainInstance(true);
 
         btnDBUpdate = getActivity().findViewById(R.id.btnDBUpdate);
         btnDBUpdate.setOnClickListener(this);
@@ -120,24 +91,20 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         uiData[0] = new UIData(tvDB, pgDB, tvDBCount, tvDBPerc, handlerDB);
         uiData[1] = new UIData(tvApp, pgApp, tvAppCount, tvAppPerc, handlerApp);
 
-        try {
-            getActivity().registerReceiver(UpdateDebetWorking, new IntentFilter("DebetUpdating"));
-        } catch (Exception ignored) {
-        }
-
         downloader = new Downloader(glbVars, getActivity());
         TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
-        getActivity().runOnUiThread(() -> {
+        new Thread(() -> {
             versionData = downloader.isServerVersionNewer();
-            if (versionData[0].equals("true")) {
-                tvAppNewVer.setVisibility(View.VISIBLE);
-                tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
-            } else {
-                tvAppNewVer.setText(R.string.newVersionAvailable);
-                tvAppNewVer.setVisibility(View.GONE);
-            }
-        });
-
+            getActivity().runOnUiThread(() -> {
+                if (versionData[0].equals("true")) {
+                    tvAppNewVer.setVisibility(View.VISIBLE);
+                    tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
+                } else {
+                    tvAppNewVer.setText(R.string.newVersionAvailable);
+                    tvAppNewVer.setVisibility(View.GONE);
+                }
+            });
+        }).start();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -145,10 +112,6 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnDBUpdate: {
-                if (!DebetIsFinished.equals("1") && !DebetIsFinished.equals("0")) {
-                    return;
-                }
-
                 if (!glbVars.isNetworkAvailable()) {
                     Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
                     return;

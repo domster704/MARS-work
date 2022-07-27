@@ -16,6 +16,7 @@ public class ReportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_report, container, false);
     }
 
@@ -23,16 +24,31 @@ public class ReportFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle("");
+        Bundle bundle = getArguments();
+        String[] chosenCheckBoxInSalesFragment = null;
+        String[] dateInSalesFragment = null;
+        if (bundle != null) {
+            chosenCheckBoxInSalesFragment = bundle.getStringArray("chosenCheckBox");
+            dateInSalesFragment = bundle.getStringArray("date");
+        }
+
+//        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+//        toolbar.setSubtitle("");
 
         TabLayout tabLayout = getActivity().findViewById(R.id.reportTab);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportFirstTab)));
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportSecondTab)));
-        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportThirdTab)));
+//        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportSecondTab)));
+//        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportThirdTab)));
 
-        final ViewPager viewPager = getActivity().findViewById(R.id.reportViewPager);
-        final ReportPageAdapter adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount());
+        ViewPager viewPager = getActivity().findViewById(R.id.reportViewPager);
+
+        ReportPageAdapter adapter;
+        if (chosenCheckBoxInSalesFragment != null && chosenCheckBoxInSalesFragment.length != 0) {
+            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount(), chosenCheckBoxInSalesFragment, dateInSalesFragment);
+        } else {
+            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount());
+        }
+
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 

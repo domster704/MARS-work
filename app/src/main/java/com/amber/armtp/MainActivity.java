@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int SIZE_KB = 1024;
     public static final int SIZE_MB = SIZE_KB * SIZE_KB;
     //Defining Variables
-    private static final int LAYOUT = R.layout.activity_main;
     public static String filesPathDB;
     public static String filesPathAPK;
     public SharedPreferences settings;
@@ -219,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(LAYOUT);
+        setContentView(R.layout.activity_main);
 
         if (!globalVariable.appDBFolder.exists()) {
             globalVariable.appDBFolder.mkdir();

@@ -6,16 +6,31 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class ReportPageAdapter extends FragmentPagerAdapter {
     private final int countOfTabs;
+    private String[] chosenCheckBoxInSalesFragment;
+    private String[] dateInSalesFragment;
+
     public ReportPageAdapter(FragmentManager fm, int countOfTabs) {
         super(fm);
         this.countOfTabs = countOfTabs;
+        chosenCheckBoxInSalesFragment = null;
+    }
+
+    public ReportPageAdapter(FragmentManager fm, int countOfTabs, String[] chosenCBInSalesFragment, String[] dateInSalesFragment) {
+        super(fm);
+        this.countOfTabs = countOfTabs;
+        this.chosenCheckBoxInSalesFragment = chosenCBInSalesFragment;
+        this.dateInSalesFragment = dateInSalesFragment;
     }
 
     @Override
     public Fragment getItem(int i) {
         switch (i) {
             case 0:
-                return new SalesFragment();
+                if (chosenCheckBoxInSalesFragment != null) {
+                    return new SalesFragment(chosenCheckBoxInSalesFragment, dateInSalesFragment);
+                } else {
+                    return new SalesFragment();
+                }
             case 1:
                 return new PromotionFragment();
             case 2:

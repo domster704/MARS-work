@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.view.Gravity;
@@ -66,6 +67,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -121,7 +123,7 @@ public class GlobalVars extends Application implements TBUpdate {
     public GridView debetList;
 
     //    public android.support.v7.widget.Toolbar toolbar;
-    public android.support.v7.widget.Toolbar toolbar;
+    public Toolbar toolbar;
     public LinearLayout layout;
 
     public Spinner spSgi, spGrup;
@@ -267,8 +269,6 @@ public class GlobalVars extends Application implements TBUpdate {
             }
             if (CurSGI.equals("0"))
                 return;
-
-            System.out.println("Group & SGI: " + CurGroup + " " + CurSGI);
             LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
         }
 
@@ -410,7 +410,6 @@ public class GlobalVars extends Application implements TBUpdate {
                     fragment = new FormOrderFragment();
 
                     Bundle args = new Bundle();
-                    System.out.println(Sgi + " " + Grup);
                     args.putString("SGI", Sgi);
                     args.putString("Group", Grup);
 
@@ -728,6 +727,9 @@ public class GlobalVars extends Application implements TBUpdate {
                         }
                     } catch (Exception ignored) {
                     }
+                } catch (SocketTimeoutException e) {
+                    Config.sout("Время ожидания вышло");
+                    return;
                 } catch (Exception e) {
                     e.printStackTrace();
                     Config.sout("Сервер недоступен");
@@ -771,8 +773,7 @@ public class GlobalVars extends Application implements TBUpdate {
         alertPhoto = null;
         String photoDir = getPhotoDir();
 
-        File imgFile = new File(photoDir + "/" + PhotoFileName);
-        File imgFile2 = new File(photoDir + "/" + FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg");
+        File imgFile = new File(photoDir + "/" + FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg");
         checkPhotoInDB(PhotoFileName);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(CurAc);
@@ -795,7 +796,7 @@ public class GlobalVars extends Application implements TBUpdate {
             checkPhotoInDB(PhotoFileName);
             String LoadingFile = PhotoFileName;
             if (imageView.getTag().toString().equals("Фото 1")) {
-                if (imgFile2.exists() && imgFile2.length() != 0) {
+                if (imgFile.exists() && imgFile.length() != 0) {
                     imageView.setTag("Фото 2");
                     LoadingFile = FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg";
                     checkPhotoInDB(LoadingFile);

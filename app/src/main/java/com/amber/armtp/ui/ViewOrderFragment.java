@@ -69,7 +69,6 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar actions click
         if (item.getItemId() == R.id.FormOrderID) {
             Fragment fragment = new FormOrderFragment();
             FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();

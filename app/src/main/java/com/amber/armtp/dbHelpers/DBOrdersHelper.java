@@ -23,7 +23,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         onCreate(sqLiteDatabase);
 //        System.out.println(oldVersion + " " + newVersion);
-        if (newVersion > oldVersion) {
+        if (newVersion > oldVersion && !isTableExisted("OUTED")) {
             sqLiteDatabase.execSQL("ALTER TABLE ZAKAZY ADD COLUMN OUTED INTEGER DEFAULT 0");
         }
     }
@@ -155,5 +155,14 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
         data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
         return data;
+    }
+
+    public boolean isTableExisted(String tableName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try (Cursor ignored1 = db.rawQuery("SELECT 1 FROM " + tableName, null)) {
+            return true;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 }

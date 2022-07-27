@@ -24,6 +24,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.File;
+import java.net.SocketTimeoutException;
 
 public class Downloader {
     private final GlobalVars globalVars;
@@ -92,7 +93,7 @@ public class Downloader {
         String ver = BuildConfig.VERSION_NAME;
 
         FTPClient client = new FTPClient();
-        int timeout = 1 * 1000;
+        int timeout = 2 * 1000;
         client.setDefaultTimeout(timeout);
         client.setDataTimeout(timeout);
         client.setConnectTimeout(timeout);
@@ -129,6 +130,9 @@ public class Downloader {
                 newVersion = serverVersion;
 
             return new String[]{String.valueOf(isNewer), newVersion};
+        } catch (SocketTimeoutException e) {
+            Config.sout("Время ожидания вышло");
+            return new String[]{"error", ""};
         } catch (Exception e) {
             e.printStackTrace();
             return new String[]{"error", ""};

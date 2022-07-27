@@ -7,9 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.ui.OrderHeadFragment;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -488,6 +492,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public String getNameOfTpById(String ID) {
+        if (!isTableExisted("TORG_PRED")) {
+            Config.sout("Таблица TORG_PRED не существует, обновите базу данных");
+            return "";
+        }
         Cursor c = null;
         try {
             SQLiteDatabase db;
@@ -946,12 +954,22 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public String countSumInRealTableById(String tpID, String[] dateData) {
+        String[] dateFrom = dateData[0].split("\\.");
+        ArrayUtils.swap(dateFrom, 0, 2);
+        dateFrom[0] = dateFrom[0].substring(2);
+        String df = StringUtils.join(dateFrom, "");
+
+        String[] dateTo = dateData[1].split("\\.");
+        ArrayUtils.swap(dateTo, 0, 2);
+        dateTo[0] = dateTo[0].substring(2);
+        String dt = StringUtils.join(dateTo, "");
+
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT SUM(SUMMA) AS SUMMA FROM REAL WHERE TORG_PRED=? AND DATA BETWEEN ? and ?", new String[]{tpID, dateData[0], dateData[1]});
+        Cursor cursor = db.rawQuery("SELECT CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) AS SUMMA FROM REAL WHERE TORG_PRED=? AND (x >= ? and x <= ?)", new String[]{tpID, df, dt});
         cursor.moveToNext();
-        String res = cursor.getString(0);
+        Double res = cursor.getDouble(1);
         cursor.close();
-        return res == null || res.equals("") ? "0.00": String.format(Locale.ROOT, "%.2f", Float.parseFloat(res.replace(",", ".")));
+        return res == null || res == 0 ? "0.00": String.format(Locale.ROOT, "%.2f", res);
     }
 
 
