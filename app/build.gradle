@@ -16,8 +16,8 @@ android {
         applicationId 'com.amber.armtp'
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode      90
-        versionName "2.0.90"
+        versionCode      96
+        versionName "2.0.96"
         multiDexEnabled true
     }
 

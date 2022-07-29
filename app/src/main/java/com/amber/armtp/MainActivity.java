@@ -34,10 +34,7 @@ import com.amber.armtp.ui.SettingFragment;
 import com.amber.armtp.ui.UpdateDataFragment;
 import com.amber.armtp.ui.report.ReportFragment;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -47,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int SIZE_KB = 1024;
     public static final int SIZE_MB = SIZE_KB * SIZE_KB;
     //Defining Variables
+    private static final int LAYOUT = R.layout.activity_main;
     public static String filesPathDB;
     public static String filesPathAPK;
     public SharedPreferences settings;
@@ -168,16 +166,16 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.dbApp = new DBAppHelper(getApplicationContext());
         }
 
-        File old_db = new File(globalVariable.GetSDCardPath() + "ARMTP_DB" + "/armtp3.db");
-        if (old_db.exists()) {
-            try {
-                FileUtils.copyFile(new File(old_db.toString()), new File(globalVariable.db.getWritableDatabase().getPath()));
-                File toName = new File(globalVariable.GetSDCardPath() + "ARMTP_DB/armtp3.db_");
-                old_db.renameTo(toName);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        File old_db = new File(globalVariable.GetSDCardPath() + "ARMTP_DB" + "/armtp3.db");
+//        if (old_db.exists()) {
+//            try {
+//                FileUtils.copyFile(new File(old_db.toString()), new File(globalVariable.db.getWritableDatabase().getPath()));
+//                File toName = new File(globalVariable.GetSDCardPath() + "ARMTP_DB/armtp3.db_");
+//                old_db.renameTo(toName);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         // armtp3.db
         try {
@@ -218,19 +216,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_main);
+        setContentView(LAYOUT);
 
-        if (!globalVariable.appDBFolder.exists()) {
-            globalVariable.appDBFolder.mkdir();
-        }
-
-        if (!globalVariable.appPhotoFolder.exists()) {
-            globalVariable.appPhotoFolder.mkdir();
-        }
-
-        if (!globalVariable.appUpdatesFolder.exists()) {
-            globalVariable.appUpdatesFolder.mkdir();
-        }
+//        if (!globalVariable.appDBFolder.exists()) {
+//            globalVariable.appDBFolder.mkdir();
+//        }
+//
+//        if (!globalVariable.appPhotoFolder.exists()) {
+//            globalVariable.appPhotoFolder.mkdir();
+//        }
+//
+//        if (!globalVariable.appUpdatesFolder.exists()) {
+//            globalVariable.appUpdatesFolder.mkdir();
+//        }
 
         // Initializing Toolbar and setting it as the actionbar
         initToolbar();

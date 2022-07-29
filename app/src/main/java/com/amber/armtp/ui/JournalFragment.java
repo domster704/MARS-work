@@ -178,6 +178,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         glbVars.gdOrders = Objects.requireNonNull(getActivity()).findViewById(R.id.listSMS);
         glbVars.orderDtList = getActivity().findViewById(R.id.listOrdersDt);
 

@@ -43,6 +43,7 @@
 
 
     <dimen name="tvWidthReportFragment">200dp</dimen>
+    <dimen name="tvWidthReportFragmentPlusCheckBoxWidth">232dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="reportResultBigFieldWidth">260dp</dimen>
     <dimen name="reportResultMediumFieldWidth">100dp</dimen>

@@ -129,9 +129,9 @@ public class GlobalVars extends Application implements TBUpdate {
     public Spinner spSgi, spGrup;
     public Spinner spWC, spFocus;
 
-    public File appDBFolder = new File(GetSDCardPath() + "ARMTP_DB");
-    public File appPhotoFolder = new File(GetSDCardPath() + "ARM_PHOTO");
-    public File appUpdatesFolder = new File(GetSDCardPath() + "ARM_UPDATES");
+//    public File appDBFolder = new File(GetSDCardPath() + "ARMTP_DB");
+//    public File appPhotoFolder = new File(GetSDCardPath() + "ARM_PHOTO");
+//    public File appUpdatesFolder = new File(GetSDCardPath() + "ARM_UPDATES");
 
     public String AsyncFileName;
     public SubsamplingScaleImageView imageView;
@@ -695,7 +695,7 @@ public class GlobalVars extends Application implements TBUpdate {
 
                 FTPClient ftpClient;
                 ftpClient = new FTPClient();
-                int timeout = 2 * 1000;
+                int timeout = 10 * 1000;
                 ftpClient.setDefaultTimeout(timeout);
                 ftpClient.setDataTimeout(timeout);
                 ftpClient.setConnectTimeout(timeout);
@@ -1611,11 +1611,11 @@ public class GlobalVars extends Application implements TBUpdate {
             String resDescr = cursor.getString(cursor.getColumnIndex("DESCR")) + "\t\t" + cursor.getString(cursor.getColumnIndex("STATUS"));
 
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
-            if (position % 2 != 0) {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
-            } else {
-                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
-            }
+//            if (position % 2 != 0) {
+//                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
+//            } else {
+//                tvDescr.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
+//            }
 
             tvDescr.setText(resDescr);
             return view;

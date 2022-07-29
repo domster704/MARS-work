@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,15 +26,13 @@ public class ReportFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         Bundle bundle = getArguments();
-        String[] chosenCheckBoxInSalesFragment = null;
-        String[] dateInSalesFragment = null;
+        SalesReportResultFragment.SentDataToSalesFragment dateInSalesFragment = null;
         if (bundle != null) {
-            chosenCheckBoxInSalesFragment = bundle.getStringArray("chosenCheckBox");
-            dateInSalesFragment = bundle.getStringArray("date");
+            dateInSalesFragment = (SalesReportResultFragment.SentDataToSalesFragment) bundle.getSerializable("dataToSalesFragment");
         }
 
-//        android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-//        toolbar.setSubtitle("");
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle("");
 
         TabLayout tabLayout = getActivity().findViewById(R.id.reportTab);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportFirstTab)));
@@ -43,8 +42,8 @@ public class ReportFragment extends Fragment {
         ViewPager viewPager = getActivity().findViewById(R.id.reportViewPager);
 
         ReportPageAdapter adapter;
-        if (chosenCheckBoxInSalesFragment != null && chosenCheckBoxInSalesFragment.length != 0) {
-            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount(), chosenCheckBoxInSalesFragment, dateInSalesFragment);
+        if (dateInSalesFragment != null) {
+            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount(), dateInSalesFragment);
         } else {
             adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount());
         }

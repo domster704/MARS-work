@@ -57,6 +57,18 @@
                     android:inputType="time" />
         </LinearLayout>
 
+        <EditText
+                android:id="@+id/contrFilterInSales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:singleLine="true"
+                android:maxEms="12"
+                android:textSize="@dimen/headOrderFontSize"
+                android:layout_marginStart="@dimen/tvWidthReportFragmentPlusCheckBoxWidth"
+                android:hint="Поиск покупателя"
+                android:paddingStart="10dp"/>
+
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -71,17 +83,17 @@
                     android:minWidth="@dimen/tvWidthReportFragment"
                     android:paddingStart="10dp" />
 
-<!--            <Spinner-->
-<!--                    android:id="@+id/buyer"-->
-<!--                    android:layout_width="500dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:gravity="center_vertical|center_horizontal" />-->
-
             <CheckBox
                     android:id="@+id/isBuyer"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center" />
+
+            <Spinner
+                    android:id="@+id/buyer"
+                    android:layout_width="500dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|center_horizontal" />
         </LinearLayout>
 
         <LinearLayout
@@ -94,15 +106,15 @@
                     android:textColor="#000"
                     android:textSize="@dimen/mainFontSize"
                     android:gravity="center_vertical|start"
-                    android:text="Группа товаров"
+                    android:text="Группа"
                     android:minWidth="@dimen/tvWidthReportFragment"
                     android:paddingStart="10dp" />
 
-<!--            <Spinner-->
-<!--                    android:id="@+id/goodsGroups"-->
-<!--                    android:layout_width="500dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:gravity="center_vertical|center_horizontal" />-->
+            <!--                        <Spinner-->
+            <!--                                android:id="@+id/goodsGroups"-->
+            <!--                                android:layout_width="500dp"-->
+            <!--                                android:layout_height="match_parent"-->
+            <!--                                android:gravity="center_vertical|center_horizontal" />-->
 
             <CheckBox
                     android:id="@+id/isGoodsGroups"

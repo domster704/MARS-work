@@ -4,20 +4,27 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.R;
+import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.SettingFragment;
 
@@ -28,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class SalesFragment extends Fragment {
@@ -36,8 +44,17 @@ public class SalesFragment extends Fragment {
     private Calendar DeliveryDateTo;
     private DBHelper dbHelper;
     private String tradeRepresentativeID = ""; // IXXX26 I09601
+
     private String[] chosenCheckBoxInSalesFragment = null;
     private String[] dateInSalesFragment = null;
+    private SalesFragment.SpecificDataForSalesReportFragment[] specificData;
+
+    private Spinner contrsSpinner;
+
+    private EditText dateFrom;
+    private EditText dateTo;
+
+    private CheckBox cbContr, cbGroup;
 
     private static class DataForDetails {
         public CheckBox checkBox;
@@ -46,6 +63,16 @@ public class SalesFragment extends Fragment {
         public DataForDetails(CheckBox checkBox, String name) {
             this.checkBox = checkBox;
             this.name = name;
+        }
+    }
+
+    public static class SpecificDataForSalesReportFragment {
+        public String name;
+        public String date;
+
+        public SpecificDataForSalesReportFragment(String name, String date) {
+            this.name = name;
+            this.date = date;
         }
     }
 
@@ -59,15 +86,17 @@ public class SalesFragment extends Fragment {
      * Не использовал Bundle, так как переход на этот фрагмент происходит через посредника (ReportPageAdapter), где могу установить данные только через конструктор
      */
     @SuppressLint("ValidFragment")
-    public SalesFragment(String[] chosenCB, String[] date) {
-        chosenCheckBoxInSalesFragment = chosenCB;
-        dateInSalesFragment = date;
+    public SalesFragment(SalesReportResultFragment.SentDataToSalesFragment dataToSalesFragment) {
+        chosenCheckBoxInSalesFragment = dataToSalesFragment.chosenCheckBox;
+        dateInSalesFragment = dataToSalesFragment.dateInSalesFragment;
+        this.specificData = dataToSalesFragment.specificData;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -105,86 +134,51 @@ public class SalesFragment extends Fragment {
                     .show();
         }
 
-        EditText dateFrom = getActivity().findViewById(R.id.dateFrom);
-        EditText dateTo = getActivity().findViewById(R.id.dateTo);
+        dateFrom = getActivity().findViewById(R.id.dateFrom);
+        dateTo = getActivity().findViewById(R.id.dateTo);
         fillDatePicker(dateFrom, dateTo);
 
         dateFrom.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateFrom, DeliveryDateFrom), DeliveryDateFrom.get(Calendar.YEAR), DeliveryDateFrom.get(Calendar.MONTH), DeliveryDateFrom.get(Calendar.DAY_OF_MONTH)).show());
         dateTo.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateTo, DeliveryDateTo), DeliveryDateTo.get(Calendar.YEAR), DeliveryDateTo.get(Calendar.MONTH), DeliveryDateTo.get(Calendar.DAY_OF_MONTH)).show());
 
+        cbContr = getActivity().findViewById(R.id.isBuyer);
+        cbGroup = getActivity().findViewById(R.id.isGoodsGroups);
+
         dataForDetails = new DataForDetails[]{
-                new DataForDetails(getActivity().findViewById(R.id.isBuyer), "CONTRS"),
-                new DataForDetails(getActivity().findViewById(R.id.isGoodsGroups), "GRUPS")
+                new DataForDetails(cbContr, "CONTRS"),
+                new DataForDetails(cbGroup, "GRUPS")
         };
 
         Button button = getActivity().findViewById(R.id.showReport);
-        button.setOnClickListener(view -> {
-            if (!dbHelper.isTableExisted("REAL")) {
-                Config.sout("Таблица REAL не существует, обновите базу данных");
-                return;
+        button.setOnClickListener(view -> showResultFragment(tpName));
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Отчёт");
+        toolbar.setSubtitle(tpName);
+
+        contrsSpinner = getActivity().findViewById(R.id.buyer);
+        contrsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (l == 0)
+                    return;
+                cbContr.setChecked(true);
             }
 
-            String wholeSum = dbHelper.countSumInRealTableById(tradeRepresentativeID,
-                    new String[]{dateFrom.getText().toString(),
-                            dateTo.getText().toString()
-                    });
-            if (isAnyCheckBoxChecked()) {
-                ArrayList<String> args = getAllChosenCheckBox();
-                SalesReportResultFragment fragment = new SalesReportResultFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment);
-
-                Bundle bundle = new Bundle();
-                bundle.putStringArrayList("details", args);
-                bundle.putString("tradeRepresentative", tradeRepresentativeID);
-                bundle.putString("wholeSum", wholeSum);
-                bundle.putString("tpName", tpName);
-                bundle.putStringArray("dateData", new String[]{
-                        dateFrom.getText().toString(),
-                        dateTo.getText().toString()
-                });
-
-                fragment.setArguments(bundle);
-                fragmentTransaction.commit();
-            } else {
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Сумма")
-                        .setMessage(wholeSum)
-                        .setPositiveButton("Закрыть", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                        })
-                        .setCancelable(true)
-                        .show();
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
 
-        if (chosenCheckBoxInSalesFragment != null) {
-            for (DataForDetails details : dataForDetails) {
-                if (ArrayUtils.contains(chosenCheckBoxInSalesFragment, details.name)) {
-                    details.checkBox.setChecked(true);
-                }
-            }
-        }
-        if (dateInSalesFragment != null) {
-            dateFrom.setText(dateInSalesFragment[0]);
-            dateTo.setText(dateInSalesFragment[1]);
+        cbContr.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) return;
+            contrsSpinner.setSelection(0);
+        });
 
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        loadContrsInSalesSpinner();
+        setFilterOnContrSpinner();
 
-            try {
-                Date from = sdf.parse(dateInSalesFragment[0]);
-                DeliveryDateFrom.setTime(from);
-
-                Date to = sdf.parse(dateInSalesFragment[1]);
-                DeliveryDateTo.setTime(to);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(tpName);
-        toolbar.setTitle("Отчёт");
+        setDataByReceivedData();
     }
 
     private void fillDatePicker(EditText dateFrom, EditText dateTo) {
@@ -250,5 +244,134 @@ public class SalesFragment extends Fragment {
             }
         }
         return arrayList;
+    }
+
+    @AsyncUI
+    private void loadContrsInSalesSpinner() {
+        contrsSpinner.setAdapter(null);
+        Cursor cursor = dbHelper.getContrList();
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        contrsSpinner.setAdapter(adapter);
+    }
+
+    @AsyncUI
+    private void loadFilterContrsInSalesSpinner(String FindStr) {
+        contrsSpinner.setAdapter(null);
+        Cursor cursor = dbHelper.getContrFilterList(FindStr);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        contrsSpinner.setAdapter(adapter);
+    }
+
+    private void setFilterOnContrSpinner() {
+        EditText etContrFilter = getActivity().findViewById(R.id.contrFilterInSales);
+        etContrFilter.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                String contrFilter = etContrFilter.getText().toString();
+                if (contrFilter.length() != 0) {
+                    loadFilterContrsInSalesSpinner(contrFilter);
+                } else {
+                    loadContrsInSalesSpinner();
+                }
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+    }
+
+    private void setDataByReceivedData() {
+        if (chosenCheckBoxInSalesFragment != null) {
+            for (DataForDetails details : dataForDetails) {
+                if (ArrayUtils.contains(chosenCheckBoxInSalesFragment, details.name)) {
+                    details.checkBox.setChecked(true);
+                }
+            }
+        }
+
+        if (dateInSalesFragment != null) {
+            dateFrom.setText(dateInSalesFragment[0]);
+            dateTo.setText(dateInSalesFragment[1]);
+
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
+            try {
+                Date from = sdf.parse(dateInSalesFragment[0]);
+                DeliveryDateFrom.setTime(from);
+
+                Date to = sdf.parse(dateInSalesFragment[1]);
+                DeliveryDateTo.setTime(to);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (specificData != null) {
+            HashMap<String, Spinner> map = new HashMap<String, Spinner>() {{
+                put("CONTRS", contrsSpinner);
+            }};
+            for (SpecificDataForSalesReportFragment elem : specificData) {
+                if (map.containsKey(elem.name)) {
+                    for (int i = 0; i < map.get(elem.name).getCount(); i++) {
+                        Cursor value = (Cursor) map.get(elem.name).getItemAtPosition(i);
+                        String id = value.getString(value.getColumnIndexOrThrow("CODE"));
+                        if (elem.date.equals(id)) {
+                            map.get(elem.name).setSelection(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void showResultFragment(String tpName) {
+        if (!dbHelper.isTableExisted("REAL")) {
+            Config.sout("Таблица REAL не существует, обновите базу данных");
+            return;
+        }
+
+        String wholeSum = dbHelper.countSumInRealTableById(tradeRepresentativeID,
+                new String[]{dateFrom.getText().toString(),
+                        dateTo.getText().toString()
+                });
+        if (isAnyCheckBoxChecked()) {
+            ArrayList<String> args = getAllChosenCheckBox();
+            SalesReportResultFragment fragment = new SalesReportResultFragment();
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame, fragment);
+
+            Bundle bundle = new Bundle();
+            bundle.putStringArrayList("details", args);
+            bundle.putSerializable("specificData", getContrIdFromSpinner());
+            bundle.putString("tradeRepresentative", tradeRepresentativeID);
+            bundle.putString("wholeSum", wholeSum);
+            bundle.putString("tpName", tpName);
+            bundle.putStringArray("dateData", new String[]{
+                    dateFrom.getText().toString(),
+                    dateTo.getText().toString()
+            });
+
+            fragment.setArguments(bundle);
+            fragmentTransaction.commit();
+        } else {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Сумма")
+                    .setMessage(wholeSum)
+                    .setPositiveButton("Закрыть", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                    })
+                    .setCancelable(true)
+                    .show();
+        }
+    }
+
+    private SpecificDataForSalesReportFragment[] getContrIdFromSpinner() {
+        Cursor cursor = (Cursor) contrsSpinner.getItemAtPosition(contrsSpinner.getSelectedItemPosition());
+        return new SpecificDataForSalesReportFragment[] {
+                new SpecificDataForSalesReportFragment("CONTRS", cursor.getString(cursor.getColumnIndex("CODE")))
+        };
     }
 }
