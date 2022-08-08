@@ -65,14 +65,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (globalVariable.viewFlipper != null) {
-            int Lay = globalVariable.viewFlipper.getDisplayedChild();
-            if (Lay == 1) {
-                globalVariable.ordStatus = null;
-                globalVariable.viewFlipper.setDisplayedChild(0);
-                globalVariable.OrdersAdapter.notifyDataSetChanged();
-            }
-        }
+        super.onBackPressed();
+
+//        if (globalVariable.viewFlipper != null) {
+//            int Lay = globalVariable.viewFlipper.getDisplayedChild();
+//            if (Lay == 1) {
+//                globalVariable.ordStatus = null;
+//                globalVariable.viewFlipper.setDisplayedChild(0);
+//                globalVariable.OrdersAdapter.notifyDataSetChanged();
+//            }
+//        }
     }
 
     @SuppressLint("WrongConstant")

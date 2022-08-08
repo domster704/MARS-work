@@ -44,6 +44,7 @@ public class SalesFragment extends Fragment {
     private Calendar DeliveryDateTo;
     private DBHelper dbHelper;
     private String tradeRepresentativeID = ""; // IXXX26 I09601
+    private String tpName;
 
     private String[] chosenCheckBoxInSalesFragment = null;
     private String[] dateInSalesFragment = null;
@@ -55,6 +56,8 @@ public class SalesFragment extends Fragment {
     private EditText dateTo;
 
     private CheckBox cbContr, cbGroup;
+
+    private Toolbar toolbar;
 
     private static class DataForDetails {
         public CheckBox checkBox;
@@ -106,6 +109,15 @@ public class SalesFragment extends Fragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            toolbar.setTitle("Отчёт");
+            toolbar.setSubtitle(tpName);
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -113,7 +125,7 @@ public class SalesFragment extends Fragment {
         tradeRepresentativeID = settings.getString("ReportTPId", "");
 
         dbHelper = new DBHelper(getActivity());
-        String tpName = dbHelper.getNameOfTpById(tradeRepresentativeID);
+        tpName = dbHelper.getNameOfTpById(tradeRepresentativeID);
 
         if (tradeRepresentativeID.equals("") || tpName.equals("")) {
             new AlertDialog.Builder(getActivity())
@@ -152,7 +164,7 @@ public class SalesFragment extends Fragment {
         Button button = getActivity().findViewById(R.id.showReport);
         button.setOnClickListener(view -> showResultFragment(tpName));
 
-        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("Отчёт");
         toolbar.setSubtitle(tpName);
 
@@ -340,8 +352,12 @@ public class SalesFragment extends Fragment {
         if (isAnyCheckBoxChecked()) {
             ArrayList<String> args = getAllChosenCheckBox();
             SalesReportResultFragment fragment = new SalesReportResultFragment();
+
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frame, fragment);
+            fragmentTransaction.add(R.id.frame, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.hide(this);
+//            fragmentTransaction.replace(R.id.frame, fragment);
 
             Bundle bundle = new Bundle();
             bundle.putStringArrayList("details", args);

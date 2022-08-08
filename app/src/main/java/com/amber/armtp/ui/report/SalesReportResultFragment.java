@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class SalesReportResultFragment extends Fragment {
+public class SalesReportResultFragment extends Fragment  {
     private String tradeRepresentative;
 
     private Map<String, ViewWidthByName> headersName;
@@ -145,20 +145,21 @@ public class SalesReportResultFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.backToSales) {
-            SentDataToSalesFragment data = new SentDataToSalesFragment(
-                    chosenCheckBoxInSalesFragment,
-                    dateInSalesFragment,
-                    specificData);
-
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("dataToSalesFragment", data);
-
-            Fragment fragment = new ReportFragment();
-            fragment.setArguments(bundle);
-
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame, fragment)
-                    .commit();
+//            SentDataToSalesFragment data = new SentDataToSalesFragment(
+//                    chosenCheckBoxInSalesFragment,
+//                    dateInSalesFragment,
+//                    specificData);
+//
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("dataToSalesFragment", data);
+//
+//            Fragment fragment = new ReportFragment();
+//            fragment.setArguments(bundle);
+//
+//            getActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame, fragment)
+//                    .commit();
+            getActivity().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
