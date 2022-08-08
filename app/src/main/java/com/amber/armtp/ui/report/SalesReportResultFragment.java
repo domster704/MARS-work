@@ -37,10 +37,6 @@ public class SalesReportResultFragment extends Fragment  {
 
     private Map<String, ViewWidthByName> headersName;
 
-    private String[] chosenCheckBoxInSalesFragment;
-    private String[] dateInSalesFragment;
-    private SalesFragment.SpecificDataForSalesReportFragment[] specificData;
-
     private static class ViewWidthByName {
         public String name;
         public int id;
@@ -94,12 +90,10 @@ public class SalesReportResultFragment extends Fragment  {
         }
 
         ArrayList<String> details = getArguments().getStringArrayList("details");
-        chosenCheckBoxInSalesFragment = details.toArray(new String[0]);
 
-        specificData = (SalesFragment.SpecificDataForSalesReportFragment[]) getArguments().getSerializable("specificData");
+        SalesFragment.SpecificDataForSalesReportFragment[] specificData = (SalesFragment.SpecificDataForSalesReportFragment[]) getArguments().getSerializable("specificData");
 
         String[] dateData = getArguments().getStringArray("dateData");
-        dateInSalesFragment = dateData.clone();
         tradeRepresentative = getArguments().getString("tradeRepresentative");
 
         Cursor cursor = null;
@@ -112,8 +106,6 @@ public class SalesReportResultFragment extends Fragment  {
         details.add(0, "_id");
         details.add("SUMMA");
 
-//        float sumOfWidth = 0;
-
         String[] chosenColumnsInCursor = details.toArray(new String[0]);
         ViewWidthByName[] chosenHeadersInHeadersLayout = new ViewWidthByName[details.size()];
         int[] chosenViewsInXML = new int[details.size()];
@@ -122,11 +114,9 @@ public class SalesReportResultFragment extends Fragment  {
                 continue;
             chosenViewsInXML[i] = headersName.get(details.get(i)).id;
             chosenHeadersInHeadersLayout[i] = headersName.get(details.get(i));
-//            sumOfWidth += headersName.get(details.get(i)).width;
         }
 
         GridView gridView = getActivity().findViewById(R.id.reportResultGrid);
-//        gridView.setLayoutParams(new RelativeLayout.LayoutParams((int) sumOfWidth, -1));
         ReportResultAdapter adapter = new ReportResultAdapter(getActivity(), R.layout.report_result_dynamic_layout, cursor, chosenColumnsInCursor, chosenViewsInXML, 0);
         gridView.setAdapter(adapter);
 
@@ -145,20 +135,6 @@ public class SalesReportResultFragment extends Fragment  {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.backToSales) {
-//            SentDataToSalesFragment data = new SentDataToSalesFragment(
-//                    chosenCheckBoxInSalesFragment,
-//                    dateInSalesFragment,
-//                    specificData);
-//
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("dataToSalesFragment", data);
-//
-//            Fragment fragment = new ReportFragment();
-//            fragment.setArguments(bundle);
-//
-//            getActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame, fragment)
-//                    .commit();
             getActivity().onBackPressed();
             return true;
         }
@@ -246,14 +222,6 @@ public class SalesReportResultFragment extends Fragment  {
 
         String df = getFormatedData(dateData[0].split("\\."));
         String dt = getFormatedData(dateData[1].split("\\."));
-
-//        System.out.println("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as convertedData, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED='" + tradeRepresentative + "' AND (convertedData >= '" + df + "' and convertedData <= '" + dt + "') GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC");
-//        Cursor c = dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as convertedData, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (convertedData >= '" + df + "' and convertedData <= '" + dt + "') GROUP BY _id, " + resGroupBy + " ORDER BY SUMMA DESC",
-//                new String[]{tradeRepresentative});
-//        c.moveToNext();
-//        System.out.println(c.getDouble(c.getColumnIndex("SUMMA")));
-//        Config.printCursor(c);
-        //        SELECT CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x from REAL WHERE x>= 220715 and x<=220816 ORDER BY x DESC
 
         DBHelper dbHelper = new DBHelper(getActivity());
         return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (x >= " + df + " and x <= " + dt + ") " + specificSqlReq + " GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC",

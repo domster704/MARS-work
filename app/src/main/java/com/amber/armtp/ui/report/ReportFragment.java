@@ -25,12 +25,6 @@ public class ReportFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Bundle bundle = getArguments();
-        SalesReportResultFragment.SentDataToSalesFragment dateInSalesFragment = null;
-        if (bundle != null) {
-            dateInSalesFragment = (SalesReportResultFragment.SentDataToSalesFragment) bundle.getSerializable("dataToSalesFragment");
-        }
-
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle("");
 
@@ -41,12 +35,7 @@ public class ReportFragment extends Fragment {
 
         ViewPager viewPager = getActivity().findViewById(R.id.reportViewPager);
 
-        ReportPageAdapter adapter;
-        if (dateInSalesFragment != null) {
-            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount(), dateInSalesFragment);
-        } else {
-            adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount());
-        }
+        ReportPageAdapter adapter = new ReportPageAdapter(getChildFragmentManager(), tabLayout.getTabCount());
 
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

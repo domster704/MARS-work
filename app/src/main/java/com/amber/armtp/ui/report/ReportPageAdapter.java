@@ -6,28 +6,18 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class ReportPageAdapter extends FragmentPagerAdapter {
     private final int countOfTabs;
-    private SalesReportResultFragment.SentDataToSalesFragment dataToSalesFragment = null;
 
     public ReportPageAdapter(FragmentManager fm, int countOfTabs) {
         super(fm);
         this.countOfTabs = countOfTabs;
     }
 
-    public ReportPageAdapter(FragmentManager fm, int countOfTabs, SalesReportResultFragment.SentDataToSalesFragment data) {
-        super(fm);
-        this.countOfTabs = countOfTabs;
-        this.dataToSalesFragment = data;
-    }
 
     @Override
     public Fragment getItem(int i) {
         switch (i) {
             case 0:
-                if (dataToSalesFragment != null) {
-                    return new SalesFragment(dataToSalesFragment);
-                } else {
-                    return new SalesFragment();
-                }
+                return new SalesFragment();
             case 1:
                 return new PromotionFragment();
             case 2:

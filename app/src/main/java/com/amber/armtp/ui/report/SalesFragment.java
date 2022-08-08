@@ -28,14 +28,9 @@ import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.SettingFragment;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 public class SalesFragment extends Fragment {
@@ -48,7 +43,6 @@ public class SalesFragment extends Fragment {
 
     private String[] chosenCheckBoxInSalesFragment = null;
     private String[] dateInSalesFragment = null;
-    private SalesFragment.SpecificDataForSalesReportFragment[] specificData;
 
     private Spinner contrsSpinner;
 
@@ -82,17 +76,6 @@ public class SalesFragment extends Fragment {
     private DataForDetails[] dataForDetails;
 
     public SalesFragment() {
-    }
-
-    /**
-     * Конструктор для передачи данных о выбранных чекбоксах и дате, чтобы при возвращении из SalesReportResultFragment эти чекбоксы и поля с датами были установлены.
-     * Не использовал Bundle, так как переход на этот фрагмент происходит через посредника (ReportPageAdapter), где могу установить данные только через конструктор
-     */
-    @SuppressLint("ValidFragment")
-    public SalesFragment(SalesReportResultFragment.SentDataToSalesFragment dataToSalesFragment) {
-        chosenCheckBoxInSalesFragment = dataToSalesFragment.chosenCheckBox;
-        dateInSalesFragment = dataToSalesFragment.dateInSalesFragment;
-        this.specificData = dataToSalesFragment.specificData;
     }
 
     @Override
@@ -190,7 +173,7 @@ public class SalesFragment extends Fragment {
         loadContrsInSalesSpinner();
         setFilterOnContrSpinner();
 
-        setDataByReceivedData();
+//        setDataByReceivedData();
     }
 
     private void fillDatePicker(EditText dateFrom, EditText dateTo) {
@@ -292,51 +275,6 @@ public class SalesFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-    }
-
-    private void setDataByReceivedData() {
-        if (chosenCheckBoxInSalesFragment != null) {
-            for (DataForDetails details : dataForDetails) {
-                if (ArrayUtils.contains(chosenCheckBoxInSalesFragment, details.name)) {
-                    details.checkBox.setChecked(true);
-                }
-            }
-        }
-
-        if (dateInSalesFragment != null) {
-            dateFrom.setText(dateInSalesFragment[0]);
-            dateTo.setText(dateInSalesFragment[1]);
-
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-
-            try {
-                Date from = sdf.parse(dateInSalesFragment[0]);
-                DeliveryDateFrom.setTime(from);
-
-                Date to = sdf.parse(dateInSalesFragment[1]);
-                DeliveryDateTo.setTime(to);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (specificData != null) {
-            HashMap<String, Spinner> map = new HashMap<String, Spinner>() {{
-                put("CONTRS", contrsSpinner);
-            }};
-            for (SpecificDataForSalesReportFragment elem : specificData) {
-                if (map.containsKey(elem.name)) {
-                    for (int i = 0; i < map.get(elem.name).getCount(); i++) {
-                        Cursor value = (Cursor) map.get(elem.name).getItemAtPosition(i);
-                        String id = value.getString(value.getColumnIndexOrThrow("CODE"));
-                        if (elem.date.equals(id)) {
-                            map.get(elem.name).setSelection(i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void showResultFragment(String tpName) {
