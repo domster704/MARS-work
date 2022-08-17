@@ -314,7 +314,7 @@
                             android:inputType="text"
                             android:textAlignment="center"
                             android:textSize="@dimen/textSizeSettings"
-                            android:hint="Торговый представитель"/>
+                            android:hint="Введите ваш ID"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

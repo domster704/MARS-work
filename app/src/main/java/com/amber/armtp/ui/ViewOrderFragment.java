@@ -53,6 +53,7 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+//        System.out.println(1);
 
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         setContrAndSum(glbVars);
@@ -74,6 +75,7 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
             FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
             fragmentTransaction.commit();
+//            getActivity().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

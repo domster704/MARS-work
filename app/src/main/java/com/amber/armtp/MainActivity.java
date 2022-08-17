@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         String path = getFilesDir().getPath();
         filesPathDB = path.substring(0, path.lastIndexOf("/")) + "/databases/";
         filesPathAPK = path.substring(0, path.lastIndexOf("/")) + "/files/";
-//        filesPathAPK = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/";
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -109,10 +108,7 @@ public class MainActivity extends AppCompatActivity {
 //                    .build());
 //        }
 
-        // For ftp-server
         SharedPreferences serverSettings = getSharedPreferences("apk_version", 0);
-
-//        Config.sout(1);
 
         String host = serverSettings.getString("FtpServerHost", getResources().getString(R.string.host));
         String port = "" + serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)));
@@ -168,17 +164,6 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.dbApp = new DBAppHelper(getApplicationContext());
         }
 
-//        File old_db = new File(globalVariable.GetSDCardPath() + "ARMTP_DB" + "/armtp3.db");
-//        if (old_db.exists()) {
-//            try {
-//                FileUtils.copyFile(new File(old_db.toString()), new File(globalVariable.db.getWritableDatabase().getPath()));
-//                File toName = new File(globalVariable.GetSDCardPath() + "ARMTP_DB/armtp3.db_");
-//                old_db.renameTo(toName);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
         // armtp3.db
         try {
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SGI (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
@@ -198,9 +183,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        globalVariable.db.addOuted("ISG63_30062022_135437933", "285424", 1);
-//        globalVariable.db.removeOuted("ISG63_30062022_135437933");
-
         // order.db
         try {
             globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT, SUM FLOAT, OUTED INTEGER)");
@@ -208,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
-//        globalVariable.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET OUTED=0");
 
         // appData.db
         try {
@@ -219,18 +200,6 @@ public class MainActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(LAYOUT);
-
-//        if (!globalVariable.appDBFolder.exists()) {
-//            globalVariable.appDBFolder.mkdir();
-//        }
-//
-//        if (!globalVariable.appPhotoFolder.exists()) {
-//            globalVariable.appPhotoFolder.mkdir();
-//        }
-//
-//        if (!globalVariable.appUpdatesFolder.exists()) {
-//            globalVariable.appUpdatesFolder.mkdir();
-//        }
 
         // Initializing Toolbar and setting it as the actionbar
         initToolbar();

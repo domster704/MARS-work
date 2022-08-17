@@ -5,6 +5,7 @@ import org.aspectj.tools.ajc.Main
 plugins {
     id 'com.android.application'
 }
+apply plugin: 'kotlin-android'
 
 android {
     signingConfigs {
@@ -16,8 +17,8 @@ android {
         applicationId 'com.amber.armtp'
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode      96
-        versionName "2.0.96"
+        versionCode      100
+        versionName "2.0.100"
         multiDexEnabled true
     }
 
@@ -75,6 +76,7 @@ dependencies {
 
     implementation 'org.aspectj:aspectjrt:1.9.4'
     implementation 'com.android.support:support-v4:25.4.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 android.applicationVariants.all { variant ->

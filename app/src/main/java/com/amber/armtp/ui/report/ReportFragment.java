@@ -1,9 +1,12 @@
 package com.amber.armtp.ui.report;
 
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -11,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amber.armtp.R;
+import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.ui.SettingFragment;
+import com.amber.armtp.ui.UpdateDataFragment;
 
 public class ReportFragment extends Fragment {
 
@@ -25,12 +31,41 @@ public class ReportFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        SharedPreferences settings = getActivity().getSharedPreferences("apk_version", 0);
+        String tradeRepresentativeID = settings.getString("ReportTPId", ""); // IXXX26 I09601
+        String tpName = new DBHelper(getActivity()).getNameOfTpById(tradeRepresentativeID);
+
+        if (tradeRepresentativeID.equals("") || tpName.equals("")) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Непраивльный идентификатор")
+                    .setMessage("Неправильно введен или отсутсвует ID торгового представителя. Попробуйте ввести правильное ID или обновить базу данных")
+                    .setCancelable(false)
+                    .setPositiveButton("Ввести ID", (dialogInterface, i) -> {
+                        SettingFragment fragment = new SettingFragment();
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putIntArray("Layouts", new int[]{R.id.reportLayoutsMain});
+
+                        fragment.setArguments(bundle);
+                        fragmentTransaction.replace(R.id.frame, fragment);
+                        fragmentTransaction.commit();
+                    })
+                    .setNegativeButton("Обновить БД", ((dialogInterface, i) ->
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame, new UpdateDataFragment())
+                            .commit()))
+                    .show();
+            return;
+        }
+
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle("");
+        toolbar.setTitle("Отчёт");
+        toolbar.setSubtitle(tpName);
 
         TabLayout tabLayout = getActivity().findViewById(R.id.reportTab);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportFirstTab)));
-//        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportSecondTab)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportSecondTab)));
 //        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.reportThirdTab)));
 
         ViewPager viewPager = getActivity().findViewById(R.id.reportViewPager);

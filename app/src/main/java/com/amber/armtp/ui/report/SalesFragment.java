@@ -26,7 +26,6 @@ import com.amber.armtp.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
-import com.amber.armtp.ui.SettingFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,11 +37,8 @@ public class SalesFragment extends Fragment {
     private Calendar DeliveryDateFrom;
     private Calendar DeliveryDateTo;
     private DBHelper dbHelper;
-    private String tradeRepresentativeID = ""; // IXXX26 I09601
+    private String tradeRepresentativeID = "";
     private String tpName;
-
-    private String[] chosenCheckBoxInSalesFragment = null;
-    private String[] dateInSalesFragment = null;
 
     private Spinner contrsSpinner;
 
@@ -105,29 +101,9 @@ public class SalesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         SharedPreferences settings = getActivity().getSharedPreferences("apk_version", 0);
-        tradeRepresentativeID = settings.getString("ReportTPId", "");
-
         dbHelper = new DBHelper(getActivity());
+        tradeRepresentativeID = settings.getString("ReportTPId", "");
         tpName = dbHelper.getNameOfTpById(tradeRepresentativeID);
-
-        if (tradeRepresentativeID.equals("") || tpName.equals("")) {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle("Непраивльный идентификатор")
-                    .setMessage("Неправильно введен или отсутсвует ID торгового представителя")
-                    .setCancelable(false)
-                    .setPositiveButton("Ввести ID", (dialogInterface, i) -> {
-                        SettingFragment fragment = new SettingFragment();
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-
-                        Bundle bundle = new Bundle();
-                        bundle.putIntArray("Layouts", new int[]{R.id.reportLayoutsMain});
-
-                        fragment.setArguments(bundle);
-                        fragmentTransaction.replace(R.id.frame, fragment);
-                        fragmentTransaction.commit();
-                    })
-                    .show();
-        }
 
         dateFrom = getActivity().findViewById(R.id.dateFrom);
         dateTo = getActivity().findViewById(R.id.dateTo);
@@ -146,10 +122,6 @@ public class SalesFragment extends Fragment {
 
         Button button = getActivity().findViewById(R.id.showReport);
         button.setOnClickListener(view -> showResultFragment(tpName));
-
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle("Отчёт");
-        toolbar.setSubtitle(tpName);
 
         contrsSpinner = getActivity().findViewById(R.id.buyer);
         contrsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -173,7 +145,8 @@ public class SalesFragment extends Fragment {
         loadContrsInSalesSpinner();
         setFilterOnContrSpinner();
 
-//        setDataByReceivedData();
+
+        toolbar = getActivity().findViewById(R.id.toolbar);
     }
 
     private void fillDatePicker(EditText dateFrom, EditText dateTo) {
@@ -295,7 +268,6 @@ public class SalesFragment extends Fragment {
             fragmentTransaction.add(R.id.frame, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.hide(this);
-//            fragmentTransaction.replace(R.id.frame, fragment);
 
             Bundle bundle = new Bundle();
             bundle.putStringArrayList("details", args);

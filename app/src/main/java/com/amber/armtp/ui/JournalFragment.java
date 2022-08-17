@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -197,9 +196,7 @@ public class JournalFragment extends Fragment implements ServerChecker {
         ScrollView view = getActivity().findViewById(R.id.scrollViewJ);
         view.fullScroll(View.FOCUS_DOWN);
 
-//        if (getArguments() != null && getArguments().getBoolean("isStartDeletingExtraOrders")) {
         deleteExtraOrders();
-//        }
     }
 
     /**
@@ -214,7 +211,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
 
             glbVars.Orders.requery();
             glbVars.OrdersAdapter.notifyDataSetChanged();
-//            glbVars.LoadOrders();
 
             GlobalVars.CurAc.runOnUiThread(() -> {
                 toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
@@ -448,7 +444,6 @@ public class JournalFragment extends Fragment implements ServerChecker {
     }
 
     private void EditOrder(final String OrderID) {
-        FragmentActivity a = getActivity();
         new Thread(new Runnable() {
             @Override
             @PGShowing

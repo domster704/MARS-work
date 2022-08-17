@@ -113,7 +113,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
 
         int[] layoutsNeededToOpen = getArguments().getIntArray("Layouts");
         for (int id: layoutsNeededToOpen) {
-            LinearLayout layout = (LinearLayout) getActivity().findViewById(id);
+            LinearLayout layout = getActivity().findViewById(id);
             for (int i = 0; i < layout.getChildCount(); i++) {
                 if (layout.getChildAt(i) instanceof LinearLayout) {
                     layout.getChildAt(i).setVisibility(View.VISIBLE);

@@ -22,20 +22,13 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         onCreate(sqLiteDatabase);
-//        System.out.println(oldVersion + " " + newVersion);
-        if (newVersion > oldVersion && !isTableExisted("OUTED")) {
-            sqLiteDatabase.execSQL("ALTER TABLE ZAKAZY ADD COLUMN OUTED INTEGER DEFAULT 0");
+        try {
+            if (newVersion > oldVersion) {
+                sqLiteDatabase.execSQL("ALTER TABLE ZAKAZY ADD COLUMN OUTED INTEGER DEFAULT 0");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
-    }
-
-    @Override
-    public SQLiteDatabase getReadableDatabase() {
-        return super.getReadableDatabase();
-    }
-
-    @Override
-    public SQLiteDatabase getWritableDatabase() {
-        return super.getWritableDatabase();
     }
 
     public Cursor getZakazy() {

@@ -1039,7 +1039,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.endTransaction();
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.N)
     public void putAllNomenPrices(String CONTR) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
@@ -1049,14 +1048,5 @@ public class DBHelper extends SQLiteOpenHelper {
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
         updatePrices(c);
-//        AtomicInteger k = new AtomicInteger();
-//        pricesMap.forEach((el, key) -> {
-//            System.out.println(k.getAndIncrement() + " " + el + " " + key);
-//        });
     }
-
-//    public Cursor getBuyer() {
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-////        Cursor cursor = sqLiteDatabase.rawQuery("SELECT ");
-//    }
 }

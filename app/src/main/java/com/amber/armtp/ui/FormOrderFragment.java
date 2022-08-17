@@ -418,7 +418,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             case R.id.ViewOrderId:
                 Fragment fragment = new ViewOrderFragment();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment, "frag_view_order");
+                fragmentTransaction.replace(R.id.frame, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.hide(this);
                 fragmentTransaction.commit();
                 return true;
             case R.id.NomenSave:

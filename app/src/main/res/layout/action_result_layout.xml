@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+            android:id="@+id/actionDesc"
+            android:layout_width="@dimen/actionDescWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:singleLine="true"
+            android:gravity="center_vertical|start" />
+
+    <TextView
+            android:id="@+id/actionDateStart"
+            android:layout_width="@dimen/ActionElemWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_toEndOf="@+id/actionDesc" />
+
+    <TextView
+            android:id="@+id/actionDateEnd"
+            android:layout_width="@dimen/ActionElemWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_toEndOf="@+id/actionDateStart" />
+
+    <TextView
+            android:id="@+id/actionFactValue"
+            android:layout_width="@dimen/ActionElemWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_toEndOf="@+id/actionDateEnd" />
+    <TextView
+            android:id="@+id/ActionPlanValue"
+            android:layout_width="@dimen/ActionElemWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_toEndOf="@+id/actionFactValue" />
+
+    <TextView
+            android:id="@+id/ActionPercent"
+            android:layout_width="@dimen/ActionElemWidth"
+            android:layout_height="@dimen/heightOfActionResultViews"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_toEndOf="@+id/ActionPlanValue"
+            android:layout_alignParentEnd="true" />
+</RelativeLayout>

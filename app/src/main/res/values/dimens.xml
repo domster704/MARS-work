@@ -49,4 +49,8 @@
     <dimen name="reportResultMediumFieldWidth">100dp</dimen>
     <dimen name="reportResultSmallFieldWidth">50dp</dimen>
     <dimen name="heightOfReportResultViews">30dp</dimen>
+    <dimen name="heightOfActionResultViews">30dp</dimen>
+
+    <dimen name="actionDescWidth">250dp</dimen>
+    <dimen name="ActionElemWidth">110dp</dimen>
 </resources>
