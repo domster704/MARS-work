@@ -32,7 +32,7 @@
             android:layout_toEndOf="@+id/actionDateStart" />
 
     <TextView
-            android:id="@+id/actionFactValue"
+            android:id="@+id/ActionFactValue"
             android:layout_width="@dimen/ActionElemWidth"
             android:layout_height="@dimen/heightOfActionResultViews"
             android:textSize="16sp"
@@ -46,7 +46,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/actionFactValue" />
+            android:layout_toEndOf="@+id/ActionFactValue" />
 
     <TextView
             android:id="@+id/ActionPercent"

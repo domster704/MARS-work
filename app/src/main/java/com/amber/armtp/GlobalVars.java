@@ -768,7 +768,6 @@ public class GlobalVars extends Application implements TBUpdate {
         downloadPhotoTread.start();
     }
 
-    // TODO
     public void ShowNomenPhoto(final String PhotoFileName) {
         alertPhoto = null;
         String photoDir = getPhotoDir();
@@ -1120,7 +1119,7 @@ public class GlobalVars extends Application implements TBUpdate {
                 CurAc.runOnUiThread(() -> {
                     myNom.requery();
                     NomenAdapter.notifyDataSetChanged();
-                    setContrAndSum(GlobalVars.this);
+//                    setContrAndSum(GlobalVars.this);
                 });
             }
         }).start();
@@ -1496,11 +1495,10 @@ public class GlobalVars extends Application implements TBUpdate {
             return (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
         }
 
-        // TODO: fix it
         @Override
         public void notifyDataSetChanged() {
             super.notifyDataSetChanged();
-
+            setContrAndSum(GlobalVars.this);
             // check isSales and if true, then set real prices from contractor
 //            if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
 //                hasBeenAlreadyNoChanged = false;

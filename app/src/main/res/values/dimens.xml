@@ -51,6 +51,6 @@
     <dimen name="heightOfReportResultViews">30dp</dimen>
     <dimen name="heightOfActionResultViews">30dp</dimen>
 
-    <dimen name="actionDescWidth">250dp</dimen>
-    <dimen name="ActionElemWidth">110dp</dimen>
+    <dimen name="actionDescWidth">225dp</dimen>
+    <dimen name="ActionElemWidth">120dp</dimen>
 </resources>

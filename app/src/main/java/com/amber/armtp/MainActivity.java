@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (!_checkAvailableSpaceOnDevice())
+        if (!checkAvailableSpaceOnDevice())
             Toast.makeText(getApplication(), "Для работы программы необходимо минимум 100 Мб. Освободите место!", Toast.LENGTH_SHORT).show();
 
 //      Для нахождения утечки памяти
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean _checkAvailableSpaceOnDevice() {
+    private boolean checkAvailableSpaceOnDevice() {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
         long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / SIZE_MB;
         return availableSpace > 200;

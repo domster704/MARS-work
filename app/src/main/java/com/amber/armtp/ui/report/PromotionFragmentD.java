@@ -74,7 +74,7 @@ public class PromotionFragmentD extends Fragment {
 
                 ActionAdapter adapter = new ActionAdapter(getActivity(), R.layout.action_result_layout, getActionCursor(tradeRepresentativeID),
                         new String[]{"ACTION", "DATAN", "DATAK", "VAL", "PLN"},
-                        new int[]{R.id.actionDesc, R.id.actionDateStart, R.id.actionDateEnd, R.id.actionFactValue, R.id.ActionPlanValue},
+                        new int[]{R.id.actionDesc, R.id.actionDateStart, R.id.actionDateEnd, R.id.ActionFactValue, R.id.ActionPlanValue},
                         0);
 
                 gridView.setAdapter(adapter);
@@ -97,7 +97,7 @@ public class PromotionFragmentD extends Fragment {
             Cursor cursor = getCursor();
 
             TextView tvPercent = view.findViewById(R.id.ActionPercent);
-            TextView tvFact = view.findViewById(R.id.actionFactValue);
+            TextView tvFact = view.findViewById(R.id.ActionFactValue);
 
             float percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(cursor.getColumnIndex("PLN")) * 100;
             tvPercent.setText(String.format(Locale.ROOT, "%.2f", percent));

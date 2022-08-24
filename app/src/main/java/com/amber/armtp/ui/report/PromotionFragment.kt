@@ -50,7 +50,7 @@ class PromotionFragment : Fragment() {
             val gridView: GridView = activity!!.findViewById(R.id.actionGridView)
             val adapter = ActionAdapter(activity!!, R.layout.action_result_layout, getActionCursor(tradeRepresentativeID), arrayOf(
                     "ACTION", "DATAN", "DATAK", "VAL", "PLN"), intArrayOf(
-                    R.id.actionDesc, R.id.actionDateStart, R.id.actionDateEnd, R.id.actionFactValue, R.id.ActionPlanValue), 0)
+                    R.id.actionDesc, R.id.actionDateStart, R.id.actionDateEnd, R.id.ActionFactValue, R.id.ActionPlanValue), 0)
             gridView.adapter = adapter
         }
     }
@@ -64,15 +64,22 @@ class PromotionFragment : Fragment() {
             val view = super.getView(position, convertView, parent)
 
             val tvPercent: TextView = view.findViewById(R.id.ActionPercent)
-            val tvFact: TextView = view.findViewById(R.id.actionFactValue)
+            val tvFact: TextView = view.findViewById(R.id.ActionFactValue)
+            val tvPlan: TextView = view.findViewById(R.id.ActionPlanValue)
 
             val percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(cursor.getColumnIndex("PLN")) * 100
             tvPercent.text = format(Locale.ROOT, "%.1f", percent)
 
             tvFact.text = if (cursor.getInt(cursor.getColumnIndex("ISKOL")) == 0) {
-                format(Locale.ROOT, "%.2f", cursor.getFloat(cursor.getColumnIndex("VAL")))
+                format(Locale.ROOT, "%.2f", cursor.getFloat(cursor.getColumnIndex("VAL"))) + " руб"
             } else {
-                tvFact.text
+                tvFact.text.toString() + " шт"
+            }
+
+            tvPlan.text = if (cursor.getInt(cursor.getColumnIndex("ISKOL")) == 0) {
+                tvPlan.text.toString() + " руб"
+            } else {
+                tvPlan.text.toString() + " шт"
             }
 
             val backgroundColor: Int = if (position % 2 != 0) {
@@ -93,9 +100,3 @@ class PromotionFragment : Fragment() {
         }
     }
 }
-
-//val backgroundColor: Int = when {
-//    percent >= 100 -> ContextCompat.getColor(context, R.color.successColor)
-//    position % 2 != 0 -> ContextCompat.getColor(context, R.color.gridViewFirstColor)
-//    else -> ContextCompat.getColor(context, R.color.gridViewSecondColor)
-//}

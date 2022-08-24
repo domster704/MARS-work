@@ -3,7 +3,9 @@ package com.amber.armtp.ui;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,9 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
+import com.amber.armtp.MainActivity;
 import com.amber.armtp.R;
 import com.amber.armtp.ftp.Downloader;
 import com.amber.armtp.interfaces.ServerChecker;
@@ -24,10 +28,12 @@ import com.amber.armtp.interfaces.ServerChecker;
  */
 public class UpdateDataFragment extends Fragment implements View.OnClickListener, ServerChecker {
     public static UIData[] uiData;
+    public static boolean isNotEnoughMemory = false;
+
     private final Handler handlerDB = new Handler();
     private final Handler handlerApp = new Handler();
     public GlobalVars glbVars;
-    Button btnDBUpdate, btnAppUpdate;
+
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
     private Downloader downloader;
@@ -71,7 +77,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
         glbVars.toolbar.setSubtitle("");
 
-        btnDBUpdate = getActivity().findViewById(R.id.btnDBUpdate);
+        Button btnDBUpdate = getActivity().findViewById(R.id.btnDBUpdate);
         btnDBUpdate.setOnClickListener(this);
 
         tvDB = getActivity().findViewById(R.id.chkDB);
@@ -79,7 +85,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         TextView tvDBPerc = getActivity().findViewById(R.id.tbDBPerc);
         TextView tvDBCount = getActivity().findViewById(R.id.tvDBCount);
 
-        btnAppUpdate = getActivity().findViewById(R.id.btnAppUpdate);
+        Button btnAppUpdate = getActivity().findViewById(R.id.btnAppUpdate);
         btnAppUpdate.setOnClickListener(this);
 
         tvApp = getActivity().findViewById(R.id.chkApp);
@@ -105,6 +111,10 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                 }
             });
         }).start();
+
+        if (!checkIsEnoughSpaceForUpdateApp()) {
+            Toast.makeText(getActivity(), "Мало свободного места, могут быть ошибки", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -179,5 +189,11 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
             this.tvCount = tvCount;
             this.handler = handler;
         }
+    }
+
+    private boolean checkIsEnoughSpaceForUpdateApp() {
+        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
+        long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / MainActivity.SIZE_MB;
+        return availableSpace > 800;
     }
 }

@@ -247,23 +247,34 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public String getOrderSum() {
+    public String getOrderSum(boolean isSales) {
         String res = "";
         Cursor cursor = null;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT [" + GlobalVars.TypeOfPrice + "], ZAKAZ FROM Nomen WHERE ZAKAZ <> 0", null);
+            cursor = db.rawQuery("SELECT [" + GlobalVars.TypeOfPrice + "], ZAKAZ, KOD5 FROM Nomen WHERE ZAKAZ <> 0", null);
             float curPrice = 0;
-            while (cursor.moveToNext()) {
-                curPrice += (Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1));
+            if (!isSales) {
+                while (cursor.moveToNext()) {
+                    curPrice += (Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1));
+                }
+            } else {
+                while (cursor.moveToNext()) {
+                    String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
+                    if (!pricesMap.containsKey(kod5)) {
+                        curPrice += Float.parseFloat(cursor.getString(0).replace(",", ".")) * cursor.getInt(1);
+                    } else {
+                        curPrice += pricesMap.get(kod5) * cursor.getInt(1);
+                    }
+                }
             }
 
             res = curPrice == 0.0 ? "" : String.format(Locale.ROOT, "%.2f", curPrice);
 
             return res;
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return res;
         } finally {
             if (cursor != null) {
@@ -969,7 +980,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.moveToNext();
         Double res = cursor.getDouble(1);
         cursor.close();
-        return res == null || res == 0 ? "0.00": String.format(Locale.ROOT, "%.2f", res);
+        return res == null || res == 0 ? "0.00" : String.format(Locale.ROOT, "%.2f", res);
     }
 
 
@@ -1023,7 +1034,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return sqlMX + searchReq;
     }
 
-    public void addOuted(String docId, String id,int count) {
+    public void addOuted(String docId, String id, int count) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         db.execSQL("INSERT INTO VYCHERK (DOCID, NOMEN, KOL) VALUES(?, ?, ?)", new Object[]{docId, id, count});

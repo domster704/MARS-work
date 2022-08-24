@@ -5,7 +5,7 @@ import com.amber.armtp.GlobalVars;
 public interface TBUpdate {
     default void setContrAndSum(GlobalVars glbVars) {
         try {
-            String OrderSum = glbVars.db.getOrderSum();
+            String OrderSum = glbVars.db.getOrderSum(glbVars.isSales);
             if (!OrderSum.equals("")) {
                 glbVars.toolbar.setSubtitle(OrderSum + " руб.");
             } else {

@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -231,7 +232,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                 IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
 
-                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] FROM Nomen where ZAKAZ<>0", null);
+                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5 FROM Nomen where ZAKAZ<>0", null);
                 if (c1.getCount() == 0) {
                     c1.close();
                     return;
@@ -429,6 +430,10 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     glbVars.resetCurData();
 
+                    if (glbVars.isSales) {
+                        putRealPriceInPriceColumn();
+                    }
+
                     if (OrderHeadFragment.isNeededToUpdateOrderTable) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
@@ -611,11 +616,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     Config.sout("Ошибка считывания таблицы заказов");
                 }
 
-//                pastSGI = GlobalVars.CurSGI;
-//                pastWC = GlobalVars.CurWCID;
-//                pastFocus = GlobalVars.CurFocusID;
-//                pastSearch = GlobalVars.CurSearchName;
-
                 return true;
             case R.id.clear_whole_order:
                 new AlertDialog.Builder(getActivity())
@@ -746,11 +746,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     }
 
     private float insertIntoZakazyDT(String docID, float SUM) {
-        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE FROM Nomen WHERE ZAKAZ<>0", null);
-//        Cursor nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT SUM([" + GlobalVars.TypeOfPrice + "] * ZAKAZ) as SUM1 FROM Nomen WHERE ZAKAZ<>0", null);
-//        nomenData.moveToNext();
-//        String sum = nomenData.getString(nomenData.getColumnIndex("SUM1"));
-//        SUM = Float.parseFloat(sum.replace(",", "."));
+        Cursor nomenData;
+        if (glbVars.isSales) {
+            nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ<>0", null);
+        } else {
+            nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE FROM Nomen WHERE ZAKAZ<>0", null);
+        }
 
         glbVars.dbOrders.getWritableDatabase().beginTransaction();
         for (int i = 0; i < nomenData.getCount(); i++) {
@@ -763,12 +764,24 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             SUM += sum;
             glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docID + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
         }
-//        glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) SELECT '" + docID + "', KOD5, DESCR, ZAKAZ, [" + GlobalVars.TypeOfPrice + "] as PRICE, PRICE * ZAKAZ FROM Nomen WHERE ZAKAZ>0");
-
 
         glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
         glbVars.dbOrders.getWritableDatabase().endTransaction();
         nomenData.close();
         return SUM;
+    }
+
+    private void putRealPriceInPriceColumn() {
+        SQLiteDatabase database = glbVars.db.getWritableDatabase();
+        Cursor cursor = database.rawQuery("SELECT KOD5 FROM Nomen WHERE ZAKAZ <> 0", null);
+
+        database.beginTransaction();
+        while (cursor.moveToNext()) {
+            String kod5 = cursor.getString(0);
+            database.execSQL("UPDATE NOMEN SET PRICE=? WHERE KOD5=?", new Object[]{DBHelper.pricesMap.get(kod5), kod5});
+        }
+        database.setTransactionSuccessful();
+        database.endTransaction();
+        cursor.close();
     }
 }
