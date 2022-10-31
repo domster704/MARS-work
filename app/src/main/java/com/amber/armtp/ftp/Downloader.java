@@ -2,6 +2,7 @@ package com.amber.armtp.ftp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
@@ -17,6 +18,7 @@ import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.DelayedCalled;
 import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.ui.UpdateDataFragment;
 
 import org.apache.commons.net.ftp.FTP;
@@ -26,7 +28,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import java.io.File;
 import java.net.SocketTimeoutException;
 
-public class Downloader {
+public class Downloader implements BackupServerConnection {
     private final GlobalVars globalVars;
     private final Activity activity;
 
@@ -67,21 +69,24 @@ public class Downloader {
                 return;
             }
 
-
             activity.runOnUiThread(() -> {
                 globalVars.db = new DBHelper(activity.getApplicationContext());
 
                 view.setEnabled(true);
                 ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                System.out.println(activity.getResources().getString(R.string.successInDownloadingProcess));
                 Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
                 ftpFileDownloader.changePGData(1, 1, ui, true);
                 globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
 
-                globalVars.db.addOuted("ISG63_30062022_175629694", "338793", 1);
+                globalVars.db.setBackupIp();
 
                 globalVars.updateOutedPositionInZakazyTable();
                 globalVars.updateOrdersStatusFromDB();
+
+                SharedPreferences serverSettings = globalVars.getSharedPreferences("apk_version", 0);
+                SharedPreferences.Editor editor = serverSettings.edit();
+                editor.remove("FtpBackupServerHost");
+                editor.apply();
             });
         } catch (Exception e) {
             catchErrorInDownloadProcess(view, ui);
@@ -100,8 +105,12 @@ public class Downloader {
         client.setControlKeepAliveTimeout(timeout);
         client.setControlKeepAliveReplyTimeout(timeout);
 
+        if (!tryConnectToDefaultIpOtherwiseToBackupIp(client)) {
+            return new String[] {"", ""};
+        }
+
         try {
-            client.connect(ServerDetails.getInstance().host, Integer.parseInt(ServerDetails.getInstance().port));
+//            client.connect(ServerDetails.getInstance().host, Integer.parseInt(ServerDetails.getInstance().port));
             client.login(ServerDetails.getInstance().user, ServerDetails.getInstance().password);
 
             client.enterLocalPassiveMode();

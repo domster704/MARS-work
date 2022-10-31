@@ -17,8 +17,8 @@ android {
         applicationId 'com.amber.armtp'
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode      103
-        versionName "2.0.103"
+        versionCode      121
+        versionName "2.0.121"
         multiDexEnabled true
     }
 
@@ -26,6 +26,7 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false

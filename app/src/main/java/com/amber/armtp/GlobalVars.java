@@ -19,7 +19,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -50,12 +52,11 @@ import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.interfaces.TBUpdate;
 import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.OrderHeadFragment;
 import com.amber.armtp.ui.SettingFragment;
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.linuxense.javadbf.DBFException;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
@@ -72,15 +73,18 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by filimonov on 22-08-2016.
  * Updated by domster704 on 27.09.2021
  */
-public class GlobalVars extends Application implements TBUpdate {
+
+// TODO: 5 месяцев назад всё было ок с заполнением заказа
+public class GlobalVars extends Application implements TBUpdate, BackupServerConnection {
     public static ArrayList<ChosenOrdersData> allOrders = new ArrayList<>();
 
     public static FragmentActivity CurAc;
@@ -91,11 +95,11 @@ public class GlobalVars extends Application implements TBUpdate {
     public int CurVisiblePosition = 0;
 
     public Context glbContext;
-    public Cursor myNom = null, mySgi, myGrups, Orders, OrdersDt;
-    public Cursor curWC = null, curFocus = null;
-    public Cursor Contr;
-    public Cursor Addr;
-    public Cursor TP;
+    public Cursor myNom = null, mySgi, myGroup, Orders, OrdersDt;
+    public Cursor myWC = null, myFocus = null;
+    public Cursor myContr;
+    public Cursor myAddress;
+    public Cursor myTP;
     public Cursor curDebet, curDebetTp;
 
     public GlobalVars.NomenAdapter NomenAdapter, PreviewZakazAdapter;
@@ -110,7 +114,6 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public boolean isDiscount = false;
     public boolean isMultiSelect = false;
-    public boolean isSecondPhoto = false;
     public boolean isSales = false;
     public boolean isNeededToBeLoadingBySgi = true;
 
@@ -126,26 +129,20 @@ public class GlobalVars extends Application implements TBUpdate {
     public Toolbar toolbar;
     public LinearLayout layout;
 
-    public Spinner spSgi, spGrup;
+    public Spinner spSgi, spGroup;
     public Spinner spWC, spFocus;
 
-//    public File appDBFolder = new File(GetSDCardPath() + "ARMTP_DB");
-//    public File appPhotoFolder = new File(GetSDCardPath() + "ARM_PHOTO");
-//    public File appUpdatesFolder = new File(GetSDCardPath() + "ARM_UPDATES");
-
-    public String AsyncFileName;
-    public SubsamplingScaleImageView imageView;
     public AlertDialog alertPhoto = null;
     public PopupMenu nomPopupMenu;
     public String OrderID = "";
     public String CurrentTp, CurrentDebTP;
 
-    public Spinner spinContr, spinAddr, TPList;
+    public Spinner spinContr, spinAddress, TPList;
     public Calendar DeliveryDate;
     public EditText txtDate;
     public EditText edContrFilter;
     public EditText txtComment;
-    public TextView spTp, spContr, spAddr;
+    public TextView spTp, spContr, spAddress;
     public TextView tvContr, tvTP;
     public ViewFlipper viewFlipper;
     public String ordStatus;
@@ -156,120 +153,153 @@ public class GlobalVars extends Application implements TBUpdate {
     public static Thread downloadPhotoTread;
     public boolean isNeededToResetSearchView = true;
 
-    private HashSet<String> listOfOutedDocId;
 
+    private String[] descriptionContrList = new String[]{"нет данных", "нет данных", "нет данных", "нет данных"};
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            String ItemID = Contr.getString(Contr.getColumnIndex("CODE"));
+            TextView descriptionContr = CurAc.findViewById(R.id.description);
+            descriptionContr.setText("");
+            descriptionContrList = new String[]{"нет данных", "нет данных", "нет данных", "нет данных"};;
+            String ItemID = myContr.getString(myContr.getColumnIndex("CODE"));
             if (!ItemID.equals("0") && !OrderHeadFragment.isOrderEditedOrCopied) {
-                LoadContrAddr(ItemID);
+                LoadContrAddress(ItemID);
             }
+
+            String[] data = db.getDebetInfoByContrID(ItemID);
+            String status = myContr.getString(myContr.getColumnIndex("STATUS"));
+            String credit = data[0];
+            String contract = data[1];
+            String debt = data[2];
+            System.out.println(Arrays.toString(data));
+
+            if (!status.equals("")) {
+                descriptionContrList[0] = status;
+            }
+            if (!credit.equals("")) {
+                descriptionContrList[1] = "Кредит: " + credit;
+            }
+            if (!contract.equals("")) {
+                descriptionContrList[2] = "Договор: " + contract;
+            }
+            if (!debt.equals("")) {
+                descriptionContrList[3] = String.format(Locale.ROOT, "%.2f", Float.parseFloat(debt.replace(",", "."))) + " ₽";
+            }
+            descriptionContr.setText(String.join(" | ", descriptionContrList));
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
         }
     };
 
+
     public AdapterView.OnItemClickListener GridNomenClick = (myAdapter, myView, position, mylng) -> {
-        long viewId = myView.getId();
+        try {
+            long viewId = myView.getId();
 
-        if (viewId == R.id.ColNomPhoto) {
-            showPhoto(myView, position, myAdapter);
-        } else if (viewId == R.id.btPlus) {
-            plusQTY(myView);
-        } else if (viewId == R.id.btMinus) {
-            minusQTY(myView);
-        } else {
-            TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
-            TextView tvOST = myView.findViewById(R.id.ColNomOst);
-            TextView tvNomenCount = myView.findViewById(R.id.ColNomZakaz);
-
-            String ID = tvKOD5.getText().toString();
-            int ost = Integer.parseInt(tvOST.getText().toString());
-            int count = Integer.parseInt(tvNomenCount.getText().toString());
-
-            if (isMultiSelect) {
-                multiSelect(ID, ost);
+            if (viewId == R.id.ColNomPhoto) {
+                showPhoto(myView, position, myAdapter);
+            } else if (viewId == R.id.btPlus) {
+                plusQTY(myView);
+            } else if (viewId == R.id.btMinus) {
+                minusQTY(myView);
             } else {
-                fillNomenDataFromAlertDialog(ID, ost);
+                TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
+                TextView tvOST = myView.findViewById(R.id.ColNomOst);
+
+                String ID = tvKOD5.getText().toString();
+                int ost = Integer.parseInt(tvOST.getText().toString());
+
+                if (isMultiSelect) {
+                    multiSelect(ID, ost);
+                } else {
+                    fillNomenDataFromAlertDialog(ID, ost);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Config.sout(e.getMessage());
         }
     };
 
-    //    public static boolean isGoneInGroup = false;
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, final int position, long arg3) {
-            String Grup;
-            String Sgi;
-            String curSgi = "";
-            String curGroup = "";
+            try {
+                String group;
+                String sgi;
 
-            TextView txtSgi = getCurView().findViewById(R.id.ColSgiID);
-            if (txtSgi != null)
-                curSgi = txtSgi.getText().toString();
+                Cursor c = myNom;
+                group = c.getString(c.getColumnIndex("GRUPPA"));
+                sgi = c.getString(c.getColumnIndex("SGI"));
 
-            TextView txtGroup = getCurView().findViewById(R.id.ColGrupID);
-            if (txtGroup != null)
-                curGroup = txtGroup.getText().toString();
-
-            Cursor c = myNom;
-            Grup = c.getString(c.getColumnIndex("GRUPPA"));
-            Sgi = c.getString(c.getColumnIndex("SGI"));
-
-            PopupMenu nomPopupMenu = new PopupMenu(glbContext, myView);
-            nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-            if (BeginPos != 0) {
-                nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
-            }
-
-            if (EndPos != 0) {
-                nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + EndPos + ")");
-            }
-
-            nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.resetBeginEndPos:
-                        BeginPos = 0;
-                        EndPos = 0;
-                        return true;
-                    case R.id.setBeginPos:
-                        BeginPos = position + 1;
-                        return true;
-                    case R.id.setEndPos:
-                        EndPos = position + 1;
-                        return true;
-                    case R.id.goToGroup:
-                        resetAllSpinners();
-                        resetCurData();
-                        resetSearchViewData();
-
-                        SetSelectedSgi(Sgi);
-                        SetSelectedGrup(Grup);
-                        return true;
+                PopupMenu nomPopupMenu = new PopupMenu(glbContext, myView);
+                nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
+                if (BeginPos != 0) {
+                    nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
                 }
-                return true;
-            });
-            nomPopupMenu.show();
+
+                if (EndPos != 0) {
+                    nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + EndPos + ")");
+                }
+
+                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
+                    switch (menuItem.getItemId()) {
+                        case R.id.resetBeginEndPos:
+                            BeginPos = 0;
+                            EndPos = 0;
+                            return true;
+                        case R.id.setBeginPos:
+                            BeginPos = position + 1;
+                            return true;
+                        case R.id.setEndPos:
+                            EndPos = position + 1;
+                            return true;
+                        case R.id.goToGroup:
+                            resetAllSpinners();
+                            resetCurData();
+                            resetSearchViewData();
+
+                            SetSelectedSgi(sgi);
+                            SetSelectedGrup(group);
+                            return true;
+                    }
+                    return true;
+                });
+                nomPopupMenu.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout(e.getMessage());
+            }
+
             return true;
         }
     };
     public AdapterView.OnItemSelectedListener SelectedGroup = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            resetSearchViewData();
-            String ItemID = myGrups.getString(myGrups.getColumnIndex("CODE"));
-            CurGroup = ItemID;
+            try {
+                resetSearchViewData();
 
-            if (!ItemID.equals("0")) {
-                TextView txtSgi = getCurView().findViewById(R.id.ColSgiID);
-                CurSGI = txtSgi.getText().toString();
+                String ItemID = myGroup.getString(myGroup.getColumnIndex("CODE"));
+                CurGroup = ItemID;
+
+                if (!ItemID.equals("0")) {
+                    TextView txtSgi = getCurView().findViewById(R.id.ColSgiID);
+                    CurSGI = txtSgi.getText().toString();
+                }
+                if (CurSGI.equals("0"))
+                    return;
+
+                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+
+                FormOrderFragment.isSorted = false;
+                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout(e.getMessage());
             }
-            if (CurSGI.equals("0"))
-                return;
-            LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -279,24 +309,29 @@ public class GlobalVars extends Application implements TBUpdate {
     public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            if (isNeededToResetSearchView) {
-                resetSearchViewData();
-            }
-            isNeededToResetSearchView = true;
-            String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
+            try {
+                if (isNeededToResetSearchView) {
+                    resetSearchViewData();
+                }
+                isNeededToResetSearchView = true;
+                String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
 
-            CurGroup = "0";
-            CurSGI = ItemID;
+                CurGroup = "0";
+                CurSGI = ItemID;
 
-            if (ItemID.equals("0")) {
-                nomenList.setAdapter(null);
-                spGrup.setAdapter(null);
-            } else {
-                LoadGroups(ItemID);
-            }
+                if (ItemID.equals("0")) {
+                    nomenList.setAdapter(null);
+                    spGroup.setAdapter(null);
+                } else {
+                    LoadGroups(ItemID);
+                }
 
-            if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
-                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+                if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
+                    LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout(e.getMessage());
             }
         }
 
@@ -304,148 +339,51 @@ public class GlobalVars extends Application implements TBUpdate {
         }
     };
 
-//    public AdapterView.OnItemClickListener OrderDtNomenClick = new AdapterView.OnItemClickListener() {
-//        @Override
-//        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
-//
-//            if (ordStatus.equals("Отправлен") || ordStatus.equals("Удален")) {
-//                Toast.makeText(CurAc, "Данный заказ уже отправлен или удаен и не может быть изменен", Toast.LENGTH_LONG).show();
-//                return;
-//            }
-//
-//            TextView c1 = myView.findViewById(R.id.ColOrdDtQty);
-//            TextView c3 = myView.findViewById(R.id.ColOrdDtCod);
-//            TextView c4 = myView.findViewById(R.id.ColOrdDtDescr);
-//            TextView c6 = myView.findViewById(R.id.ColOrdDtZakazID);
-//
-//            String Zakaz_id = c6.getText().toString();
-//
-//            LayoutInflater layoutInflater = LayoutInflater.from(CurAc);
-//            View promptView = layoutInflater.inflate(R.layout.change_qty, null);
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurAc);
-//            alertDialogBuilder.setView(promptView);
-//
-//            EditText input = promptView.findViewById(R.id.edPPQty);
-//            TextView txtCod = promptView.findViewById(R.id.txtNomCode);
-//            TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
-//            TextView txtOst = promptView.findViewById(R.id.txtNomOst);
-//
-//            input.setText(c1.getText());
-//            txtCod.setText(c3.getText());
-//            txtDescr.setText(c4.getText());
-//
-//            String ID = txtCod.getText().toString();
-//            final String Ost = db.getNomenOst(ID);
-//            txtOst.setText(Ost);
-//
-//            alertDialogBuilder
-//                    .setCancelable(true)
-//                    .setPositiveButton("OK", (dialog, id) -> {
-//                    })
-//                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-//
-//            final AlertDialog alertD = alertDialogBuilder.create();
-//            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-//            WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-//            wmlp.gravity = Gravity.TOP | Gravity.START;
-//            wmlp.x = 50;
-//            wmlp.y = 50;
-//
-//            alertD.show();
-//            input.requestFocus();
-//            input.selectAll();
-//            input.performClick();
-//            input.setPressed(true);
-//            input.invalidate();
-//            InputMethodManager imm = (InputMethodManager) CurAc.getSystemService(INPUT_METHOD_SERVICE);
-//            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-//
-//            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-//                boolean wantToCloseDialog = false;
-//                if (Integer.parseInt(input.getText().toString()) <= Integer.parseInt(Ost)) {
-//                    int newQuantityOfOrder = Integer.parseInt(input.getText().toString());
-//                    dbOrders.updateOrderQty(Zakaz_id, ID, newQuantityOfOrder);
-//                    c1.setText(newQuantityOfOrder);
-//                    OrdersDt.requery();
-//                    wantToCloseDialog = true;
-//                } else {
-//                    input.selectAll();
-//                    input.requestFocus();
-//                    input.performClick();
-//                    input.setPressed(true);
-//                    input.invalidate();
-//                    Toast.makeText(CurAc, "На остатках всего " + Ost + "шт. Вы заказываете " + input.getText().toString() + " шт.", Toast.LENGTH_LONG).show();
-//                }
-//                if (wantToCloseDialog)
-//                    alertD.dismiss();
-//            });
-//
-//            input.setOnEditorActionListener((v, actionId, event) -> {
-//                if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-//                }
-//                return true;
-//            });
-//        }
-//    };
-
     public android.support.v4.app.FragmentManager fragManager;
-    TextView grupID, sgiID;
+    TextView groupID, sgiID;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     public AdapterView.OnItemLongClickListener PreviewNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
-            grupID = myView.findViewById(R.id.ColNomGRUPID);
-            sgiID = myView.findViewById(R.id.ColNomSGIID);
+            try {
+                groupID = myView.findViewById(R.id.ColNomGRUPID);
+                sgiID = myView.findViewById(R.id.ColNomSGIID);
 
-            Cursor c = myNom;
-            final String Grup = c.getString(c.getColumnIndex("GRUPPA"));
-            final String Sgi = c.getString(c.getColumnIndex("SGI"));
+                Cursor c = myNom;
+                final String group = c.getString(c.getColumnIndex("GRUPPA"));
+                final String sgi = c.getString(c.getColumnIndex("SGI"));
 
-            nomPopupMenu = new PopupMenu(CurAc, myView);
-            nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-            nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                if (menuItem.getItemId() == R.id.goToGroup) {
-                    fragment = new FormOrderFragment();
+                nomPopupMenu = new PopupMenu(CurAc, myView);
+                nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
+                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
+                    if (menuItem.getItemId() == R.id.goToGroup) {
+                        fragment = new FormOrderFragment();
 
-                    Bundle args = new Bundle();
-                    args.putString("SGI", Sgi);
-                    args.putString("Group", Grup);
+                        Bundle args = new Bundle();
+                        args.putString("SGI", sgi);
+                        args.putString("Group", group);
 
-                    fragment.setArguments(args);
-                    fragmentTransaction = fragManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                    fragmentTransaction.commit();
+                        fragment.setArguments(args);
+                        fragmentTransaction = fragManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                        fragmentTransaction.commit();
 
-                    toolbar.setTitle("Формирование заказа");
+                        toolbar.setTitle("Формирование заказа");
 
+                        return true;
+                    }
                     return true;
-                }
-                return true;
-            });
-            nomPopupMenu.show();
+                });
+                nomPopupMenu.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout(e.getMessage());
+            }
+
             return true;
         }
     };
-    private boolean isNewLoaded = false;
-
-    public static java.util.Date StrToDbfDate(String Date) {
-        java.util.Date return_date = null;
-        String Year, Mon, Day;
-        Year = Date.substring(6, 10);
-        Mon = Date.substring(3, 5);
-        Day = Date.substring(0, 2);
-
-        String date = Year + Mon + Day;
-        try {
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-            return_date = formatter.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return return_date;
-    }
 
     public View getCurView() {
         return CurView;
@@ -461,6 +399,9 @@ public class GlobalVars extends Application implements TBUpdate {
 
     //    @AsyncUI
     public void LoadSgi() {
+        if (mySgi != null) {
+            mySgi.close();
+        }
         mySgi = db.getAllSgi();
         spSgi = CurView.findViewById(R.id.SpinSgi);
         android.widget.SimpleCursorAdapter adapter;
@@ -472,30 +413,39 @@ public class GlobalVars extends Application implements TBUpdate {
     //    private boolean isJustSettingAdapter = false;
 //    @AsyncUI
     public void LoadGroups(final String SgiID) {
-        myGrups = db.getGrupBySgi(SgiID);
-        spGrup = CurView.findViewById(R.id.SpinGrups);
+        if (myGroup != null) {
+            myGroup.close();
+        }
+        myGroup = db.getGrupBySgi(SgiID);
+        spGroup = CurView.findViewById(R.id.SpinGrups);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGrups, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGroup, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
 
 //        isJustSettingAdapter = true;
-        spGrup.setAdapter(adapter);
-        spGrup.setOnItemSelectedListener(SelectedGroup);
+        spGroup.setAdapter(adapter);
+        spGroup.setOnItemSelectedListener(SelectedGroup);
     }
 
     @AsyncUI
     public void LoadFiltersWC(View vw) {
-        curWC = dbApp.getWCs();
+        if (myWC != null) {
+            myWC.close();
+        }
+        myWC = dbApp.getWCs();
         spWC = vw.findViewById(R.id.spinWC);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, curWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr}, 0);
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, myWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr}, 0);
         spWC.setAdapter(adapter);
     }
 
     @AsyncUI
     public void LoadFiltersFocus(View vw) {
-        curFocus = db.getFocuses();
+        if (myFocus != null) {
+            myFocus.close();
+        }
+        myFocus = db.getFocuses();
         spFocus = vw.findViewById(R.id.spinFocus);
         android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, curFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr}, 0);
+        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, myFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr}, 0);
         spFocus.setAdapter(adapter);
     }
 
@@ -524,6 +474,9 @@ public class GlobalVars extends Application implements TBUpdate {
 //                        CurSGI, CurGroup,
 //                        CurWCID, CurFocusID, CurSearchName);
 //                Config.printCursor(myNom);
+//                if (myNom != null) {
+//                    myNom.close();
+//                }
                 myNom = db.getNomen(
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
@@ -537,7 +490,6 @@ public class GlobalVars extends Application implements TBUpdate {
                     // needs to call notifyDataSetChanged in NomenAdapter class
                     NomenAdapter.notifyDataSetChanged();
                 });
-                isNewLoaded = false;
             }
         }).start();
     }
@@ -556,11 +508,11 @@ public class GlobalVars extends Application implements TBUpdate {
 
     @DelayedCalled(delay = 300)
     public void SetSelectedGrup(String Grup) {
-        for (int i = 0; i < spGrup.getCount(); i++) {
-            Cursor value = (Cursor) spGrup.getItemAtPosition(i);
+        for (int i = 0; i < spGroup.getCount(); i++) {
+            Cursor value = (Cursor) spGroup.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
             if (Grup.equals(id)) {
-                spGrup.setSelection(i);
+                spGroup.setSelection(i);
                 return;
             }
         }
@@ -680,8 +632,9 @@ public class GlobalVars extends Application implements TBUpdate {
 //        }
     }
 
-    public void DownloadPhoto(final String FileName) {
+    public void downloadAndShowPhotos(final String[] fileNames, long ID) {
         downloadPhotoTread = new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             @PGShowing(isCanceled = true)
             public void run() {
@@ -693,125 +646,124 @@ public class GlobalVars extends Application implements TBUpdate {
                 ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
                 ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
-                FTPClient ftpClient;
-                ftpClient = new FTPClient();
-                int timeout = 10 * 1000;
-                ftpClient.setDefaultTimeout(timeout);
-                ftpClient.setDataTimeout(timeout);
-                ftpClient.setConnectTimeout(timeout);
-                ftpClient.setControlKeepAliveTimeout(timeout);
-                ftpClient.setControlKeepAliveReplyTimeout(timeout);
+                for (String fileName : fileNames) {
+                    if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists())
+                        continue;
 
-                final String photoDir = getPhotoDir();
-                try {
-                    ftpClient.connect(ftp_server);
-                    ftpClient.login(ftp_user, ftp_pass);
+                    FTPClient ftpClient;
+                    ftpClient = new FTPClient();
+                    int timeout = 10 * 1000;
+                    ftpClient.setDefaultTimeout(timeout);
+                    ftpClient.setDataTimeout(timeout);
+                    ftpClient.setConnectTimeout(timeout);
+                    ftpClient.setControlKeepAliveTimeout(timeout);
+                    ftpClient.setControlKeepAliveReplyTimeout(timeout);
 
-                    ftpClient.changeWorkingDirectory("FOTO");
-                    ftpClient.enterLocalPassiveMode();
-                    ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+                    if (!tryConnectToDefaultIpOtherwiseToBackupIp(ftpClient)) {
+                        return;
+                    }
 
-                    FileOutputStream fos = new FileOutputStream(photoDir + "/" + FileName);
-
-                    ftpClient.retrieveFile(FileName, fos);
-                    fos.close();
-                    String isDownloaded = FilenameUtils.removeExtension(FileName);
-                    String tmpName = isDownloaded.substring(isDownloaded.length() - 2);
-
+                    final String photoDir = getPhotoDir();
                     try {
-                        if (tmpName.equals("_2")) {
-                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(tmpName, "") + "'");
-                        } else {
+                        ftpClient.login(ftp_user, ftp_pass);
+                        ftpClient.changeWorkingDirectory("FOTO");
+                        ftpClient.enterLocalPassiveMode();
+                        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                        FileOutputStream fos = new FileOutputStream(photoDir + "/" + fileName);
+
+                        ftpClient.retrieveFile(fileName, fos);
+                        fos.close();
+                        String isDownloaded = FilenameUtils.removeExtension(fileName);
+
+                        try {
                             db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
                         }
-                    } catch (Exception ignored) {
-                    }
-                } catch (SocketTimeoutException e) {
-                    Config.sout("Время ожидания вышло");
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Config.sout("Сервер недоступен");
-                    return;
-                } finally {
-                    try {
-                        ftpClient.disconnect();
-                    } catch (IOException e) {
+                    } catch (SocketTimeoutException e) {
+                        Config.sout("Время ожидания вышло");
+                        return;
+                    } catch (Exception e) {
                         e.printStackTrace();
+                        Config.sout("Сервер недоступен");
+                        return;
+                    } finally {
+                        try {
+                            ftpClient.disconnect();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
-                if (!Thread.currentThread().isInterrupted()) {
-                    CurAc.runOnUiThread(() -> {
-                        if (!isSecondPhoto) {
-                            ShowNomenPhoto(FileName);
-                            imageView.invalidate();
-                        } else {
-                            if (alertPhoto != null) {
-                                imageView.setTag("Фото 2");
-                                alertPhoto.setTitle(FileName);
-                                imageView.setImage(ImageSource.uri(photoDir + "/" + FileName));
+                CurAc.runOnUiThread(() -> showProductPhoto(fileNames, db.getProductKod5ByRowID(ID)));
 
-                                imageView.invalidate();
-                            }
-                        }
-                        GridView gdNomen = CurView.findViewById(R.id.listContrs);
-                        myNom.requery();
-                        if (NomenAdapter != null)
-                            NomenAdapter.notifyDataSetChanged();
-                        gdNomen.invalidateViews();
-                    });
-                }
             }
         });
         downloadPhotoTread.start();
     }
 
-    public void ShowNomenPhoto(final String PhotoFileName) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void showProductPhoto(String[] photoFileName, String kod5) {
         alertPhoto = null;
         String photoDir = getPhotoDir();
+        photoFileName = Arrays.stream(photoFileName).filter(Objects::nonNull).toArray(String[]::new);
+        if (photoFileName.length == 0) {
+            Config.sout("Нет скачанных файлов");
+            return;
+        }
 
-        File imgFile = new File(photoDir + "/" + FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg");
-        checkPhotoInDB(PhotoFileName);
+        for (String s : photoFileName) {
+            checkPhotoInDB(s);
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(CurAc);
         LayoutInflater inflater = CurAc.getLayoutInflater();
+
         builder.setView(inflater.inflate(R.layout.image_layout, null));
         builder.setCancelable(true);
         builder.setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
+
         alertPhoto = builder.create();
         alertPhoto.getWindow().setLayout(600, 400);
         alertPhoto.show();
 
-        imageView = alertPhoto.findViewById(R.id.ivPhoto);
-        imageView.setMaxScale(3f);
-        imageView.setDoubleTapZoomScale(1F);
+        TextView productID = alertPhoto.findViewById(R.id.nomenId);
+        productID.setText("Код товара:   " + kod5);
 
-        imageView.setImage(ImageSource.uri(photoDir + "/" + PhotoFileName));
-        imageView.setTag("Фото 1");
+        ViewPager viewPager = alertPhoto.findViewById(R.id.photoViewPager);
 
-        imageView.setOnClickListener(v -> {
-            checkPhotoInDB(PhotoFileName);
-            String LoadingFile = PhotoFileName;
-            if (imageView.getTag().toString().equals("Фото 1")) {
-                if (imgFile.exists() && imgFile.length() != 0) {
-                    imageView.setTag("Фото 2");
-                    LoadingFile = FilenameUtils.removeExtension(PhotoFileName) + "_2.jpg";
-                    checkPhotoInDB(LoadingFile);
-                    alertPhoto.setTitle(LoadingFile);
-                }
-            } else {
-                LoadingFile = PhotoFileName;
-                imageView.setTag("Фото 1");
+        LinearLayout dots = alertPhoto.findViewById(R.id.layoutForPhotoDots);
+        PhotoDotsAdapter photoDotsAdapter = new PhotoDotsAdapter(getContext(), photoFileName.length, 0);
+        photoDotsAdapter.fillLayout(dots);
+
+        ImageAdapter adapter = new ImageAdapter(getContext(), photoFileName, photoDir);
+
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
             }
-            imageView.setImage(ImageSource.uri(photoDir + "/" + LoadingFile));
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                photoDotsAdapter.changePosition(i);
+            }
         });
     }
 
     @AsyncUI
-    public void PreviewZakaz() {
+    public void PreviewOrder() {
         nomenList.setAdapter(null);
+        if (myNom != null) {
+            myNom.close();
+        }
         myNom = db.getOrderNom();
         PreviewZakazAdapter = new NomenAdapter(glbContext, R.layout.nomen_layout_preview, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "GOFRA", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
         nomenList.setAdapter(PreviewZakazAdapter);
@@ -827,13 +779,16 @@ public class GlobalVars extends Application implements TBUpdate {
 
     @AsyncUI
     public void LoadTpList() {
-        TP = db.getTpList();
-        TPAdapter adapter = new TPAdapter(CurAc, R.layout.tp_layout, TP, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColTPID, R.id.ColTPDescr}, 0);
+        if (myTP != null) {
+            myTP.close();
+        }
+        myTP = db.getTpList();
+        TPAdapter adapter = new TPAdapter(CurAc, R.layout.tp_layout, myTP, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColTPID, R.id.ColTPDescr}, 0);
         TPList.setAdapter(adapter);
 
         TPList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-                CurrentTp = TP.getString(TP.getColumnIndex("CODE"));
+                CurrentTp = myTP.getString(myTP.getColumnIndex("CODE"));
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -847,9 +802,12 @@ public class GlobalVars extends Application implements TBUpdate {
     @AsyncUI
     public void LoadContrList() {
         spinContr.setAdapter(null);
-        Contr = db.getContrList();
+        if (myContr != null) {
+            myContr.close();
+        }
+        myContr = db.getContrList();
         ContrsAdapter adapter;
-        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, myContr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
         spinContr.setAdapter(adapter);
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
@@ -857,38 +815,61 @@ public class GlobalVars extends Application implements TBUpdate {
     @AsyncUI
     public void LoadFilteredContrList(String FindStr) {
         spinContr.setAdapter(null);
-        Contr = db.getContrFilterList(FindStr);
+        if (myContr != null) {
+            myContr.close();
+        }
+        myContr = db.getContrFilterList(FindStr);
         ContrsAdapter adapter;
-        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, Contr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+        adapter = new ContrsAdapter(CurAc, R.layout.contr_layout, myContr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
         spinContr.setAdapter(adapter);
         spinContr.setOnItemSelectedListener(SelectedContr);
     }
 
     @AsyncUI
-    public void LoadContrAddr(String ContID) {
-        Addr = db.getContrAddress(ContID);
+    public void LoadContrAddress(String ContID) {
+        if (myAddress != null) {
+            myAddress.close();
+        }
+        myAddress = db.getContrAddress(ContID);
         AddressAdapter adapter;
-        adapter = new AddressAdapter(CurAc, R.layout.addr_layout, Addr, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
-        spinAddr.setAdapter(adapter);
+        adapter = new AddressAdapter(CurAc, R.layout.addr_layout, myAddress, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrAddrID, R.id.ColContrAddrDescr}, 0);
+        spinAddress.setAdapter(adapter);
 
         String AddrID = db.GetContrAddr();
         if (!AddrID.equals("0")) {
-            SetSelectedAddr(AddrID);
+            SetSelectedAddress(AddrID);
         } else if (!OrderHeadFragment._ADDR.equals("")) {
-            SetSelectedAddr(OrderHeadFragment._ADDR);
+            SetSelectedAddress(OrderHeadFragment._ADDR);
         }
     }
 
     @DelayedCalled
-    public void SetSelectedAddr(String AddrID) {
-        for (int i = 0; i < spinAddr.getCount(); i++) {
-            Cursor value = (Cursor) spinAddr.getItemAtPosition(i);
+    public void SetSelectedAddress(String AddrID) {
+        for (int i = 0; i < spinAddress.getCount(); i++) {
+            Cursor value = (Cursor) spinAddress.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
             if (AddrID.equals(id)) {
-                spinAddr.setSelection(i, true);
+                spinAddress.setSelection(i, true);
                 return;
             }
         }
+    }
+
+    public static java.util.Date StrToDbfDate(String Date) {
+        java.util.Date return_date = null;
+        String Year, Mon, Day;
+        Year = Date.substring(6, 10);
+        Mon = Date.substring(3, 5);
+        Day = Date.substring(0, 2);
+
+        String date = Year + Mon + Day;
+        try {
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            return_date = formatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return return_date;
     }
 
     public String CreateDBFForSending(int ID) throws DBFException {
@@ -1260,41 +1241,21 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public void updateOutedPositionInZakazyTable() {
         try {
-            listOfOutedDocId = new HashSet<>();
 
             SQLiteDatabase sqLiteDatabaseOrders = dbOrders.getReadableDatabase();
             SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
 
-//        Cursor c = sqLiteDatabaseOrders.rawQuery("SELECT DISTINCT ZAKAZ_ID FROM ZAKAZY_DT WHERE IS_OUTED=1", null);
-//        while (c.moveToNext()) {
-//            listOfOutedDocId.add(c.getString(0));
-//        }
-//        c.close();
             sqLiteDatabaseOrders.beginTransaction();
             Cursor ordersId = sqLiteDatabaseOrders.rawQuery("SELECT DOCID FROM ZAKAZY", null);
             while (ordersId.moveToNext()) {
                 String orderID = ordersId.getString(0);
                 Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID=?", new String[]{orderID});
 
-//                String orderID = ordersId.getString(0);
-//                Cursor allOrdersDetails = sqLiteDatabaseOrders.rawQuery("SELECT NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID=?", new String[]{orderID});
-//                if (allOrdersDetails.getCount() == 0)
-//                    continue;
-
-//                StringBuilder s = new StringBuilder();
-//                while (allOrdersDetails.moveToNext()) {
-//                    s.append(allOrdersDetails.getString(0)).append(",");
-//                }
-//                String s2 = s.substring(0, s.length() - 1);
-
-//                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID = ? AND NOMEN in (" + s2 + ")", new String[]{orderID});
-
                 if (c.getCount() != 0) {
                     sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=1 WHERE DOCID='" + orderID + "'");
                 } else {
                     sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=0 WHERE DOCID='" + orderID + "'");
                 }
-//                allOrdersDetails.close();
                 c.close();
             }
             sqLiteDatabaseOrders.setTransactionSuccessful();
@@ -1360,8 +1321,6 @@ public class GlobalVars extends Application implements TBUpdate {
     }
 
     public class NomenAdapter extends SimpleCursorAdapter {
-        private boolean hasBeenAlreadyNoChanged = true;
-
         public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
         }
@@ -1606,7 +1565,8 @@ public class GlobalVars extends Application implements TBUpdate {
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             Cursor cursor = getCursor();
-            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR")) + "\t\t" + cursor.getString(cursor.getColumnIndex("STATUS"));
+            String resDescr = cursor.getString(cursor.getColumnIndex("DESCR"));
+//            + "\t\t" + cursor.getString(cursor.getColumnIndex("STATUS"));
 
             TextView tvDescr = view.findViewById(R.id.ColContrDescr);
 //            if (position % 2 != 0) {
@@ -1716,9 +1676,9 @@ public class GlobalVars extends Application implements TBUpdate {
         Cursor[] cursors = new Cursor[]{
                 myNom,
                 mySgi,
-                myGrups,
-                curWC,
-                curFocus
+                myGroup,
+                myWC,
+                myFocus
         };
         for (Cursor cursor : cursors) {
             if (cursor != null) {
@@ -1739,6 +1699,18 @@ public class GlobalVars extends Application implements TBUpdate {
 
     public static String[] getCurrentData() {
         return new String[]{CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName};
+    }
+
+    public void closeAllCursorsInHeadOrder() {
+        if (myAddress != null) {
+            myAddress.close();
+        }
+        if (myContr != null) {
+            myContr.close();
+        }
+        if (myTP != null) {
+            myTP.close();
+        }
     }
 
     private void updateTextFormatTo2DecAfterPoint(TextView v) {
@@ -1830,7 +1802,8 @@ public class GlobalVars extends Application implements TBUpdate {
 
         db.putPriceInNomen(kod5, price);
         db.PlusQty(kod5);
-        myNom.requery();
+        if (myNom != null)
+            myNom.requery();
 
         if (NomenAdapter != null)
             NomenAdapter.notifyDataSetChanged();
@@ -1847,7 +1820,8 @@ public class GlobalVars extends Application implements TBUpdate {
         String kod5 = tvKOD5.getText().toString();
 
         db.MinusQty(kod5);
-        myNom.requery();
+        if (myNom != null)
+            myNom.requery();
 
         if (NomenAdapter != null)
             NomenAdapter.notifyDataSetChanged();
@@ -1863,34 +1837,18 @@ public class GlobalVars extends Application implements TBUpdate {
         if (((TextView) myView).getText() == null || ((TextView) myView).getText().toString().equals(""))
             return;
 
-        isSecondPhoto = false;
-        String photoDir = getPhotoDir();
         long ID = myAdapter.getItemIdAtPosition(position);
 
-        String FileName = db.GetCod(ID);
-        File imgFile = new File(photoDir + "/" + FileName);
-//        DownloadPhoto(FileName);
-        if (!imgFile.exists() || imgFile.length() == 0) {
-            AsyncFileName = FileName;
-            if (isNetworkAvailable()) {
-                DownloadPhoto(FileName);
-            } else {
-                Toast.makeText(glbContext, "Нет доступного интернет соединения", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            //TODO: сюда заходит
-            try {
-                ShowNomenPhoto(FileName);
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Не получилось открыть фото", Toast.LENGTH_SHORT).show();
-            }
-        }
+        @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
+        downloadAndShowPhotos(fileNames, ID);
     }
 
     private void multiSelect(String ID, int ost) {
         db.UpdateQty(ID, MultiQty, ost);
-        myNom.requery();
-        NomenAdapter.notifyDataSetChanged();
+        if (myNom != null)
+            myNom.requery();
+        if (NomenAdapter != null)
+            NomenAdapter.notifyDataSetChanged();
 
         db.putPriceInNomen(ID, "" + DBHelper.pricesMap.get(ID));
         setContrAndSum(GlobalVars.this);

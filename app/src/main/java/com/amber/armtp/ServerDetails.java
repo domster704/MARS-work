@@ -13,6 +13,9 @@ public class ServerDetails {
     public String dirAPK;
     public String port;
 
+    private String backupIp = "";
+    private String previousHost = "";
+
     private ServerDetails(String... args) {
         this.host = args[0];
         this.dirDB = args[1];
@@ -22,8 +25,8 @@ public class ServerDetails {
         this.dirAPK = args[5];
     }
 
-    public static ServerDetails getInstance() throws Exception {
-        if (instance == null) throw new Exception("Wasn't created instance before");
+    public static ServerDetails getInstance() {
+        if (instance == null) return null;
         return instance;
     }
 
@@ -39,5 +42,25 @@ public class ServerDetails {
             instance.user = user;
             instance.password = pass;
         }
+    }
+
+    private static int count = 0;
+
+    public void changeIpToBackupIpOrToDefaultIP() {
+        if (count % 2 == 0) {
+            previousHost = host;
+            host = backupIp;
+        } else {
+            host = previousHost;
+        }
+        count++;
+    }
+
+    public void setBackupIp(String backupIp) {
+        this.backupIp = backupIp;
+    }
+
+    public String getBackUpIp() {
+        return this.backupIp;
     }
 }

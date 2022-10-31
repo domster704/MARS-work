@@ -9,7 +9,11 @@ import android.widget.Toast;
 
 public class Config {
     public static void sout(Object text) {
-        GlobalVars.CurAc.runOnUiThread(() -> Toast.makeText(GlobalVars.CurAc, String.valueOf(text), Toast.LENGTH_SHORT).show());
+        try {
+            GlobalVars.CurAc.runOnUiThread(() -> Toast.makeText(GlobalVars.CurAc, String.valueOf(text), Toast.LENGTH_SHORT).show());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void sout(Object text, int length) {

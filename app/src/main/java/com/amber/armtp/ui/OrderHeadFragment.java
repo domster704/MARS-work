@@ -96,6 +96,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        System.out.println(isNeededToUpdateOrderTable);
 
 //        _checkAndSetContrIDAfterDestroying();
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
@@ -104,7 +105,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         glbVars.txtComment = getActivity().findViewById(R.id.txtComment);
 
         glbVars.spinContr = getActivity().findViewById(R.id.SpinContr);
-        glbVars.spinAddr = getActivity().findViewById(R.id.SpinAddr);
+        glbVars.spinAddress = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
         Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
@@ -144,7 +145,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
             glbVars.DeliveryDate.set(Calendar.YEAR, year);
             glbVars.DeliveryDate.set(Calendar.MONTH, monthOfYear);
             glbVars.DeliveryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            String myFormat = "dd.MM.yyyy"; //In which you need put here
+            String myFormat = "dd.MM.yyyy";
             SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
             glbVars.txtDate.setText(sdf.format(glbVars.DeliveryDate.getTime()));
@@ -152,13 +153,13 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
         glbVars.txtDate.setOnClickListener(v -> new DatePickerDialog(getActivity(), date, glbVars.DeliveryDate.get(Calendar.YEAR), glbVars.DeliveryDate.get(Calendar.MONTH), glbVars.DeliveryDate.get(Calendar.DAY_OF_MONTH)).show());
 
-        int contrRowId = glbVars.db.GetContrRowID();
+        int contrRowId = glbVars.db.getContrRowID();
 
         SetSelectedContr(contrRowId);
 
         String stTP_ID = settings.getString("TP_ID", "0");
 
-        int TPRowId = glbVars.db.GetTPRowID();
+        int TPRowId = glbVars.db.getTPRowID();
         int TPDefaultRowId = glbVars.db.GetTPByID(stTP_ID);
 
         if (glbVars.CheckTPLock()) {
@@ -217,13 +218,17 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     }
 
     public void SetSelectedContr(int rowId) {
-        for (int i = 0; i < glbVars.spinContr.getCount(); i++) {
-            Cursor value = (Cursor) glbVars.spinContr.getItemAtPosition(i);
-            int id = value.getInt(value.getColumnIndexOrThrow("_id"));
-            if (rowId == id) {
-                glbVars.spinContr.setSelection(i);
-                break;
+        try {
+            for (int i = 0; i < glbVars.spinContr.getCount(); i++) {
+                Cursor value = (Cursor) glbVars.spinContr.getItemAtPosition(i);
+                int id = value.getInt(value.getColumnIndexOrThrow("_id"));
+                if (rowId == id) {
+                    glbVars.spinContr.setSelection(i);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -282,20 +287,20 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     }
 
     private void _saveOrderData() throws InterruptedException {
-        String ADDR_ID;
+        String AddressId;
 
         glbVars.spTp = Objects.requireNonNull(getActivity()).findViewById(R.id.ColTPID);
         glbVars.spContr = getActivity().findViewById(R.id.ColContrID);
-        glbVars.spAddr = getActivity().findViewById(R.id.ColContrAddrID);
+        glbVars.spAddress = getActivity().findViewById(R.id.ColContrAddrID);
 
         CONTR_ID = glbVars.spContr.getText().toString();
-        ADDR_ID = glbVars.spAddr != null ? glbVars.spAddr.getText().toString() : "0";
+        AddressId = glbVars.spAddress != null ? glbVars.spAddress.getText().toString() : "0";
 
         String DeliveryDate = glbVars.txtDate.getText().toString();
         String Comment = glbVars.txtComment.getText().toString();
         String TP_ID = glbVars.spTp.getText().toString();
 
-        if (TP_ID.equals("0") || CONTR_ID.equals("0") || ADDR_ID.equals("0") || DeliveryDate.equals("")) {
+        if (TP_ID.equals("0") || CONTR_ID.equals("0") || AddressId.equals("0") || DeliveryDate.equals("")) {
             Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
             return;
         }
@@ -316,10 +321,10 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
         GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
 
-        if (glbVars.db.insertOrder(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+        if (glbVars.db.insertOrder(TP_ID, CONTR_ID, AddressId, DeliveryDate, Comment)) {
             setContrAndSum(glbVars);
         } else {
-            if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, ADDR_ID, DeliveryDate, Comment)) {
+            if (glbVars.db.UpdateOrderHead(TP_ID, CONTR_ID, AddressId, DeliveryDate, Comment)) {
                 setContrAndSum(glbVars);
             } else {
                 Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
@@ -327,7 +332,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         }
         glbVars.resetCurData();
 //        glbVars.putAllPrices();
-
+        glbVars.closeAllCursorsInHeadOrder();
         goToFormOrderFragment();
     }
 

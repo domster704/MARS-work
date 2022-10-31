@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:layout_marginStart="100dp"
+                    android:layout_marginStart="@dimen/marginStartInSettingsFragment"
                     android:visibility="gone">
 
                 <LinearLayout
@@ -57,11 +57,11 @@
                             android:layout_height="match_parent"
                             android:gravity="start|center_vertical"
                             android:paddingEnd="8dp"
-                            android:text="@string/resUpdateServer"
+                            android:text="@string/resMainHost"
                             android:textAlignment="center"
                             android:textColor="#000"
                             android:textSize="@dimen/textSizeSettings"
-                            tools:text="Сервер" />
+                            tools:text="Основной" />
 
                     <EditText
                             android:id="@+id/etFtpServer"
@@ -75,6 +75,33 @@
                             android:textAlignment="center"
                             android:textSize="@dimen/textSizeSettings"
                             tools:text="91.208.84.67" />
+                </LinearLayout>
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:id="@+id/tvFtpBackupHost"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="start|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/resBackupHost"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="@dimen/textSizeSettings" />
+
+                    <EditText
+                            android:id="@+id/edFtpBackupHost"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:text="0.0.0.0"
+                            android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -190,7 +217,7 @@
                 <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="100dp"
+                        android:layout_marginStart="@dimen/marginStartInSettingsFragment"
                         android:layout_below="@+id/dividerSettings">
 
                     <TextView
@@ -255,7 +282,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/dividerSettings"
-                        android:layout_marginStart="100dp"
+                        android:layout_marginStart="@dimen/marginStartInSettingsFragment"
                         android:orientation="horizontal">
 
                     <Button
@@ -301,7 +328,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/dividerSettings"
-                        android:layout_marginStart="100dp"
+                        android:layout_marginStart="@dimen/marginStartInSettingsFragment"
                         android:orientation="horizontal">
 
                     <EditText

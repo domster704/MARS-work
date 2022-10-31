@@ -59,7 +59,7 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
         setContrAndSum(glbVars);
 
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
-        glbVars.PreviewZakaz();
+        glbVars.PreviewOrder();
         glbVars.fragManager = getActivity().getSupportFragmentManager();
     }
 

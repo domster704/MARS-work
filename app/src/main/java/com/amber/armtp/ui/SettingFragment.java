@@ -40,7 +40,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private SharedPreferences.Editor editor, settingsEditor;
 
     private EditText fontSize;
-    private EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort;
+    private EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort, etFtpBackupServer;
     private EditText etTpSetting;
 
     @Nullable
@@ -84,11 +84,13 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         etFtpPass = getActivity().findViewById(R.id.edFtpPass);
         etFtpUser = getActivity().findViewById(R.id.edFtpUser);
         etFtpPort = getActivity().findViewById(R.id.edFtpPort);
+        etFtpBackupServer = getActivity().findViewById(R.id.edFtpBackupHost);
 
         etFtpServer.setText(serverSettings.getString("FtpServerHost", getResources().getString(R.string.host)));
         etFtpPass.setText(serverSettings.getString("FtpServerPass", getResources().getString(R.string.password)));
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
         etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)))));
+        etFtpBackupServer.setText(serverSettings.getString("FtpBackupServerHost", ServerDetails.getInstance().getBackUpIp()));
 
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
@@ -201,6 +203,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         String port = etFtpPort.getText().toString();
         String user = etFtpUser.getText().toString();
         String pass = etFtpPass.getText().toString();
+        String backupHost = etFtpBackupServer.getText().toString();
 
         editor.putString("FtpPhotoSrv", host);
         editor.putString("FtpPhotoPass", pass);
@@ -211,8 +214,10 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         editor.putString("FtpServerPass", pass);
         editor.putString("FtpServerUser", user);
         editor.putInt("FtpServerPort", Integer.parseInt(port));
+        editor.putString("FtpBackupServerHost", backupHost);
 
         ServerDetails.updateInstance(host, port, user, pass);
+        ServerDetails.getInstance().setBackupIp(backupHost);
         editor.commit();
 
         Config.sout("Настройки сохранены");
@@ -240,7 +245,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setTpInSalesFragment() {
-        editor.putString("ReportTPId", etTpSetting.getText().toString());
+        editor.putString("ReportTPId", etTpSetting.getText().toString().trim());
         editor.apply();
     }
 }

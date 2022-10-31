@@ -75,13 +75,15 @@ public class FtpFileDownloader extends Ftp {
     }
 
     public boolean downloadWithPG(UpdateDataFragment.UIData ui) throws FTPIllegalReplyException, FTPAbortedException, FTPDataTransferException, IOException, FTPException {
-        long fileSize = getFileSize(dir);
+//        long fileSize = ;
         boolean login = initFtpClient();
         if (login) {
-            client.download(dir, new File(filePathInAndroid), new TransferListener(fileSize, ui));
+            client.download(dir, new File(filePathInAndroid), new TransferListener(getFileSize(dir), ui));
+            logout();
+        } else {
+            isFailed = true;
         }
 
-        logout();
         return isFailed;
     }
 

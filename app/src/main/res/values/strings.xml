@@ -22,9 +22,10 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="resUpdateServer">Сервер</string>
+    <string name="resMainHost">Основной</string>
     <string name="resSaveSettings" />
     <string name="resPort">Порт</string>
+    <string name="resBackupHost">Резервный</string>
     <string name="resLogin">Логин</string>
     <string name="resPass">Пароль</string>
     <string name="debetFirma">Счет</string>
@@ -56,6 +57,7 @@
     <string name="boldItalicStyleNomen">Жирным курсивом - акционный товар</string>
     <string name="journalAbout">Максимальное кол-во заказов в журнале - 100, если их больше, то старые автоматически удаляются\n\nЧерез час после отправки заказа обновите базу данных и убедитесь, что статус заказа изменился. Это будет означать, что он нормально обработан на сервере. Если статус не изменился, отправьте повторно</string>
     <string name="newVersionAvailable">Доступна новая версия</string>
+    <string name="necessaryMemorySize">Для безошибочного обновления данных необходимо иметь 800МБ свободного места на устройстве</string>
 
     <string name="errorInDownloadingProcess">Ошибка во время загрузки</string>
     <string name="successInDownloadingProcess">База данных успешно обновлена</string>

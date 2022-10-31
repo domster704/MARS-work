@@ -21,7 +21,7 @@ public class ReportPageAdapter extends FragmentPagerAdapter {
             case 1:
                 return new PromotionFragment();
             case 2:
-                return new KPIFragment();
+                return new KPIFragmentOld();
             default:
                 return null;
         }

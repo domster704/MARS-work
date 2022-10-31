@@ -20,7 +20,11 @@ class PromotionFragment : Fragment() {
 
     private lateinit var dbHelper: DBHelper
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_promotion, container, false)
     }
 
@@ -35,7 +39,8 @@ class PromotionFragment : Fragment() {
                 return@OnClickListener
             }
 
-            activity!!.findViewById<RelativeLayout>(R.id.layoutWithActionTable).visibility = View.VISIBLE
+            activity!!.findViewById<RelativeLayout>(R.id.layoutWithActionTable).visibility =
+                View.VISIBLE
             it.visibility = View.GONE
 
             showTable()
@@ -48,18 +53,41 @@ class PromotionFragment : Fragment() {
             val tradeRepresentativeID = settings.getString("ReportTPId", "") as String
 
             val gridView: GridView = activity!!.findViewById(R.id.actionGridView)
-            val adapter = ActionAdapter(activity!!, R.layout.action_result_layout, getActionCursor(tradeRepresentativeID), arrayOf(
-                    "ACTION", "DATAN", "DATAK", "VAL", "PLN"), intArrayOf(
-                    R.id.actionDesc, R.id.actionDateStart, R.id.actionDateEnd, R.id.ActionFactValue, R.id.ActionPlanValue), 0)
+            val adapter = ActionAdapter(
+                activity!!,
+                R.layout.action_result_layout,
+                getActionCursor(tradeRepresentativeID),
+                arrayOf(
+                    "ACTION", "DATAN", "DATAK", "VAL", "PLN"
+                ),
+                intArrayOf(
+                    R.id.actionDesc,
+                    R.id.actionDateStart,
+                    R.id.actionDateEnd,
+                    R.id.ActionFactValue,
+                    R.id.ActionPlanValue
+                ),
+                0
+            )
             gridView.adapter = adapter
         }
     }
 
     private fun getActionCursor(torgID: String): Cursor {
-        return dbHelper.readableDatabase.rawQuery("SELECT ROWID as _id, [ACTION], DATAN, DATAK, PLN, ISKOL, CASE WHEN ISKOL=1 THEN KOL ELSE SUMMA END AS 'VAL' FROM [ACTION] WHERE TORG_PRED=?", arrayOf(torgID))
+        return dbHelper.readableDatabase.rawQuery(
+            "SELECT ROWID as _id, [ACTION], DATAN, DATAK, PLN, ISKOL, CASE WHEN ISKOL=1 THEN KOL ELSE SUMMA END AS 'VAL' FROM [ACTION] WHERE TORG_PRED=?",
+            arrayOf(torgID)
+        )
     }
 
-    class ActionAdapter(val context: Context, layout: Int, c: Cursor?, from: Array<out String>?, private val to: IntArray?, flags: Int) : SimpleCursorAdapter(context, layout, c, from, to, flags) {
+    class ActionAdapter(
+        val context: Context,
+        layout: Int,
+        c: Cursor?,
+        from: Array<out String>?,
+        private val to: IntArray?,
+        flags: Int
+    ) : SimpleCursorAdapter(context, layout, c, from, to, flags) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view = super.getView(position, convertView, parent)
 
@@ -67,7 +95,9 @@ class PromotionFragment : Fragment() {
             val tvFact: TextView = view.findViewById(R.id.ActionFactValue)
             val tvPlan: TextView = view.findViewById(R.id.ActionPlanValue)
 
-            val percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(cursor.getColumnIndex("PLN")) * 100
+            val percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(
+                cursor.getColumnIndex("PLN")
+            ) * 100
             tvPercent.text = format(Locale.ROOT, "%.1f", percent)
 
             tvFact.text = if (cursor.getInt(cursor.getColumnIndex("ISKOL")) == 0) {
@@ -91,7 +121,8 @@ class PromotionFragment : Fragment() {
 
             if (percent >= 100) {
                 for (i in to!!) {
-                    view.findViewById<TextView>(i).setTextColor(ContextCompat.getColor(context, R.color.postDataColorGreen))
+                    view.findViewById<TextView>(i)
+                        .setTextColor(ContextCompat.getColor(context, R.color.postDataColorGreen))
                 }
                 tvPercent.setTextColor(ContextCompat.getColor(context, R.color.postDataColorGreen))
             }

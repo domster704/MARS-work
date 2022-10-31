@@ -100,16 +100,20 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         downloader = new Downloader(glbVars, getActivity());
         TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
         new Thread(() -> {
-            versionData = downloader.isServerVersionNewer();
-            getActivity().runOnUiThread(() -> {
-                if (versionData[0].equals("true")) {
-                    tvAppNewVer.setVisibility(View.VISIBLE);
-                    tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
-                } else {
-                    tvAppNewVer.setText(R.string.newVersionAvailable);
-                    tvAppNewVer.setVisibility(View.GONE);
-                }
-            });
+            try {
+                versionData = downloader.isServerVersionNewer();
+                getActivity().runOnUiThread(() -> {
+                    if (versionData[0].equals("true")) {
+                        tvAppNewVer.setVisibility(View.VISIBLE);
+                        tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
+                    } else if (versionData[0].equals("false")){
+                        tvAppNewVer.setText(R.string.newVersionAvailable);
+                        tvAppNewVer.setVisibility(View.GONE);
+                    }
+                });
+            } catch (NullPointerException ignore) {
+            }
+
         }).start();
 
         if (!checkIsEnoughSpaceForUpdateApp()) {
@@ -149,13 +153,14 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     return;
                 }
 
-                String status = downloader.isServerVersionNewer()[0];
-                if (status.equals("false")) {
-                    Config.sout("На сервере нет новой версии");
-                    return;
-                }
-
                 Thread mainLogic = new Thread(() -> {
+                    String status = downloader.isServerVersionNewer()[0];
+                    if (status.equals("false")) {
+                        Config.sout("На сервере нет новой версии");
+                        return;
+                    } else if (status.equals("")) {
+                        return;
+                    }
                     try {
                         getActivity().runOnUiThread(() -> {
                             view.setEnabled(false);
@@ -192,8 +197,20 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     }
 
     private boolean checkIsEnoughSpaceForUpdateApp() {
-        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / MainActivity.SIZE_MB;
+        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+        long availableSpace = (long) (statFs.getFreeBytes() / MainActivity.SIZE_MB);
         return availableSpace > 800;
     }
+
+//    public void TotalExtMemory()
+//    {
+//        StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
+//        System.out.println(statFs.getTotalBytes() / MainActivity.SIZE_MB + " 0*");
+//        statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+//        System.out.println(statFs.getAvailableBytes() / MainActivity.SIZE_MB + " 1*");
+//        statFs = new StatFs(Environment.getDownloadCacheDirectory().getAbsolutePath());
+//        System.out.println(statFs.getFreeBytes() / MainActivity.SIZE_MB + " 2*");
+//        statFs = new StatFs(Environment.getDataDirectory().getAbsolutePath());
+//        System.out.println(statFs.getFreeBytes() / MainActivity.SIZE_MB + " 3*");
+//    }
 }

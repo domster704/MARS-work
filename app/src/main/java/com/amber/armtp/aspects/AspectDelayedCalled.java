@@ -1,8 +1,8 @@
 package com.amber.armtp.aspects;
 
 import android.os.Handler;
-import android.util.Log;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.annotations.DelayedCalled;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -22,16 +22,21 @@ public class AspectDelayedCalled {
 
     @Around("setPointCutDelay()")
     public void setJoinPointDelay(final ProceedingJoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        DelayedCalled delayedCalleds = signature.getMethod().getAnnotation(DelayedCalled.class);
-        int delay = delayedCalleds.delay();
+        try {
+            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+            DelayedCalled delayedCalleds = signature.getMethod().getAnnotation(DelayedCalled.class);
+            int delay = delayedCalleds.delay();
 
-        new Handler().postDelayed(() -> {
-            try {
-                joinPoint.proceed();
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }, delay);
+            new Handler().postDelayed(() -> {
+                try {
+                    joinPoint.proceed();
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            }, delay);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Config.sout(e.getMessage());
+        }
     }
 }

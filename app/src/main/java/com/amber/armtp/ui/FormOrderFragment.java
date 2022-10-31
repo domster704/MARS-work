@@ -37,7 +37,6 @@ import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -96,7 +95,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
         glbVars.spSgi = getActivity().findViewById(R.id.SpinSgi);
-        glbVars.spGrup = getActivity().findViewById(R.id.SpinGrups);
+        glbVars.spGroup = getActivity().findViewById(R.id.SpinGrups);
 
         tvHeadCod = getActivity().findViewById(R.id.tvHeadCod);
         tvHeadDescr = getActivity().findViewById(R.id.tvHeadDescr);
@@ -184,113 +183,120 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    public void SaveOrder() throws ParseException {
+    public void SaveOrder() {
         new Thread(new Runnable() {
             @Override
             @PGShowing
             public void run() {
-//                for (int i = 0; i < 100; i++) {
-                Cursor c, c2, c1;
-                String TP_ID, Contr_ID, Addr_ID, Data, Comment, IDDOC = "";
-                String ContrDes, AddrDes;
-                String Status = "Сохранён";
-                float Sum = 0f;
-
-                String sql;
-                SQLiteStatement stmt;
-
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-                String curDate = df.format(Calendar.getInstance().getTime());
-
-                c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-                c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-                if (c.getCount() == 0) {
-                    Config.sout("Не заполнена шапка заказа");
-                    return;
-                }
-                c2.moveToFirst();
-
-                if (c2.getInt(1) == 0) {
-                    Config.sout("Нет ни одного добавленного товара для заказа");
-                    return;
-                }
-
-                c.moveToFirst();
-                TP_ID = c.getString(c.getColumnIndex("TP_ID"));
-                Data = c.getString(c.getColumnIndex("DATA"));
-                Comment = c.getString(c.getColumnIndex("COMMENT"));
-                Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
-                Addr_ID = c.getString(c.getColumnIndex("ADDR_ID"));
-                ContrDes = c.getString(c.getColumnIndex("C_DES"));
-                AddrDes = c.getString(c.getColumnIndex("A_DES"));
-
-                c.close();
-                c2.close();
-
-                @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
-                String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
-
-                IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
-
-                c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5 FROM Nomen where ZAKAZ<>0", null);
-                if (c1.getCount() == 0) {
-                    c1.close();
-                    return;
-                } else {
-                    Sum = insertIntoZakazyDT(IDDOC, Sum);
-                }
-
-                sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
-                stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
-                glbVars.dbOrders.getWritableDatabase().beginTransaction();
                 try {
-                    stmt.clearBindings();
-                    stmt.bindString(1, IDDOC);
-                    stmt.bindString(2, TP_ID);
-                    stmt.bindString(3, Contr_ID);
-                    stmt.bindString(4, Addr_ID);
-                    stmt.bindString(5, curDate);
-                    stmt.bindString(6, Data);
-                    stmt.bindString(7, Comment);
-                    stmt.bindString(8, Status);
-                    stmt.bindString(9, ContrDes);
-                    stmt.bindString(10, AddrDes);
-                    stmt.bindString(11, String.format(Locale.ROOT, "%.2f", Sum));
-                    stmt.executeInsert();
-                    stmt.clearBindings();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.dbOrders.getWritableDatabase().endTransaction();
-                }
+                    //                for (int i = 0; i < 100; i++) {
+                    glbVars.closeCursors();
+                    Cursor c, c2, c1;
+                    String TP_ID, Contr_ID, Address_ID, Data, Comment, IDDOC = "";
+                    String contrDes, addressDes;
+                    String status = "Сохранён";
+                    float Sum = 0f;
+
+                    String sql;
+                    SQLiteStatement stmt;
+
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                    String curDate = df.format(Calendar.getInstance().getTime());
+
+                    c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                    c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                    if (c.getCount() == 0) {
+                        Config.sout("Не заполнена шапка заказа");
+                        return;
+                    }
+                    c2.moveToFirst();
+
+                    if (c2.getInt(1) == 0) {
+                        Config.sout("Нет ни одного добавленного товара для заказа");
+                        return;
+                    }
+
+                    c.moveToFirst();
+                    TP_ID = c.getString(c.getColumnIndex("TP_ID"));
+                    Data = c.getString(c.getColumnIndex("DATA"));
+                    Comment = c.getString(c.getColumnIndex("COMMENT"));
+                    Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
+                    Address_ID = c.getString(c.getColumnIndex("ADDR_ID"));
+                    contrDes = c.getString(c.getColumnIndex("C_DES"));
+                    addressDes = c.getString(c.getColumnIndex("A_DES"));
+
+                    c.close();
+                    c2.close();
+
+                    @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
+                    String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
+
+                    IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
+
+                    c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5 FROM Nomen where ZAKAZ<>0", null);
+                    if (c1.getCount() == 0) {
+                        c1.close();
+                        return;
+                    } else {
+                        Sum = insertIntoZakazyDT(IDDOC, Sum);
+                    }
+
+                    sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+                    stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
+                    glbVars.dbOrders.getWritableDatabase().beginTransaction();
+                    try {
+                        stmt.clearBindings();
+                        stmt.bindString(1, IDDOC);
+                        stmt.bindString(2, TP_ID);
+                        stmt.bindString(3, Contr_ID);
+                        stmt.bindString(4, Address_ID);
+                        stmt.bindString(5, curDate);
+                        stmt.bindString(6, Data);
+                        stmt.bindString(7, Comment);
+                        stmt.bindString(8, status);
+                        stmt.bindString(9, contrDes);
+                        stmt.bindString(10, addressDes);
+                        stmt.bindString(11, String.format(Locale.ROOT, "%.2f", Sum));
+                        stmt.executeInsert();
+                        stmt.clearBindings();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                        glbVars.dbOrders.getWritableDatabase().endTransaction();
+                    }
 //                }
-                glbVars.db.ClearOrderHeader();
-                glbVars.db.ResetNomen();
+                    glbVars.db.ClearOrderHeader();
+                    glbVars.db.ResetNomen();
 
-                getActivity().runOnUiThread(() -> {
-                    Config.sout("Заказ сохранён");
-                    glbVars.spinContr.setSelection(0);
-                    glbVars.spinAddr.setSelection(0);
-                    glbVars.spinAddr.setAdapter(null);
-                    glbVars.txtDate.setText("");
-                    glbVars.txtComment.setText("");
-                    glbVars.edContrFilter.setText("");
+                    getActivity().runOnUiThread(() -> {
+                        try {
+                            Config.sout("Заказ сохранён");
+//                    glbVars.spinContr.setSelection(0);
+//                    glbVars.spinAddr.setSelection(0);
+//                    glbVars.spinAddr.setAdapter(null);
+//                    glbVars.txtDate.setText("");
+//                    glbVars.txtComment.setText("");
+//                    glbVars.edContrFilter.setText("");
 
-                    editor.putString("ColSgiID", "0");
-                    editor.commit();
+                            editor.putString("ColSgiID", "0");
+                            editor.commit();
 
-                    Fragment fragment = new JournalFragment();
+                            Fragment fragment = new JournalFragment();
 
-//                    Bundle args = new Bundle();
-//                    args.putBoolean("isStartDeletingExtraOrders", true);
-//                    fragment.setArguments(args);
-
-                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
-                    fragmentTransaction.commit();
-                    toolbar.setTitle(R.string.journal);
-                });
+                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
+                            fragmentTransaction.commit();
+                            toolbar.setTitle(R.string.journal);
+                        } catch (Exception e) {
+                            Config.sout(e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (Exception e) {
+                    Config.sout(e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
@@ -300,58 +306,60 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             @Override
             @PGShowing
             public void run() {
-                float Sum = 0f;
-                OrderHeadFragment.isNeededToUpdateOrderTable = false;
-
-                Cursor c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-                if (c.getCount() == 0) {
-                    Config.sout("Не заполнена шапка заказа", Toast.LENGTH_LONG);
-                    return;
-                }
-                c.moveToFirst();
-                String TP_ID = c.getString(c.getColumnIndex("TP_ID")),
-                        Data = c.getString(c.getColumnIndex("DATA")),
-                        Comment = c.getString(c.getColumnIndex("COMMENT")),
-                        Contr_ID = c.getString(c.getColumnIndex("CONTR_ID")),
-                        Addr_ID = c.getString(c.getColumnIndex("ADDR_ID")),
-                        ContrDes = c.getString(c.getColumnIndex("C_DES")),
-                        AddrDes = c.getString(c.getColumnIndex("A_DES"));
-
-                c.close();
-
-                Cursor c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-                c2.moveToFirst();
-                if (c2.getInt(1) == 0) {
-                    Config.sout("Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG);
-                    return;
-                }
-                c2.close();
-
-
-                glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-                Sum = insertIntoZakazyDT(OrderID, Sum);
-
-                String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?  WHERE DOCID='" + OrderID + "'";
-                SQLiteStatement stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
-                glbVars.dbOrders.getWritableDatabase().beginTransaction();
                 try {
-                    stmt.clearBindings();
-                    stmt.bindString(1, TP_ID);
-                    stmt.bindString(2, Contr_ID);
-                    stmt.bindString(3, Addr_ID);
-                    stmt.bindString(4, Data);
-                    stmt.bindString(5, Comment);
-                    stmt.bindString(6, ContrDes);
-                    stmt.bindString(7, AddrDes);
-                    stmt.bindString(8, String.format(Locale.ROOT, "%.2f", Sum));
-                    stmt.executeInsert();
-                    stmt.clearBindings();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
-                    glbVars.dbOrders.getWritableDatabase().endTransaction();
-                }
+                    glbVars.closeCursors();
+                    float Sum = 0f;
+                    OrderHeadFragment.isNeededToUpdateOrderTable = false;
+
+                    Cursor c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                    if (c.getCount() == 0) {
+                        Config.sout("Не заполнена шапка заказа", Toast.LENGTH_LONG);
+                        return;
+                    }
+                    c.moveToFirst();
+                    String TP_ID = c.getString(c.getColumnIndex("TP_ID")),
+                            Data = c.getString(c.getColumnIndex("DATA")),
+                            Comment = c.getString(c.getColumnIndex("COMMENT")),
+                            Contr_ID = c.getString(c.getColumnIndex("CONTR_ID")),
+                            Addr_ID = c.getString(c.getColumnIndex("ADDR_ID")),
+                            ContrDes = c.getString(c.getColumnIndex("C_DES")),
+                            AddrDes = c.getString(c.getColumnIndex("A_DES"));
+
+                    c.close();
+
+                    Cursor c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                    c2.moveToFirst();
+                    if (c2.getInt(1) == 0) {
+                        Config.sout("Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG);
+                        return;
+                    }
+                    c2.close();
+
+
+                    glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
+                    Sum = insertIntoZakazyDT(OrderID, Sum);
+
+                    String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?  WHERE DOCID='" + OrderID + "'";
+                    SQLiteStatement stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
+                    glbVars.dbOrders.getWritableDatabase().beginTransaction();
+                    try {
+                        stmt.clearBindings();
+                        stmt.bindString(1, TP_ID);
+                        stmt.bindString(2, Contr_ID);
+                        stmt.bindString(3, Addr_ID);
+                        stmt.bindString(4, Data);
+                        stmt.bindString(5, Comment);
+                        stmt.bindString(6, ContrDes);
+                        stmt.bindString(7, AddrDes);
+                        stmt.bindString(8, String.format(Locale.ROOT, "%.2f", Sum));
+                        stmt.executeInsert();
+                        stmt.clearBindings();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
+                        glbVars.dbOrders.getWritableDatabase().endTransaction();
+                    }
 
 //                glbVars.db.getWritableDatabase().beginTransaction();
 //                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DATA, COMMENT FROM ORDERS", null);
@@ -379,35 +387,44 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 //                    glbVars.OrderID = "";
 //                }
 
-                glbVars.db.ClearOrderHeader();
-                glbVars.db.ResetNomen();
+                    glbVars.db.ClearOrderHeader();
+                    glbVars.db.ResetNomen();
 
-                getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
-                    try {
-                        glbVars.spinContr.setSelection(0);
-                        glbVars.spinAddr.setSelection(0);
-                        glbVars.spinAddr.setAdapter(null);
-                    } catch (Exception ignored) {
-                    }
-                    try {
-                        glbVars.txtDate.setText("");
-                        glbVars.txtComment.setText("");
-                        glbVars.edContrFilter.setText("");
-                    } catch (Exception ignored) {
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        try {
+                            Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
+//                    try {
+//                        glbVars.spinContr.setSelection(0);
+//                        glbVars.spinAddr.setSelection(0);
+//                        glbVars.spinAddr.setAdapter(null);
+//                    } catch (Exception ignored) {
+//                    }
+//                    try {
+//                        glbVars.txtDate.setText("");
+//                        glbVars.txtComment.setText("");
+//                        glbVars.edContrFilter.setText("");
+//                    } catch (Exception ignored) {
+//                    }
 
-                    Fragment fragment = new JournalFragment();
+                            Fragment fragment = new JournalFragment();
 
-                    Bundle args = new Bundle();
-                    args.putBoolean("isStartDeletingExtraOrders", true);
-                    fragment.setArguments(args);
+                            Bundle args = new Bundle();
+                            args.putBoolean("isStartDeletingExtraOrders", true);
+                            fragment.setArguments(args);
 
-                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
-                    fragmentTransaction.commit();
-                    toolbar.setTitle(R.string.journal);
-                });
+                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(R.id.frame, fragment, "frag_journal");
+                            fragmentTransaction.commit();
+                            toolbar.setTitle(R.string.journal);
+                        } catch (Exception e) {
+                            Config.sout(e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (Exception e) {
+                    Config.sout(e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
@@ -417,12 +434,15 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.ViewOrderId:
-                Fragment fragment = new ViewOrderFragment();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment);
-//                fragmentTransaction.addToBackStack(null);
-//                fragmentTransaction.hide(this);
-                fragmentTransaction.commit();
+                try {
+                    Fragment fragment = new ViewOrderFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.frame, fragment);
+                    fragmentTransaction.commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
+                }
                 return true;
             case R.id.NomenSave:
                 try {
@@ -434,205 +454,238 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         putRealPriceInPriceColumn();
                     }
 
+//                    System.out.println(OrderHeadFragment.isNeededToUpdateOrderTable);
                     if (OrderHeadFragment.isNeededToUpdateOrderTable) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
                         SaveOrder();
                     }
-                } catch (ParseException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    Config.sout(e.getMessage());
                 }
                 return true;
             case R.id.NomenMultiPos:
-                LayoutInflater lInf = LayoutInflater.from(getActivity());
-                View RangeDlgView;
+                try {
 
-                RangeDlgView = lInf.inflate(R.layout.change_range_qty, null);
-                AlertDialog.Builder RangeDlg = new AlertDialog.Builder(getActivity());
-                RangeDlg.setView(RangeDlgView);
+                    LayoutInflater lInf = LayoutInflater.from(getActivity());
+                    View RangeDlgView;
 
-                final EditText edBeginPP = RangeDlgView.findViewById(R.id.edBeginPP);
-                final EditText edEndPP = RangeDlgView.findViewById(R.id.edEndPP);
-                final EditText edPPQty = RangeDlgView.findViewById(R.id.edPPQty);
-                edBeginPP.setText((glbVars.BeginPos != 0 ? String.valueOf(glbVars.BeginPos) : "0"));
-                edEndPP.setText((glbVars.EndPos != 0 ? String.valueOf(glbVars.EndPos) : "0"));
-                edPPQty.setText("0");
+                    RangeDlgView = lInf.inflate(R.layout.change_range_qty, null);
+                    AlertDialog.Builder RangeDlg = new AlertDialog.Builder(getActivity());
+                    RangeDlg.setView(RangeDlgView);
 
-                RangeDlg.setCancelable(true)
-                        .setPositiveButton("OK", (dialog, id) -> {
-                        })
-                        .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
+                    final EditText edBeginPP = RangeDlgView.findViewById(R.id.edBeginPP);
+                    final EditText edEndPP = RangeDlgView.findViewById(R.id.edEndPP);
+                    final EditText edPPQty = RangeDlgView.findViewById(R.id.edPPQty);
+                    edBeginPP.setText((glbVars.BeginPos != 0 ? String.valueOf(glbVars.BeginPos) : "0"));
+                    edEndPP.setText((glbVars.EndPos != 0 ? String.valueOf(glbVars.EndPos) : "0"));
+                    edPPQty.setText("0");
 
-                final AlertDialog alertDlg = RangeDlg.create();
-                Objects.requireNonNull(alertDlg.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-
-                alertDlg.show();
-
-                EditText edInput;
-
-                if (glbVars.BeginPos != 0 && glbVars.EndPos != 0) {
-                    edInput = edPPQty;
-                } else if (glbVars.BeginPos != 0) {
-                    edInput = edEndPP;
-                } else {
-                    edInput = edBeginPP;
-                }
-
-                edInput.requestFocus();
-                edInput.selectAll();
-                edInput.performClick();
-                edInput.setPressed(true);
-                edInput.invalidate();
-                getActivity();
-                InputMethodManager immPP = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-                immPP.showSoftInput(edInput, InputMethodManager.SHOW_IMPLICIT);
-
-                alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                    if (glbVars.NomenAdapter == null || glbVars.myNom == null || glbVars.myNom.getCount() == 0) {
-                        Config.sout("Таблица товаров пуста");
-                        alertDlg.dismiss();
-                        return;
-                    }
-                    if (!edBeginPP.getText().toString().equals("") && !edEndPP.getText().toString().equals("") && !edPPQty.getText().toString().equals("")) {
-                        glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
-                        glbVars.BeginPos = 0;
-                        glbVars.EndPos = 0;
-                        alertDlg.dismiss();
-                    } else {
-                        Toast.makeText(getActivity(), "Необходимо указать начальную позицию, конечную позицию и нужное количество", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                edBeginPP.setOnEditorActionListener((v, actionId, event) -> {
-                    if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                        if (!edBeginPP.getText().toString().equals("")) {
-                            edEndPP.requestFocus();
-                            edEndPP.selectAll();
-                            edEndPP.performClick();
-                            edEndPP.setPressed(true);
-                            edEndPP.invalidate();
-                        }
-                    }
-                    return true;
-                });
-
-                edEndPP.setOnEditorActionListener((v, actionId, event) -> {
-                    if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                        if (!edEndPP.getText().toString().equals("")) {
-                            edPPQty.requestFocus();
-                            edPPQty.selectAll();
-                            edPPQty.performClick();
-                            edPPQty.setPressed(true);
-                            edPPQty.invalidate();
-                        }
-                    }
-                    return true;
-                });
-
-                return true;
-            case R.id.NomenSort:
-                if (glbVars.NomenAdapter == null)
-                    return true;
-
-                if (!isSorted) {
-                    item.setIcon(R.drawable.to_top);
-                    glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
-                    glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
-                    isSorted = true;
-                } else {
-                    item.setIcon(R.drawable.to_end);
-                    glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
-                    glbVars.nomenList.setSelection(0);
-                    isSorted = false;
-                }
-                return true;
-            case R.id.NomenDiscount:
-                glbVars.CalculatePercentSale(mainMenu);
-                return true;
-            case R.id.NomenMultiSelect:
-                if (!glbVars.isMultiSelect) {
-                    LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-                    View promptView;
-
-                    promptView = layoutInflater.inflate(R.layout.multi_qty, null);
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                    alertDialogBuilder.setView(promptView);
-
-                    final EditText input = promptView.findViewById(R.id.txtPercent);
-                    input.setText(String.valueOf(glbVars.MultiQty));
-
-                    alertDialogBuilder
-                            .setCancelable(true)
+                    RangeDlg.setCancelable(true)
                             .setPositiveButton("OK", (dialog, id) -> {
                             })
                             .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
 
-                    final AlertDialog alertD = alertDialogBuilder.create();
-                    Objects.requireNonNull(alertD.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                    final AlertDialog alertDlg = RangeDlg.create();
+                    Objects.requireNonNull(alertDlg.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
-                    alertD.show();
-                    input.requestFocus();
-                    input.selectAll();
-                    input.performClick();
-                    input.setPressed(true);
-                    input.invalidate();
+                    alertDlg.show();
+
+                    EditText edInput;
+
+                    if (glbVars.BeginPos != 0 && glbVars.EndPos != 0) {
+                        edInput = edPPQty;
+                    } else if (glbVars.BeginPos != 0) {
+                        edInput = edEndPP;
+                    } else {
+                        edInput = edBeginPP;
+                    }
+
+                    edInput.requestFocus();
+                    edInput.selectAll();
+                    edInput.performClick();
+                    edInput.setPressed(true);
+                    edInput.invalidate();
                     getActivity();
-                    InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                    InputMethodManager immPP = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+                    immPP.showSoftInput(edInput, InputMethodManager.SHOW_IMPLICIT);
 
-                    alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                        glbVars.isMultiSelect = true;
-                        glbVars.MultiQty = Integer.parseInt(input.getText().toString());
-                        item.setIcon(Objects.requireNonNull(getActivity()).getResources().getDrawable(R.drawable.checkbox_marked));
-                        alertD.dismiss();
+                    alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                        if (glbVars.NomenAdapter == null || glbVars.myNom == null || glbVars.myNom.getCount() == 0) {
+                            Config.sout("Таблица товаров пуста");
+                            alertDlg.dismiss();
+                            return;
+                        }
+                        if (!edBeginPP.getText().toString().equals("") && !edEndPP.getText().toString().equals("") && !edPPQty.getText().toString().equals("")) {
+                            glbVars.UpdateNomenRange(Integer.parseInt(edBeginPP.getText().toString()), Integer.parseInt(edEndPP.getText().toString()), Integer.parseInt(edPPQty.getText().toString()));
+                            glbVars.BeginPos = 0;
+                            glbVars.EndPos = 0;
+                            alertDlg.dismiss();
+                        } else {
+                            Toast.makeText(getActivity(), "Необходимо указать начальную позицию, конечную позицию и нужное количество", Toast.LENGTH_LONG).show();
+                        }
                     });
 
-                    input.setOnEditorActionListener((v, actionId, event) -> {
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                    edBeginPP.setOnEditorActionListener((v, actionId, event) -> {
+                        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                            if (!edBeginPP.getText().toString().equals("")) {
+                                edEndPP.requestFocus();
+                                edEndPP.selectAll();
+                                edEndPP.performClick();
+                                edEndPP.setPressed(true);
+                                edEndPP.invalidate();
+                            }
                         }
                         return true;
                     });
 
-                } else {
-                    glbVars.isMultiSelect = false;
-                    item.setIcon(getResources().getDrawable(R.drawable.checkbox_free));
+                    edEndPP.setOnEditorActionListener((v, actionId, event) -> {
+                        if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                            if (!edEndPP.getText().toString().equals("")) {
+                                edPPQty.requestFocus();
+                                edPPQty.selectAll();
+                                edPPQty.performClick();
+                                edPPQty.setPressed(true);
+                                edPPQty.invalidate();
+                            }
+                        }
+                        return true;
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
+                }
+                return true;
+            case R.id.NomenSort:
+                try {
+                    if (glbVars.NomenAdapter == null)
+                        return true;
+
+                    if (!isSorted) {
+                        item.setIcon(R.drawable.to_top);
+                        glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
+                        glbVars.nomenList.setSelection(glbVars.nomenList.getCount());
+                        isSorted = true;
+                    } else {
+                        item.setIcon(R.drawable.to_end);
+                        glbVars.nomenList.setAdapter(glbVars.NomenAdapter);
+                        glbVars.nomenList.setSelection(0);
+                        isSorted = false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
+                }
+                return true;
+            case R.id.NomenDiscount:
+                try {
+                    glbVars.CalculatePercentSale(mainMenu);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
+                }
+                return true;
+            case R.id.NomenMultiSelect:
+                try {
+                    if (!glbVars.isMultiSelect) {
+                        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+                        View promptView;
+
+                        promptView = layoutInflater.inflate(R.layout.multi_qty, null);
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                        alertDialogBuilder.setView(promptView);
+
+                        final EditText input = promptView.findViewById(R.id.txtPercent);
+                        input.setText(String.valueOf(glbVars.MultiQty));
+
+                        alertDialogBuilder
+                                .setCancelable(true)
+                                .setPositiveButton("OK", (dialog, id) -> {
+                                })
+                                .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
+
+                        final AlertDialog alertD = alertDialogBuilder.create();
+                        Objects.requireNonNull(alertD.getWindow()).clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+                        alertD.show();
+                        input.requestFocus();
+                        input.selectAll();
+                        input.performClick();
+                        input.setPressed(true);
+                        input.invalidate();
+                        getActivity();
+                        InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+
+                        alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                            glbVars.isMultiSelect = true;
+                            glbVars.MultiQty = Integer.parseInt(input.getText().toString());
+                            item.setIcon(Objects.requireNonNull(getActivity()).getResources().getDrawable(R.drawable.checkbox_marked));
+                            alertD.dismiss();
+                        });
+
+                        input.setOnEditorActionListener((v, actionId, event) -> {
+                            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                            }
+                            return true;
+                        });
+
+                    } else {
+                        glbVars.isMultiSelect = false;
+                        item.setIcon(getResources().getDrawable(R.drawable.checkbox_free));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
                 }
 
                 return true;
             case R.id.NomenSales:
                 // ИП Лужбина Н.М.
                 // ИП Беляев В.В.
+                try {
+                    glbVars.isSales = !glbVars.isSales;
+                    glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
 
-                glbVars.isSales = !glbVars.isSales;
-                glbVars.setIconColor(mainMenu, R.id.NomenSales, glbVars.isSales);
-
-                if (isContrIdDifferent || DBHelper.pricesMap.size() == 0) {
-                    isContrIdDifferent = false;
-                    glbVars.putAllPrices();
-                } else if (glbVars.NomenAdapter != null) {
-                    glbVars.NomenAdapter.notifyDataSetChanged();
-                } else {
-                    Config.sout("Ошибка считывания таблицы заказов");
+                    if (isContrIdDifferent || DBHelper.pricesMap.size() == 0) {
+                        isContrIdDifferent = false;
+                        glbVars.putAllPrices();
+                    } else if (glbVars.NomenAdapter != null) {
+                        glbVars.NomenAdapter.notifyDataSetChanged();
+                    } else {
+                        Config.sout("Ошибка считывания таблицы заказов");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
                 }
 
                 return true;
             case R.id.clear_whole_order:
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Очистка заказа")
-                        .setMessage("Вы уверены, что хотите очистить текущий заказ?")
-                        .setPositiveButton("Да", (dialogInterface, i) -> {
-                            glbVars.db.clearOrder();
-                            if (glbVars.NomenAdapter != null) {
-                                glbVars.NomenAdapter.notifyDataSetChanged();
-                            }
-                            if (glbVars.myNom != null) {
-                                glbVars.myNom.requery();
-                            }
-                            setContrAndSum(glbVars);
-                        })
-                        .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.dismiss())
-                        .show();
+                try {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Очистка заказа")
+                            .setMessage("Вы уверены, что хотите очистить текущий заказ?")
+                            .setPositiveButton("Да", (dialogInterface, i) -> {
+                                glbVars.db.clearOrder();
+                                if (glbVars.NomenAdapter != null) {
+                                    glbVars.NomenAdapter.notifyDataSetChanged();
+                                }
+                                if (glbVars.myNom != null) {
+                                    glbVars.myNom.requery();
+                                }
+                                setContrAndSum(glbVars);
+                            })
+                            .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.dismiss())
+                            .show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout(e.getMessage());
+                }
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

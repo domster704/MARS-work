@@ -42,7 +42,7 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity {
     public static final int SIZE_KB = 1024;
-    public static final int SIZE_MB = SIZE_KB * SIZE_KB;
+    public static final float SIZE_MB = (float) SIZE_KB * SIZE_KB;
     //Defining Variables
     private static final int LAYOUT = R.layout.activity_main;
     public static String filesPathDB;
@@ -182,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
+
+
+        globalVariable.db.setBackupIp();
 
         // order.db
         try {
@@ -358,8 +361,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkAvailableSpaceOnDevice() {
-        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        long availableSpace = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong()) / SIZE_MB;
+        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+        long availableSpace = (long) (statFs.getFreeBytes() / MainActivity.SIZE_MB);
         return availableSpace > 200;
     }
 }

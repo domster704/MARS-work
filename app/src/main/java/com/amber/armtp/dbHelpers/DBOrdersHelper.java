@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.amber.armtp.Config;
+
 import java.util.HashMap;
 
 public class DBOrdersHelper extends SQLiteOpenHelper {
@@ -27,7 +29,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                 sqLiteDatabase.execSQL("ALTER TABLE ZAKAZY ADD COLUMN OUTED INTEGER DEFAULT 0");
             }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -138,15 +140,20 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
     public HashMap<String, String> getOrderData(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null);
-        c.moveToNext();
-
         HashMap<String, String> data = new HashMap<>();
-        data.put("TP", c.getString(c.getColumnIndex("TP")));
-        data.put("CONTR", c.getString(c.getColumnIndex("CONTR")));
-        data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
-        data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
-        data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
+        try (Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null)) {
+            c.moveToNext();
+
+            data.put("TP", c.getString(c.getColumnIndex("TP")));
+            data.put("CONTR", c.getString(c.getColumnIndex("CONTR")));
+            data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
+            data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
+            data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Config.sout("Ошибка во время копирования заголовка");
+        }
+
         return data;
     }
 

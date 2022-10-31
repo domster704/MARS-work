@@ -4,6 +4,11 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MARS.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MARS.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MARS.test.iml" filepath="$PROJECT_DIR$/.idea/modules/MARS.test.iml" />
     </modules>
   </component>
 </project>

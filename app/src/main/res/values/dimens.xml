@@ -37,7 +37,7 @@
 
     <!--  Width  -->
     <dimen name="dividerHeaderWidth">2dp</dimen>
-    <dimen name="settingsWidthAfterMargin">80dp</dimen>
+    <dimen name="settingsWidthAfterMargin">120dp</dimen>
 
     <dimen name="reportElemHeight">40dp</dimen>
 
@@ -53,4 +53,10 @@
 
     <dimen name="actionDescWidth">225dp</dimen>
     <dimen name="ActionElemWidth">120dp</dimen>
+
+    <dimen name="imageWidth">500dp</dimen>
+    <dimen name="imageHeight">400dp</dimen>
+    <dimen name="marginStartInSettingsFragment">100dp</dimen>
+    <dimen name="marginEndInDefaultFragment">150dp</dimen>
+    <dimen name="headerFontSizeInDefaultFragment">24sp</dimen>
 </resources>
