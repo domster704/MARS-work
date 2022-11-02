@@ -52,6 +52,7 @@ import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.ftp.Ftp;
 import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.interfaces.TBUpdate;
 import com.amber.armtp.ui.FormOrderFragment;
@@ -77,6 +78,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+
+import it.sauronsoftware.ftp4j.FTPException;
+import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -154,13 +158,14 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public boolean isNeededToResetSearchView = true;
 
 
-    private String[] descriptionContrList = new String[]{"нет данных", "нет данных", "нет данных", "нет данных"};
+    private String[] descriptionContrList = new String[]{"нет данных", "нет данных"};
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             TextView descriptionContr = CurAc.findViewById(R.id.description);
             descriptionContr.setText("");
-            descriptionContrList = new String[]{"нет данных", "нет данных", "нет данных", "нет данных"};;
+            descriptionContrList = new String[]{"нет данных", "нет данных"};
+            ;
             String ItemID = myContr.getString(myContr.getColumnIndex("CODE"));
             if (!ItemID.equals("0") && !OrderHeadFragment.isOrderEditedOrCopied) {
                 LoadContrAddress(ItemID);
@@ -168,22 +173,22 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
             String[] data = db.getDebetInfoByContrID(ItemID);
             String status = myContr.getString(myContr.getColumnIndex("STATUS"));
-            String credit = data[0];
-            String contract = data[1];
-            String debt = data[2];
-            System.out.println(Arrays.toString(data));
+//            String credit = data[0];
+//            String contract = data[1];
+            String debt = data[0];
+//            System.out.println(Arrays.toString(data));
 
             if (!status.equals("")) {
                 descriptionContrList[0] = status;
             }
-            if (!credit.equals("")) {
-                descriptionContrList[1] = "Кредит: " + credit;
-            }
-            if (!contract.equals("")) {
-                descriptionContrList[2] = "Договор: " + contract;
-            }
+//            if (!credit.equals("")) {
+//                descriptionContrList[1] = "Кредит: " + credit;
+//            }
+//            if (!contract.equals("")) {
+//                descriptionContrList[2] = "Договор: " + contract;
+//            }
             if (!debt.equals("")) {
-                descriptionContrList[3] = String.format(Locale.ROOT, "%.2f", Float.parseFloat(debt.replace(",", "."))) + " ₽";
+                descriptionContrList[1] = String.format(Locale.ROOT, "%.2f", Float.parseFloat(debt.replace(",", "."))) + " ₽";
             }
             descriptionContr.setText(String.join(" | ", descriptionContrList));
         }
@@ -639,16 +644,18 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             @PGShowing(isCanceled = true)
             public void run() {
                 SharedPreferences settings;
-                String ftp_server, ftp_user, ftp_pass;
+                String ftp_user, ftp_pass;
                 settings = CurAc.getSharedPreferences("apk_version", 0);
 
-                ftp_server = settings.getString("FtpPhotoSrv", getResources().getString(R.string.ftp_server));
                 ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
                 ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
+                int countOfSuccessfulDownloadedPhotos = 0;
                 for (String fileName : fileNames) {
-                    if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists())
+                    if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists()) {
+                        System.out.println(fileName);
                         continue;
+                    }
 
                     FTPClient ftpClient;
                     ftpClient = new FTPClient();
@@ -674,9 +681,21 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                         FileOutputStream fos = new FileOutputStream(photoDir + "/" + fileName);
 
                         ftpClient.retrieveFile(fileName, fos);
+                        ftpClient.disconnect();
                         fos.close();
-                        String isDownloaded = FilenameUtils.removeExtension(fileName);
 
+                        long remoteSize = getRemotePhotoSize("FOTO/" + fileName);
+                        long sizeOnDevice = getDevicePhotoSize(photoDir + "/" + fileName);
+                        System.out.println(remoteSize + " " + sizeOnDevice);
+                        if (remoteSize != sizeOnDevice) {
+                            Config.sout("Файл был загружен с повреждениями");
+                            File file = new File(photoDir + "/" + fileName);
+                            file.delete();
+                            continue;
+                        }
+
+                        String isDownloaded = FilenameUtils.removeExtension(fileName);
+                        countOfSuccessfulDownloadedPhotos++;
                         try {
                             db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
                         } catch (Exception e) {
@@ -689,20 +708,26 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                         e.printStackTrace();
                         Config.sout("Сервер недоступен");
                         return;
-                    } finally {
-                        try {
-                            ftpClient.disconnect();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
                 }
 
-                CurAc.runOnUiThread(() -> showProductPhoto(fileNames, db.getProductKod5ByRowID(ID)));
+                if (countOfSuccessfulDownloadedPhotos != 0) {
+                    CurAc.runOnUiThread(() -> showProductPhoto(fileNames, db.getProductKod5ByRowID(ID)));
+                }
 
             }
         });
         downloadPhotoTread.start();
+    }
+
+    private long getRemotePhotoSize(String fileName) throws FTPIllegalReplyException, IOException, FTPException {
+        Ftp ftp = new Ftp(ServerDetails.getInstance());
+        return ftp.getFileSize(fileName);
+    }
+
+    private long getDevicePhotoSize(String fileName) {
+        File file = new File(fileName);
+        return file.length();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -1680,6 +1705,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 myWC,
                 myFocus
         };
+        if (myNom != null) {
+            CurAc.runOnUiThread(() -> nomenList.setAdapter(null));
+        }
         for (Cursor cursor : cursors) {
             if (cursor != null) {
                 cursor.close();

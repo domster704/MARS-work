@@ -191,7 +191,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 try {
                     //                for (int i = 0; i < 100; i++) {
                     glbVars.closeCursors();
-                    Cursor c, c2, c1;
+                    Cursor c, c1, c2;
                     String TP_ID, Contr_ID, Address_ID, Data, Comment, IDDOC = "";
                     String contrDes, addressDes;
                     String status = "Сохранён";
@@ -209,14 +209,15 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         Config.sout("Не заполнена шапка заказа");
                         return;
                     }
-                    c2.moveToFirst();
 
-                    if (c2.getInt(1) == 0) {
+                    if (c2.getCount() == 0) {
                         Config.sout("Нет ни одного добавленного товара для заказа");
                         return;
+                    } else {
+                        c2.close();
                     }
 
-                    c.moveToFirst();
+                    c.moveToNext();
                     TP_ID = c.getString(c.getColumnIndex("TP_ID"));
                     Data = c.getString(c.getColumnIndex("DATA"));
                     Comment = c.getString(c.getColumnIndex("COMMENT"));
@@ -226,7 +227,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     addressDes = c.getString(c.getColumnIndex("A_DES"));
 
                     c.close();
-                    c2.close();
 
                     @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
                     String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
@@ -454,7 +454,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         putRealPriceInPriceColumn();
                     }
 
-//                    System.out.println(OrderHeadFragment.isNeededToUpdateOrderTable);
                     if (OrderHeadFragment.isNeededToUpdateOrderTable) {
                         SaveEditOrder(glbVars.OrderID);
                     } else {
@@ -818,9 +817,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             glbVars.dbOrders.getWritableDatabase().execSQL("INSERT INTO ZAKAZY_DT (ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, SUM) VALUES('" + docID + "','" + KOD5 + "','" + DESCR + "','" + ZAKAZ + "','" + PRICE + "','" + String.format(Locale.ROOT, "%.2f", sum) + "')");
         }
 
+        nomenData.close();
         glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
         glbVars.dbOrders.getWritableDatabase().endTransaction();
-        nomenData.close();
         return SUM;
     }
 
@@ -833,8 +832,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             String kod5 = cursor.getString(0);
             database.execSQL("UPDATE NOMEN SET PRICE=? WHERE KOD5=?", new Object[]{DBHelper.pricesMap.get(kod5), kod5});
         }
+        cursor.close();
         database.setTransactionSuccessful();
         database.endTransaction();
-        cursor.close();
     }
 }

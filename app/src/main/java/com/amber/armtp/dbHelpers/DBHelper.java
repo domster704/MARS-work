@@ -1040,12 +1040,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public String[] getDebetInfoByContrID(String itemID) {
         SQLiteDatabase db = this.getReadableDatabase();
         System.out.println(itemID);
-        try (Cursor c = db.rawQuery("SELECT KREDIT, DOGOVOR, DOLG FROM DEBET WHERE CODE=?", new String[]{itemID})) {
+        try (Cursor c = db.rawQuery("SELECT DOLG FROM DEBET WHERE CODE=?", new String[]{itemID})) {
             c.moveToNext();
-            System.out.println(c.getString(c.getColumnIndex("KREDIT")) + " " + c.getString(c.getColumnIndex("DOGOVOR")));
+//            System.out.println(c.getString(c.getColumnIndex("KREDIT")) + " " + c.getString(c.getColumnIndex("DOGOVOR")));
             return new String[]{
-                    c.getString(c.getColumnIndex("KREDIT")),
-                    c.getString(c.getColumnIndex("DOGOVOR")),
+//                    c.getString(c.getColumnIndex("KREDIT")),
+//                    c.getString(c.getColumnIndex("DOGOVOR")),
                     c.getString(c.getColumnIndex("DOLG")),
             };
         } catch (Exception e) {
