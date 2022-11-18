@@ -3,6 +3,7 @@ package com.amber.armtp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.widget.TextView;
 
 import com.amber.armtp.annotations.AsyncUI;
 
@@ -45,6 +46,12 @@ public class ProgressBarLoading {
                 dialog.dismiss();
             });
         }
+    }
+
+    @AsyncUI
+    public void changeText(String text) {
+        TextView tv = dialog.findViewById(R.id.pgBarText);
+        tv.setText(text);
     }
 
     @AsyncUI

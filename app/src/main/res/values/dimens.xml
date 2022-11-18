@@ -59,4 +59,8 @@
     <dimen name="marginStartInSettingsFragment">100dp</dimen>
     <dimen name="marginEndInDefaultFragment">150dp</dimen>
     <dimen name="headerFontSizeInDefaultFragment">24sp</dimen>
+    <dimen name="enterSizeWidth">30dp</dimen>
+    <dimen name="enterSizeHeight">26dp</dimen>
+    <dimen name="marginWidthEnter">5dp</dimen>
+    <dimen name="marginHeightEnter">7dp</dimen>
 </resources>

@@ -47,14 +47,10 @@ public class PromotionFragmentD extends Fragment {
 
         TextView tvPreShow = getActivity().findViewById(R.id.tvPreShow);
         tvPreShow.setOnClickListener(view -> {
-//            try {
-                if (!dbHelper.isTableExisted("ACTION")) {
-                    Config.sout("Таблица ACTION не существует, обновите базу данных");
-                    return;
-                }
-//            } catch (Exception e) {
-//                System.out.println(e);
-//            }
+            if (!dbHelper.isTableExisted("ACTION")) {
+                Config.sout("Таблица ACTION не существует, обновите базу данных");
+                return;
+            }
 
             view.setVisibility(View.GONE);
             getActivity().findViewById(R.id.layoutWithActionTable).setVisibility(View.VISIBLE);

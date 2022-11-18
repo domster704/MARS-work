@@ -22,7 +22,6 @@ public class Ping implements BackupServerConnection {
     }
 
     public boolean isReachable() {
-//        System.out.println(12345);
 //        String ip = "ftp://" + name + ":" + pass + "@" + host + ":" + port + "/";
         int timeout = 5000;
         FTPClient ftpClient = new FTPClient();
@@ -64,7 +63,6 @@ public class Ping implements BackupServerConnection {
 //            connection.connect();
 //            return true;
 //        } catch (IOException e) {
-//            System.out.println(122222);
 //            try {
 //                ip = "ftp://" + name + ":" + pass + "@" + backupIp + ":" + port + "/";
 //                URL url = new URL(ip);
@@ -74,7 +72,6 @@ public class Ping implements BackupServerConnection {
 //                return true;
 //            } catch (IOException ignore) {}
 //        }
-//        System.out.println(123456);
 //        return false;
     }
 }

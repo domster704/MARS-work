@@ -1,77 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollViewJ"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:orientation="horizontal"
-    android:screenOrientation="landscape"
-    android:weightSum="1">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/scrollViewJ"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:orientation="horizontal"
+        android:screenOrientation="landscape"
+        android:weightSum="1">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <!-- Padding 6 + 5dp от  @+id/viewflipper      -->
         <LinearLayout
-            android:id="@+id/checkboxLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/tableHeadersHeight"
-            android:orientation="vertical"
-            android:paddingTop="11dp" />
+                android:id="@+id/checkboxLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/tableHeadersHeight"
+                android:orientation="vertical"
+                android:paddingTop="11dp" />
 
         <ViewFlipper
-            android:id="@+id/viewflipper"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_margin="6dp">
+                android:id="@+id/viewflipper"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="6dp">
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/orders_journal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:longClickable="false"
-                android:orientation="horizontal"
-                android:screenOrientation="landscape"
-                android:weightSum="1"
-                tools:ignore="RedundantNamespace">
+                    android:id="@+id/orders_journal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:longClickable="false"
+                    android:orientation="horizontal"
+                    android:screenOrientation="landscape"
+                    android:weightSum="1">
 
                 <TextView
-                    android:id="@+id/textView18"
-                    android:layout_width="120dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_toEndOf="@+id/textView19"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journZakazDate"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                        android:id="@+id/textView18"
+                        android:layout_width="120dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_toEndOf="@+id/textView19"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/journZakazDate"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
 
                 <TextView
-                    android:id="@+id/textView21"
-                    android:layout_width="200dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_toEndOf="@+id/textView36"
-                    android:layout_toRightOf="@+id/textView36"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journContr"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                        android:id="@+id/textView21"
+                        android:layout_width="200dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_toEndOf="@+id/textView36"
+                        android:layout_toRightOf="@+id/textView36"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/journContr"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
 
                 <TextView
-                    android:id="@+id/textView22"
-                    android:layout_width="@dimen/buttonWidth"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_toLeftOf="@+id/textView20"
-                    android:layout_toRightOf="@+id/textView21"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journAddr"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                        android:id="@+id/textView22"
+                        android:layout_width="@dimen/buttonWidth"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_toLeftOf="@+id/textView20"
+                        android:layout_toRightOf="@+id/textView21"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/journAddr"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
 
                 <GridView
                         android:id="@+id/listSMS"
@@ -81,15 +80,15 @@
                         android:layout_alignParentStart="true"
                         android:layout_marginTop="5dp" />
 
-<!--                <TextView-->
-<!--                        android:id="@+id/journalWaiting"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:layout_below="@+id/textView18"-->
-<!--                        android:textSize="24sp"-->
-<!--                        android:gravity="center_vertical|center_horizontal"-->
-<!--                        android:visibility="invisible"-->
-<!--                        android:text="Подождите..." />-->
+                <!--                <TextView-->
+                <!--                        android:id="@+id/journalWaiting"-->
+                <!--                        android:layout_width="match_parent"-->
+                <!--                        android:layout_height="match_parent"-->
+                <!--                        android:layout_below="@+id/textView18"-->
+                <!--                        android:textSize="24sp"-->
+                <!--                        android:gravity="center_vertical|center_horizontal"-->
+                <!--                        android:visibility="invisible"-->
+                <!--                        android:text="Подождите..." />-->
 
                 <TextView
                         android:id="@+id/textView19"
@@ -103,124 +102,132 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#000000" />
 
-                <TextView
-                    android:id="@+id/textView20"
-                    android:layout_width="120dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_above="@+id/listSMS"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journSum"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                <View
+                        android:id="@+id/empty"
+                        android:layout_width="@dimen/enterSizeWidth"
+                        android:layout_height="@dimen/enterSizeHeight"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginHorizontal="@dimen/marginWidthEnter"
+                        android:layout_marginVertical="@dimen/marginHeightEnter" />
 
                 <TextView
-                    android:id="@+id/textView36"
-                    android:layout_width="120dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_toEndOf="@+id/textView18"
-                    android:layout_toRightOf="@+id/textView18"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/journDeliveryDate"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
+                        android:id="@+id/textView20"
+                        android:layout_width="100dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_above="@+id/listSMS"
+                        android:layout_toStartOf="@+id/empty"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/journSum"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <TextView
+                        android:id="@+id/textView36"
+                        android:layout_width="120dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_toEndOf="@+id/textView18"
+                        android:layout_toRightOf="@+id/textView18"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/journDeliveryDate"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
 
                 <View
-                    android:id="@+id/divide1"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dividerHeaderWidth"
-                    android:layout_below="@+id/textView19"
-                    android:layout_marginHorizontal="1dp"
-                    android:background="@color/dividerColor" />
+                        android:id="@+id/divide1"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dividerHeaderWidth"
+                        android:layout_below="@+id/textView19"
+                        android:layout_marginHorizontal="1dp"
+                        android:background="@color/dividerColor" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/ordersdt_details"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:screenOrientation="landscape">
-
-                <TextView
-                    android:id="@+id/textView23"
-                    android:layout_width="100dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/nomenCod"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/textView27"
-                    android:layout_width="fill_parent"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_alignParentTop="true"
-                    android:layout_toStartOf="@+id/txtLastVer"
-                    android:layout_toEndOf="@+id/textView23"
-                    android:background="@drawable/table_header"
-                    android:gravity="start|center_vertical"
-                    android:paddingStart="15dp"
-                    android:text="@string/nomenDescr"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/txtLastVer"
-                    android:layout_width="100dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_above="@+id/listOrdersDt"
-                    android:layout_toStartOf="@+id/txtCurVer"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/nomenQty"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/txtCurVer"
-                    android:layout_width="100dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_alignParentTop="true"
-                    android:layout_toStartOf="@+id/textView24"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/nomenPrice"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/textView24"
-                    android:layout_width="100dp"
-                    android:layout_height="@dimen/tableHeadersHeight"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:background="@drawable/table_header"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/nomenSum"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#000000" />
-
-                <GridView
-                    android:id="@+id/listOrdersDt"
+                    android:id="@+id/ordersdt_details"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_below="@+id/textView23"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginTop="5dp" />
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:screenOrientation="landscape">
+
+                <TextView
+                        android:id="@+id/textView23"
+                        android:layout_width="100dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/nomenCod"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="fill_parent"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_alignParentTop="true"
+                        android:layout_toStartOf="@+id/txtLastVer"
+                        android:layout_toEndOf="@+id/textView23"
+                        android:background="@drawable/table_header"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="15dp"
+                        android:text="@string/nomenDescr"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <TextView
+                        android:id="@+id/txtLastVer"
+                        android:layout_width="100dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_above="@+id/listOrdersDt"
+                        android:layout_toStartOf="@+id/txtCurVer"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/nomenQty"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <TextView
+                        android:id="@+id/txtCurVer"
+                        android:layout_width="100dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_alignParentTop="true"
+                        android:layout_toStartOf="@+id/textView24"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/nomenPrice"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <TextView
+                        android:id="@+id/textView24"
+                        android:layout_width="100dp"
+                        android:layout_height="@dimen/tableHeadersHeight"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:background="@drawable/table_header"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/nomenSum"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#000000" />
+
+                <GridView
+                        android:id="@+id/listOrdersDt"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_below="@+id/textView23"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp" />
 
                 <View
-                    android:id="@+id/divide2"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dividerHeaderWidth"
-                    android:layout_below="@+id/textView24"
-                    android:layout_marginHorizontal="1dp"
-                    android:background="@color/dividerColor" />
+                        android:id="@+id/divide2"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dividerHeaderWidth"
+                        android:layout_below="@+id/textView24"
+                        android:layout_marginHorizontal="1dp"
+                        android:background="@color/dividerColor" />
             </RelativeLayout>
         </ViewFlipper>
     </LinearLayout>

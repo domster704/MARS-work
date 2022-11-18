@@ -39,6 +39,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
@@ -76,8 +77,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import it.sauronsoftware.ftp4j.FTPException;
 import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
@@ -157,15 +160,15 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public static Thread downloadPhotoTread;
     public boolean isNeededToResetSearchView = true;
 
+    @SuppressLint("StaticFieldLeak")
+    public volatile static ProgressBarLoading currentPB;
 
-    private String[] descriptionContrList = new String[]{"нет данных", "нет данных"};
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             TextView descriptionContr = CurAc.findViewById(R.id.description);
             descriptionContr.setText("");
-            descriptionContrList = new String[]{"нет данных", "нет данных"};
-            ;
+            String[] descriptionContrList = new String[]{"нет данных", "0.00 ₽"};
             String ItemID = myContr.getString(myContr.getColumnIndex("CODE"));
             if (!ItemID.equals("0") && !OrderHeadFragment.isOrderEditedOrCopied) {
                 LoadContrAddress(ItemID);
@@ -173,20 +176,11 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
             String[] data = db.getDebetInfoByContrID(ItemID);
             String status = myContr.getString(myContr.getColumnIndex("STATUS"));
-//            String credit = data[0];
-//            String contract = data[1];
             String debt = data[0];
-//            System.out.println(Arrays.toString(data));
 
             if (!status.equals("")) {
                 descriptionContrList[0] = status;
             }
-//            if (!credit.equals("")) {
-//                descriptionContrList[1] = "Кредит: " + credit;
-//            }
-//            if (!contract.equals("")) {
-//                descriptionContrList[2] = "Договор: " + contract;
-//            }
             if (!debt.equals("")) {
                 descriptionContrList[1] = String.format(Locale.ROOT, "%.2f", Float.parseFloat(debt.replace(",", "."))) + " ₽";
             }
@@ -651,9 +645,10 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
                 int countOfSuccessfulDownloadedPhotos = 0;
-                for (String fileName : fileNames) {
+                for (int i = 0; i < fileNames.length; i++) {
+                    String fileName = fileNames[i];
                     if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists()) {
-                        System.out.println(fileName);
+                        countOfSuccessfulDownloadedPhotos++;
                         continue;
                     }
 
@@ -675,22 +670,22 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                         ftpClient.login(ftp_user, ftp_pass);
                         ftpClient.changeWorkingDirectory("FOTO");
                         ftpClient.enterLocalPassiveMode();
-                        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
                         FileOutputStream fos = new FileOutputStream(photoDir + "/" + fileName);
 
+                        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
                         ftpClient.retrieveFile(fileName, fos);
                         ftpClient.disconnect();
                         fos.close();
 
                         long remoteSize = getRemotePhotoSize("FOTO/" + fileName);
                         long sizeOnDevice = getDevicePhotoSize(photoDir + "/" + fileName);
-                        System.out.println(remoteSize + " " + sizeOnDevice);
-                        if (remoteSize != sizeOnDevice) {
-                            Config.sout("Файл был загружен с повреждениями");
+                        if (Math.abs(remoteSize - sizeOnDevice) >= 5) {
+                            currentPB.changeText("Файл был загружен с повреждениями. Пожалуйста, подождите.");
                             File file = new File(photoDir + "/" + fileName);
                             file.delete();
+                            i--;
                             continue;
                         }
 
@@ -1035,8 +1030,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             Orders = dbOrders.getZakazy();
             if (Orders != null)
                 putCheckBox(Orders);
-            OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum}, 0);
+            OrdersAdapter = new JournalAdapter(CurAc, R.layout.orders_item, Orders, new String[]{"DOCID", "STATUS", "DOC_DATE", "DELIVERY", "CONTR", "ADDR", "SUM", "COMMENT"}, new int[]{R.id.ColOrdDocNo, R.id.ColOrdStatus, R.id.ColOrdDocDate, R.id.ColOrdDeliveryDate, R.id.ColOrdContr, R.id.ColOrdAddr, R.id.ColOrdSum, R.id.ColOrdComment}, 0);
             gdOrders.setAdapter(OrdersAdapter);
+//            gdOrders.setOnItemClickListener(showOrderDataItemClickListener);
         } catch (Exception e) {
             Config.sout(e.getMessage(), Toast.LENGTH_LONG);
         }
@@ -1492,39 +1488,93 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     }
 
     public class JournalAdapter extends SimpleCursorAdapter {
+        private class ClickData {
+            public int visibility;
+
+            public ClickData(int visibility) {
+                this.visibility = visibility;
+            }
+        }
+
+        private HashMap<Integer, ClickData> clickDataMap;
+
         public JournalAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
             super(context, layout, c, from, to, flags);
+            clickDataMap = new HashMap<Integer, ClickData>() {
+                @Override
+                public String toString() {
+                    StringBuilder s = new StringBuilder();
+                    Set<Integer> a = clickDataMap.keySet();
+                    for (int i: a) {
+                        s.append(i).append(" ");
+                    }
+                    return s.toString();
+                }
+            };
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
+            LinearLayout layout = view.findViewById(R.id.expandedData);
+//            System.out.println(clickDataMap);
+            if (!clickDataMap.containsKey(position)) {
+                layout.setVisibility(View.GONE);
+            } else {
+                layout.setVisibility(clickDataMap.get(position).visibility);
+            }
+
+            ImageView showData = view.findViewById(R.id.showData);
             TextView tvSum = view.findViewById(R.id.ColOrdSum);
             updateTextFormatTo2DecAfterPoint(tvSum);
 
             if (cursor.getInt(cursor.getColumnIndex("OUTED")) == 1) {
                 tvSum.setText(tvSum.getText().toString() + " (-)");
             }
-//            try {
-//                if (listOfOutedDocId != null && listOfOutedDocId.contains(cursor.getString(cursor.getColumnIndex("DOCID")))) {
-//                }
-//            } catch (Exception ignore) {
-//            }
 
             TextView tvStatus = view.findViewById(R.id.ColOrdStatus);
             if (tvStatus.getText().toString().equals("Сохранён"))
                 tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
 
-//            String status = cursor.getString(cursor.getColumnIndex("STATUS"));
-//            boolean isChecked = status.equals("Сохранён");
-//            System.out.println(position);
             if (allOrders.size() != 0 && allOrders.get(position).isChecked) {
                 view.setBackgroundColor(getResources().getColor(R.color.gridViewFirstColor));
             } else {
                 view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
             }
+            ClickData clickData = new ClickData(View.GONE);
+            if (!isNeededToShowEnterIcon()) {
+                showData.setVisibility(View.INVISIBLE);
+
+                clickDataMap.put(position, clickData);
+            } else {
+                showData.setVisibility(View.VISIBLE);
+                showData.setOnClickListener(view1 -> {
+                    if (layout.getVisibility() == View.GONE) {
+                        layout.setVisibility(View.VISIBLE);
+                        clickData.visibility = View.VISIBLE;
+                    } else {
+                        layout.setVisibility(View.GONE);
+                    }
+
+                    clickDataMap.put(position, clickData);
+                });
+            }
+
             return view;
+        }
+
+        private boolean isNeededToShowEnterIcon() {
+            Cursor cursor = getCursor();
+            String[] data = new String[]{
+                    cursor.getString(cursor.getColumnIndex("COMMENT"))
+            };
+            for (String i : data) {
+                if (!i.equals("")) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -1646,6 +1696,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
             return view;
         }
+
     }
 
     public void resetCurData() {

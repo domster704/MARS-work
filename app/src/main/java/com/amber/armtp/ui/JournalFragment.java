@@ -131,7 +131,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
     private int[] itemsList;
     private final AdapterView.OnItemClickListener GridOrdersClick = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> myAdapter, View myView, int position, long mylng) {
+        public void onItemClick(AdapterView<?> myAdapter, View view, int position, long mylng) {
             boolean isCheckedNow = GlobalVars.allOrders.get(position).isChecked();
             GlobalVars.allOrders.get(position).setChecked(!isCheckedNow);
             glbVars.OrdersAdapter.notifyDataSetChanged();
@@ -453,62 +453,62 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
             @PGShowing
             public void run() {
 //                try {
-                    try (Cursor cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT ROWID FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null)) {
-                        cHead.moveToNext();
-                        if (cHead.getCount() == 0) {
-                            Config.sout("Отсутсвует информация о загаловке заказа");
-                            return;
-                        }
-                    } catch (Exception e) {
-                        Config.sout("Ошибка во время копирования " + messageName);
-                        e.printStackTrace();
+                try (Cursor cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT ROWID FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null)) {
+                    cHead.moveToNext();
+                    if (cHead.getCount() == 0) {
+                        Config.sout("Отсутсвует информация о загаловке заказа");
                         return;
                     }
+                } catch (Exception e) {
+                    Config.sout("Ошибка во время копирования " + messageName);
+                    e.printStackTrace();
+                    return;
+                }
 
-                    SQLiteDatabase db = glbVars.db.getWritableDatabase();
-                    try (Cursor cNom = glbVars.dbOrders.getReadableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null)) {
-                        glbVars.db.ResetNomen();
-                        db.beginTransaction();
-                        while (cNom.moveToNext()) {
-                            db.execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
-                        }
+                SQLiteDatabase db = glbVars.db.getWritableDatabase();
+                try (Cursor cNom = glbVars.dbOrders.getReadableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null)) {
+                    glbVars.db.ResetNomen();
+                    db.beginTransaction();
+                    while (cNom.moveToNext()) {
+                        db.execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
+                    }
 //                        db.execSQL("DELETE FROM ORDERS");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Config.sout("Ошибка во время попытки " + messageName);
-                        glbVars.db.ResetNomen();
-                        return;
-                    } finally {
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Config.sout("Ошибка во время попытки " + messageName);
+                    glbVars.db.ResetNomen();
+                    return;
+                } finally {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
+                }
 
-                    if (!isCopied) {
-                        OrderHeadFragment.isNeededToUpdateOrderTable = true;
-                    }
+                if (!isCopied) {
+                    OrderHeadFragment.isNeededToUpdateOrderTable = true;
+                }
 
-                    HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
-                    if (orderData.size() == 0) {
-                        Config.sout("Отсутсвуют данные о заказе");
-                        return;
-                    }
+                HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
+                if (orderData.size() == 0) {
+                    Config.sout("Отсутсвуют данные о заказе");
+                    return;
+                }
 
-                    Fragment fragment = new OrderHeadFragment();
+                Fragment fragment = new OrderHeadFragment();
 
-                    Bundle args = new Bundle();
-                    args.putBoolean("isOrderEditedOrCopied", true);
-                    args.putString("TP", orderData.get("TP"));
-                    args.putString("CONTR", orderData.get("CONTR"));
-                    args.putString("ADDR", orderData.get("ADDR"));
-                    args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
-                    args.putString("COMMENT", orderData.get("COMMENT"));
-                    fragment.setArguments(args);
+                Bundle args = new Bundle();
+                args.putBoolean("isOrderEditedOrCopied", true);
+                args.putString("TP", orderData.get("TP"));
+                args.putString("CONTR", orderData.get("CONTR"));
+                args.putString("ADDR", orderData.get("ADDR"));
+                args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
+                args.putString("COMMENT", orderData.get("COMMENT"));
+                fragment.setArguments(args);
 
-                    getActivity().runOnUiThread(() -> {
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                        fragmentTransaction.commit();
-                    });
+                getActivity().runOnUiThread(() -> {
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
+                    fragmentTransaction.commit();
+                });
 //                } catch (Exception e) {
 //                    Config.sout(e.getMessage(), Toast.LENGTH_LONG);
 //                }

@@ -31,6 +31,7 @@ public class AspectProgressBar {
             } else {
                 progressBarLoading = new ProgressBarLoading(GlobalVars.CurFragmentContext);
             }
+            GlobalVars.currentPB = progressBarLoading;
 
             progressBarLoading.show();
             joinPoint.proceed();

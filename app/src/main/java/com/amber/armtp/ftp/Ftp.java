@@ -5,10 +5,8 @@ import com.amber.armtp.ServerDetails;
 import com.amber.armtp.interfaces.BackupServerConnection;
 
 import java.io.IOException;
-import java.net.Socket;
 
 import it.sauronsoftware.ftp4j.FTPClient;
-import it.sauronsoftware.ftp4j.FTPConnector;
 import it.sauronsoftware.ftp4j.FTPException;
 import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 
@@ -53,38 +51,16 @@ public class Ftp implements BackupServerConnection {
         logout();
     }
 
-    public static class MyFTPConnector extends FTPConnector {
-
-        @Override
-        public Socket connectForCommunicationChannel(String s, int i) throws IOException {
-            return null;
-        }
-
-        @Override
-        public Socket connectForDataTransferChannel(String s, int i) throws IOException {
-            return null;
-        }
-
-        public int getTimeout() {
-            return this.connectionTimeout;
-        }
-    }
-
     protected boolean initFtpClient() {
         client = new FTPClient();
         int timeout = 10 * 1000;
         client.setAutoNoopTimeout(timeout);
-
-//        MyFTPConnector ftpConnector = new MyFTPConnector();
-//        ftpConnector.setConnectionTimeout(timeout / 1000);
-//        client.setConnector(ftpConnector);
 
         if (!tryConnectToDefaultIpOtherwiseToBackupIp(client)) {
             return false;
         }
 
         try {
-//            client.connect(ServerDetails.getInstance().host, port);
             client.login(user, password);
             client.setType(FTPClient.TYPE_AUTO);
 

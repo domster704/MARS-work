@@ -843,7 +843,6 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursorSetPrices = null;
         while (cursor.moveToNext()) {
-//            System.out.println(cursor.getString(cursor.getColumnIndex("TIPCEN")));
             cursorSetPrices = db.rawQuery("SELECT NOMEN, CENA, TIPCEN FROM PRICES WHERE TIPCEN = '" + cursor.getString(cursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
             for (int j = 0; j < cursorSetPrices.getCount(); j++) {
                 cursorSetPrices.moveToNext();
@@ -1042,7 +1041,6 @@ public class DBHelper extends SQLiteOpenHelper {
         System.out.println(itemID);
         try (Cursor c = db.rawQuery("SELECT DOLG FROM DEBET WHERE CODE=?", new String[]{itemID})) {
             c.moveToNext();
-//            System.out.println(c.getString(c.getColumnIndex("KREDIT")) + " " + c.getString(c.getColumnIndex("DOGOVOR")));
             return new String[]{
 //                    c.getString(c.getColumnIndex("KREDIT")),
 //                    c.getString(c.getColumnIndex("DOGOVOR")),

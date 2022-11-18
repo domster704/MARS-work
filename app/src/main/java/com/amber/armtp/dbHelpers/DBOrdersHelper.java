@@ -47,7 +47,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " ZAKAZY.STATUS AS STATUS," +
                     " ZAKAZY.SUM as SUM," +
                     " ZAKAZY.DOCID AS DOCID," +
-                    " ZAKAZY.OUTED AS OUTED" +
+                    " ZAKAZY.OUTED AS OUTED," +
+                    " ZAKAZY.COMMENT AS COMMENT" +
                     " FROM ZAKAZY" +
                     " WHERE" +
                     " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))" +

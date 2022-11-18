@@ -190,7 +190,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             public void run() {
                 try {
                     //                for (int i = 0; i < 100; i++) {
-                    glbVars.closeCursors();
                     Cursor c, c1, c2;
                     String TP_ID, Contr_ID, Address_ID, Data, Comment, IDDOC = "";
                     String contrDes, addressDes;
@@ -205,12 +204,14 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
                     c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+
                     if (c.getCount() == 0) {
                         Config.sout("Не заполнена шапка заказа");
                         return;
                     }
 
-                    if (c2.getCount() == 0) {
+                    c2.moveToFirst();
+                    if (c2.getInt(1) == 0) {
                         Config.sout("Нет ни одного добавленного товара для заказа");
                         return;
                     } else {
@@ -272,6 +273,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     getActivity().runOnUiThread(() -> {
                         try {
                             Config.sout("Заказ сохранён");
+                            glbVars.closeCursors();
 //                    glbVars.spinContr.setSelection(0);
 //                    glbVars.spinAddr.setSelection(0);
 //                    glbVars.spinAddr.setAdapter(null);
@@ -307,7 +309,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             @PGShowing
             public void run() {
                 try {
-                    glbVars.closeCursors();
                     float Sum = 0f;
                     OrderHeadFragment.isNeededToUpdateOrderTable = false;
 
@@ -393,6 +394,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     getActivity().runOnUiThread(() -> {
                         try {
                             Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
+                            glbVars.closeCursors();
 //                    try {
 //                        glbVars.spinContr.setSelection(0);
 //                        glbVars.spinAddr.setSelection(0);
