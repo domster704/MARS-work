@@ -18,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
@@ -42,6 +43,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -163,6 +165,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     @SuppressLint("StaticFieldLeak")
     public volatile static ProgressBarLoading currentPB;
 
+    private static boolean isNeededToSelectRowAfterGoToGroup = false;
+    private static String kod5 = "";
+
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
@@ -256,12 +261,14 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                             EndPos = position + 1;
                             return true;
                         case R.id.goToGroup:
+                            isNeededToSelectRowAfterGoToGroup = true;
+                            kod5 = c.getString(c.getColumnIndex("KOD5"));
                             resetAllSpinners();
                             resetCurData();
                             resetSearchViewData();
 
                             SetSelectedSgi(sgi);
-                            SetSelectedGrup(group);
+                            SetSelectedGroup(group);
                             return true;
                     }
                     return true;
@@ -295,10 +302,51 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
                 FormOrderFragment.isSorted = false;
                 FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    @PGShowing
+                    public void run() {
+                        if (isNeededToSelectRowAfterGoToGroup) {
+                            int[] elementPositionData = getPositionByKod5(kod5);
+                            System.out.println(Arrays.toString(elementPositionData));
+                            int elementPosition = elementPositionData[0];
+                            int visibleElementsCount = nomenList.getLastVisiblePosition() - nomenList.getFirstVisiblePosition() + 1;
+                            if (elementPosition == -1) {
+                                elementPosition = 0;
+                            } else if (elementPositionData[1] == 1) {
+                                elementPosition += visibleElementsCount;
+                            }
+                            System.out.println(elementPosition);
+                            nomenList.setSelection(elementPosition);
+                            isNeededToSelectRowAfterGoToGroup = false;
+                            kod5 = "";
+                        }
+                    }
+                }, 300);
             } catch (Exception e) {
                 e.printStackTrace();
                 Config.sout(e.getMessage());
             }
+        }
+
+        private int[] getPositionByKod5(String kod5) {
+            int i = 0;
+            while (myNom.moveToNext()) {
+                if (myNom.getString(myNom.getColumnIndex("KOD5")).equals(kod5)) {
+                    return new int[]{i, 1};
+                }
+                i++;
+            }
+
+            for (int j = 0; j <= nomenList.getLastVisiblePosition(); j++) {
+                RelativeLayout layout = (RelativeLayout) nomenList.getChildAt(j);
+                String localKod5 = ((TextView) layout.findViewById(R.id.ColNomCod)).getText().toString();
+                if (localKod5.equals(kod5)) {
+                    return  new int[]{j, 0};
+                }
+            }
+            return  new int[]{-1, 0};
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -357,6 +405,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
                 nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
                     if (menuItem.getItemId() == R.id.goToGroup) {
+                        isNeededToSelectRowAfterGoToGroup = true;
+                        kod5 = c.getString(c.getColumnIndex("KOD5"));
+
                         fragment = new FormOrderFragment();
 
                         Bundle args = new Bundle();
@@ -469,13 +520,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             @Override
             @PGShowing
             public void run() {
-//                myNom = db.getNomen(
-//                        CurSGI, CurGroup,
-//                        CurWCID, CurFocusID, CurSearchName);
-//                Config.printCursor(myNom);
-//                if (myNom != null) {
-//                    myNom.close();
-//                }
                 myNom = db.getNomen(
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
@@ -506,11 +550,11 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     }
 
     @DelayedCalled(delay = 300)
-    public void SetSelectedGrup(String Grup) {
+    public void SetSelectedGroup(String Group) {
         for (int i = 0; i < spGroup.getCount(); i++) {
             Cursor value = (Cursor) spGroup.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
-            if (Grup.equals(id)) {
+            if (Group.equals(id)) {
                 spGroup.setSelection(i);
                 return;
             }
@@ -1505,7 +1549,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 public String toString() {
                     StringBuilder s = new StringBuilder();
                     Set<Integer> a = clickDataMap.keySet();
-                    for (int i: a) {
+                    for (int i : a) {
                         s.append(i).append(" ");
                     }
                     return s.toString();
@@ -1518,7 +1562,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             LinearLayout layout = view.findViewById(R.id.expandedData);
-//            System.out.println(clickDataMap);
+
             if (!clickDataMap.containsKey(position)) {
                 layout.setVisibility(View.GONE);
             } else {
@@ -1542,10 +1586,10 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             } else {
                 view.setBackgroundColor(getResources().getColor(R.color.gridViewSecondColor));
             }
+
             ClickData clickData = new ClickData(View.GONE);
             if (!isNeededToShowEnterIcon()) {
                 showData.setVisibility(View.INVISIBLE);
-
                 clickDataMap.put(position, clickData);
             } else {
                 showData.setVisibility(View.VISIBLE);
@@ -1556,7 +1600,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                     } else {
                         layout.setVisibility(View.GONE);
                     }
-
                     clickDataMap.put(position, clickData);
                 });
             }

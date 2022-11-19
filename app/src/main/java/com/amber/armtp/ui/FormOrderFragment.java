@@ -122,7 +122,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             glbVars.resetSearchViewData();
 
             glbVars.SetSelectedSgi(sgi);
-            glbVars.SetSelectedGrup(group);
+            glbVars.SetSelectedGroup(group);
 
             getArguments().remove("SGI");
             getArguments().remove("Group");
@@ -190,7 +190,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             public void run() {
                 try {
                     //                for (int i = 0; i < 100; i++) {
-                    Cursor c, c1, c2;
+                    Cursor orderHeader,
+//                            nomenCountOld,
+                            nomenCount;
                     String TP_ID, Contr_ID, Address_ID, Data, Comment, IDDOC = "";
                     String contrDes, addressDes;
                     String status = "Сохранён";
@@ -202,45 +204,45 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                     String curDate = df.format(Calendar.getInstance().getTime());
 
-                    c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-                    c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                    orderHeader = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                    nomenCount = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
 
-                    if (c.getCount() == 0) {
+                    if (orderHeader.getCount() == 0) {
                         Config.sout("Не заполнена шапка заказа");
                         return;
                     }
 
-                    c2.moveToFirst();
-                    if (c2.getInt(1) == 0) {
+                    nomenCount.moveToFirst();
+                    if (nomenCount.getInt(1) == 0) {
                         Config.sout("Нет ни одного добавленного товара для заказа");
                         return;
                     } else {
-                        c2.close();
+                        nomenCount.close();
                     }
 
-                    c.moveToNext();
-                    TP_ID = c.getString(c.getColumnIndex("TP_ID"));
-                    Data = c.getString(c.getColumnIndex("DATA"));
-                    Comment = c.getString(c.getColumnIndex("COMMENT"));
-                    Contr_ID = c.getString(c.getColumnIndex("CONTR_ID"));
-                    Address_ID = c.getString(c.getColumnIndex("ADDR_ID"));
-                    contrDes = c.getString(c.getColumnIndex("C_DES"));
-                    addressDes = c.getString(c.getColumnIndex("A_DES"));
+                    orderHeader.moveToNext();
+                    TP_ID = orderHeader.getString(orderHeader.getColumnIndex("TP_ID"));
+                    Data = orderHeader.getString(orderHeader.getColumnIndex("DATA"));
+                    Comment = orderHeader.getString(orderHeader.getColumnIndex("COMMENT"));
+                    Contr_ID = orderHeader.getString(orderHeader.getColumnIndex("CONTR_ID"));
+                    Address_ID = orderHeader.getString(orderHeader.getColumnIndex("ADDR_ID"));
+                    contrDes = orderHeader.getString(orderHeader.getColumnIndex("C_DES"));
+                    addressDes = orderHeader.getString(orderHeader.getColumnIndex("A_DES"));
 
-                    c.close();
+                    orderHeader.close();
 
                     @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
                     String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
 
                     IDDOC += TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
 
-                    c1 = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5 FROM Nomen where ZAKAZ<>0", null);
-                    if (c1.getCount() == 0) {
-                        c1.close();
-                        return;
-                    } else {
-                        Sum = insertIntoZakazyDT(IDDOC, Sum);
-                    }
+//                    nomenCount = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5 FROM Nomen where ZAKAZ<>0", null);
+//                    if (nomenCount.getCount() == 0) {
+//                        nomenCount.close();
+//                        return;
+//                    } else {
+                    Sum = insertIntoOrderDT(IDDOC, Sum);
+//                    }
 
                     sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
                     stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
@@ -274,12 +276,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         try {
                             Config.sout("Заказ сохранён");
                             glbVars.closeCursors();
-//                    glbVars.spinContr.setSelection(0);
-//                    glbVars.spinAddr.setSelection(0);
-//                    glbVars.spinAddr.setAdapter(null);
-//                    glbVars.txtDate.setText("");
-//                    glbVars.txtComment.setText("");
-//                    glbVars.edContrFilter.setText("");
 
                             editor.putString("ColSgiID", "0");
                             editor.commit();
@@ -312,33 +308,32 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     float Sum = 0f;
                     OrderHeadFragment.isNeededToUpdateOrderTable = false;
 
-                    Cursor c = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
-                    if (c.getCount() == 0) {
+                    Cursor orderHeader = glbVars.db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
+                    if (orderHeader.getCount() == 0) {
                         Config.sout("Не заполнена шапка заказа", Toast.LENGTH_LONG);
                         return;
                     }
-                    c.moveToFirst();
-                    String TP_ID = c.getString(c.getColumnIndex("TP_ID")),
-                            Data = c.getString(c.getColumnIndex("DATA")),
-                            Comment = c.getString(c.getColumnIndex("COMMENT")),
-                            Contr_ID = c.getString(c.getColumnIndex("CONTR_ID")),
-                            Addr_ID = c.getString(c.getColumnIndex("ADDR_ID")),
-                            ContrDes = c.getString(c.getColumnIndex("C_DES")),
-                            AddrDes = c.getString(c.getColumnIndex("A_DES"));
+                    orderHeader.moveToFirst();
+                    String TP_ID = orderHeader.getString(orderHeader.getColumnIndex("TP_ID")),
+                            Data = orderHeader.getString(orderHeader.getColumnIndex("DATA")),
+                            Comment = orderHeader.getString(orderHeader.getColumnIndex("COMMENT")),
+                            ContrID = orderHeader.getString(orderHeader.getColumnIndex("CONTR_ID")),
+                            AddressID = orderHeader.getString(orderHeader.getColumnIndex("ADDR_ID")),
+                            ContrDes = orderHeader.getString(orderHeader.getColumnIndex("C_DES")),
+                            AddressDes = orderHeader.getString(orderHeader.getColumnIndex("A_DES"));
 
-                    c.close();
+                    orderHeader.close();
 
-                    Cursor c2 = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
-                    c2.moveToFirst();
-                    if (c2.getInt(1) == 0) {
+                    Cursor orderCount = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
+                    orderCount.moveToFirst();
+                    if (orderCount.getInt(1) == 0) {
                         Config.sout("Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG);
                         return;
                     }
-                    c2.close();
-
+                    orderCount.close();
 
                     glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-                    Sum = insertIntoZakazyDT(OrderID, Sum);
+                    Sum = insertIntoOrderDT(OrderID, Sum);
 
                     String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?  WHERE DOCID='" + OrderID + "'";
                     SQLiteStatement stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
@@ -346,12 +341,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     try {
                         stmt.clearBindings();
                         stmt.bindString(1, TP_ID);
-                        stmt.bindString(2, Contr_ID);
-                        stmt.bindString(3, Addr_ID);
+                        stmt.bindString(2, ContrID);
+                        stmt.bindString(3, AddressID);
                         stmt.bindString(4, Data);
                         stmt.bindString(5, Comment);
                         stmt.bindString(6, ContrDes);
-                        stmt.bindString(7, AddrDes);
+                        stmt.bindString(7, AddressDes);
                         stmt.bindString(8, String.format(Locale.ROOT, "%.2f", Sum));
                         stmt.executeInsert();
                         stmt.clearBindings();
@@ -362,32 +357,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         glbVars.dbOrders.getWritableDatabase().endTransaction();
                     }
 
-//                glbVars.db.getWritableDatabase().beginTransaction();
-//                cHead = glbVars.db.getWritableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DATA, COMMENT FROM ORDERS", null);
-//                if (cHead.moveToNext()) {
-//                    try {
-//                        glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-//                        Sum = insertIntoZakazyDT(OrderID, Sum);
-//
-//                        glbVars.dbOrders.getWritableDatabase().execSQL("UPDATE ZAKAZY SET TP = '" + cHead.getString(cHead.getColumnIndex("TP")) + "'," +
-//                                " CONTR = '" + cHead.getString(cHead.getColumnIndex("CONTR")) + "'," +
-//                                " ADDR = '" + cHead.getString(cHead.getColumnIndex("ADDR")) + "'," +
-//                                " DELIVERY_DATE = '" + cHead.getString(cHead.getColumnIndex("DATA")) + "'," +
-//                                " COMMENT = '" + cHead.getString(cHead.getColumnIndex("COMMENT")) + "'," +
-//                                " CONTR_DES = '" + ContrDes + "'," +
-//                                " ADDR_DES = '" + AddrDes + "'," +
-//                                " SUM = '" + String.format(Locale.ROOT, "%.2f", Sum) + "' WHERE DOCID='" + OrderID + "'");
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    cHead.close();
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                    glbVars.db.ClearOrderHeader();
-//                    glbVars.OrderID = "";
-//                }
-
                     glbVars.db.ClearOrderHeader();
                     glbVars.db.ResetNomen();
 
@@ -395,18 +364,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                         try {
                             Toast.makeText(getActivity(), "Заказ сохранён", Toast.LENGTH_LONG).show();
                             glbVars.closeCursors();
-//                    try {
-//                        glbVars.spinContr.setSelection(0);
-//                        glbVars.spinAddr.setSelection(0);
-//                        glbVars.spinAddr.setAdapter(null);
-//                    } catch (Exception ignored) {
-//                    }
-//                    try {
-//                        glbVars.txtDate.setText("");
-//                        glbVars.txtComment.setText("");
-//                        glbVars.edContrFilter.setText("");
-//                    } catch (Exception ignored) {
-//                    }
 
                             Fragment fragment = new JournalFragment();
 
@@ -799,7 +756,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    private float insertIntoZakazyDT(String docID, float SUM) {
+    private float insertIntoOrderDT(String docID, float SUM) {
         Cursor nomenData;
         if (glbVars.isSales) {
             nomenData = glbVars.db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ<>0", null);
