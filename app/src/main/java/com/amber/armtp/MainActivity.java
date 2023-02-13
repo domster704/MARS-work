@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "WifiManagerLeak"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,9 +117,11 @@ public class MainActivity extends AppCompatActivity {
 
         String user = serverSettings.getString("FtpServerUser", getResources().getString(R.string.user));
         String password = serverSettings.getString("FtpServerPass", getResources().getString(R.string.password));
+        int timeout = serverSettings.getInt("timeout", 15000);
 
         // It's singleton instance for future using
         ServerDetails serverDetails = ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);
+        serverDetails.timeout = timeout;
 
         globalVariable = (GlobalVars) getApplicationContext();
 
@@ -208,6 +210,25 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initNavigationView();
 
+//        TelephonyManager tm = null;
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+//                TelephonyManager mTelephonyMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+//                String imsi = mTelephonyMgr.getSubscriberId() + " " + mTelephonyMgr.getLine1Number();
+//                System.out.println(imsi);
+//            } else {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 123);
+//            }
+//        }
+//        864004033812444
+
+//        String androidDeviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+//                Settings.Secure.ANDROID_ID);
+//        System.out.println(androidDeviceId + " *0");
+
+//        String androidId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+//        Log.d("xd", androidId);
+
         // Initializing NavigationView
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -294,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         setToolbarTitle("Журнал");
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

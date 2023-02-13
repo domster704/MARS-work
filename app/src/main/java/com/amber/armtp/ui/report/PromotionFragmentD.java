@@ -95,8 +95,14 @@ public class PromotionFragmentD extends Fragment {
             TextView tvPercent = view.findViewById(R.id.ActionPercent);
             TextView tvFact = view.findViewById(R.id.ActionFactValue);
 
-            float percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(cursor.getColumnIndex("PLN")) * 100;
-            tvPercent.setText(String.format(Locale.ROOT, "%.2f", percent));
+            float planValue = cursor.getFloat(cursor.getColumnIndex("PLN"));
+            System.out.println(planValue);
+            if (planValue != 0) {
+                float percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / planValue * 100;
+                tvPercent.setText(String.format(Locale.ROOT, "%.2f", percent));
+            } else {
+                tvPercent.setText("-");
+            }
 
             if (cursor.getInt(cursor.getColumnIndex("ISKOL")) == 0) {
                 tvFact.setText(String.format(Locale.ROOT, "%.2f", cursor.getFloat(cursor.getColumnIndex("VAL"))));

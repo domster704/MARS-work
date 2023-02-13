@@ -296,7 +296,7 @@ public class SalesFragment extends Fragment {
 
     private SpecificDataForSalesReportFragment[] getContrIdFromSpinner() {
         Cursor cursor = (Cursor) contrsSpinner.getItemAtPosition(contrsSpinner.getSelectedItemPosition());
-        return new SpecificDataForSalesReportFragment[] {
+        return new SpecificDataForSalesReportFragment[]{
                 new SpecificDataForSalesReportFragment("CONTRS", cursor.getString(cursor.getColumnIndex("CODE")))
         };
     }

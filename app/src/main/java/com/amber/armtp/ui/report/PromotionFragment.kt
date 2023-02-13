@@ -95,10 +95,14 @@ class PromotionFragment : Fragment() {
             val tvFact: TextView = view.findViewById(R.id.ActionFactValue)
             val tvPlan: TextView = view.findViewById(R.id.ActionPlanValue)
 
-            val percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / cursor.getFloat(
-                cursor.getColumnIndex("PLN")
-            ) * 100
-            tvPercent.text = format(Locale.ROOT, "%.1f", percent)
+            val planValue = cursor.getFloat(cursor.getColumnIndex("PLN"))
+            var percent = -1f
+            tvPercent.text = if (planValue == 0f) {
+                "-"
+            } else {
+                percent = cursor.getFloat(cursor.getColumnIndex("VAL")) / planValue * 100
+                format(Locale.ROOT, "%.1f", percent)
+            }
 
             tvFact.text = if (cursor.getInt(cursor.getColumnIndex("ISKOL")) == 0) {
                 format(Locale.ROOT, "%.2f", cursor.getFloat(cursor.getColumnIndex("VAL"))) + " руб"
@@ -119,7 +123,7 @@ class PromotionFragment : Fragment() {
             }
             view.setBackgroundColor(backgroundColor)
 
-            if (percent >= 100) {
+            if (percent >= 100 && percent != -1f) {
                 for (i in to!!) {
                     view.findViewById<TextView>(i)
                         .setTextColor(ContextCompat.getColor(context, R.color.postDataColorGreen))

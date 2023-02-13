@@ -96,8 +96,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        System.out.println(isNeededToUpdateOrderTable);
-
 //        _checkAndSetContrIDAfterDestroying();
         glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         toolbar = getActivity().findViewById(R.id.toolbar);
@@ -294,6 +292,8 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         glbVars.spAddress = getActivity().findViewById(R.id.ColContrAddrID);
 
         CONTR_ID = glbVars.spContr.getText().toString();
+        CONTR_ID = CONTR_ID.trim();
+
         AddressId = glbVars.spAddress != null ? glbVars.spAddress.getText().toString() : "0";
 
         String DeliveryDate = glbVars.txtDate.getText().toString();
@@ -308,16 +308,18 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         editor.putString("TP_ID", TP_ID);
         editor.commit();
 
-        if (PREVIOUS_CONTR_ID.equals("")) {
+        FormOrderFragment.isContrIdDifferent = true;
+        if (PREVIOUS_CONTR_ID.equals("") || PREVIOUS_CONTR_ID == null || CONTR_ID == null || CONTR_ID.equals("")) {
             PREVIOUS_CONTR_ID = CONTR_ID;
-            FormOrderFragment.isContrIdDifferent = true;
+//            FormOrderFragment.isContrIdDifferent = true;
         } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
-            FormOrderFragment.isContrIdDifferent = true;
+//            FormOrderFragment.isContrIdDifferent = true;
             PREVIOUS_CONTR_ID = CONTR_ID;
             glbVars.updateNomenPrice(isCopiedLocal);
-        } else {
-            FormOrderFragment.isContrIdDifferent = false;
         }
+//        else {
+//            FormOrderFragment.isContrIdDifferent = false;
+//        }
 
         GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
 
@@ -336,14 +338,14 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         goToFormOrderFragment();
     }
 
-    private void _checkAndSetContrIDAfterDestroying() {
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(APP_PREFERENCES_CONTR, Context.MODE_PRIVATE);
-        if (sharedPreferences == null)
-            return;
-        String newPreviousContrID = sharedPreferences.getString("PREVIOUS_CONTR_ID", "");
-        String newContrID = sharedPreferences.getString("CURRENT_CONTR_ID", "");
-
-        PREVIOUS_CONTR_ID = !newPreviousContrID.equals("") ? newPreviousContrID : PREVIOUS_CONTR_ID;
-        CONTR_ID = !newContrID.equals("") ? newContrID : CONTR_ID;
-    }
+//    private void _checkAndSetContrIDAfterDestroying() {
+//        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(APP_PREFERENCES_CONTR, Context.MODE_PRIVATE);
+//        if (sharedPreferences == null)
+//            return;
+//        String newPreviousContrID = sharedPreferences.getString("PREVIOUS_CONTR_ID", "");
+//        String newContrID = sharedPreferences.getString("CURRENT_CONTR_ID", "");
+//
+//        PREVIOUS_CONTR_ID = !newPreviousContrID.equals("") ? newPreviousContrID : PREVIOUS_CONTR_ID;
+//        CONTR_ID = !newContrID.equals("") ? newContrID : CONTR_ID;
+//    }
 }

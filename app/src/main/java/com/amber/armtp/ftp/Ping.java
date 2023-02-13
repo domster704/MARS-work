@@ -23,7 +23,7 @@ public class Ping implements BackupServerConnection {
 
     public boolean isReachable() {
 //        String ip = "ftp://" + name + ":" + pass + "@" + host + ":" + port + "/";
-        int timeout = 5000;
+        int timeout = ServerDetails.getInstance().timeout;
         FTPClient ftpClient = new FTPClient();
         ftpClient.setDefaultTimeout(timeout);
         ftpClient.setDataTimeout(timeout);

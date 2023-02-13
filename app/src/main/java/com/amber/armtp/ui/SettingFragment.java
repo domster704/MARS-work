@@ -42,6 +42,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private EditText fontSize;
     private EditText etFtpServer, etFtpUser, etFtpPass, etFtpPort, etFtpBackupServer;
     private EditText etTpSetting;
+    private EditText etTimeout;
 
     @Nullable
     @Override
@@ -85,12 +86,14 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         etFtpUser = getActivity().findViewById(R.id.edFtpUser);
         etFtpPort = getActivity().findViewById(R.id.edFtpPort);
         etFtpBackupServer = getActivity().findViewById(R.id.edFtpBackupHost);
+        etTimeout = getActivity().findViewById(R.id.etTimeout);
 
         etFtpServer.setText(serverSettings.getString("FtpServerHost", getResources().getString(R.string.host)));
         etFtpPass.setText(serverSettings.getString("FtpServerPass", getResources().getString(R.string.password)));
         etFtpUser.setText(serverSettings.getString("FtpServerUser", getResources().getString(R.string.user)));
         etFtpPort.setText(String.valueOf(serverSettings.getInt("FtpServerPort", Integer.parseInt(getResources().getString(R.string.port)))));
         etFtpBackupServer.setText(serverSettings.getString("FtpBackupServerHost", ServerDetails.getInstance().getBackUpIp()));
+        etTimeout.setText(String.valueOf(serverSettings.getInt("timeout", ServerDetails.getInstance().timeout)));
 
         nomenDescriptionFontSize = settings.getInt("fontSize", 14);
         fontSize = getActivity().findViewById(R.id.fontSize);
@@ -193,6 +196,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             changeServerData();
             changeFontSize();
             setTpInSalesFragment();
+            changeTimeout();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -247,5 +251,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private void setTpInSalesFragment() {
         editor.putString("ReportTPId", etTpSetting.getText().toString().trim());
         editor.apply();
+    }
+
+    private void changeTimeout() {
+        ServerDetails.getInstance().timeout = Integer.parseInt(etTimeout.getText().toString());
+        editor.putInt("timeout", ServerDetails.getInstance().timeout);
+        editor.apply();
+        Config.sout("Таймаут изменён на " + ServerDetails.getInstance().timeout);
     }
 }

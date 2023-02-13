@@ -19,6 +19,7 @@ import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.DelayedCalled;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.BackupServerConnection;
+import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.UpdateDataFragment;
 
 import org.apache.commons.net.ftp.FTP;
@@ -58,6 +59,8 @@ public class Downloader implements BackupServerConnection {
         }
     }
 
+    // TODO: есть баг, когда интернет плохой - полоса прогресса не двигается, но когда он переключается на хороший, и пользователь выходит из меню "Обновить" и заходит обратнр,
+    // TODO: то всё работает так, как будто он сохраняет предыдущий результат байтов и продолжает их "догружать", в результате чего разархивирование выдаёт ошибку.
     public void downloadDB(final UpdateDataFragment.UIData ui, View view) {
         String fileName = "armtp3.rar";
         String filePath = MainActivity.filesPathDB + fileName;
@@ -75,6 +78,7 @@ public class Downloader implements BackupServerConnection {
                 view.setEnabled(true);
                 ui.tvData.setTextColor(Color.rgb(3, 103, 0));
                 Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
+                FormOrderFragment.isContrIdDifferent = true;
                 ftpFileDownloader.changePGData(1, 1, ui, true);
                 globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
 
@@ -98,7 +102,7 @@ public class Downloader implements BackupServerConnection {
         String ver = BuildConfig.VERSION_NAME;
 
         FTPClient client = new FTPClient();
-        int timeout = 10 * 1000;
+        int timeout = ServerDetails.getInstance().timeout;
         client.setDefaultTimeout(timeout);
         client.setDataTimeout(timeout);
         client.setConnectTimeout(timeout);

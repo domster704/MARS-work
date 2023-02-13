@@ -72,6 +72,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -91,8 +92,6 @@ import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
  * Created by filimonov on 22-08-2016.
  * Updated by domster704 on 27.09.2021
  */
-
-// TODO: 5 месяцев назад всё было ок с заполнением заказа
 public class GlobalVars extends Application implements TBUpdate, BackupServerConnection {
     public static ArrayList<ChosenOrdersData> allOrders = new ArrayList<>();
 
@@ -166,7 +165,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public volatile static ProgressBarLoading currentPB;
 
     private static boolean isNeededToSelectRowAfterGoToGroup = false;
-    private static String kod5 = "";
+    public static String kod5 = "";
 
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -256,19 +255,34 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                             return true;
                         case R.id.setBeginPos:
                             BeginPos = position + 1;
+                            NomenAdapter.notifyDataSetChanged();
                             return true;
                         case R.id.setEndPos:
                             EndPos = position + 1;
+                            NomenAdapter.notifyDataSetChanged();
                             return true;
                         case R.id.goToGroup:
                             isNeededToSelectRowAfterGoToGroup = true;
                             kod5 = c.getString(c.getColumnIndex("KOD5"));
-                            resetAllSpinners();
+
+                            if (spWC != null) {
+                                spWC.setSelection(0);
+                                spFocus.setSelection(0);
+                            }
+                            FormOrderFragment.filter.setImageResource(R.drawable.filter);
+                            FormOrderFragment.isFiltered = false;
+
+                            System.out.println(CurSGI + " " + sgi);
+                            if (!CurSGI.equals(sgi)) {
+                                GlobalVars.allowUpdate = false;
+                            }
+//                            resetAllSpinners();
                             resetCurData();
                             resetSearchViewData();
 
-                            SetSelectedSgi(sgi);
-                            SetSelectedGroup(group);
+                            setSelectionByCodeSgiAsync(sgi);
+                            new Handler().postDelayed(() -> setSelectionByCodeGroupAsync(group), 500);
+
                             return true;
                     }
                     return true;
@@ -282,71 +296,30 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             return true;
         }
     };
+
+    public static boolean allowUpdate = true;
     public AdapterView.OnItemSelectedListener SelectedGroup = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
             try {
-                resetSearchViewData();
-
-                String ItemID = myGroup.getString(myGroup.getColumnIndex("CODE"));
-                CurGroup = ItemID;
-
-                if (!ItemID.equals("0")) {
-                    TextView txtSgi = getCurView().findViewById(R.id.ColSgiID);
-                    CurSGI = txtSgi.getText().toString();
+                if (!FormOrderFragment.isCleared) {
+                    resetSearchViewData();
                 }
-                if (CurSGI.equals("0"))
-                    return;
+                FormOrderFragment.isCleared = false;
 
-                LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+                CurGroup = myGroup.getString(myGroup.getColumnIndex("CODE"));
+
+                if (allowUpdate) {
+                    LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
+                }
+                allowUpdate = true;
 
                 FormOrderFragment.isSorted = false;
                 FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    @PGShowing
-                    public void run() {
-                        if (isNeededToSelectRowAfterGoToGroup) {
-                            int[] elementPositionData = getPositionByKod5(kod5);
-                            System.out.println(Arrays.toString(elementPositionData));
-                            int elementPosition = elementPositionData[0];
-                            int visibleElementsCount = nomenList.getLastVisiblePosition() - nomenList.getFirstVisiblePosition() + 1;
-                            if (elementPosition == -1) {
-                                elementPosition = 0;
-                            } else if (elementPositionData[1] == 1) {
-                                elementPosition += visibleElementsCount;
-                            }
-                            System.out.println(elementPosition);
-                            nomenList.setSelection(elementPosition);
-                            isNeededToSelectRowAfterGoToGroup = false;
-                            kod5 = "";
-                        }
-                    }
-                }, 300);
             } catch (Exception e) {
                 e.printStackTrace();
                 Config.sout(e.getMessage());
             }
-        }
-
-        private int[] getPositionByKod5(String kod5) {
-            int i = 0;
-            while (myNom.moveToNext()) {
-                if (myNom.getString(myNom.getColumnIndex("KOD5")).equals(kod5)) {
-                    return new int[]{i, 1};
-                }
-                i++;
-            }
-
-            for (int j = 0; j <= nomenList.getLastVisiblePosition(); j++) {
-                RelativeLayout layout = (RelativeLayout) nomenList.getChildAt(j);
-                String localKod5 = ((TextView) layout.findViewById(R.id.ColNomCod)).getText().toString();
-                if (localKod5.equals(kod5)) {
-                    return  new int[]{j, 0};
-                }
-            }
-            return  new int[]{-1, 0};
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -356,6 +329,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
+            System.out.println(1);
             try {
                 if (isNeededToResetSearchView) {
                     resetSearchViewData();
@@ -369,9 +343,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 if (ItemID.equals("0")) {
                     nomenList.setAdapter(null);
                     spGroup.setAdapter(null);
-                } else {
-                    LoadGroups(ItemID);
                 }
+                LoadGroups(ItemID);
 
                 if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
                     LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
@@ -435,10 +408,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
     };
 
-    public View getCurView() {
-        return CurView;
-    }
-
     public Context getContext() {
         return glbContext;
     }
@@ -454,25 +423,24 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
         mySgi = db.getAllSgi();
         spSgi = CurView.findViewById(R.id.SpinSgi);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr}, 0);
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr}, 0);
+
         spSgi.setAdapter(adapter);
-        spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
+//        spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
+        spSgi.setOnItemSelectedListener(SelectedSgi);
     }
 
-    //    private boolean isJustSettingAdapter = false;
-//    @AsyncUI
-    public void LoadGroups(final String SgiID) {
+    //    @AsyncUI
+    public void LoadGroups(String SgiID) {
         if (myGroup != null) {
             myGroup.close();
         }
-        myGroup = db.getGrupBySgi(SgiID);
+        myGroup = db.getGroupsBySgi(SgiID);
         spGroup = CurView.findViewById(R.id.SpinGrups);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGroup, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
+        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGroup, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
 
-//        isJustSettingAdapter = true;
         spGroup.setAdapter(adapter);
+//        spGroup.post(() -> spGroup.setOnItemSelectedListener(SelectedGroup));
         spGroup.setOnItemSelectedListener(SelectedGroup);
     }
 
@@ -504,17 +472,17 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     }
 
     public void LoadNomen(String... args) {
-        String[] formatedArgs = new String[5];
-        System.arraycopy(args, 0, formatedArgs, 0, args.length);
-        for (int i = args.length; i < formatedArgs.length; i++) {
-            formatedArgs[i] = "0";
+        String[] formattedArgs = new String[5];
+        System.arraycopy(args, 0, formattedArgs, 0, args.length);
+        for (int i = args.length; i < formattedArgs.length; i++) {
+            formattedArgs[i] = "0";
         }
 
-        CurSGI = formatedArgs[0];
-        CurGroup = formatedArgs[1];
-        CurWCID = formatedArgs[2];
-        CurFocusID = formatedArgs[3];
-        CurSearchName = formatedArgs[4].toLowerCase(Locale.ROOT);
+        CurSGI = formattedArgs[0];
+        CurGroup = formattedArgs[1];
+        CurWCID = formattedArgs[2];
+        CurFocusID = formattedArgs[3];
+        CurSearchName = formattedArgs[4].toLowerCase(Locale.ROOT);
 
         new Thread(new Runnable() {
             @Override
@@ -523,6 +491,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 myNom = db.getNomen(
                         CurSGI, CurGroup,
                         CurWCID, CurFocusID, CurSearchName);
+//                Config.printCursor(myNom);
                 NomenAdapter = getNomenAdapter(myNom);
                 CurAc.runOnUiThread(() -> {
                     nomenList.setAdapter(null);
@@ -532,33 +501,126 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
                     // needs to call notifyDataSetChanged in NomenAdapter class
                     NomenAdapter.notifyDataSetChanged();
+                    setPositionAfterGoToGroup();
                 });
+
+
+            }
+
+            private void setPositionAfterGoToGroup() {
+                System.out.println(CurSGI + " " + CurGroup);
+                if (isNeededToSelectRowAfterGoToGroup) {
+                    int[] elementPositionData = getPositionByKod5(kod5);
+                    int elementPosition = elementPositionData[0];
+                    System.out.println(elementPosition + " " + kod5);
+                    int visibleElementsCount = nomenList.getLastVisiblePosition() - nomenList.getFirstVisiblePosition() + 1;
+                    if (elementPosition == -1) {
+                        elementPosition = 0;
+                    } else if (elementPositionData[1] == 1) {
+                        elementPosition += visibleElementsCount;
+                    }
+                    nomenList.setSelection(elementPosition);
+                    isNeededToSelectRowAfterGoToGroup = false;
+                    kod5 = "";
+                }
+            }
+
+            private int[] getPositionByKod5(String kod5) {
+                int i = 0;
+                while (myNom.moveToNext()) {
+                    if (myNom.getString(myNom.getColumnIndex("KOD5")).equals(kod5)) {
+                        return new int[]{i, 1};
+                    }
+                    i++;
+                }
+
+                for (int j = 0; j <= nomenList.getLastVisiblePosition(); j++) {
+                    RelativeLayout layout = (RelativeLayout) nomenList.getChildAt(j);
+                    String localKod5 = ((TextView) layout.findViewById(R.id.ColNomCod)).getText().toString();
+                    if (localKod5.equals(kod5)) {
+                        return new int[]{j, 0};
+                    }
+                }
+                return new int[]{-1, 0};
             }
         }).start();
     }
 
-    @DelayedCalled()
-    public void SetSelectedSgi(String SgiID) {
+    //    @DelayedCalled()
+    public void setSelectionByCodeSgiAsync(String sgiCode) {
         for (int i = 0; i < spSgi.getCount(); i++) {
             Cursor value = (Cursor) spSgi.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
-            if (SgiID.equals(id)) {
+            if (sgiCode.equals(id)) {
+                int finalI = i;
+                spSgi.post(() -> spSgi.setSelection(finalI));
+                return;
+            }
+        }
+    }
+
+    public void setSelectionByCodeSgi(String sgiCode) {
+        for (int i = 0; i < spSgi.getCount(); i++) {
+            Cursor value = (Cursor) spSgi.getItemAtPosition(i);
+            String id = value.getString(value.getColumnIndex("CODE"));
+            if (sgiCode.equals(id)) {
                 spSgi.setSelection(i);
                 return;
             }
         }
     }
 
-    @DelayedCalled(delay = 300)
-    public void SetSelectedGroup(String Group) {
+    //    @DelayedCalled(delay = 100)
+    public void setSelectionByCodeGroupAsync(String groupCode) {
         for (int i = 0; i < spGroup.getCount(); i++) {
             Cursor value = (Cursor) spGroup.getItemAtPosition(i);
             String id = value.getString(value.getColumnIndex("CODE"));
-            if (Group.equals(id)) {
+            if (groupCode.equals(id)) {
+                int finalI = i;
+                spGroup.post(() -> spGroup.setSelection(finalI));
+                return;
+            }
+        }
+    }
+
+    public void setSelectionByCodeGroup(String groupCode) {
+        for (int i = 0; i < spGroup.getCount(); i++) {
+            Cursor value = (Cursor) spGroup.getItemAtPosition(i);
+            String id = value.getString(value.getColumnIndex("CODE"));
+            if (groupCode.equals(id)) {
                 spGroup.setSelection(i);
                 return;
             }
         }
+    }
+
+    public void setSelectionByCodeSgiAndGroup(String sgiCode, String groupCode) {
+        int sgiPosition = 0;
+        for (int i = 0; i < spSgi.getCount(); i++) {
+            Cursor value = (Cursor) spSgi.getItemAtPosition(i);
+            String id = value.getString(value.getColumnIndex("CODE"));
+            if (sgiCode.equals(id)) {
+                sgiPosition = i;
+                break;
+            }
+        }
+
+        int finalSgiPosition = sgiPosition;
+        spSgi.post(() -> {
+            spSgi.setSelection(finalSgiPosition);
+
+            int groupPosition = 0;
+            for (int i = 0; i < spGroup.getCount(); i++) {
+                Cursor value = (Cursor) spGroup.getItemAtPosition(i);
+                String id = value.getString(value.getColumnIndex("CODE"));
+                if (groupCode.equals(id)) {
+                    groupPosition = i;
+                    break;
+                }
+            }
+            int finalGroupPosition = groupPosition;
+            spGroup.post(() -> spGroup.setSelection(finalGroupPosition));
+        });
     }
 
     @DelayedCalled
@@ -675,30 +737,52 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 //        }
     }
 
-    public void downloadAndShowPhotos(final String[] fileNames, long ID) {
-        downloadPhotoTread = new Thread(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            @PGShowing(isCanceled = true)
-            public void run() {
-                SharedPreferences settings;
-                String ftp_user, ftp_pass;
-                settings = CurAc.getSharedPreferences("apk_version", 0);
+    class PhotoDownloadingRunnable implements Runnable {
+        private final String[] fileNames;
+        private final long ID;
+        private int necessaryBytesAmountForDeletingFile = 5;
 
-                ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
-                ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
 
+        private FTPClient ftpClient = null;
+        private FileOutputStream fosPhoto = null;
+        private InputStream inputStream = null;
+
+        private String ftp_user, ftp_pass;
+
+        private void init() {
+            SharedPreferences settings;
+            settings = CurAc.getSharedPreferences("apk_version", 0);
+
+            ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
+            ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
+        }
+
+        public PhotoDownloadingRunnable(String[] fileNames, long ID) {
+            this.fileNames = fileNames;
+            this.ID = ID;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        @PGShowing(isCanceled = true)
+        public void run() {
+            try {
+                init();
                 int countOfSuccessfulDownloadedPhotos = 0;
                 for (int i = 0; i < fileNames.length; i++) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedException();
+                    }
+                    currentDownloadingPhotoName = "";
                     String fileName = fileNames[i];
                     if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists()) {
                         countOfSuccessfulDownloadedPhotos++;
                         continue;
                     }
+                    currentDownloadingPhotoName = getPhotoDir() + "/" + fileName;
 
-                    FTPClient ftpClient;
                     ftpClient = new FTPClient();
-                    int timeout = 10 * 1000;
+                    int timeout = ServerDetails.getInstance().timeout;
                     ftpClient.setDefaultTimeout(timeout);
                     ftpClient.setDataTimeout(timeout);
                     ftpClient.setConnectTimeout(timeout);
@@ -706,56 +790,96 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                     ftpClient.setControlKeepAliveReplyTimeout(timeout);
 
                     if (!tryConnectToDefaultIpOtherwiseToBackupIp(ftpClient)) {
-                        return;
+                        throw new InterruptedException();
                     }
 
                     final String photoDir = getPhotoDir();
+                    ftpClient.login(ftp_user, ftp_pass);
+                    ftpClient.changeWorkingDirectory("FOTO");
+                    ftpClient.enterLocalPassiveMode();
+
+                    fosPhoto = new FileOutputStream(photoDir + "/" + fileName);
+
+                    ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                    inputStream = ftpClient.retrieveFileStream(fileName);
+                    byte[] bytesArray = new byte[16];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            throw new InterruptedException();
+                        }
+                        fosPhoto.write(bytesArray, 0, bytesRead);
+                    }
+
+//                    ftpClient.retrieveFile(fileName, fosPhoto);
+                    ftpClient.disconnect();
+                    inputStream.close();
+                    fosPhoto.close();
+
+                    long remoteSize = getRemotePhotoSize("FOTO/" + fileName);
+                    long sizeOnDevice = getDevicePhotoSize(photoDir + "/" + fileName);
+                    if (Math.abs(remoteSize - sizeOnDevice) >= necessaryBytesAmountForDeletingFile) {
+                        currentPB.changeText("Файл был загружен с повреждениями. Пожалуйста, подождите.");
+                        File file = new File(photoDir + "/" + fileName);
+                        file.delete();
+                        i--;
+                        continue;
+                    }
+
+                    String kod5FromFileName = FilenameUtils.removeExtension(fileName);
+                    countOfSuccessfulDownloadedPhotos++;
                     try {
-                        ftpClient.login(ftp_user, ftp_pass);
-                        ftpClient.changeWorkingDirectory("FOTO");
-                        ftpClient.enterLocalPassiveMode();
-
-                        FileOutputStream fos = new FileOutputStream(photoDir + "/" + fileName);
-
-                        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-                        ftpClient.retrieveFile(fileName, fos);
-                        ftpClient.disconnect();
-                        fos.close();
-
-                        long remoteSize = getRemotePhotoSize("FOTO/" + fileName);
-                        long sizeOnDevice = getDevicePhotoSize(photoDir + "/" + fileName);
-                        if (Math.abs(remoteSize - sizeOnDevice) >= 5) {
-                            currentPB.changeText("Файл был загружен с повреждениями. Пожалуйста, подождите.");
-                            File file = new File(photoDir + "/" + fileName);
-                            file.delete();
-                            i--;
-                            continue;
-                        }
-
-                        String isDownloaded = FilenameUtils.removeExtension(fileName);
-                        countOfSuccessfulDownloadedPhotos++;
-                        try {
-                            db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    } catch (SocketTimeoutException e) {
-                        Config.sout("Время ожидания вышло");
-                        return;
+                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + kod5FromFileName + "'");
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Config.sout("Сервер недоступен");
-                        return;
                     }
+
                 }
 
                 if (countOfSuccessfulDownloadedPhotos != 0) {
                     CurAc.runOnUiThread(() -> showProductPhoto(fileNames, db.getProductKod5ByRowID(ID)));
                 }
-
+                currentDownloadingPhotoName = "";
+            } catch (InterruptedException interruptedException) {
+                closeStreamAndDeleteFile();
+            } catch (SocketTimeoutException socketTimeoutException) {
+                socketTimeoutException.printStackTrace();
+                Config.sout("Время ожидания вышло");
+                closeStreamAndDeleteFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout("Сервер недоступен");
+                closeStreamAndDeleteFile();
             }
-        });
+        }
+
+        private void closeStreamAndDeleteFile() {
+            try {
+                if (fosPhoto != null) {
+                    fosPhoto.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (ftpClient != null) {
+                    ftpClient.disconnect();
+                }
+                File f = new File(currentDownloadingPhotoName);
+                f.delete();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                Config.sout("Загрузка отменена");
+            }
+        }
+    }
+
+    public static String currentDownloadingPhotoName = "";
+
+    public void downloadAndShowPhotos(final String[] fileNames, long ID) {
+        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, ID));
         downloadPhotoTread.start();
     }
 
@@ -1437,6 +1561,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
 
             if (DBHelper.pricesMap.containsKey(kod5) && isSales) {
+//                System.out.println(kod5 + " " + DBHelper.pricesMap.get(kod5));
                 tvPrice.setText(String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5)));
             }
 
@@ -1460,7 +1585,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             long daysSubtraction = _countDaySubtraction(cursor);
 
             int backgroundColor;
-            if (!tvZakaz.getText().toString().equals("0")) {
+            if ((BeginPos != 0 || EndPos != 0) && position >= BeginPos - 1 && position <= EndPos - 1) {
+                backgroundColor = getResources().getColor(R.color.multiSelectedNomen);
+            } else if (!tvZakaz.getText().toString().equals("0")) {
                 backgroundColor = getResources().getColor(R.color.selectedNomen);
             } else {
                 if (position % 2 != 0) {
@@ -1705,7 +1832,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Cursor cursor = getCursor();
             View view = super.getView(position, convertView, parent);
             TextView[] tvArray = new TextView[]{
                     view.findViewById(R.id.ColDebetContr),
@@ -1755,7 +1881,13 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     }
 
     public void resetAllSpinners() {
-        spSgi.setSelection(0);
+        if (spGroup != null) {
+            spGroup.post(() -> spGroup.setAdapter(null));
+        }
+
+        if (spSgi != null) {
+            spSgi.post(() -> spSgi.setSelection(0));
+        }
 
         // if spWC != null, то и spFocus и другие фильтры тоже != null
         if (spWC != null) {

@@ -53,7 +53,7 @@ public class Ftp implements BackupServerConnection {
 
     protected boolean initFtpClient() {
         client = new FTPClient();
-        int timeout = 10 * 1000;
+        int timeout = ServerDetails.getInstance().timeout;
         client.setAutoNoopTimeout(timeout);
 
         if (!tryConnectToDefaultIpOtherwiseToBackupIp(client)) {

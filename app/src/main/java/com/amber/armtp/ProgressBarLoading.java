@@ -42,6 +42,21 @@ public class ProgressBarLoading {
         dialog = builder.create();
         if (isCanceled) {
             dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Отменить", (dialogInterface, i) -> {
+//                try {
+//                    GlobalVars.fosPhoto.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                if (file.exists()) {
+//                    System.out.println(GlobalVars.currentDownloadingPhotoName + " *");
+//                    boolean t = file.delete();
+//                    System.out.println(t);
+//                }
+//                File file = new File(GlobalVars.currentDownloadingPhotoName);
+//                if (file.exists()) {
+//                    System.out.println(GlobalVars.currentDownloadingPhotoName + " *");
+//                    file.delete();
+//                }
                 thread.interrupt();
                 dialog.dismiss();
             });

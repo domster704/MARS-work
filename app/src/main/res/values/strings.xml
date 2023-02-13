@@ -25,6 +25,7 @@
     <string name="resMainHost">Основной</string>
     <string name="resSaveSettings" />
     <string name="resPort">Порт</string>
+    <string name="timeout">Таймаут, мс</string>
     <string name="resBackupHost">Резервный</string>
     <string name="resLogin">Логин</string>
     <string name="resPass">Пароль</string>

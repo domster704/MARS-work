@@ -383,7 +383,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
         new Thread(() -> {
             try {
                 FTPClient ftpClient = new FTPClient();
-                int timeout = 10 * 1000;
+                int timeout = ServerDetails.getInstance().timeout;
                 ftpClient.setDefaultTimeout(timeout);
                 ftpClient.setDataTimeout(timeout);
                 ftpClient.setConnectTimeout(timeout);

@@ -12,7 +12,6 @@ import android.support.annotation.RequiresApi;
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -92,12 +91,16 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor getGrupBySgi(String KEY_GRUP_SGIID) {
+    public Cursor getGroupsBySgi(String KEY_GRUP_SGIID) {
         Cursor cursor;
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR, 0 AS SGI UNION ALL SELECT ROWID AS _id, CODE, DESCR, SGI FROM GRUPS WHERE SGI='" + KEY_GRUP_SGIID + "'", null);
+            if (KEY_GRUP_SGIID.equals("0")) {
+                cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR, 0 AS SGI UNION ALL SELECT ROWID AS _id, CODE, DESCR, SGI FROM GRUPS", null);
+            } else {
+                cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR, 0 AS SGI UNION ALL SELECT ROWID AS _id, CODE, DESCR, SGI FROM GRUPS WHERE SGI='" + KEY_GRUP_SGIID + "'", null);
+            }
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,39 +115,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db = this.getReadableDatabase();
             cursor = db.rawQuery("SELECT 0 AS _id, 0 AS CODE, 'Выберите группу' AS DESCR UNION ALL SELECT ROWID AS _id, CODE, DESCR FROM GRUPS", null);
             return cursor;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Cursor getNomByGroup(String GroupID, String SgiID, String sqlCondition, String searchString) {
-        Cursor cursor1;
-        Cursor cursor;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-
-            if (!listOfUpdatedGroups.contains(GroupID)) {
-                // Обновление цен по GROUP
-                if (!SgiID.equals("")) {
-                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
-                    setNomenPriceWithSgi(cursor1, GroupID);
-                }
-
-                // Обновление цен по SGI
-                if (!SgiID.equals("")) {
-                    cursor1 = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA IS NULL", null);
-                    setNomenPriceWithSgi(cursor1, GroupID);
-                }
-            }
-
-            // Инфа про Nomen
-            cursor = db.rawQuery("SELECT rowid AS _id, KOD5, DESCR, OST," +
-                    " PRICE," +
-                    " GRUPPA, ZAKAZ, FOTO, PD, SGI, GOFRA, MP, POSTDATA, [ACTION] FROM Nomen WHERE OST>0 " + sqlCondition + searchString + " ORDER BY Nomen.DESCR", null);
-            return cursor;
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -865,29 +835,6 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    @AsyncUI
-    public float getRealPrice(String nomenCode) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor sgiAndGroup = db.rawQuery("SELECT SGI, GRUPPA FROM NOMEN WHERE KOD5='" + nomenCode + "'", null);
-
-        sgiAndGroup.moveToNext();
-
-        String SgiID = sgiAndGroup.getString(sgiAndGroup.getColumnIndex("SGI"));
-        String GroupID = sgiAndGroup.getString(sgiAndGroup.getColumnIndex("GRUPPA"));
-        Cursor tipcenCursor = db.rawQuery("SELECT SKIDKA, TIPCEN, SGI FROM SKIDKI WHERE KONTR = '" + OrderHeadFragment.CONTR_ID + "' AND SGI = '" + SgiID + "' AND GRUPPA = '" + GroupID + "'", null);
-
-        tipcenCursor.moveToNext();
-
-        Cursor c = db.rawQuery("SELECT NOMEN, CENA, TIPCEN FROM PRICES WHERE TIPCEN = '" + tipcenCursor.getString(tipcenCursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
-        c.moveToNext();
-
-        float price = Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(tipcenCursor.getString(tipcenCursor.getColumnIndex("SKIDKA"))) / 100);
-        sgiAndGroup.close();
-        tipcenCursor.close();
-        c.close();
-        return price;
-    }
-
     public void calcSales(String ContrID, String data) {
         Cursor c;
         if (pricesMap.size() > 0 && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals("") && !OrderHeadFragment.PREVIOUS_CONTR_ID.equals(ContrID)) {
@@ -958,10 +905,10 @@ public class DBHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             String nomen = c.getString(c.getColumnIndex("NOMEN"));
             float price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(c.getString(c.getColumnIndex("SKIDKA"))) / 100)).replace(",", "."));
-            if (pricesMap.containsKey(nomen) && pricesMap.get(nomen) == price) {
+
+            if (pricesMap.containsKey(nomen) && pricesMap.get(nomen) == price || Float.isNaN(price)) {
                 continue;
             }
-
             pricesMap.put(nomen, price);
         }
         c.close();
@@ -1022,11 +969,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public void putAllNomenPrices(String CONTR) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
         updatePrices(c);
 
         c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
         updatePrices(c);
     }
 
@@ -1038,7 +985,6 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     public String[] getDebetInfoByContrID(String itemID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        System.out.println(itemID);
         try (Cursor c = db.rawQuery("SELECT DOLG FROM DEBET WHERE CODE=?", new String[]{itemID})) {
             c.moveToNext();
             return new String[]{
@@ -1049,5 +995,17 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             return new String[]{"", "", ""};
         }
+    }
+
+    public String getSgiIDByGroupId(String groupID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String id = "0";
+        try (Cursor c = db.rawQuery("SELECT SGI FROM GRUPS WHERE CODE=?", new String[]{groupID})) {
+            c.moveToNext();
+            id = c.getString(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 }

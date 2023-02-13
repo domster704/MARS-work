@@ -24,6 +24,7 @@
     <color name="gridViewFirstColor">#c9ebff</color>
 
     <color name="selectedNomen">#D5D9C2</color>
+    <color name="multiSelectedNomen">#D8BFD8</color>
 
     <color name="dividerColor">#d3d3d3</color>
     <color name="dividerColorForNomen">#ddd</color>

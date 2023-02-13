@@ -34,13 +34,8 @@ public class ZipUnpacking {
         }
 
         try {
-//            File fileDB = new File(MainActivity.filesPathDB + "armtp3.db");
-//            fileDB.delete();
             boolean result = unZip(file);
             file.delete();
-
-//            fileDB = new File(MainActivity.filesPathDB + "armtp3.db");
-//            return result && fileDB.exists();
             return result;
         } catch (Exception e) {
             e.printStackTrace();

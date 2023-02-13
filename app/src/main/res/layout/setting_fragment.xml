@@ -183,6 +183,32 @@
                             android:text="20123"
                             android:textSize="@dimen/textSizeSettings" />
                 </LinearLayout>
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:id="@+id/tvTimeout"
+                            android:layout_width="@dimen/settingsWidthAfterMargin"
+                            android:layout_height="match_parent"
+                            android:gravity="start|center_vertical"
+                            android:paddingEnd="8dp"
+                            android:text="@string/timeout"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textSize="@dimen/textSizeSettings" />
+
+                    <EditText
+                            android:id="@+id/etTimeout"
+                            android:layout_width="398dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:ems="10"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:text="15000"
+                            android:textSize="@dimen/textSizeSettings" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
