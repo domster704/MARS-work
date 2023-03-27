@@ -254,6 +254,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     }
 
     private void changeTimeout() {
+        if (ServerDetails.getInstance().timeout == Integer.parseInt(etTimeout.getText().toString())) {
+            return;
+        }
         ServerDetails.getInstance().timeout = Integer.parseInt(etTimeout.getText().toString());
         editor.putInt("timeout", ServerDetails.getInstance().timeout);
         editor.apply();

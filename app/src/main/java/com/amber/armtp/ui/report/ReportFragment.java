@@ -1,7 +1,6 @@
 package com.amber.armtp.ui.report;
 
 import android.app.AlertDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amber.armtp.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.SettingFragment;
@@ -31,8 +31,7 @@ public class ReportFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        SharedPreferences settings = getActivity().getSharedPreferences("apk_version", 0);
-        String tradeRepresentativeID = settings.getString("ReportTPId", ""); // IXXX26 I09601
+        String tradeRepresentativeID = Config.getTPId(getActivity());
         String tpName = new DBHelper(getActivity()).getNameOfTpById(tradeRepresentativeID);
 
         if (tradeRepresentativeID.equals("") || tpName.equals("")) {

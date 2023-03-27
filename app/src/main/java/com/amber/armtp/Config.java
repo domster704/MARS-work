@@ -1,6 +1,8 @@
 package com.amber.armtp;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -47,5 +49,10 @@ public class Config {
             searchView.clearFocus();
 //            searchView.requestFocus();
         }
+    }
+
+    public static String getTPId(Activity activity) {
+        SharedPreferences settings = activity.getSharedPreferences("apk_version", 0);
+        return settings.getString("ReportTPId", ""); // IXXX26 I09601
     }
 }

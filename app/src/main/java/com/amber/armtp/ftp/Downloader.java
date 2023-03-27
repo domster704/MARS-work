@@ -90,6 +90,12 @@ public class Downloader implements BackupServerConnection {
                 SharedPreferences serverSettings = globalVars.getSharedPreferences("apk_version", 0);
                 SharedPreferences.Editor editor = serverSettings.edit();
                 editor.remove("FtpBackupServerHost");
+
+                String tradeRepresentativeID = Config.getTPId(activity);
+                if (!globalVars.db.isSettingTpIDIsExistedInDB(tradeRepresentativeID)) {
+                    editor.remove("ReportTPId");
+                }
+
                 editor.apply();
             });
         } catch (Exception e) {

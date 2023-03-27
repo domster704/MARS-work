@@ -108,7 +108,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public Cursor myContr;
     public Cursor myAddress;
     public Cursor myTP;
-    public Cursor curDebet, curDebetTp;
+    public Cursor curDebet;
 
     public GlobalVars.NomenAdapter NomenAdapter, PreviewZakazAdapter;
     public JournalAdapter OrdersAdapter;
@@ -143,7 +143,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public AlertDialog alertPhoto = null;
     public PopupMenu nomPopupMenu;
     public String OrderID = "";
-    public String CurrentTp, CurrentDebTP;
+    public String CurrentTp;
 
     public Spinner spinContr, spinAddress, TPList;
     public Calendar DeliveryDate;
@@ -151,11 +151,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public EditText edContrFilter;
     public EditText txtComment;
     public TextView spTp, spContr, spAddress;
-    public TextView tvContr, tvTP;
     public ViewFlipper viewFlipper;
     public String ordStatus;
-
-    public Spinner spTP;
     public int BeginPos = 0, EndPos = 0;
 
     public static Thread downloadPhotoTread;
@@ -222,6 +219,32 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         } catch (Exception e) {
             e.printStackTrace();
             Config.sout(e.getMessage());
+        }
+    };
+
+    public AdapterView.OnLongClickListener PhotoLongClick = new AdapterView.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            try {
+                TextView tvKod5 = ((RelativeLayout) view.getParent()).findViewById(R.id.ColNomCod);
+                String kod5 = tvKod5.getText().toString();
+
+                PopupMenu nomPopupMenu = new PopupMenu(glbContext, view);
+                nomPopupMenu.getMenuInflater().inflate(R.menu.photo_context_menu, nomPopupMenu.getMenu());
+
+                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
+                    if (menuItem.getItemId() == R.id.forceDownloadPhoto) {
+                        @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(kod5);
+                        downloadAndShowPhotos(fileNames, Long.parseLong(kod5), true);
+                    }
+                    return true;
+                });
+                nomPopupMenu.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Config.sout(e.getMessage());
+            }
+            return true;
         }
     };
 
@@ -583,46 +606,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
     }
 
-    public void setSelectionByCodeGroup(String groupCode) {
-        for (int i = 0; i < spGroup.getCount(); i++) {
-            Cursor value = (Cursor) spGroup.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndex("CODE"));
-            if (groupCode.equals(id)) {
-                spGroup.setSelection(i);
-                return;
-            }
-        }
-    }
-
-    public void setSelectionByCodeSgiAndGroup(String sgiCode, String groupCode) {
-        int sgiPosition = 0;
-        for (int i = 0; i < spSgi.getCount(); i++) {
-            Cursor value = (Cursor) spSgi.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndex("CODE"));
-            if (sgiCode.equals(id)) {
-                sgiPosition = i;
-                break;
-            }
-        }
-
-        int finalSgiPosition = sgiPosition;
-        spSgi.post(() -> {
-            spSgi.setSelection(finalSgiPosition);
-
-            int groupPosition = 0;
-            for (int i = 0; i < spGroup.getCount(); i++) {
-                Cursor value = (Cursor) spGroup.getItemAtPosition(i);
-                String id = value.getString(value.getColumnIndex("CODE"));
-                if (groupCode.equals(id)) {
-                    groupPosition = i;
-                    break;
-                }
-            }
-            int finalGroupPosition = groupPosition;
-            spGroup.post(() -> spGroup.setSelection(finalGroupPosition));
-        });
-    }
-
     @DelayedCalled
     public void SetSelectedFilterWC(String ID) {
         for (int i = 0; i < spWC.getCount(); i++) {
@@ -647,36 +630,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
     }
 
-    public String GetSDCardPath() {
-        String sdpath = "";
-        if (Build.BRAND.equals("samsung")) {
-            sdpath = "/storage/extSdCard/";
-        } else {
-            if (new File("/storage/extSdCard/").exists()) {
-                sdpath = "/storage/extSdCard/";
-
-            }
-            if (new File("/storage/sdcard1/").exists()) {
-                sdpath = "/storage/sdcard1/";
-            }
-            if (new File("/storage/usbcard1/").exists()) {
-                sdpath = "/storage/usbcard1/";
-            }
-            if (new File("/storage/sdcard0/").exists()) {
-                sdpath = "/storage/sdcard0/";
-            }
-            if (new File("/storage/sdcard/").exists()) {
-                sdpath = "/storage/sdcard/";
-            }
-            if (new File("/storage/emulated/0/").exists()) {
-                sdpath = "/storage/emulated/0/";
-            }
-        }
-
-        return sdpath;
-
-    }
-
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) glbContext.getSystemService(CONNECTIVITY_SERVICE);
 
@@ -686,62 +639,13 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
         Config.sout("Нет доступа к интернету");
         return false;
-//        if (activeNetworkInfo == null) {
-//            Toast.makeText(glbContext, "Нет доступной сотовой сети", Toast.LENGTH_LONG).show();
-//            return false;
-//        }
-//        if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-//            return activeNetworkInfo.isConnectedOrConnecting();
-//        } else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-//            switch (activeNetworkInfo.getSubtype()) {
-//                case TelephonyManager.NETWORK_TYPE_1xRTT:
-//                case TelephonyManager.NETWORK_TYPE_EDGE:
-//                    return false; // ~ 50-100 kbps
-//                case TelephonyManager.NETWORK_TYPE_CDMA:
-//                    return false; // ~ 14-64 kbps
-//                case TelephonyManager.NETWORK_TYPE_EVDO_0:
-//                    return true; // ~ 400-1000 kbps
-//                case TelephonyManager.NETWORK_TYPE_EVDO_A:
-//                    return true; // ~ 600-1400 kbps
-//                case TelephonyManager.NETWORK_TYPE_GPRS:
-//                    return false; // ~ 100 kbps
-//                case TelephonyManager.NETWORK_TYPE_HSDPA:
-//                    return true; // ~ 2-14 Mbps
-//                case TelephonyManager.NETWORK_TYPE_HSPA:
-//                    return true; // ~ 700-1700 kbps
-//                case TelephonyManager.NETWORK_TYPE_HSUPA:
-//                    return true; // ~ 1-23 Mbps
-//                case TelephonyManager.NETWORK_TYPE_UMTS:
-//                    return true; // ~ 400-7000 kbps
-//                /*
-//                 * Above API level 7, make sure to set android:targetSdkVersion
-//                 * to appropriate level to use these
-//                 */
-//                case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
-//                    return true; // ~ 1-2 Mbps
-//                case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
-//                    return true; // ~ 5 Mbps
-//                case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
-//                    return true; // ~ 10-20 Mbps
-//                case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
-//                    return false; // ~25 kbps
-//                case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
-//                    return true; // ~ 10+ Mbps
-//                // Unknown
-//                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-//                default:
-//                    return false;
-//            }
-//        } else {
-//            return false;
-//        }
     }
 
     class PhotoDownloadingRunnable implements Runnable {
         private final String[] fileNames;
-        private final long ID;
+        private String kod5;
         private int necessaryBytesAmountForDeletingFile = 5;
-
+        private final boolean isForced;
 
         private FTPClient ftpClient = null;
         private FileOutputStream fosPhoto = null;
@@ -757,9 +661,16 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
         }
 
-        public PhotoDownloadingRunnable(String[] fileNames, long ID) {
+        public PhotoDownloadingRunnable(String[] fileNames, long ID, boolean isForced) {
             this.fileNames = fileNames;
-            this.ID = ID;
+            this.isForced = isForced;
+            this.kod5 = db.getProductKod5ByRowID(ID);
+        }
+
+        public PhotoDownloadingRunnable(String[] fileNames, String kod5, boolean isForced) {
+            this.fileNames = fileNames;
+            this.isForced = isForced;
+            this.kod5 = kod5;
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -775,7 +686,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                     }
                     currentDownloadingPhotoName = "";
                     String fileName = fileNames[i];
-                    if (fileName == null || new File(getPhotoDir() + "/" + fileName).exists()) {
+                    if (!isForced && (fileName == null || fileName != null && new File(getPhotoDir() + "/" + fileName).exists())) {
+//                         && !isDifferentSizeOfPhotosOnDeviceAndOnServer(fileName))
                         countOfSuccessfulDownloadedPhotos++;
                         continue;
                     }
@@ -839,7 +751,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 }
 
                 if (countOfSuccessfulDownloadedPhotos != 0) {
-                    CurAc.runOnUiThread(() -> showProductPhoto(fileNames, db.getProductKod5ByRowID(ID)));
+                    CurAc.runOnUiThread(() -> showProductPhoto(fileNames, kod5));
                 }
                 currentDownloadingPhotoName = "";
             } catch (InterruptedException interruptedException) {
@@ -878,8 +790,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
     public static String currentDownloadingPhotoName = "";
 
-    public void downloadAndShowPhotos(final String[] fileNames, long ID) {
-        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, ID));
+    public void downloadAndShowPhotos(final String[] fileNames, long ID, boolean isForced) {
+        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, ID, isForced));
         downloadPhotoTread.start();
     }
 
@@ -1233,14 +1145,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         debetList.setAdapter(adapter);
     }
 
-    public void LoadTpListDeb() {
-        spTP.setAdapter(null);
-        curDebetTp = db.getTpList();
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(CurAc, R.layout.tp_layout, curDebetTp, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColTPID, R.id.ColTPDescr}, 0);
-        spTP.setAdapter(adapter);
-    }
-
     public void UpdateNomenRange(int beginRange, int endRange, int qty) {
         new Thread(new Runnable() {
             @Override
@@ -1412,21 +1316,21 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         orderPrices.close();
     }
 
-    public void calculatePricesByContrDiscount(String data) {
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                db.calcSales(db.GetContrID(), data);
-                CurAc.runOnUiThread(() -> {
-                    if (NomenAdapter != null) {
-                        myNom.requery();
-                        NomenAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
-    }
+//    public void calculatePricesByContrDiscount(String data) {
+//        new Thread(new Runnable() {
+//            @Override
+//            @PGShowing
+//            public void run() {
+//                db.calcSales(db.GetContrID(), data);
+//                CurAc.runOnUiThread(() -> {
+//                    if (NomenAdapter != null) {
+//                        myNom.requery();
+//                        NomenAdapter.notifyDataSetChanged();
+//                    }
+//                });
+//            }
+//        }).start();
+//    }
 
     public void updateOutedPositionInZakazyTable() {
         try {
@@ -1551,6 +1455,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
             if (tvPhoto != null) {
                 tvPhoto.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
+                tvPhoto.setOnLongClickListener(PhotoLongClick);
             }
 
             if (tvPrice != null && !tvPrice.getText().toString().equals("null")) {
@@ -2094,7 +1999,11 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         long ID = myAdapter.getItemIdAtPosition(position);
 
         @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
-        downloadAndShowPhotos(fileNames, ID);
+        downloadAndShowPhotos(fileNames, ID, false);
+    }
+
+    private boolean isDifferentSizeOfPhotosOnDeviceAndOnServer(String photoName) throws FTPIllegalReplyException, IOException, FTPException {
+        return getRemotePhotoSize("FOTO/" + photoName) != getDevicePhotoSize(getPhotoDir() + "/" + photoName);
     }
 
     private void multiSelect(String ID, int ost) {

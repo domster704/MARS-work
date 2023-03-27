@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.SimpleDateFormat;
@@ -311,6 +312,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         FormOrderFragment.isContrIdDifferent = true;
         if (PREVIOUS_CONTR_ID.equals("") || PREVIOUS_CONTR_ID == null || CONTR_ID == null || CONTR_ID.equals("")) {
             PREVIOUS_CONTR_ID = CONTR_ID;
+            DBHelper.pricesMap.clear();
 //            FormOrderFragment.isContrIdDifferent = true;
         } else if (!PREVIOUS_CONTR_ID.equals(CONTR_ID)) {
 //            FormOrderFragment.isContrIdDifferent = true;

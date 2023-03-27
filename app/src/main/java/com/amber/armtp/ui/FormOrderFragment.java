@@ -822,7 +822,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             if (!DBHelper.pricesMap.containsKey(kod5)) {
                 continue;
             }
-            System.out.println(DBHelper.pricesMap.get(kod5) + " " + kod5);
             database.execSQL("UPDATE NOMEN SET PRICE=? WHERE KOD5=?", new Object[]{DBHelper.pricesMap.get(kod5), kod5});
         }
         cursor.close();
