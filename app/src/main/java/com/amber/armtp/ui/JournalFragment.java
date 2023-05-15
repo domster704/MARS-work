@@ -510,54 +510,9 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                     fragmentTransaction.commit();
                 });
 //                } catch (Exception e) {
-//                    Config.sout(e.getMessage(), Toast.LENGTH_LONG);
+//                    Config.sout(e, Toast.LENGTH_LONG);
 //                }
             }
         }).start();
     }
-
-//    private void copyOrder(final String OrderID) {
-//        new Thread(new Runnable() {
-//            @Override
-//            @PGShowing
-//            public void run() {
-//                try (Cursor cursor = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT QTY, NOMEN, PRICE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null);){
-//                    glbVars.db.ResetNomen();
-//                    glbVars.db.getWritableDatabase().beginTransaction();
-//                    while (cursor.moveToNext()) {
-//                        glbVars.db.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=" + cursor.getInt(cursor.getColumnIndex("QTY")) + " WHERE KOD5='" + cursor.getString(cursor.getColumnIndex("NOMEN")) + "'");
-//                    }
-//                    glbVars.db.getWritableDatabase().execSQL("DELETE FROM ORDERS");
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    Config.sout("Ошибка во время попытки копирования");
-//                    glbVars.db.ResetNomen();
-//                    return;
-//                } finally {
-//                    glbVars.db.getWritableDatabase().setTransactionSuccessful();
-//                    glbVars.db.getWritableDatabase().endTransaction();
-//                }
-//
-//                HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
-//                if (orderData.size() == 0) {
-//                    return;
-//                }
-//
-//                Fragment fragment = new OrderHeadFragment();
-//
-//                Bundle args = new Bundle();
-//                args.putBoolean("isOrderEditedOrCopied", true);
-//                args.putString("TP", orderData.get("TP"));
-//                args.putString("CONTR", orderData.get("CONTR"));
-//                args.putString("ADDR", orderData.get("ADDR"));
-//                args.putString("DELIVERY_DATE", orderData.get("DELIVERY_DATE"));
-//                args.putString("COMMENT", orderData.get("COMMENT"));
-//                fragment.setArguments(args);
-//
-//                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-//                fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-//                fragmentTransaction.commit();
-//            }
-//        }).start();
-//    }
 }

@@ -17,12 +17,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.auxiliaryData.CounterAgentInfo;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
@@ -107,8 +108,11 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         glbVars.spinAddress = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-        Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
-        returnMoneyButton.setOnClickListener(this);
+//        Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
+//        returnMoneyButton.setOnClickListener(this);
+
+        ImageButton userCardInfoButton = getActivity().findViewById(R.id.userCardInfoButton);
+        userCardInfoButton.setOnClickListener(this);
 
         GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
         setContrAndSum(glbVars);
@@ -216,6 +220,34 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         }
     }
 
+
+    @Override
+    public void onClick(View view) {
+//        if (view.getId() == R.id.returnMoneyButton) {
+//            String currentText = glbVars.txtComment.getText().toString();
+//            if (currentText.equals("")) {
+//                glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney));
+//            } else {
+//                glbVars.txtComment.setText(currentText + ", " + getResources().getString(R.string.takeOutMoney).toLowerCase());
+//            }
+//        }
+        if (view.getId() == R.id.userCardInfoButton) {
+            CounterAgentInfo counterAgentInfo = glbVars.db.getCounterAgentInfo(GlobalVars.CurContr);
+            CounterAgentDialogFragment dialogFragment = new CounterAgentDialogFragment();
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("counterAgentInfo", counterAgentInfo);
+
+            dialogFragment.setArguments(bundle);
+            dialogFragment.show(getFragmentManager(), "counterAgentDialogFragment");
+//            new AlertDialog.Builder(getContext())
+//                    .setTitle("Информация о контрагенте")
+//                    .setMessage(counterAgentInfo.toString())
+//                    .show()
+//                    .create();
+        }
+    }
+
     public void SetSelectedContr(int rowId) {
         try {
             for (int i = 0; i < glbVars.spinContr.getCount(); i++) {
@@ -265,24 +297,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         editor.putString("PREVIOUS_CONTR_ID", PREVIOUS_CONTR_ID);
         editor.putString("CURRENT_CONTR_ID", CONTR_ID);
         editor.apply();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.returnMoneyButton) {
-            String currentText = glbVars.txtComment.getText().toString();
-            if (currentText.equals("")) {
-                glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney));
-            } else {
-                glbVars.txtComment.setText(currentText + ", " + getResources().getString(R.string.takeOutMoney).toLowerCase());
-            }
-//            String currentText = glbVars.txtComment.getText().toString();
-//            if (!currentText.equals("")) {
-//                currentText = ", " + currentText;
-//            }
-//            glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney) + currentText);
-//            view.setEnabled(false);
-        }
     }
 
     private void _saveOrderData() throws InterruptedException {

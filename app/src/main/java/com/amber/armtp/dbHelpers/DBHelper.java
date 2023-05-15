@@ -12,6 +12,8 @@ import android.support.annotation.RequiresApi;
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
+import com.amber.armtp.annotations.Async;
+import com.amber.armtp.auxiliaryData.CounterAgentInfo;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -264,6 +266,7 @@ public class DBHelper extends SQLiteOpenHelper {
             namesOfPhotos = Arrays.stream(namesOfPhotos).filter(Objects::nonNull).toArray(String[]::new);
             return namesOfPhotos;
         } catch (SQLiteException e) {
+            Config.sout(e);
             e.printStackTrace();
         }
         return new String[0];
@@ -278,6 +281,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            Config.sout(e);
             e.printStackTrace();
         } finally {
             db.endTransaction();
@@ -293,6 +297,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            Config.sout(e);
             e.printStackTrace();
         } finally {
             db.endTransaction();
@@ -337,7 +342,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 as _id, '0' as CODE, 'Выберете контрагента' as DESCR, '' as STATUS UNION ALL SELECT rowid AS _id, CODE, DESCR, STATUS FROM CONTRS", null);
+            cursor = db.rawQuery("SELECT 0 as _id, '0' as CODE, 'Выберите контрагента' as DESCR, '' as STATUS UNION ALL SELECT rowid AS _id, CODE, DESCR, STATUS FROM CONTRS", null);
             return cursor;
         } catch (Exception e) {
             e.printStackTrace();
@@ -525,7 +530,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // TODO: make showing progress bar
         db.beginTransaction();
-        pricesMap.clear();
         listOfUpdatedGroups.clear();
 
         Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
@@ -546,6 +550,7 @@ public class DBHelper extends SQLiteOpenHelper {
         } else {
             db.execSQL("UPDATE Nomen SET PRICE=0 WHERE PRICE<>0");
         }
+        pricesMap.clear();
 
         cCheck.close();
         db.setTransactionSuccessful();
@@ -660,6 +665,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    @Async
     public void putPriceInNomen(String id, String price) {
         SQLiteDatabase db;
         db = this.getWritableDatabase();
@@ -821,7 +827,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.endTransaction();
     }
 
-    public String countSumInRealTableById(String tpID, String[] dateData) {
+    public String[] countSaleDataInRealTableById(String tpID, String[] dateData) {
         String[] dateFrom = dateData[0].split("\\.");
         ArrayUtils.swap(dateFrom, 0, 2);
         dateFrom[0] = dateFrom[0].substring(2);
@@ -833,13 +839,17 @@ public class DBHelper extends SQLiteOpenHelper {
         String dt = StringUtils.join(dateTo, "");
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) AS SUMMA FROM REAL WHERE TORG_PRED=? AND (x >= ? and x <= ?)", new String[]{tpID, df, dt});
+        Cursor cursor = db.rawQuery("SELECT CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) AS SUMMA, SUM(KOL) as KOL FROM REAL WHERE TORG_PRED=? AND (x >= ? and x <= ?)", new String[]{tpID, df, dt});
         cursor.moveToNext();
         Double res = cursor.getDouble(1);
-        cursor.close();
-        return res == null || res == 0 ? "0.00" : String.format(Locale.ROOT, "%.2f", res);
-    }
+        Integer count = cursor.getInt(2);
 
+        cursor.close();
+        return new String[]{
+                res == null || res == 0 ? "0.00" : String.format(Locale.ROOT, "%.2f", res),
+                count == null || count == 0 ? "0" : String.valueOf(count)
+        };
+    }
 
     private void updatePrices(Cursor c) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -889,12 +899,48 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public boolean isSettingTpIDIsExistedInDB(String tpID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        try (Cursor c = db.rawQuery("SELECT ROWID FROM TORG_PRED WHERE CODE=?", new String[] {tpID})) {
+        try (Cursor c = db.rawQuery("SELECT ROWID FROM TORG_PRED WHERE CODE=?", new String[]{tpID})) {
             return c.getCount() != 0;
         } catch (Exception e) {
-            Config.sout(e.getMessage());
+            Config.sout(e);
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public String getStartDate() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT DATA FROM CONFIG WHERE NAME='REAL_DATE_BEG'", null)) {
+            c.moveToNext();
+            return c.getString(c.getColumnIndex("DATA"));
+        } catch (Exception e) {
+            Config.sout(e);
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public int getContrFlagByID(String contrId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT FLAG FROM CONTRS WHERE CODE=?", new String[]{contrId})) {
+            c.moveToNext();
+            return c.getInt(c.getColumnIndex("FLAG"));
+        } catch (Exception e) {
+            Config.sout(e);
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public CounterAgentInfo getCounterAgentInfo(String contrID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT CODE, PASSWORD, EMAIL FROM CONTRS WHERE CODE=?", new String[]{contrID})) {
+            c.moveToNext();
+            return new CounterAgentInfo(c.getString(0), c.getString(1), c.getString(2));
+        } catch (Exception e) {
+            Config.sout(e);
+            e.printStackTrace();
+            return null;
         }
     }
 

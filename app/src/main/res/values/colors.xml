@@ -16,6 +16,8 @@
     <color name="blue">#0000ff</color>
     <color name="black">#000000</color>
     <color name="systemColor">#0D9380</color>
+    <color name="grayForFieldHeader">#818081</color>
+    <color name="grayForField">#303030</color>
 
     <color name="postDataColorRed">#c90000</color>
     <color name="postDataColorGreen">#53ad2f</color>
@@ -30,4 +32,8 @@
     <color name="dividerColorForNomen">#ddd</color>
 
     <color name="tabBackgroundColor">#eee</color>
+    
+    <color name="orderStatusOk">@color/postDataColorGreen</color>
+    <color name="orderStatusWarn">#ffa500</color>
+    <color name="orderStatusBad">#f00</color>
 </resources>

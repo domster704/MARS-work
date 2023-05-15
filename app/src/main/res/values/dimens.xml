@@ -12,6 +12,7 @@
 
     <dimen name="orderFragNecFieldsHeight">60dp</dimen>
     <dimen name="tvWidthOrderFragment">280dp</dimen>
+    <dimen name="tvWidthOrderFragmentForContrAgent">230dp</dimen>
     <!-- на 5dp должно быть меньше чем tvWidthOrderFragment  -->
     <dimen name="editTextParentWidth">275dp</dimen>
     <!-- padding в SettingFragment   -->
@@ -47,7 +48,8 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="reportResultBigFieldWidth">260dp</dimen>
     <dimen name="reportResultMediumFieldWidth">100dp</dimen>
-    <dimen name="reportResultSmallFieldWidth">50dp</dimen>
+    <dimen name="reportResultSmallFieldWidth">75dp</dimen>
+    <dimen name="reportResultExtraSmallFieldWidth">50dp</dimen>
     <dimen name="heightOfReportResultViews">30dp</dimen>
     <dimen name="heightOfActionResultViews">30dp</dimen>
 
@@ -63,4 +65,7 @@
     <dimen name="enterSizeHeight">26dp</dimen>
     <dimen name="marginWidthEnter">5dp</dimen>
     <dimen name="marginHeightEnter">7dp</dimen>
+
+    <dimen name="fontSizeInCounterAgentInfo">18sp</dimen>
+    <dimen name="fontSizeInCounterAgentInfoForFieldHeader">14sp</dimen>
 </resources>

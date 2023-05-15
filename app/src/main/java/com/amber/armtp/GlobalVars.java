@@ -40,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -98,6 +99,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public static FragmentActivity CurAc;
     public static Context CurFragmentContext;
     public static String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
+    public static String CurContr = "0";
     public static String TypeOfPrice = "";
 
     public int CurVisiblePosition = 0;
@@ -165,12 +167,19 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public static String kod5 = "";
 
     private final AdapterView.OnItemSelectedListener SelectedContr = new AdapterView.OnItemSelectedListener() {
+        private TextView descriptionContr = null;
+        private TextView descriptionContrHeader = null;
+        private LinearLayout descriptionContrLayout = null;
+        private ImageButton contrInfoButton;
+
         @Override
         public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            TextView descriptionContr = CurAc.findViewById(R.id.description);
+            init();
             descriptionContr.setText("");
+
             String[] descriptionContrList = new String[]{"нет данных", "0.00 ₽"};
             String ItemID = myContr.getString(myContr.getColumnIndex("CODE"));
+            CurContr = ItemID;
             if (!ItemID.equals("0") && !OrderHeadFragment.isOrderEditedOrCopied) {
                 LoadContrAddress(ItemID);
             }
@@ -185,7 +194,41 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             if (!debt.equals("")) {
                 descriptionContrList[1] = String.format(Locale.ROOT, "%.2f", Float.parseFloat(debt.replace(",", "."))) + " ₽";
             }
+
             descriptionContr.setText(String.join(" | ", descriptionContrList));
+
+            if (!ItemID.equals("0")) {
+                descriptionContrLayout.setVisibility(View.VISIBLE);
+                contrInfoButton.setVisibility(View.VISIBLE);
+                changeStatusColor(descriptionContr, descriptionContrHeader, ItemID);
+            } else {
+                descriptionContrLayout.setVisibility(View.GONE);
+                contrInfoButton.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        private void changeStatusColor(TextView tvStatus, TextView tvStatusHeader, String contrId) {
+            switch (db.getContrFlagByID(contrId)) {
+                case 0:
+                    tvStatus.setTextColor(getResources().getColor(R.color.orderStatusOk));
+                    tvStatusHeader.setTextColor(getResources().getColor(R.color.orderStatusOk));
+                    break;
+                case 1:
+                    tvStatus.setTextColor(getResources().getColor(R.color.orderStatusWarn));
+                    tvStatusHeader.setTextColor(getResources().getColor(R.color.orderStatusWarn));
+                    break;
+                case 2:
+                    tvStatus.setTextColor(getResources().getColor(R.color.orderStatusBad));
+                    tvStatusHeader.setTextColor(getResources().getColor(R.color.orderStatusBad));
+                    break;
+            }
+        }
+
+        private void init() {
+            descriptionContr = CurAc.findViewById(R.id.description);
+            descriptionContrHeader = CurAc.findViewById(R.id.descriptionHeader);
+            descriptionContrLayout = CurAc.findViewById(R.id.layoutOfContrStatus);
+            contrInfoButton = CurAc.findViewById(R.id.userCardInfoButton);
         }
 
         public void onNothingSelected(AdapterView<?> arg0) {
@@ -218,7 +261,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Config.sout(e.getMessage());
+            Config.sout(e);
         }
     };
 
@@ -235,14 +278,14 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
                     if (menuItem.getItemId() == R.id.forceDownloadPhoto) {
                         @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(kod5);
-                        downloadAndShowPhotos(fileNames, Long.parseLong(kod5), true);
+                        downloadAndShowPhotos(fileNames, kod5, true);
                     }
                     return true;
                 });
                 nomPopupMenu.show();
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e.getMessage());
+                Config.sout(e);
             }
             return true;
         }
@@ -313,7 +356,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 nomPopupMenu.show();
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e.getMessage());
+                Config.sout(e);
             }
 
             return true;
@@ -341,7 +384,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e.getMessage());
+                Config.sout(e);
             }
         }
 
@@ -374,7 +417,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e.getMessage());
+                Config.sout(e);
             }
         }
 
@@ -424,7 +467,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 nomPopupMenu.show();
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e.getMessage());
+                Config.sout(e);
             }
 
             return true;
@@ -795,6 +838,11 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         downloadPhotoTread.start();
     }
 
+    public void downloadAndShowPhotos(final String[] fileNames, String kod5, boolean isForced) {
+        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, kod5, isForced));
+        downloadPhotoTread.start();
+    }
+
     private long getRemotePhotoSize(String fileName) throws FTPIllegalReplyException, IOException, FTPException {
         Ftp ftp = new Ftp(ServerDetails.getInstance());
         return ftp.getFileSize(fileName);
@@ -1114,7 +1162,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             gdOrders.setAdapter(OrdersAdapter);
 //            gdOrders.setOnItemClickListener(showOrderDataItemClickListener);
         } catch (Exception e) {
-            Config.sout(e.getMessage(), Toast.LENGTH_LONG);
+            Config.sout(e, Toast.LENGTH_LONG);
         }
     }
 
@@ -1958,7 +2006,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
         String price = tvPrice.getText().toString();
         String kod5 = tvKOD5.getText().toString();
-
         db.putPriceInNomen(kod5, price);
         db.PlusQty(kod5);
         if (myNom != null)
@@ -1970,7 +2017,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         if (PreviewZakazAdapter != null)
             PreviewZakazAdapter.notifyDataSetChanged();
 
-        setContrAndSum(GlobalVars.this);
+//        setContrAndSum(GlobalVars.this);
     }
 
     private void minusQTY(View myView) {
@@ -1988,7 +2035,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         if (PreviewZakazAdapter != null)
             PreviewZakazAdapter.notifyDataSetChanged();
 
-        setContrAndSum(GlobalVars.this);
+//        setContrAndSum(GlobalVars.this);
     }
 
     @AsyncUI
@@ -2000,10 +2047,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
         @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
         downloadAndShowPhotos(fileNames, ID, false);
-    }
-
-    private boolean isDifferentSizeOfPhotosOnDeviceAndOnServer(String photoName) throws FTPIllegalReplyException, IOException, FTPException {
-        return getRemotePhotoSize("FOTO/" + photoName) != getDevicePhotoSize(getPhotoDir() + "/" + photoName);
     }
 
     private void multiSelect(String ID, int ost) {
@@ -2019,73 +2062,86 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
     @AsyncUI
     private void fillNomenDataFromAlertDialog(String ID, int ost) {
-        LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
-        View promptView = layoutInflater.inflate(R.layout.change_qty, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurFragmentContext);
-        alertDialogBuilder.setView(promptView);
+        try {
+            LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
+            View promptView = layoutInflater.inflate(R.layout.change_qty, null);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurFragmentContext);
+            alertDialogBuilder.setView(promptView);
 
-        final EditText input = promptView.findViewById(R.id.edPPQty);
-        final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
-        final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
-        final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
-        final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
+            final EditText input = promptView.findViewById(R.id.edPPQty);
+            final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
+            final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
+            final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
+            final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
 
-        input.setText(myNom.getString(myNom.getColumnIndex("ZAKAZ")));
-        txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
-        txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
-        txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
-
-        Cursor c = db.getReadableDatabase().rawQuery("SELECT DESCR FROM GRUPS WHERE CODE=?", new String[]{myNom.getString(myNom.getColumnIndex("GRUPPA"))});
-        c.moveToNext();
-        String groupDescription = c.getString(c.getColumnIndex("DESCR"));
-        txtGrup.setText(groupDescription);
-
-        alertDialogBuilder
-                .setCancelable(true)
-                .setPositiveButton("OK", (dialog, id) -> {
-                })
-                .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-
-        final AlertDialog alertD = alertDialogBuilder.create();
-        alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-        wmlp.gravity = Gravity.TOP | Gravity.LEFT;
-        wmlp.x = 50;
-        wmlp.y = 15;
-
-        alertD.show();
-        input.requestFocus();
-        input.selectAll();
-        input.performClick();
-        input.setPressed(true);
-        input.invalidate();
-        InputMethodManager imm = (InputMethodManager) glbContext.getSystemService(INPUT_METHOD_SERVICE);
-        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-
-        alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            TextView tvPrice = CurView.findViewById(R.id.ColNomPrice);
-            String price = tvPrice.getText().toString();
-            db.putPriceInNomen(ID, price);
-
-            db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
-            myNom.requery();
-
-            setContrAndSum(GlobalVars.this);
-
-            if (NomenAdapter != null)
-                NomenAdapter.notifyDataSetChanged();
-
-            if (PreviewZakazAdapter != null)
-                PreviewZakazAdapter.notifyDataSetChanged();
-
-            alertD.dismiss();
-            Config.hideKeyBoard();
-        });
-        input.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+            try {
+                input.setText(myNom.getString(myNom.getColumnIndex("ZAKAZ")));
+                txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
+                txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
+                txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
+            } catch (Exception e1) {
+                Config.sout("123 " + e1);
             }
-            return true;
-        });
+
+            try {
+                Cursor c = db.getReadableDatabase().rawQuery("SELECT DESCR FROM GRUPS WHERE CODE=?", new String[]{myNom.getString(myNom.getColumnIndex("GRUPPA"))});
+                c.moveToNext();
+                String groupDescription = c.getString(c.getColumnIndex("DESCR"));
+                txtGrup.setText(groupDescription);
+            } catch (Exception e2) {
+                Config.sout("aaa " + e2);
+            }
+
+            alertDialogBuilder
+                    .setCancelable(true)
+                    .setPositiveButton("OK", (dialog, id) -> {
+                    })
+                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
+
+            final AlertDialog alertD = alertDialogBuilder.create();
+            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+            WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
+            wmlp.gravity = Gravity.TOP | Gravity.LEFT;
+            wmlp.x = 50;
+            wmlp.y = 15;
+
+            alertD.show();
+            input.requestFocus();
+            input.selectAll();
+            input.performClick();
+            input.setPressed(true);
+            input.invalidate();
+            InputMethodManager imm = (InputMethodManager) glbContext.getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+
+            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                TextView tvPrice = CurView.findViewById(R.id.ColNomPrice);
+                String price = tvPrice.getText().toString();
+                db.putPriceInNomen(ID, price);
+
+                db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
+                myNom.requery();
+
+                setContrAndSum(GlobalVars.this);
+
+                if (NomenAdapter != null)
+                    NomenAdapter.notifyDataSetChanged();
+
+                if (PreviewZakazAdapter != null)
+                    PreviewZakazAdapter.notifyDataSetChanged();
+
+                alertD.dismiss();
+                Config.hideKeyBoard();
+            });
+            input.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                }
+                return true;
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Config.sout(e);
+        }
     }
 }

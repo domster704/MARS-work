@@ -21,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.R;
@@ -108,6 +109,9 @@ public class SalesFragment extends Fragment {
         dateFrom = getActivity().findViewById(R.id.dateFrom);
         dateTo = getActivity().findViewById(R.id.dateTo);
         fillDatePicker(dateFrom, dateTo);
+
+        TextView startDateTv = getActivity().findViewById(R.id.startDate);
+        startDateTv.setText("(Вы можете увидеть свои продажи с " + dbHelper.getStartDate() + ")");
 
         dateFrom.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateFrom, DeliveryDateFrom), DeliveryDateFrom.get(Calendar.YEAR), DeliveryDateFrom.get(Calendar.MONTH), DeliveryDateFrom.get(Calendar.DAY_OF_MONTH)).show());
         dateTo.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateTo, DeliveryDateTo), DeliveryDateTo.get(Calendar.YEAR), DeliveryDateTo.get(Calendar.MONTH), DeliveryDateTo.get(Calendar.DAY_OF_MONTH)).show());
@@ -256,10 +260,12 @@ public class SalesFragment extends Fragment {
             return;
         }
 
-        String wholeSum = dbHelper.countSumInRealTableById(tradeRepresentativeID,
+        String[] data = dbHelper.countSaleDataInRealTableById(tradeRepresentativeID,
                 new String[]{dateFrom.getText().toString(),
                         dateTo.getText().toString()
                 });
+        String allSum = data[0];
+        String allCount = data[1];
         if (isAnyCheckBoxChecked()) {
             ArrayList<String> args = getAllChosenCheckBox();
             SalesReportResultFragment fragment = new SalesReportResultFragment();
@@ -273,7 +279,7 @@ public class SalesFragment extends Fragment {
             bundle.putStringArrayList("details", args);
             bundle.putSerializable("specificData", getContrIdFromSpinner());
             bundle.putString("tradeRepresentative", tradeRepresentativeID);
-            bundle.putString("wholeSum", wholeSum);
+            bundle.putString("wholeSum", allSum);
             bundle.putString("tpName", tpName);
             bundle.putStringArray("dateData", new String[]{
                     dateFrom.getText().toString(),
@@ -284,8 +290,8 @@ public class SalesFragment extends Fragment {
             fragmentTransaction.commit();
         } else {
             new AlertDialog.Builder(getActivity())
-                    .setTitle("Сумма")
-                    .setMessage(wholeSum)
+                    .setTitle("Продажи")
+                    .setMessage(allSum + " руб.\n" + allCount + " шт.")
                     .setPositiveButton("Закрыть", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
                     })

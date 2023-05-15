@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0F2F4">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:minWidth="600dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/counter_agent_info_header"
+            android:layout_marginBottom="10dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="15dp">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:text="Информация о контрагенте"
+                android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/counter_agent_info_body"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="15dp"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginBottom="3dp">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfoForFieldHeader"
+                    android:text="Логин от сайта"
+                    android:textColor="@color/grayForFieldHeader"
+                    android:layout_marginBottom="2dp"/>
+
+            <TextView
+                    android:id="@+id/loginContrInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfo"
+                    android:textColor="@color/grayForField"
+                    android:textIsSelectable="true" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfoForFieldHeader"
+                    android:text="Пароль от сайта"
+                    android:textColor="@color/grayForFieldHeader"
+                    android:layout_marginBottom="2dp" />
+
+            <TextView
+                    android:id="@+id/passwordContrInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfo"
+                    android:textColor="@color/grayForField"
+                    android:textIsSelectable="true" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfoForFieldHeader"
+                    android:text="Email"
+                    android:textColor="@color/grayForFieldHeader"
+                    android:layout_marginBottom="2dp" />
+
+            <TextView
+                    android:id="@+id/emailContrInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfo"
+                    android:textColor="@color/grayForField"
+                    android:singleLine="false"
+                    android:textIsSelectable="true"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

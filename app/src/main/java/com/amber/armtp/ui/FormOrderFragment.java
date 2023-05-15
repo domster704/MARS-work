@@ -263,7 +263,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {
-                Config.sout(e.getMessage());
+                Config.sout(e);
                 e.printStackTrace();
                 throw new Exception(e);
             } finally {
@@ -290,12 +290,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                     toolbar.setTitle(R.string.journal);
                 } catch (Exception e) {
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                     e.printStackTrace();
                 }
             });
         } catch (Exception e) {
-            Config.sout(e.getMessage());
+            Config.sout(e);
             e.printStackTrace();
         } finally {
             if (c != null) {
@@ -362,7 +362,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {
-                Config.sout(e.getMessage());
+                Config.sout(e);
                 throw new Exception(e);
             } finally {
                 glbVars.dbOrders.getWritableDatabase().setTransactionSuccessful();
@@ -389,12 +389,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                     toolbar.setTitle(R.string.journal);
                 } catch (Exception e) {
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                     e.printStackTrace();
                 }
             });
         } catch (Exception e) {
-            Config.sout(e.getMessage());
+            Config.sout(e);
             e.printStackTrace();
         }
 //            }
@@ -413,7 +413,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
                 return true;
             case R.id.NomenSave:
@@ -437,7 +437,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Config.sout(e.getMessage());
+                            Config.sout(e);
                         }
                     }
                 }).start();
@@ -532,7 +532,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
                 return true;
             case R.id.NomenSort:
@@ -553,7 +553,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
                 return true;
             case R.id.NomenDiscount:
@@ -561,7 +561,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     glbVars.CalculatePercentSale(mainMenu);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
                 return true;
             case R.id.NomenMultiSelect:
@@ -616,7 +616,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
 
                 return true;
@@ -638,7 +638,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
                 return true;
             case R.id.clear_whole_order:
@@ -660,7 +660,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                             .show();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e.getMessage());
+                    Config.sout(e);
                 }
 
                 return true;

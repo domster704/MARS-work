@@ -40,7 +40,7 @@ public class AspectProgressBar {
             if (progressBarLoading != null)
                 progressBarLoading.dismiss();
             e.printStackTrace();
-            Config.sout(e.getMessage());
+            Config.sout(e);
         }
     }
 }

@@ -57,6 +57,17 @@
                     android:inputType="time" />
         </LinearLayout>
 
+        <TextView
+                android:id="@+id/startDate"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/orderFragNecFieldsHeight"
+                android:singleLine="true"
+                android:maxEms="12"
+                android:textSize="@dimen/headOrderFontSize"
+                android:textColor="#000"
+                android:text="Дата"
+                android:paddingStart="10dp" />
+
         <EditText
                 android:id="@+id/contrFilterInSales"
                 android:layout_width="match_parent"

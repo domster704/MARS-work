@@ -25,7 +25,6 @@ import com.amber.armtp.dbHelpers.DBHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,18 +48,6 @@ public class SalesReportResultFragment extends Fragment  {
         }
     }
 
-    public static class SentDataToSalesFragment implements Serializable {
-        public String[] chosenCheckBox;
-        public String[] dateInSalesFragment;
-        public SalesFragment.SpecificDataForSalesReportFragment[] specificData;
-
-        public SentDataToSalesFragment(String[] chosenCheckBox, String[] dateInSalesFragment, SalesFragment.SpecificDataForSalesReportFragment[] specificData) {
-            this.chosenCheckBox = chosenCheckBox;
-            this.dateInSalesFragment = dateInSalesFragment;
-            this.specificData = specificData;
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,10 +66,11 @@ public class SalesReportResultFragment extends Fragment  {
         super.onActivityCreated(savedInstanceState);
 
         headersName = new HashMap<String, ViewWidthByName>() {{
-            put("_id", new ViewWidthByName("NN", R.id.reportResultPos, getResources().getDimension(R.dimen.reportResultSmallFieldWidth)));
+            put("_id", new ViewWidthByName("NN", R.id.reportResultPos, getResources().getDimension(R.dimen.reportResultExtraSmallFieldWidth)));
             put("CONTRS", new ViewWidthByName("Покупатель", R.id.contr, getResources().getDimension(R.dimen.reportResultBigFieldWidth)));
             put("GRUPS", new ViewWidthByName("Группа", R.id.groups, getResources().getDimension(R.dimen.reportResultBigFieldWidth)));
-            put("SUMMA", new ViewWidthByName("Сумма", R.id.sum, getResources().getDimension(R.dimen.reportResultMediumFieldWidth)));
+            put("KOL", new ViewWidthByName("Шт", R.id.count, getResources().getDimension(R.dimen.reportResultSmallFieldWidth)));
+            put("SUMMA", new ViewWidthByName("Руб", R.id.sum, getResources().getDimension(R.dimen.reportResultMediumFieldWidth)));
         }};
 
         if (getArguments() == null) {
@@ -103,7 +91,10 @@ public class SalesReportResultFragment extends Fragment  {
             e.printStackTrace();
         }
 
+
+        // При добавлении новых столбцов надо сделать добавление здесь
         details.add(0, "_id");
+        details.add("KOL");
         details.add("SUMMA");
 
         String[] chosenColumnsInCursor = details.toArray(new String[0]);
@@ -224,7 +215,7 @@ public class SalesReportResultFragment extends Fragment  {
         String dt = getFormatedData(dateData[1].split("\\."));
 
         DBHelper dbHelper = new DBHelper(getActivity());
-        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) as SUMMA " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (x >= " + df + " and x <= " + dt + ") " + specificSqlReq + " GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC",
+        return dbHelper.getReadableDatabase().rawQuery("SELECT REAL.ROWID as _id, CAST((substr(data, 7, 4) || '' || substr(data, 4, 2) || '' || substr(data, 1, 2)) as INTEGER) as x, SUM(SUMMA) as SUMMA, SUM(KOL) as KOL " + res + " FROM REAL " + joinSqlReq + " WHERE TORG_PRED=? AND (x >= " + df + " and x <= " + dt + ") " + specificSqlReq + " GROUP BY " + resGroupBy + " ORDER BY SUMMA DESC",
                 new String[]{tradeRepresentative});
     }
 

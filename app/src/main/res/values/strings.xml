@@ -59,6 +59,7 @@
     <string name="journalAbout">Максимальное кол-во заказов в журнале - 100, если их больше, то старые автоматически удаляются\n\nЧерез час после отправки заказа обновите базу данных и убедитесь, что статус заказа изменился. Это будет означать, что он нормально обработан на сервере. Если статус не изменился, отправьте повторно</string>
     <string name="newVersionAvailable">Доступна новая версия</string>
     <string name="necessaryMemorySize">Для безошибочного обновления данных необходимо иметь 800МБ свободного места на устройстве</string>
+    <string name="contrStatusInfo">Расцветка статуса контрагента: <font color="#53ad2f">зеленый</font> - все в порядке, <font color="#ffa500">оранжевый</font> - пора обновить карту клиента, <font color="#ff0000">красный</font> - отгрузки запрещены</string>
 
     <string name="errorInDownloadingProcess">Ошибка во время загрузки</string>
     <string name="successInDownloadingProcess">База данных успешно обновлена</string>

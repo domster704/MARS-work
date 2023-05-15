@@ -36,7 +36,7 @@ public class AspectDelayedCalled {
             }, delay);
         } catch (Exception e) {
             e.printStackTrace();
-            Config.sout(e.getMessage());
+            Config.sout(e);
         }
     }
 }

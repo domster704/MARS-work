@@ -57,7 +57,7 @@ public class DebetFragment extends Fragment {
 
         if (tradeRepresentativeID.equals("") || tpName.equals("")) {
             new AlertDialog.Builder(getActivity())
-                    .setTitle("Непраивльный идентификатор")
+                    .setTitle("Неправильный идентификатор")
                     .setMessage("Неправильно введен или отсутсвует ID торгового представителя. Попробуйте ввести правильное ID или обновить базу данных")
                     .setCancelable(false)
                     .setPositiveButton("Ввести ID", (dialogInterface, i) -> {
