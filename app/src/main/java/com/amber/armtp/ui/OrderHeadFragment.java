@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,8 +109,8 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         glbVars.spinAddress = getActivity().findViewById(R.id.SpinAddr);
         glbVars.TPList = getActivity().findViewById(R.id.SpinTP);
 
-//        Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
-//        returnMoneyButton.setOnClickListener(this);
+        Button returnMoneyButton = getActivity().findViewById(R.id.returnMoneyButton);
+        returnMoneyButton.setOnClickListener(this);
 
         ImageButton userCardInfoButton = getActivity().findViewById(R.id.userCardInfoButton);
         userCardInfoButton.setOnClickListener(this);
@@ -223,15 +224,14 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
     @Override
     public void onClick(View view) {
-//        if (view.getId() == R.id.returnMoneyButton) {
-//            String currentText = glbVars.txtComment.getText().toString();
-//            if (currentText.equals("")) {
-//                glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney));
-//            } else {
-//                glbVars.txtComment.setText(currentText + ", " + getResources().getString(R.string.takeOutMoney).toLowerCase());
-//            }
-//        }
-        if (view.getId() == R.id.userCardInfoButton) {
+        if (view.getId() == R.id.returnMoneyButton) {
+            String currentText = glbVars.txtComment.getText().toString();
+            if (currentText.equals("")) {
+                glbVars.txtComment.setText(getResources().getString(R.string.takeOutMoney));
+            } else {
+                glbVars.txtComment.setText(currentText + ", " + getResources().getString(R.string.takeOutMoney).toLowerCase());
+            }
+        } else if (view.getId() == R.id.userCardInfoButton) {
             CounterAgentInfo counterAgentInfo = glbVars.db.getCounterAgentInfo(GlobalVars.CurContr);
             CounterAgentDialogFragment dialogFragment = new CounterAgentDialogFragment();
 
@@ -240,11 +240,6 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
             dialogFragment.setArguments(bundle);
             dialogFragment.show(getFragmentManager(), "counterAgentDialogFragment");
-//            new AlertDialog.Builder(getContext())
-//                    .setTitle("Информация о контрагенте")
-//                    .setMessage(counterAgentInfo.toString())
-//                    .show()
-//                    .create();
         }
     }
 

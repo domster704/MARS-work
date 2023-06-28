@@ -15,7 +15,7 @@ import com.amber.armtp.R;
 import com.amber.armtp.auxiliaryData.CounterAgentInfo;
 
 public class CounterAgentDialogFragment extends DialogFragment {
-    private CounterAgentInfo counterAgentInfo;
+    private CounterAgentInfo counterAgentInfo = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,7 +28,6 @@ public class CounterAgentDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getDialog().setTitle("Информация о контрагенте");
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog);
         View view = inflater.inflate(R.layout.counter_agent_info_layout, container, false);
@@ -37,9 +36,11 @@ public class CounterAgentDialogFragment extends DialogFragment {
         TextView password = view.findViewById(R.id.passwordContrInfo);
         TextView email = view.findViewById(R.id.emailContrInfo);
 
-        login.setText(counterAgentInfo.login);
-        password.setText(counterAgentInfo.password);
-        email.setText(counterAgentInfo.email);
+        if (counterAgentInfo != null) {
+            login.setText(counterAgentInfo.login);
+            password.setText(counterAgentInfo.password);
+            email.setText(counterAgentInfo.email);
+        }
 
         return view;
     }

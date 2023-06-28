@@ -333,6 +333,13 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     ContrDes = orderHeader.getString(orderHeader.getColumnIndex("C_DES")),
                     AddressDes = orderHeader.getString(orderHeader.getColumnIndex("A_DES"));
 
+
+            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("HHmmss");
+            String dateForIDDOC = dateFormat.format(Calendar.getInstance().getTimeInMillis()) + Calendar.getInstance().get(Calendar.MILLISECOND);
+
+            String IDDOC = TP_ID + "_" + Data.replace(".", "") + "_" + dateForIDDOC;
+//            String IDDOC = TP_ID;
+
             orderHeader.close();
 
             Cursor orderCount = glbVars.db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
@@ -344,9 +351,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             orderCount.close();
 
             glbVars.dbOrders.getWritableDatabase().execSQL("DELETE FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'");
-            Sum = insertIntoOrderDT(OrderID, Sum);
+            Sum = insertIntoOrderDT(IDDOC, Sum);
 
-            String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?  WHERE DOCID='" + OrderID + "'";
+            String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?, DOCID=? WHERE DOCID='" + OrderID + "'";
             SQLiteStatement stmt = glbVars.dbOrders.getWritableDatabase().compileStatement(sql);
             glbVars.dbOrders.getWritableDatabase().beginTransaction();
             try {
@@ -359,6 +366,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.bindString(6, ContrDes);
                 stmt.bindString(7, AddressDes);
                 stmt.bindString(8, String.format(Locale.ROOT, "%.2f", Sum));
+                stmt.bindString(9, IDDOC);
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {

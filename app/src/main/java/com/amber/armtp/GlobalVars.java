@@ -1023,7 +1023,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public String CreateDBFForSending(int ID) throws DBFException {
         Cursor c;
 
-        String TP, CONTR, ADDR, DOCNO, COMMENT, NOMEN;
+        String TP, CONTR, ADDR, DOCNO = "", COMMENT, NOMEN;
         java.util.Date DELIVERY, DOCDATE;
         double QTY;
         String PRICE;
@@ -1042,8 +1042,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         cForTpId.moveToNext();
         String tpID = cForTpId.getString(cForTpId.getColumnIndex("TP"));
 
-        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tpID + "_" + curdate + ".temp";
-        String DBF_FileName = tpID + "_" + curdate + ".temp";
+        String fileID = tpID + "_" + curdate;
+        String FileName = CurAc.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + fileID + ".temp";
+        String DBF_FileName = fileID + ".temp";
 
         File DBFFile = new File(FileName);
         if (DBFFile.exists()) {
@@ -1147,6 +1148,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         } finally {
             c.close();
         }
+        System.out.println(DOCNO);
         Table.write();
 
         return DBF_FileName;
