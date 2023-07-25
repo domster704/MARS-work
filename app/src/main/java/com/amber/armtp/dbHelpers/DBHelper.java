@@ -789,15 +789,15 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursorSetPrices = null;
         while (cursor.moveToNext()) {
-            cursorSetPrices = db.rawQuery("SELECT NOMEN, CENA, TIPCEN FROM PRICES WHERE TIPCEN = '" + cursor.getString(cursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
+            cursorSetPrices = db.rawQuery("SELECT NOMEN, CENA, TIPCEN, NOMEN.FIX FROM PRICES JOIN NOMEN on NOMEN.KOD5 = PRICES.NOMEN WHERE TIPCEN = '" + cursor.getString(cursor.getColumnIndex("TIPCEN")) + "' AND NOMEN IN (SELECT KOD5 FROM NOMEN WHERE GRUPPA = '" + GroupID + "')", null);
             for (int j = 0; j < cursorSetPrices.getCount(); j++) {
                 cursorSetPrices.moveToNext();
                 if (pricesMap.containsKey(cursorSetPrices.getString(cursorSetPrices.getColumnIndex("NOMEN"))))
                     continue;
 
                 float price = Float.parseFloat(cursorSetPrices.getString(cursorSetPrices.getColumnIndex("CENA"))) * (1 - Float.parseFloat(cursor.getString(cursor.getColumnIndex("SKIDKA"))) / 100);
-                pricesMap.remove(cursorSetPrices.getString(cursorSetPrices.getColumnIndex("NOMEN")));
 
+                pricesMap.remove(cursorSetPrices.getString(cursorSetPrices.getColumnIndex("NOMEN")));
                 pricesMap.put(cursorSetPrices.getString(cursorSetPrices.getColumnIndex("NOMEN")), price);
                 isPulledFields = true;
             }
@@ -854,6 +854,8 @@ public class DBHelper extends SQLiteOpenHelper {
     private void updatePrices(Cursor c) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         while (c.moveToNext()) {
+            if (c.getInt(c.getColumnIndex("FIX")) == 1) continue;
+
             String nomen = c.getString(c.getColumnIndex("NOMEN"));
             float price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(c.getString(c.getColumnIndex("SKIDKA"))) / 100)).replace(",", "."));
             if (pricesMap.containsKey(nomen) && pricesMap.get(nomen) == price || Float.isNaN(price)) {
@@ -867,11 +869,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void putAllNomenPrices(String CONTR) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN, NOMEN.FIX as FIX" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
         updatePrices(c);
         c.close();
-        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN" +
+        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN, NOMEN.FIX as FIX" +
                 " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
         updatePrices(c1);
         c1.close();

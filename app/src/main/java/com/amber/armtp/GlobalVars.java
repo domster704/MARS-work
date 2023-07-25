@@ -783,14 +783,12 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                         continue;
                     }
 
-                    String kod5FromFileName = FilenameUtils.removeExtension(fileName);
                     countOfSuccessfulDownloadedPhotos++;
                     try {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + kod5FromFileName + "'");
+                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE FOTO=? or FOTO2=?", new Object[]{fileName, fileName});
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
 
                 if (countOfSuccessfulDownloadedPhotos != 0) {
@@ -1354,34 +1352,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         gdNomen.invalidateViews();
     }
 
-    public void rewritePriceToMainDB(String docId) {
-        Cursor orderPrices;
-        orderPrices = dbOrders.getReadableDatabase().rawQuery("SELECT PRICE, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID = '" + docId + "'", null);
-
-        while (orderPrices.moveToNext()) {
-            DBHelper.pricesMap.remove(orderPrices.getString(1));
-            DBHelper.pricesMap.put(orderPrices.getString(1), Float.parseFloat(orderPrices.getString(0).replace(",", ".")));
-        }
-
-        orderPrices.close();
-    }
-
-//    public void calculatePricesByContrDiscount(String data) {
-//        new Thread(new Runnable() {
-//            @Override
-//            @PGShowing
-//            public void run() {
-//                db.calcSales(db.GetContrID(), data);
-//                CurAc.runOnUiThread(() -> {
-//                    if (NomenAdapter != null) {
-//                        myNom.requery();
-//                        NomenAdapter.notifyDataSetChanged();
-//                    }
-//                });
-//            }
-//        }).start();
-//    }
-
     public void updateOutedPositionInZakazyTable() {
         try {
 
@@ -1524,12 +1494,12 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString()) * (1 - Discount / 100f)));
             }
 
-            if (tvPhoto != null && cursor.getString(cursor.getColumnIndex("FOTO")) != null) {
-                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1)
+            if (tvPhoto != null && (cursor.getString(cursor.getColumnIndex("FOTO")) != null)) {
+                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
                     resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
-                else
+                } else {
                     resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
-
+                }
                 SpannableStringBuilder builder = new SpannableStringBuilder();
                 builder.append(" ").append(" ");
                 builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
