@@ -13,6 +13,7 @@ import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
+import com.amber.armtp.annotations.TimeLogger;
 import com.amber.armtp.auxiliaryData.CounterAgentInfo;
 import com.amber.armtp.ui.OrderHeadFragment;
 
@@ -130,8 +131,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            // Ошибка была в том, что cursor был объявлен вне try-catch (что странно)
-            return db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [" + GlobalVars.TypeOfPrice + "], [ACTION] FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE OST>0 " + sqlMX + searchReq + " ORDER BY Nomen.GRUPPA", null);
+            // Ошибка когда-то была в том, что cursor был объявлен вне try-catch (что странно)
+            return db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [" + GlobalVars.TypeOfPrice + "], [ACTION], " +
+                    " (SELECT group_concat(act_id) as ACT_LIST" +
+                    "  FROM (SELECT ACT.ID as act_id," +
+                    "               SUM(" +
+                    "                       CASE" +
+                    "                           WHEN ACT.OFIS_NOT = TORG_PRED.OFIS THEN -10000" +
+                    "                           WHEN ACT.OFIS_IN = TORG_PRED.OFIS OR ACT.OFIS_IN = '' THEN 1" +
+                    "                           ELSE 0" +
+                    "                           END)" +
+                    "                      AS ACTION_COUNT" +
+                    "        FROM NOMEN_ACT" +
+                    "                 JOIN ACT ON ACT.ID = NOMEN_ACT.ACT" +
+                    "                 JOIN TORG_PRED ON TORG_PRED.CODE = '" + OrderHeadFragment.TP_ID + "'" +
+                    "        WHERE (ACT.OFIS_IN = TORG_PRED.OFIS OR ACT.OFIS_IN = '' OR ACT.OFIS_NOT = TORG_PRED.OFIS)" +
+                    "          AND NOMEN_ACT.NOMEN = NOMEN.KOD5" +
+                    "        GROUP BY act_id) act_list_table" +
+                    "  WHERE ACTION_COUNT > 0) AS ACT_LIST" +
+                    " FROM Nomen" +
+                    " JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE" +
+                    " WHERE OST>0 " + sqlMX + searchReq +
+                    " ORDER BY Nomen.GRUPPA", null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -143,7 +164,27 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST,[" + GlobalVars.TypeOfPrice + "] AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD FROM Nomen JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE WHERE ZAKAZ<>0 ORDER BY Nomen.DESCR", null);
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST,[" + GlobalVars.TypeOfPrice + "] AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD, " +
+                    " (SELECT group_concat(act_id) as ACT_LIST" +
+                    "  FROM (SELECT ACT.ID as act_id," +
+                    "               SUM(" +
+                    "                       CASE" +
+                    "                           WHEN ACT.OFIS_NOT = TORG_PRED.OFIS THEN -10000" +
+                    "                           WHEN ACT.OFIS_IN = TORG_PRED.OFIS OR ACT.OFIS_IN = '' THEN 1" +
+                    "                           ELSE 0" +
+                    "                           END)" +
+                    "                      AS ACTION_COUNT" +
+                    "        FROM NOMEN_ACT" +
+                    "                 JOIN ACT ON ACT.ID = NOMEN_ACT.ACT" +
+                    "                 JOIN TORG_PRED ON TORG_PRED.CODE = '" + OrderHeadFragment.TP_ID + "'" +
+                    "        WHERE (ACT.OFIS_IN = TORG_PRED.OFIS OR ACT.OFIS_IN = '' OR ACT.OFIS_NOT = TORG_PRED.OFIS)" +
+                    "          AND NOMEN_ACT.NOMEN = NOMEN.KOD5" +
+                    "        GROUP BY act_id) act_list_table" +
+                    "  WHERE ACTION_COUNT > 0) AS ACT_LIST" +
+                    " FROM Nomen " +
+                    " JOIN GRUPS ON Nomen.GRUPPA = GRUPS.CODE " +
+                    " WHERE ZAKAZ<>0 " +
+                    " ORDER BY Nomen.DESCR", null);
             return cursor;
 
         } catch (Exception e) {
@@ -854,27 +895,43 @@ public class DBHelper extends SQLiteOpenHelper {
     private void updatePrices(Cursor c) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         while (c.moveToNext()) {
-            if (c.getInt(c.getColumnIndex("FIX")) == 1) continue;
-
+//            if (c.getInt(c.getColumnIndex("FIX")) == 1) {
+////                price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CONTR_PRICE")))));
+//                continue;
+//            }
             String nomen = c.getString(c.getColumnIndex("NOMEN"));
-            float price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(c.getString(c.getColumnIndex("SKIDKA"))) / 100)).replace(",", "."));
+            float price = Float.parseFloat(decimalFormat.format(Float.parseFloat(c.getString(c.getColumnIndex("CENA"))) * (1 - Float.parseFloat(c.getString(c.getColumnIndex("SKIDKA_NEW"))) / 100)).replace(",", "."));
+
             if (pricesMap.containsKey(nomen) && pricesMap.get(nomen) == price || Float.isNaN(price)) {
                 continue;
             }
-//            Log.d("xd", nomen + " " + price + " " + c.getString(c.getColumnIndex("TIPCEN")) + " " + c.getString(c.getColumnIndex("SKIDKA")));
             pricesMap.put(nomen, price);
         }
         c.close();
     }
 
+    @TimeLogger
     public void putAllNomenPrices(String CONTR) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN, NOMEN.FIX as FIX" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.SGI=SKIDKI.SGI AND SKIDKI.GRUPPA IS NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+        System.out.println(CONTR);
+        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + GlobalVars.TypeOfPrice + "] as CONTR_PRICE" +
+                " FROM SKIDKI" +
+                "         JOIN PRICES ON SKIDKI.TIPCEN = PRICES.TIPCEN" +
+                "         JOIN NOMEN ON NOMEN.KOD5 = PRICES.NOMEN AND NOMEN.SGI = SKIDKI.SGI" +
+                " WHERE SKIDKI.KONTR = ?" +
+                " AND SKIDKI.GRUPPA IS NULL" +
+                " AND SKIDKI.TIPCEN IS NOT NULL" +
+                " AND NOT (SKIDKA_NEW = 0 AND CENA = CONTR_PRICE)", new String[]{CONTR});
         updatePrices(c);
         c.close();
-        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, SKIDKI.SKIDKA as SKIDKA, SKIDKI.TIPCEN as TIPCEN, NOMEN.FIX as FIX" +
-                " FROM SKIDKI JOIN PRICES ON SKIDKI.TIPCEN=PRICES.TIPCEN JOIN NOMEN ON NOMEN.KOD5=PRICES.NOMEN AND NOMEN.GRUPPA=SKIDKI.GRUPPA AND SKIDKI.GRUPPA IS NOT NULL AND SKIDKI.TIPCEN IS NOT NULL WHERE SKIDKI.KONTR=?", new String[]{CONTR});
+        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + GlobalVars.TypeOfPrice + "] as CONTR_PRICE" +
+                " FROM SKIDKI" +
+                "         JOIN PRICES ON SKIDKI.TIPCEN = PRICES.TIPCEN" +
+                "         JOIN NOMEN ON NOMEN.KOD5 = PRICES.NOMEN AND NOMEN.GRUPPA = SKIDKI.GRUPPA " +
+                " WHERE SKIDKI.KONTR = ?" +
+                " AND SKIDKI.GRUPPA IS NOT NULL" +
+                " AND SKIDKI.TIPCEN IS NOT NULL" +
+                " AND NOT (SKIDKA_NEW = 0 AND CENA = CONTR_PRICE)" , new String[]{CONTR});
         updatePrices(c1);
         c1.close();
     }

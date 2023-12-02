@@ -2,16 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp">
 
     <TextView
             android:id="@+id/actionDesc"
-            android:layout_width="@dimen/actionDescWidth"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/heightOfActionResultViews"
             android:textSize="16sp"
             android:textColor="#000000"
             android:singleLine="true"
-            android:gravity="center_vertical|start" />
+            android:gravity="center_vertical|start"
+            android:layout_toStartOf="@+id/actionDateStart"/>
 
     <TextView
             android:id="@+id/actionDateStart"
@@ -20,7 +22,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/actionDesc" />
+            android:layout_toStartOf="@id/actionDateEnd" />
 
     <TextView
             android:id="@+id/actionDateEnd"
@@ -29,7 +31,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/actionDateStart" />
+            android:layout_toStartOf="@+id/ActionFactValue" />
 
     <TextView
             android:id="@+id/ActionFactValue"
@@ -38,7 +40,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/actionDateEnd" />
+            android:layout_toStartOf="@+id/ActionPlanValue" />
     <TextView
             android:id="@+id/ActionPlanValue"
             android:layout_width="@dimen/ActionElemWidth"
@@ -46,7 +48,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/ActionFactValue" />
+            android:layout_toStartOf="@+id/ActionPercent" />
 
     <TextView
             android:id="@+id/ActionPercent"
@@ -55,6 +57,5 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:gravity="center"
-            android:layout_toEndOf="@+id/ActionPlanValue"
             android:layout_alignParentEnd="true" />
 </RelativeLayout>

@@ -1496,9 +1496,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
             if (tvPhoto != null && (cursor.getString(cursor.getColumnIndex("FOTO")) != null)) {
                 if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
-                    resID = glbContext.getResources().getIdentifier("photo_green", "drawable", glbContext.getPackageName());
+                    resID = glbContext.getResources().getIdentifier("photo_downloaded", "drawable", glbContext.getPackageName());
                 } else {
-                    resID = glbContext.getResources().getIdentifier("photo2", "drawable", glbContext.getPackageName());
+                    resID = glbContext.getResources().getIdentifier("photo_no_downloaded", "drawable", glbContext.getPackageName());
                 }
                 SpannableStringBuilder builder = new SpannableStringBuilder();
                 builder.append(" ").append(" ");
@@ -1531,7 +1531,13 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             }
             _setTextColorOnTextView(tvListForChange, color);
 
-            int style = cursor.getInt(cursor.getColumnIndex("ACTION")) == 1 ? Typeface.BOLD_ITALIC : Typeface.NORMAL;
+            int style = Typeface.NORMAL;
+            String action_list_temp = cursor.getString(cursor.getColumnIndex("ACT_LIST"));
+            String[] action_list = action_list_temp == null ? new String[]{} : action_list_temp.split(",");
+
+            if (action_list.length > 0) {
+                style = Typeface.BOLD_ITALIC;
+            }
             _setTypeFaceOnTextView(tvListForChange, style);
 
             tvPosition.setText(String.valueOf(position + 1));
@@ -1908,6 +1914,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public void updateOrdersStatusFromDB() {
         SQLiteDatabase dbApp = db.getReadableDatabase();
         SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
+//        dbOrd.beginTransaction();
         Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
         Cursor statusInDB;
         while (statusInApp.moveToNext()) {
@@ -1922,6 +1929,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
 
         statusInApp.close();
+//        dbOrd.endTransaction();
 //        if (statusInDB != null)
 //            statusInDB.close();
     }
@@ -2052,7 +2060,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
                 txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
             } catch (Exception e1) {
-                Config.sout("123 " + e1);
+                Config.sout(e1);
             }
 
             try {
@@ -2061,7 +2069,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
                 String groupDescription = c.getString(c.getColumnIndex("DESCR"));
                 txtGrup.setText(groupDescription);
             } catch (Exception e2) {
-                Config.sout("aaa " + e2);
+                Config.sout(e2);
             }
 
             alertDialogBuilder

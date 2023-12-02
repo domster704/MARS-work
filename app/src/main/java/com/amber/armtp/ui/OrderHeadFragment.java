@@ -40,6 +40,7 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClickListener {
+    public static String TP_ID = "";
     public static String CONTR_ID = "";
     public static String PREVIOUS_CONTR_ID = "";
     public static String _ADDR = "";
@@ -308,7 +309,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 
         String DeliveryDate = glbVars.txtDate.getText().toString();
         String Comment = glbVars.txtComment.getText().toString();
-        String TP_ID = glbVars.spTp.getText().toString();
+        TP_ID = glbVars.spTp.getText().toString();
 
         if (TP_ID.equals("0") || CONTR_ID.equals("0") || AddressId.equals("0") || DeliveryDate.equals("")) {
             Toast.makeText(getActivity(), "Необходимо заполнить все обязательные поля шапки заказа", Toast.LENGTH_LONG).show();
@@ -347,6 +348,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 //        glbVars.putAllPrices();
         glbVars.closeAllCursorsInHeadOrder();
         goToFormOrderFragment();
+//        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commitAllowingStateLoss();
     }
 
 //    private void _checkAndSetContrIDAfterDestroying() {

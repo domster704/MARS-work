@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOKUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
             globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
+//            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS prices_kod5_index ON PRICES (NOMEN)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -242,39 +243,50 @@ public class MainActivity extends AppCompatActivity {
 
                 // Closing drawer on item click
                 drawerLayout.closeDrawers();
-
+                for (Fragment i : getSupportFragmentManager().getFragments()) {
+                    System.out.println(i.getClass());
+                }
                 // Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     // Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_update_data:
+//                        getSupportFragmentManager().beginTransaction().remove()
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new UpdateDataFragment(), "frag_update_data");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_journal:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new JournalFragment(), "frag_journal");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_order_header:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new OrderHeadFragment(), "frag_order_header");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_debet:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new DebetFragment(), "frag_debet");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_admin:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new SettingFragment(), "frag_set");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_report:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new ReportFragment(), "frag_report");
                         setToolbarTitle(menuItem.getTitle());
                         return true;
                     case R.id.nav_exit:
+//                        getFragmentManager().popBackStack();
                         finish();
                         System.exit(0);
                         return true;
                     default:
+//                        getFragmentManager().popBackStack();
                         DisplayFragment(new DefaultFragment(), "frag_default");
                         setToolbarTitle(menuItem.getTitle());
                         return true;

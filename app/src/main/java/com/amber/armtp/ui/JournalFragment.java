@@ -202,6 +202,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
         deleteExtraOrders();
     }
 
+
     /**
      * Если кол-во заказов > 100, то удаляем самые старые заказы, которые выходят за рамки 100 заказов
      */

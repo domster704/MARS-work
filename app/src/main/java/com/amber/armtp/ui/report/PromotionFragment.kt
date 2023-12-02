@@ -75,7 +75,7 @@ class PromotionFragment : Fragment() {
 
     private fun getActionCursor(torgID: String): Cursor {
         return dbHelper.readableDatabase.rawQuery(
-            "SELECT ROWID as _id, [ACTION], DATAN, DATAK, PLN, ISKOL, CASE WHEN ISKOL=1 THEN KOL ELSE SUMMA END AS 'VAL' FROM [ACTION] WHERE TORG_PRED=?",
+            "SELECT ROWID as _id, [ACTION], DATAN, DATAK, PLN, ISKOL, CASE WHEN ISKOL=1 THEN KOL ELSE SUMMA END AS 'VAL' FROM [ACTION] WHERE TORG_PRED=? ORDER BY [ACTION]",
             arrayOf(torgID)
         )
     }

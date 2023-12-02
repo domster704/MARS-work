@@ -43,10 +43,6 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 
-
-/**
- * Updated by domster704 on 27.09.2021
- */
 public class FormOrderFragment extends Fragment implements View.OnClickListener, TBUpdate {
     public static Menu mainMenu;
     public static ImageButton filter;
@@ -94,7 +90,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        System.out.println(OrderHeadFragment.TP_ID);
         toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
         glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
 

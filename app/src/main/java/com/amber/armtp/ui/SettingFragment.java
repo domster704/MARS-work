@@ -44,6 +44,9 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private EditText etTpSetting;
     private EditText etTimeout;
 
+    public SettingFragment() {
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -117,7 +120,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
             return;
 
         int[] layoutsNeededToOpen = getArguments().getIntArray("Layouts");
-        for (int id: layoutsNeededToOpen) {
+        for (int id : layoutsNeededToOpen) {
             LinearLayout layout = getActivity().findViewById(id);
             for (int i = 0; i < layout.getChildCount(); i++) {
                 if (layout.getChildAt(i) instanceof LinearLayout) {
@@ -172,8 +175,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                                 if (countOfFiles != 0) {
                                     Config.sout("Фотографии успешно удалены");
                                     glbVars.db.clearPhoto();
-                                }
-                                else {
+                                } else {
                                     Config.sout("Отсутствуют фотографии на устройстве");
                                 }
                             }
