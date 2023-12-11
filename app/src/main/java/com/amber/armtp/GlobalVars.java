@@ -1,93 +1,56 @@
 package com.amber.armtp;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableStringBuilder;
-import android.text.style.ImageSpan;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.amber.armtp.adapters.NomenAdapterSQLite;
 import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.DelayedCalled;
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.ftp.Ftp;
+import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.interfaces.TBUpdate;
-import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.OrderHeadFragment;
-import com.amber.armtp.ui.SettingFragment;
 import com.linuxense.javadbf.DBFException;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
-
-import it.sauronsoftware.ftp4j.FTPException;
-import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 
 /**
  * Created by filimonov on 22-08-2016.
@@ -100,19 +63,16 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public static Context CurFragmentContext;
     public static String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
     public static String CurContr = "0";
-    public static String TypeOfPrice = "";
 
-    public int CurVisiblePosition = 0;
 
     public Context glbContext;
-    public Cursor myNom = null, mySgi, myGroup, Orders, OrdersDt;
-    public Cursor myWC = null, myFocus = null;
+    public Cursor Orders, OrdersDt;
     public Cursor myContr;
     public Cursor myAddress;
     public Cursor myTP;
     public Cursor curDebet;
 
-    public GlobalVars.NomenAdapter NomenAdapter, PreviewZakazAdapter;
+    public NomenAdapterSQLite PreviewZakazAdapter;
     public JournalAdapter OrdersAdapter;
     public JournalDetailsAdapter OrdersDtAdapter;
 
@@ -122,13 +82,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public DBOrdersHelper dbOrders;
     public DBAppHelper dbApp;
 
-    public boolean isDiscount = false;
     public boolean isMultiSelect = false;
     public boolean isSales = false;
-    public boolean isNeededToBeLoadingBySgi = true;
-
-    public float Discount = 0;
-    public int MultiQty = 0;
 
     public GridView nomenList;
     public GridView gdOrders;
@@ -138,13 +93,7 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     //    public android.support.v7.widget.Toolbar toolbar;
     public Toolbar toolbar;
     public LinearLayout layout;
-
-    public Spinner spSgi, spGroup;
-    public Spinner spWC, spFocus;
-
-    public AlertDialog alertPhoto = null;
     public PopupMenu nomPopupMenu;
-    public String OrderID = "";
     public String CurrentTp;
 
     public Spinner spinContr, spinAddress, TPList;
@@ -155,13 +104,8 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     public TextView spTp, spContr, spAddress;
     public ViewFlipper viewFlipper;
     public String ordStatus;
-    public int BeginPos = 0, EndPos = 0;
 
     public static Thread downloadPhotoTread;
-    public boolean isNeededToResetSearchView = true;
-
-    @SuppressLint("StaticFieldLeak")
-    public volatile static ProgressBarLoading currentPB;
 
     private static boolean isNeededToSelectRowAfterGoToGroup = false;
     public static String kod5 = "";
@@ -235,244 +179,9 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
     };
 
-
-    public AdapterView.OnItemClickListener GridNomenClick = (myAdapter, myView, position, mylng) -> {
-        try {
-            long viewId = myView.getId();
-
-            if (viewId == R.id.ColNomPhoto) {
-                showPhoto(myView, position, myAdapter);
-            } else if (viewId == R.id.btPlus) {
-                plusQTY(myView);
-            } else if (viewId == R.id.btMinus) {
-                minusQTY(myView);
-            } else {
-                TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
-                TextView tvOST = myView.findViewById(R.id.ColNomOst);
-
-                String ID = tvKOD5.getText().toString();
-                int ost = Integer.parseInt(tvOST.getText().toString());
-
-                if (isMultiSelect) {
-                    multiSelect(ID, ost);
-                } else {
-                    fillNomenDataFromAlertDialog(ID, ost);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Config.sout(e);
-        }
-    };
-
-    public AdapterView.OnLongClickListener PhotoLongClick = new AdapterView.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View view) {
-            try {
-                TextView tvKod5 = ((RelativeLayout) view.getParent()).findViewById(R.id.ColNomCod);
-                String kod5 = tvKod5.getText().toString();
-
-                PopupMenu nomPopupMenu = new PopupMenu(glbContext, view);
-                nomPopupMenu.getMenuInflater().inflate(R.menu.photo_context_menu, nomPopupMenu.getMenu());
-
-                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                    if (menuItem.getItemId() == R.id.forceDownloadPhoto) {
-                        @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(kod5);
-                        downloadAndShowPhotos(fileNames, kod5, true);
-                    }
-                    return true;
-                });
-                nomPopupMenu.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-            return true;
-        }
-    };
-
-    public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
-        @SuppressLint("NonConstantResourceId")
-        @Override
-        public boolean onItemLongClick(AdapterView<?> arg0, final View myView, final int position, long arg3) {
-            try {
-                String group;
-                String sgi;
-
-                Cursor c = myNom;
-                group = c.getString(c.getColumnIndex("GRUPPA"));
-                sgi = c.getString(c.getColumnIndex("SGI"));
-
-                PopupMenu nomPopupMenu = new PopupMenu(glbContext, myView);
-                nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-                if (BeginPos != 0) {
-                    nomPopupMenu.getMenu().findItem(R.id.setBeginPos).setTitle("Установить как начальную позицию. (сейчас установлена " + BeginPos + ")");
-                }
-
-                if (EndPos != 0) {
-                    nomPopupMenu.getMenu().findItem(R.id.setEndPos).setTitle("Установить как конечную позицию. (сейчас установлена " + EndPos + ")");
-                }
-
-                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                    switch (menuItem.getItemId()) {
-                        case R.id.resetBeginEndPos:
-                            BeginPos = 0;
-                            EndPos = 0;
-                            return true;
-                        case R.id.setBeginPos:
-                            BeginPos = position + 1;
-                            NomenAdapter.notifyDataSetChanged();
-                            return true;
-                        case R.id.setEndPos:
-                            EndPos = position + 1;
-                            NomenAdapter.notifyDataSetChanged();
-                            return true;
-                        case R.id.goToGroup:
-                            isNeededToSelectRowAfterGoToGroup = true;
-                            kod5 = c.getString(c.getColumnIndex("KOD5"));
-
-                            if (spWC != null) {
-                                spWC.setSelection(0);
-                                spFocus.setSelection(0);
-                            }
-                            FormOrderFragment.filter.setImageResource(R.drawable.filter);
-                            FormOrderFragment.isFiltered = false;
-
-                            System.out.println(CurSGI + " " + sgi);
-                            if (!CurSGI.equals(sgi)) {
-                                GlobalVars.allowUpdate = false;
-                            }
-//                            resetAllSpinners();
-                            resetCurData();
-                            resetSearchViewData();
-
-                            setSelectionByCodeSgiAsync(sgi);
-                            new Handler().postDelayed(() -> setSelectionByCodeGroupAsync(group), 500);
-
-                            return true;
-                    }
-                    return true;
-                });
-                nomPopupMenu.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-
-            return true;
-        }
-    };
-
-    public static boolean allowUpdate = true;
-    public AdapterView.OnItemSelectedListener SelectedGroup = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            try {
-                if (!FormOrderFragment.isCleared) {
-                    resetSearchViewData();
-                }
-                FormOrderFragment.isCleared = false;
-
-                CurGroup = myGroup.getString(myGroup.getColumnIndex("CODE"));
-
-                if (allowUpdate) {
-                    LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-                }
-                allowUpdate = true;
-
-                FormOrderFragment.isSorted = false;
-                FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-        }
-
-        public void onNothingSelected(AdapterView<?> arg0) {
-        }
-    };
-
-    public AdapterView.OnItemSelectedListener SelectedSgi = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> arg0, View selectedItemView, int position, long id) {
-            System.out.println(1);
-            try {
-                if (isNeededToResetSearchView) {
-                    resetSearchViewData();
-                }
-                isNeededToResetSearchView = true;
-                String ItemID = mySgi.getString(mySgi.getColumnIndex("CODE"));
-
-                CurGroup = "0";
-                CurSGI = ItemID;
-
-                if (ItemID.equals("0")) {
-                    nomenList.setAdapter(null);
-                    spGroup.setAdapter(null);
-                }
-                LoadGroups(ItemID);
-
-                if (!CurWCID.equals("0") || !CurFocusID.equals("0") || !CurSearchName.equals("")) {
-                    LoadNomen(CurSGI, CurGroup, CurWCID, CurFocusID, CurSearchName);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-        }
-
-        public void onNothingSelected(AdapterView<?> arg0) {
-        }
-    };
-
     public android.support.v4.app.FragmentManager fragManager;
-    TextView groupID, sgiID;
     android.support.v4.app.Fragment fragment = null;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-    public AdapterView.OnItemLongClickListener PreviewNomenLongClick = new AdapterView.OnItemLongClickListener() {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
-            try {
-                groupID = myView.findViewById(R.id.ColNomGRUPID);
-                sgiID = myView.findViewById(R.id.ColNomSGIID);
-
-                Cursor c = myNom;
-                final String group = c.getString(c.getColumnIndex("GRUPPA"));
-                final String sgi = c.getString(c.getColumnIndex("SGI"));
-
-                nomPopupMenu = new PopupMenu(CurAc, myView);
-                nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                    if (menuItem.getItemId() == R.id.goToGroup) {
-                        isNeededToSelectRowAfterGoToGroup = true;
-                        kod5 = c.getString(c.getColumnIndex("KOD5"));
-
-                        fragment = new FormOrderFragment();
-
-                        Bundle args = new Bundle();
-                        args.putString("SGI", sgi);
-                        args.putString("Group", group);
-
-                        fragment.setArguments(args);
-                        fragmentTransaction = fragManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                        fragmentTransaction.commit();
-
-                        toolbar.setTitle("Формирование заказа");
-
-                        return true;
-                    }
-                    return true;
-                });
-                nomPopupMenu.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-
-            return true;
-        }
-    };
 
     public Context getContext() {
         return glbContext;
@@ -480,197 +189,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
     public void setContext(Context context) {
         glbContext = context;
-    }
-
-    //    @AsyncUI
-    public void LoadSgi() {
-        if (mySgi != null) {
-            mySgi.close();
-        }
-        mySgi = db.getAllSgi();
-        spSgi = CurView.findViewById(R.id.SpinSgi);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.sgi_layout, mySgi, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColSgiID, R.id.ColSgiDescr}, 0);
-
-        spSgi.setAdapter(adapter);
-//        spSgi.post(() -> spSgi.setOnItemSelectedListener(SelectedSgi));
-        spSgi.setOnItemSelectedListener(SelectedSgi);
-    }
-
-    //    @AsyncUI
-    public void LoadGroups(String SgiID) {
-        if (myGroup != null) {
-            myGroup.close();
-        }
-        myGroup = db.getGroupsBySgi(SgiID);
-        spGroup = CurView.findViewById(R.id.SpinGrups);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.grup_layout, myGroup, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColGrupID, R.id.ColGrupDescr}, 0);
-
-        spGroup.setAdapter(adapter);
-//        spGroup.post(() -> spGroup.setOnItemSelectedListener(SelectedGroup));
-        spGroup.setOnItemSelectedListener(SelectedGroup);
-    }
-
-    @AsyncUI
-    public void LoadFiltersWC(View vw) {
-        if (myWC != null) {
-            myWC.close();
-        }
-        myWC = dbApp.getWCs();
-        spWC = vw.findViewById(R.id.spinWC);
-        android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.wc_layout, myWC, new String[]{"_id", "DEMP"}, new int[]{R.id.ColWCID, R.id.ColWCDescr}, 0);
-        spWC.setAdapter(adapter);
-    }
-
-    @AsyncUI
-    public void LoadFiltersFocus(View vw) {
-        if (myFocus != null) {
-            myFocus.close();
-        }
-        myFocus = db.getFocuses();
-        spFocus = vw.findViewById(R.id.spinFocus);
-        android.widget.SimpleCursorAdapter adapter;
-        adapter = new android.widget.SimpleCursorAdapter(glbContext, R.layout.focus_layout, myFocus, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColFocusID, R.id.ColFocusDescr}, 0);
-        spFocus.setAdapter(adapter);
-    }
-
-    private GlobalVars.NomenAdapter getNomenAdapter(Cursor cursor) {
-        return new NomenAdapter(glbContext, R.layout.nomen_layout, cursor, new String[]{"_id", "KOD5", "DESCR", "OST", "ZAKAZ", "GRUPPA", "SGI", "FOTO", "GOFRA", "MP", GlobalVars.TypeOfPrice}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP, R.id.ColNomPrice}, 0);
-    }
-
-    public void LoadNomen(String... args) {
-        String[] formattedArgs = new String[5];
-        System.arraycopy(args, 0, formattedArgs, 0, args.length);
-        for (int i = args.length; i < formattedArgs.length; i++) {
-            formattedArgs[i] = "0";
-        }
-
-        CurSGI = formattedArgs[0];
-        CurGroup = formattedArgs[1];
-        CurWCID = formattedArgs[2];
-        CurFocusID = formattedArgs[3];
-        CurSearchName = formattedArgs[4].toLowerCase(Locale.ROOT);
-
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                myNom = db.getNomen(
-                        CurSGI, CurGroup,
-                        CurWCID, CurFocusID, CurSearchName);
-//                Config.printCursor(myNom);
-                NomenAdapter = getNomenAdapter(myNom);
-                CurAc.runOnUiThread(() -> {
-                    nomenList.setAdapter(null);
-                    nomenList.setAdapter(NomenAdapter);
-                    nomenList.setOnItemClickListener(GridNomenClick);
-                    nomenList.setOnItemLongClickListener(GridNomenLongClick);
-
-                    // needs to call notifyDataSetChanged in NomenAdapter class
-                    NomenAdapter.notifyDataSetChanged();
-                    setPositionAfterGoToGroup();
-                });
-
-
-            }
-
-            private void setPositionAfterGoToGroup() {
-                System.out.println(CurSGI + " " + CurGroup);
-                if (isNeededToSelectRowAfterGoToGroup) {
-                    int[] elementPositionData = getPositionByKod5(kod5);
-                    int elementPosition = elementPositionData[0];
-                    System.out.println(elementPosition + " " + kod5);
-                    int visibleElementsCount = nomenList.getLastVisiblePosition() - nomenList.getFirstVisiblePosition() + 1;
-                    if (elementPosition == -1) {
-                        elementPosition = 0;
-                    } else if (elementPositionData[1] == 1) {
-                        elementPosition += visibleElementsCount;
-                    }
-                    nomenList.setSelection(elementPosition);
-                    isNeededToSelectRowAfterGoToGroup = false;
-                    kod5 = "";
-                }
-            }
-
-            private int[] getPositionByKod5(String kod5) {
-                int i = 0;
-                while (myNom.moveToNext()) {
-                    if (myNom.getString(myNom.getColumnIndex("KOD5")).equals(kod5)) {
-                        return new int[]{i, 1};
-                    }
-                    i++;
-                }
-
-                for (int j = 0; j <= nomenList.getLastVisiblePosition(); j++) {
-                    RelativeLayout layout = (RelativeLayout) nomenList.getChildAt(j);
-                    String localKod5 = ((TextView) layout.findViewById(R.id.ColNomCod)).getText().toString();
-                    if (localKod5.equals(kod5)) {
-                        return new int[]{j, 0};
-                    }
-                }
-                return new int[]{-1, 0};
-            }
-        }).start();
-    }
-
-    //    @DelayedCalled()
-    public void setSelectionByCodeSgiAsync(String sgiCode) {
-        for (int i = 0; i < spSgi.getCount(); i++) {
-            Cursor value = (Cursor) spSgi.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndex("CODE"));
-            if (sgiCode.equals(id)) {
-                int finalI = i;
-                spSgi.post(() -> spSgi.setSelection(finalI));
-                return;
-            }
-        }
-    }
-
-    public void setSelectionByCodeSgi(String sgiCode) {
-        for (int i = 0; i < spSgi.getCount(); i++) {
-            Cursor value = (Cursor) spSgi.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndex("CODE"));
-            if (sgiCode.equals(id)) {
-                spSgi.setSelection(i);
-                return;
-            }
-        }
-    }
-
-    //    @DelayedCalled(delay = 100)
-    public void setSelectionByCodeGroupAsync(String groupCode) {
-        for (int i = 0; i < spGroup.getCount(); i++) {
-            Cursor value = (Cursor) spGroup.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndex("CODE"));
-            if (groupCode.equals(id)) {
-                int finalI = i;
-                spGroup.post(() -> spGroup.setSelection(finalI));
-                return;
-            }
-        }
-    }
-
-    @DelayedCalled
-    public void SetSelectedFilterWC(String ID) {
-        for (int i = 0; i < spWC.getCount(); i++) {
-            Cursor value = (Cursor) spWC.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("_id"));
-            if (ID.equals(id)) {
-                spWC.setSelection(i);
-                break;
-            }
-        }
-    }
-
-    @DelayedCalled
-    public void SetSelectedFilterFocus(String ID) {
-        for (int i = 0; i < spFocus.getCount(); i++) {
-            Cursor value = (Cursor) spFocus.getItemAtPosition(i);
-            String id = value.getString(value.getColumnIndexOrThrow("CODE"));
-            if (ID.equals(id)) {
-                spFocus.setSelection(i);
-                break;
-            }
-        }
     }
 
     public boolean isNetworkAvailable() {
@@ -682,239 +200,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
         Config.sout("Нет доступа к интернету");
         return false;
-    }
-
-    class PhotoDownloadingRunnable implements Runnable {
-        private final String[] fileNames;
-        private String kod5;
-        private int necessaryBytesAmountForDeletingFile = 5;
-        private final boolean isForced;
-
-        private FTPClient ftpClient = null;
-        private FileOutputStream fosPhoto = null;
-        private InputStream inputStream = null;
-
-        private String ftp_user, ftp_pass;
-
-        private void init() {
-            SharedPreferences settings;
-            settings = CurAc.getSharedPreferences("apk_version", 0);
-
-            ftp_user = settings.getString("FtpPhotoUser", getResources().getString(R.string.ftp_pass));
-            ftp_pass = settings.getString("FtpPhotoPass", getResources().getString(R.string.ftp_user));
-        }
-
-        public PhotoDownloadingRunnable(String[] fileNames, long ID, boolean isForced) {
-            this.fileNames = fileNames;
-            this.isForced = isForced;
-            this.kod5 = db.getProductKod5ByRowID(ID);
-        }
-
-        public PhotoDownloadingRunnable(String[] fileNames, String kod5, boolean isForced) {
-            this.fileNames = fileNames;
-            this.isForced = isForced;
-            this.kod5 = kod5;
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        @PGShowing(isCanceled = true)
-        public void run() {
-            try {
-                init();
-                int countOfSuccessfulDownloadedPhotos = 0;
-                for (int i = 0; i < fileNames.length; i++) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        throw new InterruptedException();
-                    }
-                    currentDownloadingPhotoName = "";
-                    String fileName = fileNames[i];
-                    if (!isForced && (fileName == null || fileName != null && new File(getPhotoDir() + "/" + fileName).exists())) {
-//                         && !isDifferentSizeOfPhotosOnDeviceAndOnServer(fileName))
-                        countOfSuccessfulDownloadedPhotos++;
-                        continue;
-                    }
-                    currentDownloadingPhotoName = getPhotoDir() + "/" + fileName;
-
-                    ftpClient = new FTPClient();
-                    int timeout = ServerDetails.getInstance().timeout;
-                    ftpClient.setDefaultTimeout(timeout);
-                    ftpClient.setDataTimeout(timeout);
-                    ftpClient.setConnectTimeout(timeout);
-                    ftpClient.setControlKeepAliveTimeout(timeout);
-                    ftpClient.setControlKeepAliveReplyTimeout(timeout);
-
-                    if (!tryConnectToDefaultIpOtherwiseToBackupIp(ftpClient)) {
-                        throw new InterruptedException();
-                    }
-
-                    final String photoDir = getPhotoDir();
-                    ftpClient.login(ftp_user, ftp_pass);
-                    ftpClient.changeWorkingDirectory("FOTO");
-                    ftpClient.enterLocalPassiveMode();
-
-                    fosPhoto = new FileOutputStream(photoDir + "/" + fileName);
-
-                    ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                    inputStream = ftpClient.retrieveFileStream(fileName);
-                    byte[] bytesArray = new byte[16];
-                    int bytesRead;
-                    while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            throw new InterruptedException();
-                        }
-                        fosPhoto.write(bytesArray, 0, bytesRead);
-                    }
-
-//                    ftpClient.retrieveFile(fileName, fosPhoto);
-                    ftpClient.disconnect();
-                    inputStream.close();
-                    fosPhoto.close();
-
-                    long remoteSize = getRemotePhotoSize("FOTO/" + fileName);
-                    long sizeOnDevice = getDevicePhotoSize(photoDir + "/" + fileName);
-                    if (Math.abs(remoteSize - sizeOnDevice) >= necessaryBytesAmountForDeletingFile) {
-                        currentPB.changeText("Файл был загружен с повреждениями. Пожалуйста, подождите.");
-                        File file = new File(photoDir + "/" + fileName);
-                        file.delete();
-                        i--;
-                        continue;
-                    }
-
-                    countOfSuccessfulDownloadedPhotos++;
-                    try {
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE FOTO=? or FOTO2=?", new Object[]{fileName, fileName});
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (countOfSuccessfulDownloadedPhotos != 0) {
-                    CurAc.runOnUiThread(() -> showProductPhoto(fileNames, kod5));
-                }
-                currentDownloadingPhotoName = "";
-            } catch (InterruptedException interruptedException) {
-                closeStreamAndDeleteFile();
-            } catch (SocketTimeoutException socketTimeoutException) {
-                socketTimeoutException.printStackTrace();
-                Config.sout("Время ожидания вышло");
-                closeStreamAndDeleteFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout("Сервер недоступен");
-                closeStreamAndDeleteFile();
-            }
-        }
-
-        private void closeStreamAndDeleteFile() {
-            try {
-                if (fosPhoto != null) {
-                    fosPhoto.close();
-                }
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (ftpClient != null) {
-                    ftpClient.disconnect();
-                }
-                File f = new File(currentDownloadingPhotoName);
-                f.delete();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                Config.sout("Загрузка отменена");
-            }
-        }
-    }
-
-    public static String currentDownloadingPhotoName = "";
-
-    public void downloadAndShowPhotos(final String[] fileNames, long ID, boolean isForced) {
-        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, ID, isForced));
-        downloadPhotoTread.start();
-    }
-
-    public void downloadAndShowPhotos(final String[] fileNames, String kod5, boolean isForced) {
-        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, kod5, isForced));
-        downloadPhotoTread.start();
-    }
-
-    private long getRemotePhotoSize(String fileName) throws FTPIllegalReplyException, IOException, FTPException {
-        Ftp ftp = new Ftp(ServerDetails.getInstance());
-        return ftp.getFileSize(fileName);
-    }
-
-    private long getDevicePhotoSize(String fileName) {
-        File file = new File(fileName);
-        return file.length();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void showProductPhoto(String[] photoFileName, String kod5) {
-        alertPhoto = null;
-        String photoDir = getPhotoDir();
-        photoFileName = Arrays.stream(photoFileName).filter(Objects::nonNull).toArray(String[]::new);
-        if (photoFileName.length == 0) {
-            Config.sout("Нет скачанных файлов");
-            return;
-        }
-
-        for (String s : photoFileName) {
-            checkPhotoInDB(s);
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(CurAc);
-        LayoutInflater inflater = CurAc.getLayoutInflater();
-
-        builder.setView(inflater.inflate(R.layout.image_layout, null));
-        builder.setCancelable(true);
-        builder.setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
-
-        alertPhoto = builder.create();
-        alertPhoto.getWindow().setLayout(600, 400);
-        alertPhoto.show();
-
-        TextView productID = alertPhoto.findViewById(R.id.nomenId);
-        productID.setText("Код товара:   " + kod5);
-
-        ViewPager viewPager = alertPhoto.findViewById(R.id.photoViewPager);
-
-        LinearLayout dots = alertPhoto.findViewById(R.id.layoutForPhotoDots);
-        PhotoDotsAdapter photoDotsAdapter = new PhotoDotsAdapter(getContext(), photoFileName.length, 0);
-        photoDotsAdapter.fillLayout(dots);
-
-        ImageAdapter adapter = new ImageAdapter(getContext(), photoFileName, photoDir);
-
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                photoDotsAdapter.changePosition(i);
-            }
-        });
-    }
-
-    @AsyncUI
-    public void PreviewOrder() {
-        nomenList.setAdapter(null);
-        if (myNom != null) {
-            myNom.close();
-        }
-        myNom = db.getOrderNom();
-        PreviewZakazAdapter = new NomenAdapter(glbContext, R.layout.nomen_layout_preview, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "GOFRA", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
-        nomenList.setAdapter(PreviewZakazAdapter);
-        nomenList.setOnItemClickListener(GridNomenClick);
-        nomenList.setOnItemLongClickListener(PreviewNomenLongClick);
     }
 
     public Boolean CheckTPLock() {
@@ -1193,120 +478,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         debetList.setAdapter(adapter);
     }
 
-    public void UpdateNomenRange(int beginRange, int endRange, int qty) {
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                int EndRange = endRange;
-                int BeginRange = beginRange;
-//                String sql_update = "UPDATE Nomen SET ZAKAZ = CASE WHEN (OST - " + qty + ") >= 0 THEN " + qty + " ELSE OST END WHERE ROWID=?";
-                String sql_update = "UPDATE Nomen SET ZAKAZ = " + qty + " WHERE ROWID=?";
-                SQLiteStatement stmt = db.getWritableDatabase().compileStatement(sql_update);
-                db.getWritableDatabase().beginTransaction();
-                int tmpVal;
-
-                if (EndRange > CurVisiblePosition) {
-                    EndRange = CurVisiblePosition;
-                }
-
-                if (BeginRange > EndRange) {
-                    tmpVal = BeginRange;
-                    BeginRange = EndRange;
-                    EndRange = tmpVal;
-                }
-
-                for (int i = BeginRange - 1; i <= EndRange - 1; i++) {
-                    stmt.clearBindings();
-                    stmt.bindLong(1, NomenAdapter.getItemId(i));
-                    stmt.executeUpdateDelete();
-                    stmt.clearBindings();
-                }
-
-                db.getWritableDatabase().setTransactionSuccessful();
-                db.getWritableDatabase().endTransaction();
-
-                for (int i = BeginRange; i <= EndRange; i++) {
-                    long pos = NomenAdapter.getItemId(i - 1);
-
-                    SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
-                    Cursor kod5 = sqLiteDatabase.rawQuery("SELECT KOD5 FROM NOMEN WHERE rowid='" + pos + "'", null);
-                    kod5.moveToNext();
-                    if (kod5.getCount() == 0)
-                        continue;
-                    db.putPriceInNomen(pos, "" + DBHelper.pricesMap.get(kod5.getString(0)));
-                    kod5.close();
-                }
-
-                CurAc.runOnUiThread(() -> {
-                    myNom.requery();
-                    NomenAdapter.notifyDataSetChanged();
-//                    setContrAndSum(GlobalVars.this);
-                });
-            }
-        }).start();
-    }
-
-    @AsyncUI
-    public void setIconColor(Menu menu, int MenuItem, Boolean vis) {
-        if (menu.findItem(MenuItem) == null)
-            return;
-        Drawable drawable = menu.findItem(MenuItem).getIcon();
-        drawable.mutate();
-        if (vis) {
-            drawable.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-        } else {
-            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        }
-//        isDiscount = vis;
-    }
-
-    public void CalculatePercentSale(final Menu menu) {
-        LayoutInflater SaleInf = LayoutInflater.from(CurAc);
-        final View SaleMarkupView;
-
-        SaleMarkupView = SaleInf.inflate(R.layout.discount_dlg, null);
-        AlertDialog.Builder SaleDlg = new AlertDialog.Builder(CurAc);
-        SaleDlg.setView(SaleMarkupView);
-
-        final EditText edPercent = SaleMarkupView.findViewById(R.id.txtPercent);
-        edPercent.setText(String.valueOf(Discount));
-
-        SaleDlg.setCancelable(true)
-                .setPositiveButton("OK", (dialog, id) -> {
-                    String perc;
-                    perc = edPercent.getText().toString().equals("") ? "0" : edPercent.getText().toString();
-                    Discount = Float.parseFloat(perc);
-                    if (Discount > 100) {
-                        Discount = 100;
-                    }
-
-                    if (Discount == 0) {
-                        isDiscount = false;
-                        setIconColor(menu, R.id.NomenDiscount, false);
-                    } else {
-                        isDiscount = true;
-                        setIconColor(menu, R.id.NomenDiscount, true);
-                    }
-
-                    if (NomenAdapter != null) {
-                        myNom.requery();
-                        NomenAdapter.notifyDataSetChanged();
-                    }
-
-                    if (PreviewZakazAdapter != null) {
-                        myNom.requery();
-                        PreviewZakazAdapter.notifyDataSetChanged();
-                    }
-                })
-                .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-
-        final AlertDialog discountDlg = SaleDlg.create();
-        discountDlg.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-
-        discountDlg.show();
-    }
-
     public String getPhotoDir() {
         String photo_dir;
         File file = CurAc.getExternalFilesDir(Environment.DIRECTORY_DCIM);
@@ -1321,35 +492,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
         }
         photo_dir = arm_photo.toString();
         return photo_dir;
-    }
-
-    public void checkPhotoInDB(String FileName) {
-        Cursor cur;
-        String isDownloaded = FilenameUtils.removeExtension(FileName);
-        String Sql;
-
-        if (isDownloaded.equals("_2")) {
-            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'";
-        } else {
-            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded + "'";
-        }
-        cur = db.getWritableDatabase().rawQuery(Sql, null);
-
-        if (cur.moveToFirst()) {
-            if (cur.getInt(0) == 0) {
-                if (isDownloaded.equals("_2")) {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'");
-                } else {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
-                }
-            }
-        }
-        cur.close();
-        GridView gdNomen = CurView.findViewById(R.id.listContrs);
-        myNom.requery();
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-        gdNomen.invalidateViews();
     }
 
     public void updateOutedPositionInZakazyTable() {
@@ -1430,162 +572,6 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
             tvDescr.setText(cursor.getString(2));
 
             return view;
-        }
-    }
-
-    public class NomenAdapter extends SimpleCursorAdapter {
-        public NomenAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-            super(context, layout, c, from, to, flags);
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-
-            Cursor cursor = getCursor();
-            CurVisiblePosition = cursor.getCount();
-            int resID;
-
-            String kod5 = cursor.getString(cursor.getColumnIndex("KOD5"));
-
-            TextView tvDescr = view.findViewById(R.id.ColNomDescr);
-            TextView tvPrice = view.findViewById(R.id.ColNomPrice);
-            TextView tvPosition = view.findViewById(R.id.ColNomPosition);
-            TextView tvMP = view.findViewById(R.id.ColNomMP);
-            TextView tvGofra = view.findViewById(R.id.ColNomVkorob);
-            TextView tvOst = view.findViewById(R.id.ColNomOst);
-            TextView tvCod = view.findViewById(R.id.ColNomCod);
-            TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
-            TextView tvZakaz = view.findViewById(R.id.ColNomZakaz);
-
-            TextView[] tvListForChange = new TextView[]{
-                    tvDescr,
-                    tvPrice,
-                    tvPosition,
-                    tvMP,
-                    tvGofra,
-                    tvOst,
-                    tvCod,
-            };
-
-            Button btPlus = view.findViewById(R.id.btPlus);
-            Button btMinus = view.findViewById(R.id.btMinus);
-
-            tvDescr.setTextSize(SettingFragment.nomenDescriptionFontSize);
-            if (tvPhoto != null) {
-                tvPhoto.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
-                tvPhoto.setOnLongClickListener(PhotoLongClick);
-            }
-
-            if (tvPrice != null && !tvPrice.getText().toString().equals("null")) {
-                tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString())));
-            }
-
-            btPlus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
-            btMinus.setOnClickListener(v -> ((GridView) parent).performItemClick(v, position, 0));
-
-            if (DBHelper.pricesMap.containsKey(kod5) && isSales) {
-//                System.out.println(kod5 + " " + DBHelper.pricesMap.get(kod5));
-                tvPrice.setText(String.format(Locale.ROOT, "%.2f", DBHelper.pricesMap.get(kod5)));
-            }
-
-            if (isDiscount && tvPhoto != null) {
-                tvPrice.setText(String.format(Locale.ROOT, "%.2f", Float.parseFloat(tvPrice.getText().toString()) * (1 - Discount / 100f)));
-            }
-
-            if (tvPhoto != null && (cursor.getString(cursor.getColumnIndex("FOTO")) != null)) {
-                if (cursor.getInt(cursor.getColumnIndex("PD")) == 1) {
-                    resID = glbContext.getResources().getIdentifier("photo_downloaded", "drawable", glbContext.getPackageName());
-                } else {
-                    resID = glbContext.getResources().getIdentifier("photo_no_downloaded", "drawable", glbContext.getPackageName());
-                }
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(" ").append(" ");
-                builder.setSpan(new ImageSpan(glbContext, resID), builder.length() - 1, builder.length(), 0);
-                builder.append(" ");
-                tvPhoto.setText(builder);
-            }
-
-            long daysSubtraction = _countDaySubtraction(cursor);
-
-            int backgroundColor;
-            if ((BeginPos != 0 || EndPos != 0) && position >= BeginPos - 1 && position <= EndPos - 1) {
-                backgroundColor = getResources().getColor(R.color.multiSelectedNomen);
-            } else if (!tvZakaz.getText().toString().equals("0")) {
-                backgroundColor = getResources().getColor(R.color.selectedNomen);
-            } else {
-                if (position % 2 != 0) {
-                    backgroundColor = getResources().getColor(R.color.gridViewFirstColor);
-                } else {
-                    backgroundColor = getResources().getColor(R.color.gridViewSecondColor);
-                }
-            }
-            view.setBackgroundColor(backgroundColor);
-
-            int color = getResources().getColor(R.color.black);
-            if (daysSubtraction <= 2) {
-                color = getResources().getColor(R.color.postDataColorRed);
-            } else if (daysSubtraction <= 4) {
-                color = getResources().getColor(R.color.postDataColorGreen);
-            }
-            _setTextColorOnTextView(tvListForChange, color);
-
-            int style = Typeface.NORMAL;
-            String action_list_temp = cursor.getString(cursor.getColumnIndex("ACT_LIST"));
-            String[] action_list = action_list_temp == null ? new String[]{} : action_list_temp.split(",");
-
-            if (action_list.length > 0) {
-                style = Typeface.BOLD_ITALIC;
-            }
-            _setTypeFaceOnTextView(tvListForChange, style);
-
-            tvPosition.setText(String.valueOf(position + 1));
-
-            return view;
-        }
-
-        private void _setTextColorOnTextView(TextView[] tvList, int color) {
-            for (TextView tv : tvList) {
-                tv.setTextColor(color);
-            }
-        }
-
-        private void _setTypeFaceOnTextView(TextView[] tvList, int style) {
-            for (TextView tv : tvList) {
-                tv.setTypeface(Typeface.defaultFromStyle(style));
-            }
-        }
-
-        private long _countDaySubtraction(Cursor cursor) {
-            long CurrentTime = Calendar.getInstance().getTimeInMillis();
-            String PostData = cursor.getString(cursor.getColumnIndex("POSTDATA"));
-
-            String[] data = PostData.split("\\.");
-            data[2] = "20" + data[2];
-
-            PostData = data[0] + "." + data[1] + "." + data[2];
-
-            DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            long PostDataTime = 0;
-            try {
-                PostDataTime = format.parse(PostData).getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            return (long) Math.abs((PostDataTime - CurrentTime) / (1000d * 60 * 60 * 24));
-        }
-
-        @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
-            setContrAndSum(GlobalVars.this);
-            // check isSales and if true, then set real prices from contractor
-//            if (hasBeenAlreadyNoChanged && isSales && nomenList.getCount() != 0) {
-//                hasBeenAlreadyNoChanged = false;
-//                FormOrderFragment.setRealPrices(GlobalVars.this);
-//            }
         }
     }
 
@@ -1799,86 +785,12 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
 
     }
 
-    public void resetCurData() {
-        CurGroup = CurWCID = CurFocusID = CurSGI = "0";
-        CurSearchName = "";
-        isNeededToBeLoadingBySgi = true;
-
-        Discount = 0f;
-        Menu menu = FormOrderFragment.mainMenu;
-        if (menu != null && menu.size() > 1) {
-            setIconColor(menu, R.id.NomenDiscount, false);
-        }
-    }
-
-    public void resetAllSpinners() {
-        if (spGroup != null) {
-            spGroup.post(() -> spGroup.setAdapter(null));
-        }
-
-        if (spSgi != null) {
-            spSgi.post(() -> spSgi.setSelection(0));
-        }
-
-        // if spWC != null, то и spFocus и другие фильтры тоже != null
-        if (spWC != null) {
-            spWC.setSelection(0);
-            spFocus.setSelection(0);
-        }
-        FormOrderFragment.filter.setImageResource(R.drawable.filter);
-        FormOrderFragment.isFiltered = false;
-    }
-
-    public void resetSearchViewData() {
-        CurSearchName = "";
-        SearchView searchView = CurAc.findViewById(R.id.menu_search);
-        if (searchView != null) {
-            searchView.setQuery("", false);
-            searchView.clearFocus();
-            searchView.onActionViewCollapsed();
-        }
-    }
-
-    public void putAllPrices() {
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
-                db.putAllNomenPrices(OrderHeadFragment.CONTR_ID);
-                CurAc.runOnUiThread(() -> {
-                    if (NomenAdapter != null) {
-                        NomenAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
-    }
-
-    public void closeCursors() {
-        Cursor[] cursors = new Cursor[]{
-                myNom,
-                mySgi,
-                myGroup,
-                myWC,
-                myFocus
-        };
-        if (myNom != null) {
-            CurAc.runOnUiThread(() -> nomenList.setAdapter(null));
-        }
-        for (Cursor cursor : cursors) {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
     public void updateNomenPrice(boolean isCopied) {
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
+        new Thread(() -> {
+            new ProgressBarShower(getContext()).setFunction(() -> {
                 db.ResetNomenPrice(isCopied);
-            }
+                return null;
+            }).start();
         });
     }
 
@@ -1979,149 +891,5 @@ public class GlobalVars extends Application implements TBUpdate, BackupServerCon
     }
 
     // Начадл обработчиков событий нажатия на NomenLayout
-    private void plusQTY(View myView) {
-        View parent = (View) myView.getParent();
-        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-        TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
 
-        String price = tvPrice.getText().toString();
-        String kod5 = tvKOD5.getText().toString();
-        db.putPriceInNomen(kod5, price);
-        db.PlusQty(kod5);
-        if (myNom != null)
-            myNom.requery();
-
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        if (PreviewZakazAdapter != null)
-            PreviewZakazAdapter.notifyDataSetChanged();
-
-//        setContrAndSum(GlobalVars.this);
-    }
-
-    private void minusQTY(View myView) {
-        View parent = (View) myView.getParent();
-        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-        String kod5 = tvKOD5.getText().toString();
-
-        db.MinusQty(kod5);
-        if (myNom != null)
-            myNom.requery();
-
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        if (PreviewZakazAdapter != null)
-            PreviewZakazAdapter.notifyDataSetChanged();
-
-//        setContrAndSum(GlobalVars.this);
-    }
-
-    @AsyncUI
-    private void showPhoto(View myView, int position, AdapterView<?> myAdapter) {
-        if (((TextView) myView).getText() == null || ((TextView) myView).getText().toString().equals(""))
-            return;
-
-        long ID = myAdapter.getItemIdAtPosition(position);
-
-        @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
-        downloadAndShowPhotos(fileNames, ID, false);
-    }
-
-    private void multiSelect(String ID, int ost) {
-        db.UpdateQty(ID, MultiQty, ost);
-        if (myNom != null)
-            myNom.requery();
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        db.putPriceInNomen(ID, "" + DBHelper.pricesMap.get(ID));
-        setContrAndSum(GlobalVars.this);
-    }
-
-    @AsyncUI
-    private void fillNomenDataFromAlertDialog(String ID, int ost) {
-        try {
-            LayoutInflater layoutInflater = LayoutInflater.from(glbContext);
-            View promptView = layoutInflater.inflate(R.layout.change_qty, null);
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CurFragmentContext);
-            alertDialogBuilder.setView(promptView);
-
-            final EditText input = promptView.findViewById(R.id.edPPQty);
-            final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
-            final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
-            final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
-            final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
-
-            try {
-                input.setText(myNom.getString(myNom.getColumnIndex("ZAKAZ")));
-                txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
-                txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
-                txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
-            } catch (Exception e1) {
-                Config.sout(e1);
-            }
-
-            try {
-                Cursor c = db.getReadableDatabase().rawQuery("SELECT DESCR FROM GRUPS WHERE CODE=?", new String[]{myNom.getString(myNom.getColumnIndex("GRUPPA"))});
-                c.moveToNext();
-                String groupDescription = c.getString(c.getColumnIndex("DESCR"));
-                txtGrup.setText(groupDescription);
-            } catch (Exception e2) {
-                Config.sout(e2);
-            }
-
-            alertDialogBuilder
-                    .setCancelable(true)
-                    .setPositiveButton("OK", (dialog, id) -> {
-                    })
-                    .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-
-            final AlertDialog alertD = alertDialogBuilder.create();
-            alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-            WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-            wmlp.gravity = Gravity.TOP | Gravity.LEFT;
-            wmlp.x = 50;
-            wmlp.y = 15;
-
-            alertD.show();
-            input.requestFocus();
-            input.selectAll();
-            input.performClick();
-            input.setPressed(true);
-            input.invalidate();
-            InputMethodManager imm = (InputMethodManager) glbContext.getSystemService(INPUT_METHOD_SERVICE);
-            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-
-            alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                TextView tvPrice = CurView.findViewById(R.id.ColNomPrice);
-                String price = tvPrice.getText().toString();
-                db.putPriceInNomen(ID, price);
-
-                db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
-                myNom.requery();
-
-                setContrAndSum(GlobalVars.this);
-
-                if (NomenAdapter != null)
-                    NomenAdapter.notifyDataSetChanged();
-
-                if (PreviewZakazAdapter != null)
-                    PreviewZakazAdapter.notifyDataSetChanged();
-
-                alertD.dismiss();
-                Config.hideKeyBoard();
-            });
-            input.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                }
-                return true;
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            Config.sout(e);
-        }
-    }
 }

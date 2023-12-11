@@ -10,11 +10,11 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
 import com.amber.armtp.annotations.TimeLogger;
 import com.amber.armtp.auxiliaryData.CounterAgentInfo;
+import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.OrderHeadFragment;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -132,7 +132,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getReadableDatabase();
             // Ошибка когда-то была в том, что cursor был объявлен вне try-catch (что странно)
-            return db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [" + GlobalVars.TypeOfPrice + "], [ACTION], " +
+            return db.rawQuery("SELECT Nomen.ROWID AS _id, Nomen.KOD5, Nomen.DESCR, OST, PRICE, ZAKAZ, GRUPPA, NOMEN.SGI, FOTO, GRUPS.DESCR AS GRUP, PD, GOFRA, MP, POSTDATA, [" + FormOrderFragment.TypeOfPrice + "], [ACTION], " +
                     " (SELECT group_concat(act_id) as ACT_LIST" +
                     "  FROM (SELECT ACT.ID as act_id," +
                     "               SUM(" +
@@ -164,7 +164,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST,[" + GlobalVars.TypeOfPrice + "] AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD, " +
+            cursor = db.rawQuery("SELECT Nomen.ROWID AS _id, KOD5, Nomen.DESCR, OST,[" + FormOrderFragment.TypeOfPrice + "] AS PRICE, ZAKAZ, GRUPPA, Nomen.SGI, GOFRA, MP, POSTDATA, [ACTION], FOTO, PD, " +
                     " (SELECT group_concat(act_id) as ACT_LIST" +
                     "  FROM (SELECT ACT.ID as act_id," +
                     "               SUM(" +
@@ -199,7 +199,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db;
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT [" + GlobalVars.TypeOfPrice + "], ZAKAZ, KOD5 FROM Nomen WHERE ZAKAZ <> 0", null);
+            cursor = db.rawQuery("SELECT [" + FormOrderFragment.TypeOfPrice + "], ZAKAZ, KOD5 FROM Nomen WHERE ZAKAZ <> 0", null);
             float curPrice = 0;
             if (!isSales) {
                 while (cursor.moveToNext()) {
@@ -914,7 +914,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void putAllNomenPrices(String CONTR) {
         SQLiteDatabase db = this.getWritableDatabase();
         System.out.println(CONTR);
-        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + GlobalVars.TypeOfPrice + "] as CONTR_PRICE" +
+        Cursor c = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + FormOrderFragment.TypeOfPrice + "] as CONTR_PRICE" +
                 " FROM SKIDKI" +
                 "         JOIN PRICES ON SKIDKI.TIPCEN = PRICES.TIPCEN" +
                 "         JOIN NOMEN ON NOMEN.KOD5 = PRICES.NOMEN AND NOMEN.SGI = SKIDKI.SGI" +
@@ -924,7 +924,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 " AND NOT (SKIDKA_NEW = 0 AND CENA = CONTR_PRICE)", new String[]{CONTR});
         updatePrices(c);
         c.close();
-        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + GlobalVars.TypeOfPrice + "] as CONTR_PRICE" +
+        Cursor c1 = db.rawQuery("SELECT PRICES.NOMEN as NOMEN, CENA, (CASE WHEN FIX = 1 THEN 0 ELSE SKIDKI.SKIDKA END) as SKIDKA_NEW, SKIDKI.TIPCEN as TIPCEN, NOMEN.[" + FormOrderFragment.TypeOfPrice + "] as CONTR_PRICE" +
                 " FROM SKIDKI" +
                 "         JOIN PRICES ON SKIDKI.TIPCEN = PRICES.TIPCEN" +
                 "         JOIN NOMEN ON NOMEN.KOD5 = PRICES.NOMEN AND NOMEN.GRUPPA = SKIDKI.GRUPPA " +

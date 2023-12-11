@@ -1,6 +1,7 @@
 package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,10 +11,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
+import com.amber.armtp.adapters.NomenAdapterSQLite;
+import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.util.Objects;
@@ -24,6 +28,11 @@ import java.util.Objects;
 public class ViewOrderFragment extends Fragment implements TBUpdate {
     public GlobalVars glbVars;
     View thisView;
+    public GridView nomenList;
+    public Cursor myNom;
+    public NomenAdapterSQLite PreviewZakazAdapter;
+
+    private DBHelper db;
 
     public ViewOrderFragment() {
     }
@@ -59,8 +68,10 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
         setContrAndSum(glbVars);
 
         glbVars.nomenList = getActivity().findViewById(R.id.listContrs);
-        glbVars.PreviewOrder();
+        PreviewOrder();
         glbVars.fragManager = getActivity().getSupportFragmentManager();
+
+        db = new DBHelper(getActivity().getApplicationContext());
     }
 
     @Override
@@ -79,5 +90,19 @@ public class ViewOrderFragment extends Fragment implements TBUpdate {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void PreviewOrder() {
+        getActivity().runOnUiThread(() -> {
+            nomenList.setAdapter(null);
+            if (myNom != null) {
+                myNom.close();
+            }
+            myNom = db.getOrderNom();
+            PreviewZakazAdapter = new NomenAdapterSQLite(getContext(), R.layout.nomen_layout_preview, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "GOFRA", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
+            nomenList.setAdapter(PreviewZakazAdapter);
+//        nomenList.setOnItemClickListener(GridNomenClick);
+//        nomenList.setOnItemLongClickListener(PreviewNomenLongClick);
+        });
     }
 }

@@ -22,10 +22,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
 import com.amber.armtp.ui.JournalFragment;
@@ -375,12 +375,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    @PGShowing
     private void initLastUpdate() {
-        tvLastUpdate = findViewById(R.id.tvLastUpdateText);
-        if (tvLastUpdate != null) {
-            tvLastUpdate.setText(globalVariable.ReadLastUpdate());
-        }
+        new ProgressBarShower(this).setFunction(() -> {
+            tvLastUpdate = findViewById(R.id.tvLastUpdateText);
+            if (tvLastUpdate != null) {
+                tvLastUpdate.setText(globalVariable.ReadLastUpdate());
+            }
+            return null;
+        }).start();
+
     }
 
     private void DisplayFragment(Fragment Frag, String Tag) {

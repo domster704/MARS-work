@@ -8,13 +8,16 @@ import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.GridView
+import android.widget.RelativeLayout
+import android.widget.SimpleCursorAdapter
+import android.widget.TextView
 import com.amber.armtp.Config
 import com.amber.armtp.R
-import com.amber.armtp.annotations.PGShowing
 import com.amber.armtp.dbHelpers.DBHelper
+import com.amber.armtp.extra.ProgressBarShower
 import java.lang.String.format
-import java.util.*
+import java.util.Locale
 
 class PromotionFragment : Fragment() {
 
@@ -48,28 +51,31 @@ class PromotionFragment : Fragment() {
     }
 
     private fun showTable() {
-        activity!!.runOnUiThread @PGShowing {
-            val settings = activity!!.getSharedPreferences("apk_version", 0)
-            val tradeRepresentativeID = settings.getString("ReportTPId", "") as String
+        activity!!.runOnUiThread {
+            ProgressBarShower(context).setFunction {
+                val settings = activity!!.getSharedPreferences("apk_version", 0)
+                val tradeRepresentativeID = settings.getString("ReportTPId", "") as String
 
-            val gridView: GridView = activity!!.findViewById(R.id.actionGridView)
-            val adapter = ActionAdapter(
-                activity!!,
-                R.layout.action_result_layout,
-                getActionCursor(tradeRepresentativeID),
-                arrayOf(
-                    "ACTION", "DATAN", "DATAK", "VAL", "PLN"
-                ),
-                intArrayOf(
-                    R.id.actionDesc,
-                    R.id.actionDateStart,
-                    R.id.actionDateEnd,
-                    R.id.ActionFactValue,
-                    R.id.ActionPlanValue
-                ),
-                0
-            )
-            gridView.adapter = adapter
+                val gridView: GridView = activity!!.findViewById(R.id.actionGridView)
+                val adapter = ActionAdapter(
+                    activity!!,
+                    R.layout.action_result_layout,
+                    getActionCursor(tradeRepresentativeID),
+                    arrayOf(
+                        "ACTION", "DATAN", "DATAK", "VAL", "PLN"
+                    ),
+                    intArrayOf(
+                        R.id.actionDesc,
+                        R.id.actionDateStart,
+                        R.id.actionDateEnd,
+                        R.id.ActionFactValue,
+                        R.id.ActionPlanValue
+                    ),
+                    0
+                )
+                gridView.adapter = adapter
+                return@setFunction null;
+            }.start()
         }
     }
 

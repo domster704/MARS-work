@@ -144,7 +144,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                runCheckServerForAvailability(mainLogic);
+                runCheckServerForAvailability(getContext(), mainLogic);
                 return;
             }
             case R.id.btnAppUpdate: {
@@ -174,7 +174,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                runCheckServerForAvailability(mainLogic);
+                runCheckServerForAvailability(getContext(), mainLogic);
                 break;
             }
         }

@@ -1,44 +1,55 @@
 package com.amber.armtp.extra;
 
+import android.content.Context;
+
 import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
 import com.amber.armtp.ProgressBarLoading;
+
+import java.util.concurrent.Callable;
 
 public class ProgressBarShower {
     private boolean isCancelled = false;
-    private Runnable function;
+    private Callable function;
+    private ProgressBarLoading progressBarLoading;
+    private final Context context;
+    private Thread futureCancelledThread;
 
-    public ProgressBarShower(Runnable function, boolean isCancelled) {
+    public ProgressBarShower(Context context, boolean isCancelled, Thread thread) {
+        this.context = context;
         this.isCancelled = isCancelled;
-        this.function = function;
+        futureCancelledThread = thread;
     }
 
-    public ProgressBarShower(Runnable function) {
-        this.isCancelled = isCancelled;
+    public ProgressBarShower(Context context) {
+        this.context = context;
+    }
+
+    public ProgressBarShower setFunction(Callable function) {
         this.function = function;
+        return this;
     }
 
     public void start() {
-        ProgressBarLoading progressBarLoading = null;
         try {
-//            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-//            PGShowing delayedCalled = signature.getMethod().getAnnotation(PGShowing.class);
-//            boolean isCanceled = delayedCalled.isCanceled();
             if (isCancelled) {
-                progressBarLoading = new ProgressBarLoading(GlobalVars.CurFragmentContext, true, GlobalVars.downloadPhotoTread);
+                progressBarLoading = new ProgressBarLoading(context, true, futureCancelledThread);
             } else {
-                progressBarLoading = new ProgressBarLoading(GlobalVars.CurFragmentContext);
+                progressBarLoading = new ProgressBarLoading(context);
             }
-            GlobalVars.currentPB = progressBarLoading;
 
             progressBarLoading.show();
-            function.run();
+            function.call();
             progressBarLoading.dismiss();
         } catch (Exception e) {
-            if (progressBarLoading != null)
+            if (progressBarLoading != null) {
                 progressBarLoading.dismiss();
+            }
             e.printStackTrace();
             Config.sout(e);
         }
+    }
+
+    public ProgressBarLoading getProgressBarLoading() {
+        return progressBarLoading;
     }
 }

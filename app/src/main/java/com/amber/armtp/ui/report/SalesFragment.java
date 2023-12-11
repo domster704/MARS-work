@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.R;
-import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
 
 import java.text.SimpleDateFormat;
@@ -218,20 +217,23 @@ public class SalesFragment extends Fragment {
         return arrayList;
     }
 
-    @AsyncUI
     private void loadContrsInSalesSpinner() {
-        contrsSpinner.setAdapter(null);
-        Cursor cursor = dbHelper.getContrList();
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
-        contrsSpinner.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> {
+            contrsSpinner.setAdapter(null);
+            Cursor cursor = dbHelper.getContrList();
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+            contrsSpinner.setAdapter(adapter);
+        });
+
     }
 
-    @AsyncUI
     private void loadFilterContrsInSalesSpinner(String FindStr) {
-        contrsSpinner.setAdapter(null);
-        Cursor cursor = dbHelper.getContrFilterList(FindStr);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
-        contrsSpinner.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> {
+            contrsSpinner.setAdapter(null);
+            Cursor cursor = dbHelper.getContrFilterList(FindStr);
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+            contrsSpinner.setAdapter(adapter);
+        });
     }
 
     private void setFilterOnContrSpinner() {

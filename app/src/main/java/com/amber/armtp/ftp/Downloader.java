@@ -15,7 +15,6 @@ import com.amber.armtp.GlobalVars;
 import com.amber.armtp.MainActivity;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.annotations.DelayedCalled;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.interfaces.BackupServerConnection;
@@ -80,7 +79,7 @@ public class Downloader implements BackupServerConnection {
                 Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
                 FormOrderFragment.isContrIdDifferent = true;
                 ftpFileDownloader.changePGData(1, 1, ui, true);
-                globalVars.dbApp.putDemp(globalVars.db.getReadableDatabase());
+                globalVars.dbApp.putSectionsFromDownloadedDB(activity, globalVars.db.getReadableDatabase());
 
                 globalVars.db.setBackupIp();
 
@@ -158,12 +157,13 @@ public class Downloader implements BackupServerConnection {
         }
     }
 
-    @AsyncUI
     private void catchErrorInDownloadProcess(View view, UpdateDataFragment.UIData ui) {
-        System.out.println(activity.getResources().getString(R.string.errorInDownloadingProcess));
-        Config.sout(activity.getResources().getString(R.string.errorInDownloadingProcess), Toast.LENGTH_LONG);
-        view.setEnabled(true);
-        ui.progressBar.setProgress(0);
+        activity.runOnUiThread(() -> {
+            System.out.println(activity.getResources().getString(R.string.errorInDownloadingProcess));
+            Config.sout(activity.getResources().getString(R.string.errorInDownloadingProcess), Toast.LENGTH_LONG);
+            view.setEnabled(true);
+            ui.progressBar.setProgress(0);
+        });
     }
 
     private boolean _isFirstVersionHigherThanSecond(String[] first, String[] second) {

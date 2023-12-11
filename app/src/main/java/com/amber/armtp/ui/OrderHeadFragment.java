@@ -44,19 +44,17 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     public static String CONTR_ID = "";
     public static String PREVIOUS_CONTR_ID = "";
     public static String _ADDR = "";
-    public static boolean isOrderEditedOrCopied = false;
-    public static boolean isNeededToUpdateOrderTable = false;
-    public GlobalVars glbVars;
-
     private String _TP = "";
     private String _CONTR = "";
     private String _DATE = "";
     private String _COMMENT = "";
-
-    private SharedPreferences.Editor editor;
-    private android.support.v7.widget.Toolbar toolbar;
-    private boolean isCopiedLocal = false;
     private static final String APP_PREFERENCES_CONTR = "Contr";
+    public static boolean isOrderEditedOrCopied = false;
+    public static boolean isNeededToUpdateOrderTable = false;
+    private boolean isCopiedLocal = false;
+    private SharedPreferences.Editor editor;
+    public GlobalVars glbVars;
+    private android.support.v7.widget.Toolbar toolbar;
 
     public OrderHeadFragment() {
     }
@@ -116,7 +114,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         ImageButton userCardInfoButton = getActivity().findViewById(R.id.userCardInfoButton);
         userCardInfoButton.setOnClickListener(this);
 
-        GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
+        FormOrderFragment.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
         setContrAndSum(glbVars);
 
         glbVars.LoadTpList();
@@ -333,7 +331,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
 //            FormOrderFragment.isContrIdDifferent = false;
 //        }
 
-        GlobalVars.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
+        FormOrderFragment.TypeOfPrice = glbVars.db.getPriceType(CONTR_ID);
 
         if (glbVars.db.insertOrder(TP_ID, CONTR_ID, AddressId, DeliveryDate, Comment)) {
             setContrAndSum(glbVars);
@@ -344,21 +342,8 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
                 Toast.makeText(getActivity(), "Вы уже заполнили шапку заказа, либо не удалось обновить шапку заказа", Toast.LENGTH_LONG).show();
             }
         }
-        glbVars.resetCurData();
 //        glbVars.putAllPrices();
         glbVars.closeAllCursorsInHeadOrder();
         goToFormOrderFragment();
-//        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commitAllowingStateLoss();
     }
-
-//    private void _checkAndSetContrIDAfterDestroying() {
-//        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(APP_PREFERENCES_CONTR, Context.MODE_PRIVATE);
-//        if (sharedPreferences == null)
-//            return;
-//        String newPreviousContrID = sharedPreferences.getString("PREVIOUS_CONTR_ID", "");
-//        String newContrID = sharedPreferences.getString("CURRENT_CONTR_ID", "");
-//
-//        PREVIOUS_CONTR_ID = !newPreviousContrID.equals("") ? newPreviousContrID : PREVIOUS_CONTR_ID;
-//        CONTR_ID = !newContrID.equals("") ? newContrID : CONTR_ID;
-//    }
 }

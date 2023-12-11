@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.amber.armtp.Config;
 import com.amber.armtp.R;
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.extra.ProgressBarShower;
 
 import java.util.Locale;
 
@@ -59,10 +59,8 @@ public class PromotionFragmentD extends Fragment {
     }
 
     private void showTable() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
+        getActivity().runOnUiThread(() -> {
+            new ProgressBarShower(getContext()).setFunction(() -> {
                 SharedPreferences settings = getActivity().getSharedPreferences("apk_version", 0);
                 String tradeRepresentativeID = settings.getString("ReportTPId", "");
 
@@ -74,7 +72,8 @@ public class PromotionFragmentD extends Fragment {
                         0);
 
                 gridView.setAdapter(adapter);
-            }
+                return null;
+            }).start();
         });
     }
 

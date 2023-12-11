@@ -25,7 +25,7 @@ import com.amber.armtp.Config;
 import com.amber.armtp.GlobalVars;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.annotations.PGShowing;
+import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.ftp.Ftp;
 import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.interfaces.ServerChecker;
@@ -55,6 +55,8 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
     PopupMenu nomPopupMenu;
     AlertDialog.Builder builder;
 
+    public static String OrderID;
+
     private final AdapterView.OnItemLongClickListener GridOrdersLongClick = new AdapterView.OnItemLongClickListener() {
         @SuppressLint("NonConstantResourceId")
         @Override
@@ -72,7 +74,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
             nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
                 switch (menuItem.getItemId()) {
                     case R.id.CtxOrdEdit:
-                        glbVars.OrderID = ID;
+                        OrderID = ID;
                         builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
                         builder.setMessage("Вы уверены?")
                                 .setNegativeButton("Нет", (dialog, id1) -> {
@@ -255,10 +257,8 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                             if (!isAtLeastOneSelectedOrder())
                                 return;
 
-                            Thread mainLogic = new Thread(new Runnable() {
-                                @Override
-                                @PGShowing
-                                public void run() {
+                            Thread mainLogic = new Thread(() -> {
+                                new ProgressBarShower(getContext()).setFunction(() -> {
                                     isChecked = false;
 
                                     for (GlobalVars.ChosenOrdersData i : chosenOrders) {
@@ -267,10 +267,11 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                                         }
                                     }
                                     Config.sout("Заказы отправлены");
-                                }
+                                    return null;
+                                }).start();
                             });
 
-                            runCheckServerForAvailability(mainLogic);
+                            runCheckServerForAvailability(getContext(), mainLogic);
                         });
                 AlertDialog alertDlgSend = builderSend.create();
                 alertDlgSend.show();
@@ -449,21 +450,19 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
 
     private void modifyOrder(String OrderID, boolean isCopied) {
         String messageName = isCopied ? "копирования" : "редоктирования";
-        new Thread(new Runnable() {
-            @Override
-            @PGShowing
-            public void run() {
+        new Thread(() -> {
+            new ProgressBarShower(getContext()).setFunction(() -> {
 //                try {
                 try (Cursor cHead = glbVars.dbOrders.getWritableDatabase().rawQuery("SELECT ROWID FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null)) {
                     cHead.moveToNext();
                     if (cHead.getCount() == 0) {
                         Config.sout("Отсутсвует информация о загаловке заказа");
-                        return;
+                        return null;
                     }
                 } catch (Exception e) {
                     Config.sout("Ошибка во время копирования " + messageName);
                     e.printStackTrace();
-                    return;
+                    return null;
                 }
 
                 SQLiteDatabase db = glbVars.db.getWritableDatabase();
@@ -478,7 +477,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                     e.printStackTrace();
                     Config.sout("Ошибка во время попытки " + messageName);
                     glbVars.db.ResetNomen();
-                    return;
+                    return null;
                 } finally {
                     db.setTransactionSuccessful();
                     db.endTransaction();
@@ -491,7 +490,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                 HashMap<String, String> orderData = glbVars.dbOrders.getOrderData(OrderID);
                 if (orderData.size() == 0) {
                     Config.sout("Отсутсвуют данные о заказе");
-                    return;
+                    return null;
                 }
 
                 Fragment fragment = new OrderHeadFragment();
@@ -513,7 +512,8 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
 //                } catch (Exception e) {
 //                    Config.sout(e, Toast.LENGTH_LONG);
 //                }
-            }
+                return null;
+            }).start();
         }).start();
     }
 }

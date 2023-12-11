@@ -23,7 +23,6 @@ public class AspectAsync {
             try {
                 joinPoint.proceed();
                 Object target = joinPoint.getTarget();
-                System.out.println(getContext(target));
 //                Method[] m = target.getClass().getMethods();
 //                for (Method i : m) {
 //                    System.out.println(i.getName());
