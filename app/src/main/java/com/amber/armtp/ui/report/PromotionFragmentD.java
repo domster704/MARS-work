@@ -14,7 +14,7 @@ import android.widget.GridView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.extra.ProgressBarShower;
@@ -48,7 +48,7 @@ public class PromotionFragmentD extends Fragment {
         TextView tvPreShow = getActivity().findViewById(R.id.tvPreShow);
         tvPreShow.setOnClickListener(view -> {
             if (!dbHelper.isTableExisted("ACTION")) {
-                Config.sout("Таблица ACTION не существует, обновите базу данных");
+                Config.sout("Таблица ACTION не существует, обновите базу данных", getContext());
                 return;
             }
 

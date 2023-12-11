@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amber.armtp.Config;
-
 import java.util.HashMap;
 
 public class DBOrdersHelper extends SQLiteOpenHelper {
@@ -152,7 +150,7 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
         } catch (Exception e) {
             e.printStackTrace();
-            Config.sout("Ошибка во время копирования заголовка");
+//            Config.sout("Ошибка во время копирования заголовка");
         }
 
         return data;

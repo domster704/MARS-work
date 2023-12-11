@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.Async;
 import com.amber.armtp.annotations.TimeLogger;
@@ -307,7 +306,6 @@ public class DBHelper extends SQLiteOpenHelper {
             namesOfPhotos = Arrays.stream(namesOfPhotos).filter(Objects::nonNull).toArray(String[]::new);
             return namesOfPhotos;
         } catch (SQLiteException e) {
-            Config.sout(e);
             e.printStackTrace();
         }
         return new String[0];
@@ -322,7 +320,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
         } finally {
             db.endTransaction();
@@ -338,7 +335,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5='" + ID + "'");
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
         } finally {
             db.endTransaction();
@@ -455,7 +451,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public String getNameOfTpById(String ID) {
         if (!isTableExisted("TORG_PRED")) {
-            Config.sout("Таблица TORG_PRED не существует, обновите базу данных");
+//            Config.sout("Таблица TORG_PRED не существует, обновите базу данных");
             return "";
         }
         SQLiteDatabase db = this.getReadableDatabase();
@@ -961,7 +957,6 @@ public class DBHelper extends SQLiteOpenHelper {
         try (Cursor c = db.rawQuery("SELECT ROWID FROM TORG_PRED WHERE CODE=?", new String[]{tpID})) {
             return c.getCount() != 0;
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
             return false;
         }
@@ -973,7 +968,6 @@ public class DBHelper extends SQLiteOpenHelper {
             c.moveToNext();
             return c.getString(c.getColumnIndex("DATA"));
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
             return "";
         }
@@ -985,7 +979,6 @@ public class DBHelper extends SQLiteOpenHelper {
             c.moveToNext();
             return c.getInt(c.getColumnIndex("FLAG"));
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
             return 0;
         }
@@ -997,7 +990,6 @@ public class DBHelper extends SQLiteOpenHelper {
             c.moveToNext();
             return new CounterAgentInfo(c.getString(0), c.getString(1), c.getString(2));
         } catch (Exception e) {
-            Config.sout(e);
             e.printStackTrace();
             return null;
         }

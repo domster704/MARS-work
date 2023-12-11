@@ -55,6 +55,10 @@ public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate 
         this.toolbar = toolbar;
     }
 
+    public void setPhotoLongClick(AdapterView.OnLongClickListener photoLongClick) {
+        PhotoLongClick = photoLongClick;
+    }
+
     @SuppressLint("DefaultLocale")
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
@@ -70,7 +74,7 @@ public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate 
         TextView tvPrice = view.findViewById(R.id.ColNomPrice);
         TextView tvPosition = view.findViewById(R.id.ColNomPosition);
         TextView tvMP = view.findViewById(R.id.ColNomMP);
-        TextView tvGofra = view.findViewById(R.id.ColNomVkorob);
+        TextView tvCorrugation = view.findViewById(R.id.ColNomVkorob);
         TextView tvOst = view.findViewById(R.id.ColNomOst);
         TextView tvCod = view.findViewById(R.id.ColNomCod);
         TextView tvPhoto = view.findViewById(R.id.ColNomPhoto);
@@ -81,7 +85,7 @@ public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate 
                 tvPrice,
                 tvPosition,
                 tvMP,
-                tvGofra,
+                tvCorrugation,
                 tvOst,
                 tvCod,
         };
@@ -183,7 +187,7 @@ public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate 
 
         PostData = data[0] + "." + data[1] + "." + data[2];
 
-        DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         long PostDataTime = 0;
         try {
             PostDataTime = format.parse(PostData).getTime();

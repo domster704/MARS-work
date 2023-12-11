@@ -2,7 +2,7 @@ package com.amber.armtp.interfaces;
 
 import android.content.Context;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.ftp.Ping;
@@ -14,7 +14,7 @@ public interface ServerChecker {
                 new ProgressBarShower(context).setFunction(() -> {
                     try {
                         if (!new Ping(ServerDetails.getInstance()).isReachable()) {
-                            Config.sout("Сервер недоступен");
+                            Config.sout("Сервер недоступен", context);
                         } else {
                             t.start();
                         }
@@ -25,7 +25,7 @@ public interface ServerChecker {
                 }).start();
             }).start();
         } catch (Exception e) {
-            Config.sout(e);
+            Config.sout(e, context);
         }
     }
 }

@@ -12,7 +12,7 @@ import android.widget.GridView
 import android.widget.RelativeLayout
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
-import com.amber.armtp.Config
+import com.amber.armtp.extra.Config
 import com.amber.armtp.R
 import com.amber.armtp.dbHelpers.DBHelper
 import com.amber.armtp.extra.ProgressBarShower
@@ -38,7 +38,7 @@ class PromotionFragment : Fragment() {
         val tvPreShow: TextView = activity!!.findViewById(R.id.tvPreShow)
         tvPreShow.setOnClickListener(View.OnClickListener {
             if (!dbHelper.isTableExisted("ACTION")) {
-                Config.sout("Таблица ACTION не существует, обновите базу данных")
+                Config.sout("Таблица ACTION не существует, обновите базу данных", activity)
                 return@OnClickListener
             }
 

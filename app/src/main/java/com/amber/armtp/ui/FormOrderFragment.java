@@ -10,21 +10,13 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,35 +28,24 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.GlobalVars;
-import com.amber.armtp.ImageAdapter;
-import com.amber.armtp.PhotoDotsAdapter;
 import com.amber.armtp.R;
 import com.amber.armtp.adapters.NomenAdapterSQLite;
 import com.amber.armtp.annotations.DelayedCalled;
-import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
-import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.extra.ExtraFunctions;
-import com.amber.armtp.extra.PhotoDownloadingRunnable;
 import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.interfaces.TBUpdate;
 
-import org.apache.commons.io.FilenameUtils;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
@@ -72,44 +53,29 @@ import java.util.Objects;
 /**
  * Updated by domster704 on 02.12.2023
  */
-public class FormOrderFragment extends Fragment implements View.OnClickListener, TBUpdate {
+public class FormOrderFragment extends NomenOrderFragment implements View.OnClickListener, TBUpdate {
     public boolean isSorted = false;
     public static boolean isContrIdDifferent = false;
     public boolean isFiltered = false;
     public boolean isCleared = false;
-    public static boolean isSales;
-    public boolean isMultiSelect = false;
-    private boolean isNeededToSelectRowAfterGoToGroup = false;
-    private boolean isNeededToResetSearchView = true;
-    private boolean isDiscount = false;
-    private DBHelper db;
-    public DBAppHelper dbApp;
-    public DBOrdersHelper dbOrders;
-    public Cursor myNom = null, mySgi, myGroup;
+    protected boolean isNeededToSelectRowAfterGoToGroup = false;
+    protected boolean isNeededToResetSearchView = true;
+    protected boolean isDiscount = false;
+    public Cursor mySgi, myGroup;
     public Cursor myWC = null, myFocus = null;
-    private SharedPreferences.Editor editor;
-    private SearchView searchView;
-    public GridView nomenList;
+    protected SharedPreferences.Editor editor;
+    protected SearchView searchView;
     public ImageButton filter;
     public ImageButton spinnerClearing;
     public static Menu mainMenu;
-    private View rootView;
-    private TextView FilterWC_ID, FilterFocus_ID;
-    private android.support.v7.widget.Toolbar toolbar;
-
-    private Spinner spSgi, spGroup;
-    private Spinner spWC, spFocus;
-    private Handler photoThreadhandler;
-    public static Thread downloadPhotoTread;
-    private NomenAdapterSQLite NomenAdapter, PreviewZakazAdapter;
-    private String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
+    protected TextView FilterWC_ID, FilterFocus_ID;
+    protected Spinner spSgi, spGroup;
+    protected Spinner spWC, spFocus;
+    protected String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
     public static String TypeOfPrice = "";
-    public static String kod5 = "";
     public int BeginPos = 0, EndPos = 0;
-    public int MultiQty = 0;
-    public float Discount = 0;
 
-    private final SearchView.OnQueryTextListener searchTextListener =
+    protected final SearchView.OnQueryTextListener searchTextListener =
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextChange(String newText) {
@@ -123,7 +89,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     LoadNomen(GlobalVars.getCurrentData());
-                    Config.hideKeyBoard();
+                    Config.hideKeyBoard(getActivity());
                     searchView.clearFocus();
                     return true;
                 }
@@ -135,13 +101,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         super.onActivityCreated(savedInstanceState);
         toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
 
-        db = new DBHelper(getActivity().getApplicationContext());
-        dbApp = new DBAppHelper(getActivity().getApplicationContext());
-        dbOrders = new DBOrdersHelper(getActivity().getApplicationContext());
-
-        toolbar = getActivity().findViewById(R.id.toolbar);
-
-        nomenList = getActivity().findViewById(R.id.listContrs);
         spSgi = getActivity().findViewById(R.id.SpinSgi);
         spGroup = getActivity().findViewById(R.id.SpinGrups);
 
@@ -161,7 +120,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         spinnerClearing = getActivity().findViewById(R.id.SGIClear);
         spinnerClearing.setOnClickListener(this);
 
-        setContrAndSumValue(db, toolbar, isSales);
         if (getArguments() != null && getArguments().size() != 0 && getArguments().containsKey("SGI")) {
             String sgi = getArguments().getString("SGI");
             String group = getArguments().getString("Group");
@@ -193,33 +151,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-        GlobalVars.CurFragmentContext = getActivity();
-        GlobalVars.CurAc = getActivity();
-
-        resetCurData();
-
-        photoThreadhandler = new Handler(new Handler.Callback() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public boolean handleMessage(Message message) {
-                Bundle bundle = message.getData();
-                switch (message.what) {
-                    case PhotoDownloadingRunnable.MESSAGE_UPDATE_DB:
-                        String fileName = bundle.getString("fileName");
-                        db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE FOTO=? or FOTO2=?", new Object[]{fileName, fileName});
-                        break;
-                    case PhotoDownloadingRunnable.MESSAGE_SHOW_PRODUCTS:
-                        String[] fileNames = bundle.getStringArray("fileNames");
-                        String kod5 = bundle.getString("kod5");
-                        getActivity().runOnUiThread(() -> showProductPhoto(fileNames, kod5));
-                        break;
-                }
-                return false;
-            }
-        });
-
-        Config.hideKeyBoard();
     }
 
     @Override
@@ -262,21 +193,18 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             String status = "Сохранён";
             float Sum = 0f;
 
-            String sql;
-            SQLiteStatement stmt;
-
             @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             String curDate = df.format(Calendar.getInstance().getTime());
 
             c = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
             c2 = db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
             if (c.getCount() == 0) {
-                Config.sout("Не заполнена шапка заказа");
+                Config.sout("Не заполнена шапка заказа", getContext());
                 return;
             }
 
             if (c2.getCount() == 0) {
-                Config.sout("Нет ни одного добавленного товара для заказа");
+                Config.sout("Нет ни одного добавленного товара для заказа", getContext());
                 return;
             } else {
                 c2.close();
@@ -306,10 +234,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 Sum = insertIntoOrderDT(IDDOC, Sum);
             }
 
-            sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
-            stmt = dbOrders.getWritableDatabase().compileStatement(sql);
-            dbOrders.getWritableDatabase().beginTransaction();
-            try {
+            String sql = "INSERT INTO ZAKAZY(DOCID, TP, CONTR, ADDR, DOC_DATE, DELIVERY_DATE, COMMENT, STATUS, CONTR_DES, ADDR_DES, SUM)  VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+            try (SQLiteStatement stmt = dbOrders.getWritableDatabase().compileStatement(sql)) {
+                dbOrders.getWritableDatabase().beginTransaction();
                 stmt.clearBindings();
                 stmt.bindString(1, IDDOC);
                 stmt.bindString(2, TP_ID);
@@ -325,13 +252,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {
-                Config.sout(e);
+                Config.sout(e, getContext());
                 e.printStackTrace();
                 throw new Exception(e);
             } finally {
                 dbOrders.getWritableDatabase().setTransactionSuccessful();
                 dbOrders.getWritableDatabase().endTransaction();
-                stmt.close();
             }
 //                }
             db.ClearOrderHeader();
@@ -339,7 +265,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
             getActivity().runOnUiThread(() -> {
                 try {
-                    Config.sout("Заказ сохранён");
+                    Config.sout("Заказ сохранён", getContext());
                     closeCursors();
 
                     editor.putString("ColSgiID", "0");
@@ -352,12 +278,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                     toolbar.setTitle(R.string.journal);
                 } catch (Exception e) {
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                     e.printStackTrace();
                 }
             });
         } catch (Exception e) {
-            Config.sout(e);
+            Config.sout(e, getContext());
             e.printStackTrace();
         } finally {
             if (c != null) {
@@ -383,7 +309,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
             Cursor orderHeader = db.getReadableDatabase().rawQuery("SELECT TORG_PRED.CODE as TP_ID, ORDERS.DATA as DATA, ORDERS.COMMENT as COMMENT, CONTRS.CODE AS CONTR_ID, ADDRS.CODE AS ADDR_ID, CONTRS.DESCR as C_DES, ADDRS.DESCR as A_DES FROM ORDERS JOIN TORG_PRED ON ORDERS.TP=TORG_PRED.CODE JOIN CONTRS ON ORDERS.CONTR=CONTRS.CODE JOIN ADDRS ON ORDERS.ADDR=ADDRS.CODE", null);
             if (orderHeader.getCount() == 0) {
-                Config.sout("Не заполнена шапка заказа", Toast.LENGTH_LONG);
+                Config.sout("Не заполнена шапка заказа", getContext(), Toast.LENGTH_LONG);
                 return;
             }
             orderHeader.moveToFirst();
@@ -407,7 +333,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             Cursor orderCount = db.getReadableDatabase().rawQuery("SELECT 0 AS _id, CASE WHEN COUNT(ROWID) IS NULL THEN 0 ELSE COUNT(ROWID) END AS COUNT FROM Nomen WHERE ZAKAZ<>0", null);
             orderCount.moveToFirst();
             if (orderCount.getInt(1) == 0) {
-                Config.sout("Нет ни одного добавленного товара для заказа", Toast.LENGTH_LONG);
+                Config.sout("Нет ни одного добавленного товара для заказа", getContext(), Toast.LENGTH_LONG);
                 return;
             }
             orderCount.close();
@@ -416,9 +342,8 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             Sum = insertIntoOrderDT(IDDOC, Sum);
 
             String sql = "UPDATE ZAKAZY SET TP=?, CONTR=?, ADDR=?, DELIVERY_DATE=?, COMMENT=?, CONTR_DES=?, ADDR_DES=?, SUM=?, DOCID=? WHERE DOCID='" + OrderID + "'";
-            SQLiteStatement stmt = dbOrders.getWritableDatabase().compileStatement(sql);
-            dbOrders.getWritableDatabase().beginTransaction();
-            try {
+            try (SQLiteStatement stmt = dbOrders.getWritableDatabase().compileStatement(sql)) {
+                dbOrders.getWritableDatabase().beginTransaction();
                 stmt.clearBindings();
                 stmt.bindString(1, TP_ID);
                 stmt.bindString(2, ContrID);
@@ -432,12 +357,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 stmt.executeInsert();
                 stmt.clearBindings();
             } catch (Exception e) {
-                Config.sout(e);
+                Config.sout(e, getContext());
                 throw new Exception(e);
             } finally {
                 dbOrders.getWritableDatabase().setTransactionSuccessful();
                 dbOrders.getWritableDatabase().endTransaction();
-                stmt.close();
             }
 
             db.ClearOrderHeader();
@@ -459,12 +383,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                     toolbar.setTitle(R.string.journal);
                 } catch (Exception e) {
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                     e.printStackTrace();
                 }
             });
         } catch (Exception e) {
-            Config.sout(e);
+            Config.sout(e, getContext());
             e.printStackTrace();
         }
 //            }
@@ -483,7 +407,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     fragmentTransaction.commit();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
                 return true;
             case R.id.NomenSave:
@@ -504,7 +428,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Config.sout(e);
+                            Config.sout(e, getContext());
                         }
                         return null;
                     }).start();
@@ -558,7 +482,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
                     alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                         if (nomenList == null || NomenAdapter == null || myNom == null || myNom.getCount() == 0) {
-                            Config.sout("Таблица товаров пуста");
+                            Config.sout("Таблица товаров пуста", getContext());
                             alertDlg.dismiss();
                             return;
                         }
@@ -599,7 +523,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
                 return true;
             case R.id.NomenSort:
@@ -620,7 +544,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
                 return true;
             case R.id.NomenDiscount:
@@ -628,7 +552,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     CalculatePercentSale(mainMenu);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
                 return true;
             case R.id.NomenMultiSelect:
@@ -683,7 +607,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
 
                 return true;
@@ -700,11 +624,11 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     } else if (NomenAdapter != null) {
                         NomenAdapter.notifyDataSetChanged();
                     } else {
-                        Config.sout("Ошибка считывания таблицы заказов");
+                        Config.sout("Ошибка считывания таблицы заказов", getContext());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
                 return true;
             case R.id.clear_whole_order:
@@ -726,7 +650,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                             .show();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Config.sout(e);
+                    Config.sout(e, getContext());
                 }
 
                 return true;
@@ -836,7 +760,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 nomenList.setAdapter(null);
                 myNom = null;
 
-                GlobalVars.CurSearchName = localSearchName;
+                CurSearchName = localSearchName;
                 spSgi.post(() -> {
                     spSgi.setAdapter(spSgi.getAdapter());
                     spSgi.setSelection(0);
@@ -846,7 +770,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    private float insertIntoOrderDT(String docID, float SUM) {
+    protected float insertIntoOrderDT(String docID, float SUM) {
         Cursor nomenData;
         if (isSales) {
             nomenData = db.getReadableDatabase().rawQuery("SELECT KOD5, DESCR, ZAKAZ, PRICE FROM Nomen WHERE ZAKAZ<>0", null);
@@ -877,7 +801,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         return SUM;
     }
 
-    private void putRealPriceInPriceColumn() {
+    protected void putRealPriceInPriceColumn() {
         SQLiteDatabase database = db.getWritableDatabase();
         Cursor cursor = database.rawQuery("SELECT KOD5 FROM Nomen WHERE ZAKAZ <> 0", null);
 
@@ -894,114 +818,9 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         database.endTransaction();
     }
 
-    public void downloadAndShowPhotos(final String[] fileNames, long ID, boolean isForced) {
-        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, db.getProductKod5ByRowID(ID), isForced, getActivity(), photoThreadhandler));
-        downloadPhotoTread.start();
-    }
 
-    public void downloadAndShowPhotos(final String[] fileNames, String kod5, boolean isForced) {
-        downloadPhotoTread = new Thread(new PhotoDownloadingRunnable(fileNames, kod5, isForced, getActivity(), photoThreadhandler));
-        downloadPhotoTread.start();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void showProductPhoto(String[] photoFileName, String kod5) {
-        AlertDialog alertPhoto = null;
-        String photoDir = ExtraFunctions.getPhotoDir(getContext());
-        photoFileName = Arrays.stream(photoFileName).filter(Objects::nonNull).toArray(String[]::new);
-        if (photoFileName.length == 0) {
-            Config.sout("Нет скачанных файлов");
-            return;
-        }
-
-        for (String s : photoFileName) {
-            checkPhotoInDB(s);
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        builder.setView(inflater.inflate(R.layout.image_layout, null));
-        builder.setCancelable(true);
-        builder.setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
-
-        alertPhoto = builder.create();
-        alertPhoto.getWindow().setLayout(600, 400);
-        alertPhoto.show();
-
-        TextView productID = alertPhoto.findViewById(R.id.nomenId);
-        productID.setText("Код товара:   " + kod5);
-
-        ViewPager viewPager = alertPhoto.findViewById(R.id.photoViewPager);
-
-        LinearLayout dots = alertPhoto.findViewById(R.id.layoutForPhotoDots);
-        PhotoDotsAdapter photoDotsAdapter = new PhotoDotsAdapter(getContext(), photoFileName.length, 0);
-        photoDotsAdapter.fillLayout(dots);
-
-        ImageAdapter adapter = new ImageAdapter(getContext(), photoFileName, photoDir);
-
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                photoDotsAdapter.changePosition(i);
-            }
-        });
-    }
-
-    public void checkPhotoInDB(String FileName) {
-        Cursor cur;
-        String isDownloaded = FilenameUtils.removeExtension(FileName);
-        String Sql;
-
-        if (isDownloaded.equals("_2")) {
-            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'";
-        } else {
-            Sql = "SELECT PD From Nomen WHERE KOD5='" + isDownloaded + "'";
-        }
-        cur = db.getWritableDatabase().rawQuery(Sql, null);
-
-        if (cur.moveToFirst()) {
-            if (cur.getInt(0) == 0) {
-                if (isDownloaded.equals("_2")) {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded.replace(isDownloaded, "") + "'");
-                } else {
-                    db.getWritableDatabase().execSQL("UPDATE Nomen SET PD=1 WHERE KOD5='" + isDownloaded + "'");
-                }
-            }
-        }
-        cur.close();
-        GridView gdNomen = getActivity().getWindow().getDecorView().findViewById(R.id.listContrs);
-        myNom.requery();
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-        gdNomen.invalidateViews();
-    }
-
-    private NomenAdapterSQLite getNomenAdapter(Cursor cursor) {
+    protected NomenAdapterSQLite getNomenAdapter(Cursor cursor) {
         return new NomenAdapterSQLite(getContext(), R.layout.nomen_layout, cursor, new String[]{"_id", "KOD5", "DESCR", "OST", "ZAKAZ", "GRUPPA", "SGI", "FOTO", "GOFRA", "MP", TypeOfPrice}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomPhoto, R.id.ColNomVkorob, R.id.ColNomMP, R.id.ColNomPrice}, 0);
-    }
-
-    public void PreviewOrder() {
-        getActivity().runOnUiThread(() -> {
-            nomenList.setAdapter(null);
-            if (myNom != null) {
-                myNom.close();
-            }
-            myNom = db.getOrderNom();
-            PreviewZakazAdapter = new NomenAdapterSQLite(getContext(), R.layout.nomen_layout_preview, myNom, new String[]{"_id", "KOD5", "DESCR", "OST", "PRICE", "ZAKAZ", "GRUPPA", "SGI", "GOFRA", "MP"}, new int[]{R.id.ColNomID, R.id.ColNomCod, R.id.ColNomDescr, R.id.ColNomOst, R.id.ColNomPrice, R.id.ColNomZakaz, R.id.ColNomGRUPID, R.id.ColNomSGIID, R.id.ColNomVkorob, R.id.ColNomMP}, 0);
-            nomenList.setAdapter(PreviewZakazAdapter);
-            nomenList.setOnItemClickListener(GridNomenClick);
-            nomenList.setOnItemLongClickListener(PreviewNomenLongClick);
-        });
     }
 
     public void LoadNomen(String... args) {
@@ -1027,6 +846,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                     NomenAdapter = getNomenAdapter(myNom);
                     NomenAdapter.setToolbar(toolbar);
                     NomenAdapter.setDbHelper(db);
+                    NomenAdapter.setPhotoLongClick(PhotoLongClick);
                     getActivity().runOnUiThread(() -> {
                         nomenList.setAdapter(null);
                         nomenList.setAdapter(NomenAdapter);
@@ -1078,61 +898,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
             }
         }).start();
     }
-
-    public AdapterView.OnItemClickListener GridNomenClick = (myAdapter, myView, position, mylng) -> {
-        try {
-            long viewId = myView.getId();
-
-            if (viewId == R.id.ColNomPhoto) {
-                showPhoto(myView, position, myAdapter);
-            } else if (viewId == R.id.btPlus) {
-                plusQTY(myView);
-            } else if (viewId == R.id.btMinus) {
-                minusQTY(myView);
-            } else {
-                TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
-                TextView tvOST = myView.findViewById(R.id.ColNomOst);
-
-                String ID = tvKOD5.getText().toString();
-                int ost = Integer.parseInt(tvOST.getText().toString());
-
-                if (isMultiSelect) {
-                    multiSelect(ID, ost);
-                } else {
-                    fillNomenDataFromAlertDialog(ID, ost);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Config.sout(e);
-        }
-    };
-
-    public AdapterView.OnLongClickListener PhotoLongClick = new AdapterView.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View view) {
-            try {
-                TextView tvKod5 = ((RelativeLayout) view.getParent()).findViewById(R.id.ColNomCod);
-                String kod5 = tvKod5.getText().toString();
-
-                PopupMenu nomPopupMenu = new PopupMenu(getContext(), view);
-                nomPopupMenu.getMenuInflater().inflate(R.menu.photo_context_menu, nomPopupMenu.getMenu());
-
-                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                    if (menuItem.getItemId() == R.id.forceDownloadPhoto) {
-                        @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(kod5);
-                        downloadAndShowPhotos(fileNames, kod5, true);
-                    }
-                    return true;
-                });
-                nomPopupMenu.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-            return true;
-        }
-    };
 
     public AdapterView.OnItemLongClickListener GridNomenLongClick = new AdapterView.OnItemLongClickListener() {
         @SuppressLint("NonConstantResourceId")
@@ -1198,215 +963,12 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 nomPopupMenu.show();
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e);
+                Config.sout(e, getContext());
             }
 
             return true;
         }
     };
-
-
-    public AdapterView.OnItemLongClickListener PreviewNomenLongClick = new AdapterView.OnItemLongClickListener() {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> arg0, final View myView, int position, long arg3) {
-            try {
-                TextView groupID = myView.findViewById(R.id.ColNomGRUPID);
-                TextView sgiID = myView.findViewById(R.id.ColNomSGIID);
-
-                Cursor c = myNom;
-                final String group = c.getString(c.getColumnIndex("GRUPPA"));
-                final String sgi = c.getString(c.getColumnIndex("SGI"));
-
-                PopupMenu nomPopupMenu = new PopupMenu(getActivity(), myView);
-                nomPopupMenu.getMenuInflater().inflate(R.menu.nomen_context_menu, nomPopupMenu.getMenu());
-                nomPopupMenu.setOnMenuItemClickListener(menuItem -> {
-                    if (menuItem.getItemId() == R.id.goToGroup) {
-                        isNeededToSelectRowAfterGoToGroup = true;
-                        kod5 = c.getString(c.getColumnIndex("KOD5"));
-
-                        Fragment fragment = new FormOrderFragment();
-
-                        Bundle args = new Bundle();
-                        args.putString("SGI", sgi);
-                        args.putString("Group", group);
-
-                        fragment.setArguments(args);
-                        android.support.v4.app.FragmentManager fragManager = getActivity().getSupportFragmentManager();
-                        FragmentTransaction fragmentTransaction = fragManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.frame, fragment, "frag_order_header");
-                        fragmentTransaction.commit();
-
-                        toolbar.setTitle("Формирование заказа");
-
-                        return true;
-                    }
-                    return true;
-                });
-                nomPopupMenu.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-
-            return true;
-        }
-    };
-
-    private void plusQTY(View myView) {
-        View parent = (View) myView.getParent();
-        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-        TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
-
-        String price = tvPrice.getText().toString();
-        String kod5 = tvKOD5.getText().toString();
-        db.putPriceInNomen(kod5, price);
-        db.PlusQty(kod5);
-        if (myNom != null)
-            myNom.requery();
-
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        if (PreviewZakazAdapter != null)
-            PreviewZakazAdapter.notifyDataSetChanged();
-    }
-
-    private void minusQTY(View myView) {
-        View parent = (View) myView.getParent();
-        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-        String kod5 = tvKOD5.getText().toString();
-
-        db.MinusQty(kod5);
-        if (myNom != null)
-            myNom.requery();
-
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        if (PreviewZakazAdapter != null)
-            PreviewZakazAdapter.notifyDataSetChanged();
-    }
-
-    private void showPhoto(View myView, int position, AdapterView<?> myAdapter) {
-        getActivity().runOnUiThread(() -> {
-            if (((TextView) myView).getText() == null || ((TextView) myView).getText().toString().equals(""))
-                return;
-
-            long ID = myAdapter.getItemIdAtPosition(position);
-
-            @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
-            downloadAndShowPhotos(fileNames, ID, false);
-        });
-    }
-
-    private void multiSelect(String ID, int ost) {
-        db.UpdateQty(ID, MultiQty, ost);
-        if (myNom != null)
-            myNom.requery();
-        if (NomenAdapter != null)
-            NomenAdapter.notifyDataSetChanged();
-
-        db.putPriceInNomen(ID, "" + DBHelper.pricesMap.get(ID));
-        setContrAndSumValue(db, toolbar, isSales);
-    }
-
-    private void fillNomenDataFromAlertDialog(String ID, int ost) {
-        getActivity().runOnUiThread(() -> {
-            try {
-                LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-                View promptView = layoutInflater.inflate(R.layout.change_qty, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-                alertDialogBuilder.setView(promptView);
-
-                final EditText input = promptView.findViewById(R.id.edPPQty);
-                final TextView txtCod = promptView.findViewById(R.id.txtNomCode);
-                final TextView txtDescr = promptView.findViewById(R.id.txtNomDescr);
-                final TextView txtOst = promptView.findViewById(R.id.txtNomOst);
-                final TextView txtGrup = promptView.findViewById(R.id.txtNomGroup);
-
-                try {
-                    input.setText(myNom.getString(myNom.getColumnIndex("ZAKAZ")));
-                    txtCod.setText(myNom.getString(myNom.getColumnIndex("KOD5")));
-                    txtDescr.setText(myNom.getString(myNom.getColumnIndex("DESCR")));
-                    txtOst.setText(myNom.getString(myNom.getColumnIndex("OST")));
-                } catch (Exception e1) {
-                    Config.sout(e1);
-                }
-
-                try {
-                    Cursor c = db.getReadableDatabase().rawQuery("SELECT DESCR FROM GRUPS WHERE CODE=?", new String[]{myNom.getString(myNom.getColumnIndex("GRUPPA"))});
-                    c.moveToNext();
-                    String groupDescription = c.getString(c.getColumnIndex("DESCR"));
-                    txtGrup.setText(groupDescription);
-                } catch (Exception e2) {
-                    Config.sout(e2);
-                }
-
-                alertDialogBuilder
-                        .setCancelable(true)
-                        .setPositiveButton("OK", (dialog, id) -> {
-                        })
-                        .setNegativeButton("Отмена", (dialog, id) -> dialog.cancel());
-
-                final AlertDialog alertD = alertDialogBuilder.create();
-                alertD.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                WindowManager.LayoutParams wmlp = alertD.getWindow().getAttributes();
-                wmlp.gravity = Gravity.TOP | Gravity.LEFT;
-                wmlp.x = 50;
-                wmlp.y = 15;
-
-                alertD.show();
-                input.requestFocus();
-                input.selectAll();
-                input.performClick();
-                input.setPressed(true);
-                input.invalidate();
-                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
-                imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-
-                alertD.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                    TextView tvPrice = rootView.findViewById(R.id.ColNomPrice);
-                    String price = tvPrice.getText().toString();
-                    db.putPriceInNomen(ID, price);
-
-                    db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
-                    myNom.requery();
-
-                    setContrAndSumValue(db, toolbar, isSales);
-
-                    if (NomenAdapter != null)
-                        NomenAdapter.notifyDataSetChanged();
-
-                    if (PreviewZakazAdapter != null)
-                        PreviewZakazAdapter.notifyDataSetChanged();
-
-                    alertD.dismiss();
-                    Config.hideKeyBoard();
-                });
-                input.setOnEditorActionListener((v, actionId, event) -> {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        alertD.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                    }
-                    return true;
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                Config.sout(e);
-            }
-        });
-    }
-
-    public void resetCurData() {
-        CurGroup = CurWCID = CurFocusID = CurSGI = "0";
-        CurSearchName = "";
-//        isNeededToBeLoadingBySgi = true;
-
-        Discount = 0f;
-        Menu menu = FormOrderFragment.mainMenu;
-        if (menu != null && menu.size() > 1) {
-            setIconColor(menu, R.id.NomenDiscount, false);
-        }
-    }
 
     public void resetAllSpinners() {
         if (spGroup != null) {
@@ -1461,21 +1023,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    public void setIconColor(Menu menu, int MenuItem, Boolean vis) {
-        getActivity().runOnUiThread(() -> {
-            if (menu.findItem(MenuItem) == null)
-                return;
-            Drawable drawable = menu.findItem(MenuItem).getIcon();
-            drawable.mutate();
-            if (vis) {
-                drawable.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-            } else {
-                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            }
-        });
-//        isDiscount = vis;
-    }
-
     public static boolean allowUpdate = true;
     public AdapterView.OnItemSelectedListener SelectedGroup = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -1497,7 +1044,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 FormOrderFragment.mainMenu.findItem(R.id.NomenSort).setIcon(R.drawable.to_end);
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e);
+                Config.sout(e, getContext());
             }
         }
 
@@ -1529,7 +1076,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout(e);
+                Config.sout(e, getContext());
             }
         }
 
@@ -1626,7 +1173,6 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
     }
 
     public void UpdateNomenRange(int beginRange, int endRange, int qty) {
-
         new Thread(() -> {
             new ProgressBarShower(getContext()).setFunction(() -> {
                 int EndRange = endRange;
@@ -1726,7 +1272,7 @@ public class FormOrderFragment extends Fragment implements View.OnClickListener,
 
     public void putAllPrices() {
         new Thread(() -> {
-           new ProgressBarShower(getContext()).setFunction(() -> {
+            new ProgressBarShower(getContext()).setFunction(() -> {
                 db.putAllNomenPrices(OrderHeadFragment.CONTR_ID);
                 getActivity().runOnUiThread(() -> {
                     if (NomenAdapter != null) {

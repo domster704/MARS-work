@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.ui.SettingFragment;

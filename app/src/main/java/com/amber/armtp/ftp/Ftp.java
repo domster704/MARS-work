@@ -1,6 +1,5 @@
 package com.amber.armtp.ftp;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.interfaces.BackupServerConnection;
 
@@ -66,7 +65,7 @@ public class Ftp implements BackupServerConnection {
 
             return client.isAuthenticated();
         } catch (Exception e) {
-            Config.sout("Время ожидания подключения истекло");
+//            Config.sout("Время ожидания подключения истекло");
             e.printStackTrace();
         }
         return false;

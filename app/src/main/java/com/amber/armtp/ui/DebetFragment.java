@@ -3,6 +3,7 @@ package com.amber.armtp.ui;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,10 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
-import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
+import com.amber.armtp.adapters.DebetAdapterSQLite;
 import com.amber.armtp.dbHelpers.DBHelper;
 
 import java.util.Objects;
@@ -23,33 +25,30 @@ import java.util.Objects;
  * Updated by domster704 on 27.09.2021
  */
 public class DebetFragment extends Fragment {
-    public GlobalVars glbVars;
-
-    Menu mainMenu;
+    private GridView debetList;
+    private Menu mainMenu;
+    private DBHelper db;
+    public Cursor curDebet;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.debet_fragment, container, false);
         Objects.requireNonNull(getActivity()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setHasOptionsMenu(true);
-        glbVars.CurView = rootView;
         return rootView;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
-        glbVars.setContext(getActivity().getApplicationContext());
-        GlobalVars.CurFragmentContext = getActivity();
-        GlobalVars.CurAc = getActivity();
     }
 
     @SuppressLint("CutPasteId")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        glbVars.toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+        db = new DBHelper(getActivity().getApplicationContext());
+
         android.support.v7.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
 
         String tradeRepresentativeID = Config.getTPId(getActivity());
@@ -80,13 +79,22 @@ public class DebetFragment extends Fragment {
         }
 
         toolbar.setSubtitle(tpName);
-        glbVars.debetList = getActivity().findViewById(R.id.listContrs);
-        glbVars.LoadDebet(tradeRepresentativeID);
+        debetList = getActivity().findViewById(R.id.listContrs);
+        LoadDebet(tradeRepresentativeID);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.debet_menu, menu);
         mainMenu = menu;
+    }
+
+    public void LoadDebet(final String TP_ID) {
+        getActivity().runOnUiThread(() -> {
+            curDebet = db.getDebet(TP_ID);
+            debetList.setAdapter(null);
+            DebetAdapterSQLite adapter = new DebetAdapterSQLite(getActivity(), R.layout.debet_layout, curDebet, new String[]{"DESCR", "STATUS", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE"}, new int[]{R.id.ColDebetContr, R.id.ColDebetStatus, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor}, 0);
+            debetList.setAdapter(adapter);
+        });
     }
 }

@@ -23,7 +23,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.dbHelpers.DBHelper;
 
@@ -258,7 +258,7 @@ public class SalesFragment extends Fragment {
 
     private void showResultFragment(String tpName) {
         if (!dbHelper.isTableExisted("REAL")) {
-            Config.sout("Таблица REAL не существует, обновите базу данных");
+            Config.sout("Таблица REAL не существует, обновите базу данных", getContext());
             return;
         }
 

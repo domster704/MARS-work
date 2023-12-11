@@ -3,6 +3,8 @@ package com.amber.armtp.ftp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
@@ -10,13 +12,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.amber.armtp.BuildConfig;
-import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.MainActivity;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.annotations.DelayedCalled;
+import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.dbHelpers.DBOrdersHelper;
 import com.amber.armtp.interfaces.BackupServerConnection;
 import com.amber.armtp.ui.FormOrderFragment;
 import com.amber.armtp.ui.UpdateDataFragment;
@@ -29,12 +32,16 @@ import java.io.File;
 import java.net.SocketTimeoutException;
 
 public class Downloader implements BackupServerConnection {
-    private final GlobalVars globalVars;
+    private DBHelper db;
+    private final DBAppHelper dbApp;
+    private DBOrdersHelper dbOrders;
     private final Activity activity;
 
-    public Downloader(GlobalVars globalVars, Activity activity) {
-        this.globalVars = globalVars;
+    public Downloader(Activity activity, DBHelper db, DBAppHelper dbAppHelper, DBOrdersHelper dbOrdersHelper) {
         this.activity = activity;
+        this.db = db;
+        this.dbApp = dbAppHelper;
+        this.dbOrders = dbOrdersHelper;
     }
 
     public void downloadApp(final UpdateDataFragment.UIData ui, View view, String ver) {
@@ -72,26 +79,26 @@ public class Downloader implements BackupServerConnection {
             }
 
             activity.runOnUiThread(() -> {
-                globalVars.db = new DBHelper(activity.getApplicationContext());
+                db = new DBHelper(activity.getApplicationContext());
 
                 view.setEnabled(true);
                 ui.tvData.setTextColor(Color.rgb(3, 103, 0));
-                Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess));
+                Config.sout(activity.getResources().getString(R.string.successInDownloadingProcess), activity.getApplicationContext());
                 FormOrderFragment.isContrIdDifferent = true;
                 ftpFileDownloader.changePGData(1, 1, ui, true);
-                globalVars.dbApp.putSectionsFromDownloadedDB(activity, globalVars.db.getReadableDatabase());
+                dbApp.putSectionsFromDownloadedDB(activity, db.getReadableDatabase());
 
-                globalVars.db.setBackupIp();
+                db.setBackupIp();
 
-                globalVars.updateOutedPositionInZakazyTable();
-                globalVars.updateOrdersStatusFromDB();
+                updateOutedPositionInZakazyTable();
+                updateOrdersStatusFromDB();
 
-                SharedPreferences serverSettings = globalVars.getSharedPreferences("apk_version", 0);
+                SharedPreferences serverSettings = activity.getSharedPreferences("apk_version", 0);
                 SharedPreferences.Editor editor = serverSettings.edit();
                 editor.remove("FtpBackupServerHost");
 
                 String tradeRepresentativeID = Config.getTPId(activity);
-                if (!globalVars.db.isSettingTpIDIsExistedInDB(tradeRepresentativeID)) {
+                if (!db.isSettingTpIDIsExistedInDB(tradeRepresentativeID)) {
                     editor.remove("ReportTPId");
                 }
 
@@ -115,7 +122,7 @@ public class Downloader implements BackupServerConnection {
         client.setControlKeepAliveReplyTimeout(timeout);
 
         if (!tryConnectToDefaultIpOtherwiseToBackupIp(client)) {
-            return new String[] {"", ""};
+            return new String[]{"", ""};
         }
 
         try {
@@ -149,7 +156,7 @@ public class Downloader implements BackupServerConnection {
 
             return new String[]{String.valueOf(isNewer), newVersion};
         } catch (SocketTimeoutException e) {
-            Config.sout("Время ожидания вышло");
+            Config.sout("Время ожидания вышло", activity.getApplicationContext());
             return new String[]{"error", ""};
         } catch (Exception e) {
             e.printStackTrace();
@@ -160,7 +167,7 @@ public class Downloader implements BackupServerConnection {
     private void catchErrorInDownloadProcess(View view, UpdateDataFragment.UIData ui) {
         activity.runOnUiThread(() -> {
             System.out.println(activity.getResources().getString(R.string.errorInDownloadingProcess));
-            Config.sout(activity.getResources().getString(R.string.errorInDownloadingProcess), Toast.LENGTH_LONG);
+            Config.sout(activity.getResources().getString(R.string.errorInDownloadingProcess), activity.getApplicationContext(), Toast.LENGTH_LONG);
             view.setEnabled(true);
             ui.progressBar.setProgress(0);
         });
@@ -204,5 +211,54 @@ public class Downloader implements BackupServerConnection {
             isExisted = true;
         }
         return isExisted;
+    }
+
+    public void updateOutedPositionInZakazyTable() {
+        try {
+            SQLiteDatabase sqLiteDatabaseOrders = dbOrders.getReadableDatabase();
+            SQLiteDatabase sqLiteDatabase = db.getReadableDatabase();
+
+            sqLiteDatabaseOrders.beginTransaction();
+            Cursor ordersId = sqLiteDatabaseOrders.rawQuery("SELECT DOCID FROM ZAKAZY", null);
+            while (ordersId.moveToNext()) {
+                String orderID = ordersId.getString(0);
+                Cursor c = sqLiteDatabase.rawQuery("SELECT NOMEN FROM VYCHERK WHERE DOCID=?", new String[]{orderID});
+
+                if (c.getCount() != 0) {
+                    sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=1 WHERE DOCID='" + orderID + "'");
+                } else {
+                    sqLiteDatabaseOrders.execSQL("UPDATE ZAKAZY SET OUTED=0 WHERE DOCID='" + orderID + "'");
+                }
+                c.close();
+            }
+            sqLiteDatabaseOrders.setTransactionSuccessful();
+            sqLiteDatabaseOrders.endTransaction();
+            ordersId.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateOrdersStatusFromDB() {
+        SQLiteDatabase dbApp = db.getReadableDatabase();
+        SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
+//        dbOrd.beginTransaction();
+        Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
+        Cursor statusInDB;
+        while (statusInApp.moveToNext()) {
+            String docId = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
+            statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + docId + "'", null);
+            if (statusInDB.getCount() != 0) {
+                statusInDB.moveToNext();
+                String Status = statusInDB.getString(statusInDB.getColumnIndex("STATUS"));
+                dbOrd.execSQL("UPDATE ZAKAZY SET STATUS = '" + Status + "' WHERE DOCID='" + docId + "'");
+            }
+            statusInDB.close();
+        }
+
+        statusInApp.close();
+//        dbOrd.endTransaction();
+//        if (statusInDB != null)
+//            statusInDB.close();
     }
 }

@@ -1,6 +1,6 @@
 package com.amber.armtp.aspects;
 
-import com.amber.armtp.GlobalVars;
+import android.os.Handler;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,7 +17,7 @@ public class AspectAsyncUI {
 
     @Around("setPointCutThreadUI()")
     public void setJoinPointThreadUI(final ProceedingJoinPoint joinPoint) {
-        GlobalVars.CurAc.runOnUiThread(() -> {
+        new Handler().post(() -> {
             try {
                 joinPoint.proceed();
             } catch (Throwable throwable) {

@@ -1,6 +1,5 @@
 package com.amber.armtp.interfaces;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.ServerDetails;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -17,7 +16,7 @@ public interface BackupServerConnection {
                 ftpClient.connect(ServerDetails.getInstance().host);
             } catch (IOException ignored) {
                 ServerDetails.getInstance().changeIpToBackupIpOrToDefaultIP();
-                Config.sout("Сервер недоступен");
+//                Config.sout("Сервер недоступен");
                 System.out.println("Сервер недоступен " + ServerDetails.getInstance().host);
                 return false;
             }
@@ -34,7 +33,7 @@ public interface BackupServerConnection {
                 ftpClient.connect(ServerDetails.getInstance().host, Integer.parseInt(ServerDetails.getInstance().port));
             } catch (Exception ex) {
                 ServerDetails.getInstance().changeIpToBackupIpOrToDefaultIP();
-                Config.sout("Сервер недоступен");
+//                Config.sout("Сервер недоступен");
                 return false;
             }
         }

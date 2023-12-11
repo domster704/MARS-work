@@ -8,12 +8,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.ftp.Ftp;
 import com.amber.armtp.interfaces.BackupServerConnection;
-import com.amber.armtp.ui.FormOrderFragment;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -31,7 +29,6 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
     public final static int MESSAGE_UPDATE_DB = 1;
     public final static int MESSAGE_SHOW_PRODUCTS = 2;
 
-
     private final String[] fileNames;
     private String kod5;
     private int necessaryBytesAmountForDeletingFile = 5;
@@ -46,7 +43,7 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
     private Context context;
     public String currentDownloadingPhotoName = "";
 
-    private Handler handler;
+    private final Handler handler;
 
     private void init() {
         SharedPreferences settings;
@@ -75,7 +72,7 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void run() {
-        ProgressBarShower progressBarShower = new ProgressBarShower(context, true, FormOrderFragment.downloadPhotoTread);
+        ProgressBarShower progressBarShower = new ProgressBarShower(context, true);
         progressBarShower.setFunction(() -> {
             try {
                 init();
@@ -164,11 +161,11 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
                 closeStreamAndDeleteFile();
             } catch (SocketTimeoutException socketTimeoutException) {
                 socketTimeoutException.printStackTrace();
-                Config.sout("Время ожидания вышло");
+                Config.sout("Время ожидания вышло", context);
                 closeStreamAndDeleteFile();
             } catch (Exception e) {
                 e.printStackTrace();
-                Config.sout("Сервер недоступен");
+                Config.sout("Сервер недоступен", context);
                 closeStreamAndDeleteFile();
             }
             return null;
@@ -192,7 +189,7 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            Config.sout("Загрузка отменена");
+            Config.sout("Загрузка отменена", context);
         }
     }
 

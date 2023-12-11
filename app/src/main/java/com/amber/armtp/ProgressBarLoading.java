@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.widget.TextView;
 
 public class ProgressBarLoading {
+    // поток, который необходимо прервать
+    public static Thread pgThread;
     private final Context context;
     private AlertDialog dialog;
 
@@ -15,9 +17,9 @@ public class ProgressBarLoading {
         create();
     }
 
-    public ProgressBarLoading(Context context, boolean isCreatedCancelButton, Thread thread) {
+    public ProgressBarLoading(Context context, boolean isCreatedCancelButton) {
         this.context = context;
-        create(isCreatedCancelButton, thread);
+        create(isCreatedCancelButton);
     }
 
     private void create() {
@@ -31,9 +33,8 @@ public class ProgressBarLoading {
 
     /**
      * @param isCanceled - параметр, указывающий на необходимость создания кнопки "Отменить"
-     * @param thread     - поток, который необходимо прервать
      */
-    private void create(boolean isCanceled, Thread thread) {
+    private void create(boolean isCanceled) {
         new Handler(context.getMainLooper()).post(() -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setCancelable(false);
@@ -42,7 +43,7 @@ public class ProgressBarLoading {
             dialog = builder.create();
             if (isCanceled) {
                 dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Отменить", (dialogInterface, i) -> {
-                    thread.interrupt();
+                    pgThread.interrupt();
                     dialog.dismiss();
                 });
             }

@@ -2,7 +2,6 @@ package com.amber.armtp.extra;
 
 import android.content.Context;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.ProgressBarLoading;
 
 import java.util.concurrent.Callable;
@@ -12,12 +11,10 @@ public class ProgressBarShower {
     private Callable function;
     private ProgressBarLoading progressBarLoading;
     private final Context context;
-    private Thread futureCancelledThread;
 
-    public ProgressBarShower(Context context, boolean isCancelled, Thread thread) {
+    public ProgressBarShower(Context context, boolean isCancelled) {
         this.context = context;
         this.isCancelled = isCancelled;
-        futureCancelledThread = thread;
     }
 
     public ProgressBarShower(Context context) {
@@ -32,7 +29,7 @@ public class ProgressBarShower {
     public void start() {
         try {
             if (isCancelled) {
-                progressBarLoading = new ProgressBarLoading(context, true, futureCancelledThread);
+                progressBarLoading = new ProgressBarLoading(context, true);
             } else {
                 progressBarLoading = new ProgressBarLoading(context);
             }
@@ -45,7 +42,7 @@ public class ProgressBarShower {
                 progressBarLoading.dismiss();
             }
             e.printStackTrace();
-            Config.sout(e);
+            Config.sout(e, context);
         }
     }
 
