@@ -35,11 +35,13 @@ public class CounterAgentDialogFragment extends DialogFragment {
         TextView login = view.findViewById(R.id.loginContrInfo);
         TextView password = view.findViewById(R.id.passwordContrInfo);
         TextView email = view.findViewById(R.id.emailContrInfo);
+        TextView inn = view.findViewById(R.id.innContrInfo);
 
         if (counterAgentInfo != null) {
             login.setText(counterAgentInfo.login);
             password.setText(counterAgentInfo.password);
             email.setText(counterAgentInfo.email);
+            inn.setText(counterAgentInfo.inn);
         }
 
         return view;

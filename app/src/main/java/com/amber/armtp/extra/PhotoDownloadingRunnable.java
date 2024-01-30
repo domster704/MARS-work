@@ -30,8 +30,8 @@ public class PhotoDownloadingRunnable implements Runnable, BackupServerConnectio
     public final static int MESSAGE_SHOW_PRODUCTS = 2;
 
     private final String[] fileNames;
-    private String kod5;
-    private int necessaryBytesAmountForDeletingFile = 5;
+    private final String kod5;
+    private final int necessaryBytesAmountForDeletingFile = 5;
     private final boolean isForced;
 
     private FTPClient ftpClient = null;

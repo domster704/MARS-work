@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class SalesReportResultFragment extends Fragment  {
+public class SalesReportResultFragment extends Fragment {
     private String tradeRepresentative;
 
     private Map<String, ViewWidthByName> headersName;
@@ -204,12 +204,12 @@ public class SalesReportResultFragment extends Fragment  {
 
         // Создаём запрос для конкретных id
         StringBuilder specificSqlReq = new StringBuilder();
-        if (specificData.length != 0) {
-            for (SalesFragment.SpecificDataForSalesReportFragment i : specificData) {
-                if (i.date.equals("0")) continue;
-                specificSqlReq.append(" AND ").append("REAL.").append(i.name).append("='").append(i.date).append("'");
-            }
+//        if (specificData.length != 0) {
+        for (SalesFragment.SpecificDataForSalesReportFragment i : specificData) {
+            if (i.date.equals("0")) continue;
+            specificSqlReq.append(" AND ").append("REAL.").append(i.name).append("='").append(i.date).append("'");
         }
+//        }
 
         String df = getFormatedData(dateData[0].split("\\."));
         String dt = getFormatedData(dateData[1].split("\\."));
@@ -220,10 +220,9 @@ public class SalesReportResultFragment extends Fragment  {
     }
 
     private String getFormatedData(String[] date) {
-        String[] dateF = date;
-        ArrayUtils.swap(dateF, 0, 2);
-        dateF[0] = dateF[0].substring(2);
-        return StringUtils.join(dateF, "");
+        ArrayUtils.swap(date, 0, 2);
+        date[0] = date[0].substring(2);
+        return StringUtils.join(date, "");
     }
 
     private static class HeaderView extends android.support.v7.widget.AppCompatTextView {

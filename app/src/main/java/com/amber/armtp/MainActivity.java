@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
-import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.ui.DebetFragment;
 import com.amber.armtp.ui.DefaultFragment;
 import com.amber.armtp.ui.JournalFragment;
@@ -157,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
             db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
             db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOKUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
             db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
-//            db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS prices_kod5_index ON PRICES (NOMEN)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -278,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Setting the actionbarToggle to drawer layout
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
@@ -339,13 +337,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initLastUpdate() {
-        new ProgressBarShower(this).setFunction(() -> {
-            tvLastUpdate = findViewById(R.id.tvLastUpdateText);
-            if (tvLastUpdate != null) {
-                tvLastUpdate.setText(ReadLastUpdate());
-            }
-            return null;
-        }).start();
+//        new ProgressBarShower(this).setFunction(() -> {
+        tvLastUpdate = findViewById(R.id.tvLastUpdateText);
+        if (tvLastUpdate != null) {
+            tvLastUpdate.setText(db.getLastUpdateTime());
+        }
+//        }).start();
 
     }
 
@@ -365,10 +362,5 @@ public class MainActivity extends AppCompatActivity {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
         long availableSpace = (long) (statFs.getFreeBytes() / MainActivity.SIZE_MB);
         return availableSpace > 200;
-    }
-
-    public String ReadLastUpdate() {
-        String timeUpdate = db.getLastUpdateTime();
-        return timeUpdate != null ? timeUpdate : "";
     }
 }

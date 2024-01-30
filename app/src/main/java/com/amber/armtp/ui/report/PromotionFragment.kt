@@ -74,7 +74,7 @@ class PromotionFragment : Fragment() {
                     0
                 )
                 gridView.adapter = adapter
-                return@setFunction null;
+                return@setFunction null
             }.start()
         }
     }
@@ -129,7 +129,7 @@ class PromotionFragment : Fragment() {
             }
             view.setBackgroundColor(backgroundColor)
 
-            if (percent >= 100 && percent != -1f) {
+            if (percent >= 100) {
                 for (i in to!!) {
                     view.findViewById<TextView>(i)
                         .setTextColor(ContextCompat.getColor(context, R.color.postDataColorGreen))

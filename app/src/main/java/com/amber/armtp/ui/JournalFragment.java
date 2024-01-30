@@ -24,15 +24,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.amber.armtp.extra.Config;
+import com.amber.armtp.BuildConfig;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
 import com.amber.armtp.adapters.JournalAdapterSQLite;
 import com.amber.armtp.adapters.JournalDetailsAdapterSQLite;
-import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.auxiliaryData.ChosenOrdersData;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.extra.ExtraFunctions;
 import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.ftp.Ftp;
@@ -266,12 +266,17 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                             Thread mainLogic = new Thread(() -> new ProgressBarShower(getContext()).setFunction(() -> {
                                 isChecked = false;
 
+                                boolean isForEntered = false;
                                 for (ChosenOrdersData i : chosenOrders) {
                                     if (i.getStatus().equals("Сохранён") || i.getStatus().equals("Отправлен")) {
                                         sendOrders(i.getId());
+                                        isForEntered = true;
                                     }
                                 }
-                                Config.sout("Заказы отправлены", getContext());
+                                if (!isForEntered)
+                                    return null;
+
+                                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Заказы отправлены", Toast.LENGTH_SHORT).show());
                                 return null;
                             }).start());
 
@@ -408,23 +413,19 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
 
                 File secondLocalFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + tmp_filename);
 
-                InputStream inputStream = new FileInputStream(secondLocalFile);
-
-                OutputStream outputStream = ftpClient.storeFileStream(tmp_filename);
                 byte[] bytesIn = new byte[4096];
                 int read;
 
-                try {
+                try (InputStream inputStream = new FileInputStream(secondLocalFile); OutputStream outputStream = ftpClient.storeFileStream(tmp_filename)) {
                     while ((read = inputStream.read(bytesIn)) != -1) {
                         outputStream.write(bytesIn, 0, read);
                     }
-                    outputStream.close();
                 } catch (Exception ignored) {
                 }
 
                 if (checkFileIntegrityOnServer(FileName, secondLocalFile.length())) {
                     if (ftpClient.completePendingCommand()) {
-                        secondLocalFile.delete();
+//                        secondLocalFile.delete();
                         changeIntegralFile(FileName);
                         dbOrders.setZakazStatus("Отправлен", id);
                         LoadOrders();
@@ -433,7 +434,6 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                     Config.sout("Сбой отправки", getContext());
                 }
 
-                inputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -443,6 +443,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
     private boolean checkFileIntegrityOnServer(String FileName, long fileInAppSize) throws Exception {
         Ftp ftp = new Ftp(ServerDetails.getInstance());
         long fileSize = ftp.getFileSize("EXCHANGE/IN/MARS/" + FileName);
+        System.out.println(fileSize + " " + fileInAppSize);
         return fileSize == fileInAppSize;
     }
 
@@ -473,13 +474,13 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                 while (cNom.moveToNext()) {
                     db.execSQL("UPDATE Nomen SET ZAKAZ=" + cNom.getInt(cNom.getColumnIndex("QTY")) + " WHERE KOD5='" + cNom.getString(cNom.getColumnIndex("NOMEN")) + "'");
                 }
+                db.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
                 Config.sout("Ошибка во время попытки " + messageName, getContext());
                 dbHelper.ResetNomen();
                 return null;
             } finally {
-                db.setTransactionSuccessful();
                 db.endTransaction();
             }
 
@@ -513,17 +514,23 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
         }).start()).start();
     }
 
-    @AsyncUI
     public void LoadOrdersDetails(String ZakazID) {
-        _doUpdateQTYByOuted(ZakazID);
+        getActivity().runOnUiThread(() -> {
+            _doUpdateQTYByOuted(ZakazID);
 
-        allOrders.clear();
-        layout.removeAllViews();
+            allOrders.clear();
+            layout.removeAllViews();
 
-        orderDtList.setAdapter(null);
-        Cursor ordersDt = dbOrders.getZakazDetails(ZakazID);
-        JournalDetailsAdapterSQLite ordersDtAdapter = new JournalDetailsAdapterSQLite(getActivity(), R.layout.orderdt_item, ordersDt, new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"}, new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum}, 0);
-        orderDtList.setAdapter(ordersDtAdapter);
+            orderDtList.setAdapter(null);
+            Cursor ordersDt = dbOrders.getZakazDetails(ZakazID);
+            JournalDetailsAdapterSQLite ordersDtAdapter = new JournalDetailsAdapterSQLite(getActivity(),
+                    R.layout.orderdt_item,
+                    ordersDt,
+                    new String[]{"ZAKAZ_ID", "NOMEN", "DESCR", "QTY", "PRICE", "SUM"},
+                    new int[]{R.id.ColOrdDtZakazID, R.id.ColOrdDtCod, R.id.ColOrdDtDescr, R.id.ColOrdDtQty, R.id.ColOrdDtPrice, R.id.ColOrdDtSum},
+                    0);
+            orderDtList.setAdapter(ordersDtAdapter);
+        });
     }
 
     public void LoadOrders() {
@@ -598,7 +605,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
 
         DBFWriter Table = new DBFWriter(DBFFile);
         Table.setCharactersetName("cp866");
-        DBFField[] fields = new DBFField[10];
+        DBFField[] fields = new DBFField[11];
 
         int index = 0;
 
@@ -659,6 +666,12 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
         fields[index].setName("PRICE");
         fields[index].setDataType(DBFField.FIELD_TYPE_C);
         fields[index].setFieldLength(15);
+        index++;
+
+        fields[index] = new DBFField();
+        fields[index].setName("VERSION");
+        fields[index].setDataType(DBFField.FIELD_TYPE_C);
+        fields[index].setFieldLength(50);
         Table.setFields(fields);
 
         try {
@@ -674,7 +687,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                 QTY = c.getDouble(c.getColumnIndex("QTY"));
                 PRICE = c.getString(c.getColumnIndex("PRICE")).replace(",", ".");
 
-                Object[] rowData = new Object[10];
+                Object[] rowData = new Object[11];
                 rowData[0] = TP;
                 rowData[1] = CONTR;
                 rowData[2] = ADDR;
@@ -685,6 +698,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
                 rowData[7] = NOMEN;
                 rowData[8] = QTY;
                 rowData[9] = PRICE;
+                rowData[10] = BuildConfig.VERSION_NAME;
                 Table.addRecord(rowData);
             }
         } catch (Exception e) {

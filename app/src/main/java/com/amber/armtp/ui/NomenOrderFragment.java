@@ -71,7 +71,7 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
     protected String CurSGI = "0", CurGroup = "0", CurWCID = "0", CurFocusID = "0", CurSearchName = "";
     public static String kod5 = "";
     public int MultiQty = 0;
-    public float Discount = 0;
+//    public float Discount = 0;
     protected boolean isNeededToSelectRowAfterGoToGroup = false;
 
     @SuppressLint("CutPasteId")
@@ -101,7 +101,7 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
         return rootView;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -268,15 +268,13 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
                 minusQTY(myView);
             } else {
                 TextView tvKOD5 = myView.findViewById(R.id.ColNomCod);
-                TextView tvOST = myView.findViewById(R.id.ColNomOst);
 
                 String ID = tvKOD5.getText().toString();
-                int ost = Integer.parseInt(tvOST.getText().toString());
 
                 if (isMultiSelect) {
-                    multiSelect(ID, ost);
+                    multiSelect(ID);
                 } else {
-                    fillNomenDataFromAlertDialog(ID, ost);
+                    fillNomenDataFromAlertDialog(ID);
                 }
                 if (PreviewZakazAdapter != null)
                     PreviewZakazAdapter.notifyDataSetChanged();
@@ -288,13 +286,13 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
     };
 
     protected void plusQTY(View myView) {
-        getActivity().runOnUiThread(() -> {
-            View parent = (View) myView.getParent();
-            TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-            TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
+        View parent = (View) myView.getParent();
+        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
+        TextView tvPrice = parent.findViewById(R.id.ColNomPrice);
 
-            String price = tvPrice.getText().toString();
-            String kod5 = tvKOD5.getText().toString();
+        String price = tvPrice.getText().toString();
+        String kod5 = tvKOD5.getText().toString();
+        getActivity().runOnUiThread(() -> {
             db.putPriceInNomen(kod5, price);
             db.PlusQty(kod5);
             if (myNom != null)
@@ -309,11 +307,10 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
     }
 
     protected void minusQTY(View myView) {
+        View parent = (View) myView.getParent();
+        TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
+        String kod5 = tvKOD5.getText().toString();
         getActivity().runOnUiThread(() -> {
-            View parent = (View) myView.getParent();
-            TextView tvKOD5 = parent.findViewById(R.id.ColNomCod);
-            String kod5 = tvKOD5.getText().toString();
-
             db.MinusQty(kod5);
             if (myNom != null)
                 myNom.requery();
@@ -333,14 +330,14 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
 
             long ID = myAdapter.getItemIdAtPosition(position);
 
-            @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(ID);
+            @SuppressLint({"NewApi", "LocalSuppress"}) String[] fileNames = db.getPhotoNames(db.getProductKod5ByRowID(ID));
             downloadAndShowPhotos(fileNames, db.getProductKod5ByRowID(ID), false);
         });
     }
 
-    protected void multiSelect(String ID, int ost) {
+    protected void multiSelect(String ID) {
         getActivity().runOnUiThread(() -> {
-            db.UpdateQty(ID, MultiQty, ost);
+            db.UpdateQty(ID, MultiQty);
             if (myNom != null)
                 myNom.requery();
             if (NomenAdapter != null)
@@ -351,7 +348,7 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
         });
     }
 
-    protected void fillNomenDataFromAlertDialog(String ID, int ost) {
+    protected void fillNomenDataFromAlertDialog(String ID) {
         getActivity().runOnUiThread(() -> {
             try {
                 LayoutInflater layoutInflater = LayoutInflater.from(getContext());
@@ -411,7 +408,7 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
                     String price = tvPrice.getText().toString();
                     db.putPriceInNomen(ID, price);
 
-                    db.UpdateQty(ID, Integer.parseInt(input.getText().toString()), ost);
+                    db.UpdateQty(ID, Integer.parseInt(input.getText().toString()));
                     myNom.requery();
 
                     setContrAndSumValue(db, toolbar, isSales);
@@ -442,14 +439,17 @@ public class NomenOrderFragment extends Fragment implements TBUpdate {
         CurGroup = CurWCID = CurFocusID = CurSGI = "0";
         CurSearchName = "";
 
-        Discount = 0f;
+        if (NomenAdapter != null) {
+            getActivity().runOnUiThread(() -> NomenAdapter.setDiscount(0f));
+        }
+
         Menu menu = FormOrderFragment.mainMenu;
         if (menu != null && menu.size() > 1) {
             setIconColor(menu, R.id.NomenDiscount, false);
         }
     }
 
-    public void setIconColor(Menu menu, int MenuItem, Boolean vis) {
+    public void setIconColor(Menu menu, int MenuItem, boolean vis) {
         getActivity().runOnUiThread(() -> {
             if (menu.findItem(MenuItem) == null)
                 return;

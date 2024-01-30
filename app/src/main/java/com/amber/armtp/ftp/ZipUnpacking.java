@@ -4,10 +4,10 @@ package com.amber.armtp.ftp;
 import android.util.Log;
 
 import com.github.junrar.Junrar;
-import com.github.junrar.exception.RarException;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 public class ZipUnpacking {
     private final String fileDir;
@@ -18,10 +18,13 @@ public class ZipUnpacking {
 
     private boolean unZip(File archiveFile) {
         final File destinationFolder = new File(archiveFile.getParent());
-        try {
-            Junrar.extract(archiveFile, destinationFolder);
+        try (InputStream stream = new FileInputStream(archiveFile)) {
+//        try {
+            Junrar.extract(stream, destinationFolder);
+//            Junrar.extract(archiveFile, destinationFolder);
             return true;
-        } catch (RarException | IOException ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

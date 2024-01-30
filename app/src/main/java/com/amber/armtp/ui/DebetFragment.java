@@ -26,7 +26,6 @@ import java.util.Objects;
  */
 public class DebetFragment extends Fragment {
     private GridView debetList;
-    private Menu mainMenu;
     private DBHelper db;
     public Cursor curDebet;
 
@@ -86,14 +85,17 @@ public class DebetFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.debet_menu, menu);
-        mainMenu = menu;
     }
 
     public void LoadDebet(final String TP_ID) {
         getActivity().runOnUiThread(() -> {
             curDebet = db.getDebet(TP_ID);
             debetList.setAdapter(null);
-            DebetAdapterSQLite adapter = new DebetAdapterSQLite(getActivity(), R.layout.debet_layout, curDebet, new String[]{"DESCR", "STATUS", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE"}, new int[]{R.id.ColDebetContr, R.id.ColDebetStatus, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor}, 0);
+            DebetAdapterSQLite adapter = new DebetAdapterSQLite(
+                    getActivity(), R.layout.debet_layout, curDebet,
+                    new String[]{"DESCR", "STATUS", "KREDIT", "SALDO", "A7", "A14", "A21", "A28", "A35", "A42", "A49", "A56", "A63", "A64", "OTG30", "OPL30", "KOB", "FIRMA", "CRT_DATE", "DATASVERKI"},
+                    new int[]{R.id.ColDebetContr, R.id.ColDebetStatus, R.id.ColDebetCredit, R.id.ColDebetDolg, R.id.ColDebetA7, R.id.ColDebetA14, R.id.ColDebetA21, R.id.ColDebetA28, R.id.ColDebetA35, R.id.ColDebetA42, R.id.ColDebetA49, R.id.ColDebetA56, R.id.ColDebetA63, R.id.ColDebetA64, R.id.ColDebetOTG30, R.id.ColDebetOPL30, R.id.ColDebetKOB, R.id.ColDebetFirma, R.id.ColDebetDogovor, R.id.ColDebetDatasverki},
+                    0);
             debetList.setAdapter(adapter);
         });
     }

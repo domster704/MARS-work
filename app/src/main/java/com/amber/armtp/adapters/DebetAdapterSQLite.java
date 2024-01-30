@@ -11,7 +11,8 @@ import com.amber.armtp.R;
 import com.amber.armtp.extra.ExtraFunctions;
 
 public class DebetAdapterSQLite extends SimpleCursorAdapter {
-    private Context context;
+    private final Context context;
+
     public DebetAdapterSQLite(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
         this.context = context;
@@ -39,6 +40,11 @@ public class DebetAdapterSQLite extends SimpleCursorAdapter {
                 view.findViewById(R.id.ColDebetOPL30),
                 view.findViewById(R.id.ColDebetKOB),
         };
+
+        TextView dataSverki = view.findViewById(R.id.ColDebetDatasverki);
+        if (dataSverki.getText().equals("01.01.53")) {
+            dataSverki.setText("");
+        }
 
         if (position % 2 != 0) {
             view.setBackgroundColor(context.getResources().getColor(R.color.gridViewFirstColor));

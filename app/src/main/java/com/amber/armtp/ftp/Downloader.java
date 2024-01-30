@@ -34,7 +34,7 @@ import java.net.SocketTimeoutException;
 public class Downloader implements BackupServerConnection {
     private DBHelper db;
     private final DBAppHelper dbApp;
-    private DBOrdersHelper dbOrders;
+    private final DBOrdersHelper dbOrders;
     private final Activity activity;
 
     public Downloader(Activity activity, DBHelper db, DBAppHelper dbAppHelper, DBOrdersHelper dbOrdersHelper) {
@@ -200,19 +200,6 @@ public class Downloader implements BackupServerConnection {
         });
     }
 
-    private boolean _checkAlreadyExistedApk(String ver) {
-        boolean isExisted = false;
-        File file = new File(MainActivity.filesPathAPK + "/" + ver + ".apk");
-        if (file.exists() && !ver.equals("") && _isFirstVersionHigherThanSecond(ver.split("\\."), BuildConfig.VERSION_NAME.split("\\."))) {
-            _startInstallApp(ver);
-            for (File file1 : new File(MainActivity.filesPathAPK + "/").listFiles()) {
-                file1.deleteOnExit();
-            }
-            isExisted = true;
-        }
-        return isExisted;
-    }
-
     public void updateOutedPositionInZakazyTable() {
         try {
             SQLiteDatabase sqLiteDatabaseOrders = dbOrders.getReadableDatabase();
@@ -242,12 +229,11 @@ public class Downloader implements BackupServerConnection {
     public void updateOrdersStatusFromDB() {
         SQLiteDatabase dbApp = db.getReadableDatabase();
         SQLiteDatabase dbOrd = dbOrders.getWritableDatabase();
-//        dbOrd.beginTransaction();
+
         Cursor statusInApp = dbOrd.rawQuery("SELECT DOCID FROM ZAKAZY", null);
-        Cursor statusInDB;
         while (statusInApp.moveToNext()) {
             String docId = statusInApp.getString(statusInApp.getColumnIndex("DOCID"));
-            statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + docId + "'", null);
+            Cursor statusInDB = dbApp.rawQuery("SELECT STATUS FROM STATUS WHERE DOCID = '" + docId + "'", null);
             if (statusInDB.getCount() != 0) {
                 statusInDB.moveToNext();
                 String Status = statusInDB.getString(statusInDB.getColumnIndex("STATUS"));
@@ -257,8 +243,5 @@ public class Downloader implements BackupServerConnection {
         }
 
         statusInApp.close();
-//        dbOrd.endTransaction();
-//        if (statusInDB != null)
-//            statusInDB.close();
     }
 }

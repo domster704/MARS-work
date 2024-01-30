@@ -23,12 +23,10 @@ public class ProgressBarLoading {
     }
 
     private void create() {
-        new Handler(context.getMainLooper()).post(() -> {
-            dialog = new AlertDialog.Builder(context)
-                    .setCancelable(false)
-                    .setView(R.layout.progress_bar_loading)
-                    .create();
-        });
+        new Handler(context.getMainLooper()).post(() -> dialog = new AlertDialog.Builder(context)
+                .setCancelable(false)
+                .setView(R.layout.progress_bar_loading)
+                .create());
     }
 
     /**
@@ -58,14 +56,10 @@ public class ProgressBarLoading {
     }
 
     public void show() {
-        new Handler(context.getMainLooper()).post(() -> {
-            dialog.show();
-        });
+        new Handler(context.getMainLooper()).post(() -> dialog.show());
     }
 
     public void dismiss() {
-        new Handler(context.getMainLooper()).post(() -> {
-            dialog.dismiss();
-        });
+        new Handler(context.getMainLooper()).post(() -> dialog.dismiss());
     }
 }

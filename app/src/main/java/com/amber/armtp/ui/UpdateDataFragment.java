@@ -32,7 +32,6 @@ import com.amber.armtp.interfaces.ServerChecker;
  */
 public class UpdateDataFragment extends Fragment implements View.OnClickListener, ServerChecker {
     public static UIData[] uiData;
-    public static boolean isNotEnoughMemory = false;
 
     private final Handler handlerDB = new Handler();
     private final Handler handlerApp = new Handler();

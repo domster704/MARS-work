@@ -1,6 +1,5 @@
 package com.amber.armtp.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -11,6 +10,8 @@ import android.widget.TextView;
 import com.amber.armtp.R;
 import com.amber.armtp.extra.ExtraFunctions;
 
+import java.util.Locale;
+
 public class JournalDetailsAdapterSQLite extends SimpleCursorAdapter {
     private final Context context;
     public JournalDetailsAdapterSQLite(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -18,7 +19,6 @@ public class JournalDetailsAdapterSQLite extends SimpleCursorAdapter {
         this.context = context;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         Cursor cursor = getCursor();
@@ -39,7 +39,7 @@ public class JournalDetailsAdapterSQLite extends SimpleCursorAdapter {
         if (cursor.getInt(cursor.getColumnIndex("IS_OUTED")) == 1) {
             int outQTY = cursor.getInt(cursor.getColumnIndex("OUT_QTY"));
             int QTY = cursor.getInt(cursor.getColumnIndex("QTY"));
-            tvQty.setText(QTY + "(" + (QTY - outQTY) + ")");
+            tvQty.setText(String.format(Locale.ROOT,"%d(%d)", QTY, QTY - outQTY));
         }
 
         return view;

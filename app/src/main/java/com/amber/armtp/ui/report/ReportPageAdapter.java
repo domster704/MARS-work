@@ -12,7 +12,6 @@ public class ReportPageAdapter extends FragmentPagerAdapter {
         this.countOfTabs = countOfTabs;
     }
 
-
     @Override
     public Fragment getItem(int i) {
         switch (i) {

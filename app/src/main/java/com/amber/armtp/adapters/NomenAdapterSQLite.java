@@ -27,18 +27,14 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate {
-
     public static int CurVisiblePosition = 0;
     public int beginPos;
     public int endPos;
-    public float Discount = 0;
+    private float Discount = 0;
+    private boolean isDiscount = false;
     public boolean isSales;
-    public boolean isDiscount;
-
     public Context context;
-
     public AdapterView.OnLongClickListener PhotoLongClick;
-
     private DBHelper dbHelper;
     private android.support.v7.widget.Toolbar toolbar;
 
@@ -203,5 +199,23 @@ public class NomenAdapterSQLite extends SimpleCursorAdapter implements TBUpdate 
         super.notifyDataSetChanged();
 //        setContrAndSum(GlobalVars.this);
         setContrAndSumValue(dbHelper, toolbar, isSales);
+    }
+
+    public void setDiscount(float discount) {
+        Discount = discount;
+        isDiscount = !(discount == 0);
+        this.notifyDataSetChanged();
+    }
+
+    public float getDiscount() {
+        return Discount;
+    }
+
+    public void setSales(boolean sales) {
+        boolean flag = isSales == sales;
+        isSales = sales;
+        if (!flag) {
+            this.notifyDataSetChanged();
+        }
     }
 }
