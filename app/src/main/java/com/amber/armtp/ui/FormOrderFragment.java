@@ -106,6 +106,10 @@ public class FormOrderFragment extends NomenOrderFragment implements View.OnClic
         SharedPreferences settings = getActivity().getSharedPreferences("form_order", 0);
         editor = settings.edit();
 
+        if (getArguments() != null && getArguments().containsKey("isSales")) {
+            isSales = getArguments().getBoolean("isSales");
+        }
+
         LoadSgi();
 
         filter = getActivity().findViewById(R.id.NomenFilters);
@@ -171,6 +175,7 @@ public class FormOrderFragment extends NomenOrderFragment implements View.OnClic
             NomenAdapter.notifyDataSetChanged();
         }
 
+        setIconColor(mainMenu, R.id.NomenSales, isSales);
         setContrAndSumValue(db, toolbar, isSales);
     }
 
@@ -393,6 +398,9 @@ public class FormOrderFragment extends NomenOrderFragment implements View.OnClic
             case R.id.ViewOrderId:
                 try {
                     Fragment fragment = new ViewOrderFragment();
+                    Bundle args = new Bundle();
+                    args.putBoolean("isSales", isSales);
+                    fragment.setArguments(args);
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frame, fragment);
                     fragmentTransaction.commit();
@@ -605,7 +613,6 @@ public class FormOrderFragment extends NomenOrderFragment implements View.OnClic
 
                 return true;
             case R.id.NomenSales:
-                System.out.println(isSales + " " + isContrIdDifferent + " " + (DBHelper.pricesMap.size() == 0) + " " + (isContrIdDifferent || DBHelper.pricesMap.size() == 0 && !isSales));
                 try {
                     isSales = !isSales;
                     if (isContrIdDifferent || DBHelper.pricesMap.size() == 0 && isSales) {

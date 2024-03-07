@@ -91,6 +91,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
 
     public HashMap<String, String> getOrderData(String id) {
         HashMap<String, String> data = new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
         try (Cursor c = this.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null)) {
             c.moveToNext();
 
@@ -99,8 +101,11 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
             data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
             data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
+            db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            db.endTransaction();
         }
         return data;
     }

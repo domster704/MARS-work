@@ -34,7 +34,6 @@ import com.amber.armtp.adapters.ContractorAdapterSQLite;
 import com.amber.armtp.adapters.TPAdapterSQLite;
 import com.amber.armtp.auxiliaryData.CounterAgentInfo;
 import com.amber.armtp.dbHelpers.DBHelper;
-import com.amber.armtp.extra.ProgressBarShower;
 import com.amber.armtp.interfaces.TBUpdate;
 
 import java.text.SimpleDateFormat;
@@ -425,6 +424,7 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
         editor.commit();
 
         FormOrderFragment.isContrIdDifferent = true;
+        System.out.println(PREVIOUS_CONTR_ID + " " + CONTR_ID + " " + isCopiedLocal + " " + !PREVIOUS_CONTR_ID.equals(CONTR_ID));
         if (PREVIOUS_CONTR_ID.equals("") || PREVIOUS_CONTR_ID == null || CONTR_ID == null || CONTR_ID.equals("")) {
             PREVIOUS_CONTR_ID = CONTR_ID;
             DBHelper.pricesMap.clear();
@@ -521,9 +521,9 @@ public class OrderHeadFragment extends Fragment implements TBUpdate, View.OnClic
     }
 
     public void updateNomenPrice(boolean isCopied) {
-        new Thread(() -> new ProgressBarShower(getContext()).setFunction(() -> {
-            db.ResetNomenPrice(isCopied);
-            return null;
-        }).start());
+//        new Thread(() -> new ProgressBarShower(getContext()).setFunction(() -> {
+        db.ResetNomenPrice(isCopied);
+//            return null;
+//        }).start());
     }
 }

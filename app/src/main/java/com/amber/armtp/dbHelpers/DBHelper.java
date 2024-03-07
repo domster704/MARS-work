@@ -173,7 +173,8 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public String getOrderSum(boolean isSales) {
-        try (Cursor cursor = this.getReadableDatabase().rawQuery("SELECT [" + FormOrderFragment.TypeOfPrice + "], ZAKAZ, KOD5 FROM Nomen WHERE ZAKAZ <> 0", null)) {
+        String nomenPriceColumnName = !FormOrderFragment.TypeOfPrice.equals("") ? "[" + FormOrderFragment.TypeOfPrice + "]" : "PRICE";
+        try (Cursor cursor = this.getReadableDatabase().rawQuery("SELECT " + nomenPriceColumnName + ", ZAKAZ, KOD5 FROM Nomen WHERE ZAKAZ <> 0", null)) {
             float curPrice = 0;
             if (!isSales) {
                 while (cursor.moveToNext()) {
@@ -244,16 +245,24 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void PlusQty(String ID) {
+        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            this.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5='" + ID + "'");
+            db.beginTransaction();
+            db.execSQL("UPDATE Nomen SET ZAKAZ = ZAKAZ + 1 WHERE KOD5='" + ID + "'");
+            db.setTransactionSuccessful();
+            db.endTransaction();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void MinusQty(String ID) {
+        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            this.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5='" + ID + "'");
+            db.beginTransaction();
+            db.execSQL("UPDATE Nomen SET ZAKAZ = CASE WHEN (ZAKAZ-1) <= 0 THEN 0 ELSE ZAKAZ-1 END WHERE KOD5='" + ID + "'");
+            db.setTransactionSuccessful();
+            db.endTransaction();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -400,9 +409,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void ResetNomen() {
         try {
+            this.getWritableDatabase().beginTransaction();
             this.getWritableDatabase().execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ>0");
+            this.getWritableDatabase().setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            this.getWritableDatabase().endTransaction();
         }
     }
 
@@ -414,7 +427,7 @@ public class DBHelper extends SQLiteOpenHelper {
         listOfUpdatedGroups.clear();
 
         Cursor cCheck = db.rawQuery("SELECT GRUPPA, SGI, KOD5 FROM NOMEN WHERE ZAKAZ <> 0", null);
-
+        System.out.println(cCheck.getCount() + " rows");
         if (!isCopied) {
             db.execSQL("UPDATE Nomen SET ZAKAZ=0 WHERE ZAKAZ<>0");
         }
@@ -435,6 +448,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         cCheck.close();
         db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     public String GetToolbarContr() {

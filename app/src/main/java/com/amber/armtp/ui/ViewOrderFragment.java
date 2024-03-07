@@ -29,6 +29,8 @@ import java.util.Objects;
  */
 public class ViewOrderFragment extends NomenOrderFragment implements TBUpdate {
 
+    private boolean isSales = false;
+
     public ViewOrderFragment() {
     }
 
@@ -59,7 +61,11 @@ public class ViewOrderFragment extends NomenOrderFragment implements TBUpdate {
         nomenList = getActivity().findViewById(R.id.listContrs);
         PreviewOrder();
 
-        setContrAndSumValue(db, toolbar, FormOrderFragment.isSales);
+        if (getArguments()!= null) {
+            isSales = getArguments().getBoolean("isSales");
+        }
+
+        setContrAndSumValue(db, toolbar, isSales);
     }
 
     @Override
@@ -71,6 +77,9 @@ public class ViewOrderFragment extends NomenOrderFragment implements TBUpdate {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.FormOrderID) {
             Fragment fragment = new FormOrderFragment();
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isSales", isSales);
+            fragment.setArguments(bundle);
             FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame, fragment, "frag_form_order");
             fragmentTransaction.commit();

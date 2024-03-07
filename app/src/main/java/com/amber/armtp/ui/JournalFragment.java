@@ -455,19 +455,24 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
     private void modifyOrder(String OrderID, boolean isCopied) {
         String messageName = isCopied ? "копирования" : "редактирования";
         new Thread(() -> new ProgressBarShower(getContext()).setFunction(() -> {
-            try (Cursor cHead = dbOrders.getWritableDatabase().rawQuery("SELECT ROWID FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null)) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.beginTransaction();
+            try (Cursor cHead = dbOrders.getReadableDatabase().rawQuery("SELECT ROWID FROM ZAKAZY WHERE DOCID='" + OrderID + "'", null)) {
                 cHead.moveToNext();
+                db.setTransactionSuccessful();
                 if (cHead.getCount() == 0) {
                     Config.sout("Отсутствует информация о заголовке заказа", getContext());
                     return null;
                 }
             } catch (Exception e) {
-                Config.sout("Ошибка во время копирования " + messageName, getContext());
+                Config.sout("Ошибка во время " + messageName, getContext());
                 e.printStackTrace();
                 return null;
+            } finally {
+                db.endTransaction();
             }
 
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db = dbHelper.getWritableDatabase();
             try (Cursor cNom = dbOrders.getReadableDatabase().rawQuery("SELECT QTY, NOMEN FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + OrderID + "'", null)) {
                 dbHelper.ResetNomen();
                 db.beginTransaction();
@@ -671,7 +676,7 @@ public class JournalFragment extends Fragment implements ServerChecker, BackupSe
         fields[index] = new DBFField();
         fields[index].setName("VERSION");
         fields[index].setDataType(DBFField.FIELD_TYPE_C);
-        fields[index].setFieldLength(50);
+        fields[index].setFieldLength(10);
         Table.setFields(fields);
 
         try {
