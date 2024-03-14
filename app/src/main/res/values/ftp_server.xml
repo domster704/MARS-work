@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="host">91.208.84.67</string>
-    <string name="user">amberftp</string>
-    <string name="password">201002</string>
-    <string name="port">21</string>
-    <string name="fileDirectoryDB">/EXCHANGE/OUT/MARS/armtp3.zip</string>
-    <string name="fileDirectoryApk">/EXCHANGE/OUT/MARS/UPDATE/mars.apk</string>
-</resources>
