@@ -23,9 +23,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.amber.armtp.Config;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
-import com.amber.armtp.annotations.AsyncUI;
 import com.amber.armtp.dbHelpers.DBHelper;
 
 import java.text.SimpleDateFormat;
@@ -46,7 +45,7 @@ public class SalesFragment extends Fragment {
     private EditText dateFrom;
     private EditText dateTo;
 
-    private CheckBox cbContr, cbGroup;
+    private CheckBox cbContr;
 
     private Toolbar toolbar;
 
@@ -111,13 +110,13 @@ public class SalesFragment extends Fragment {
         fillDatePicker(dateFrom, dateTo);
 
         TextView startDateTv = getActivity().findViewById(R.id.startDate);
-        startDateTv.setText("(Вы можете увидеть свои продажи с " + dbHelper.getStartDate() + ")");
+        startDateTv.setText(String.format("(Вы можете увидеть свои продажи с %s)", dbHelper.getStartDate()));
 
         dateFrom.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateFrom, DeliveryDateFrom), DeliveryDateFrom.get(Calendar.YEAR), DeliveryDateFrom.get(Calendar.MONTH), DeliveryDateFrom.get(Calendar.DAY_OF_MONTH)).show());
         dateTo.setOnClickListener(v -> new DatePickerDialog(getActivity(), getDateSetListener(dateTo, DeliveryDateTo), DeliveryDateTo.get(Calendar.YEAR), DeliveryDateTo.get(Calendar.MONTH), DeliveryDateTo.get(Calendar.DAY_OF_MONTH)).show());
 
         cbContr = getActivity().findViewById(R.id.isBuyer);
-        cbGroup = getActivity().findViewById(R.id.isGoodsGroups);
+        CheckBox cbGroup = getActivity().findViewById(R.id.isGoodsGroups);
 
         dataForDetails = new DataForDetails[]{
                 new DataForDetails(cbContr, "CONTRS"),
@@ -218,20 +217,23 @@ public class SalesFragment extends Fragment {
         return arrayList;
     }
 
-    @AsyncUI
     private void loadContrsInSalesSpinner() {
-        contrsSpinner.setAdapter(null);
-        Cursor cursor = dbHelper.getContrList();
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
-        contrsSpinner.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> {
+            contrsSpinner.setAdapter(null);
+            Cursor cursor = dbHelper.getContrList();
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+            contrsSpinner.setAdapter(adapter);
+        });
+
     }
 
-    @AsyncUI
     private void loadFilterContrsInSalesSpinner(String FindStr) {
-        contrsSpinner.setAdapter(null);
-        Cursor cursor = dbHelper.getContrFilterList(FindStr);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
-        contrsSpinner.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> {
+            contrsSpinner.setAdapter(null);
+            Cursor cursor = dbHelper.getContrFilterList(FindStr);
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), R.layout.sales_contr_layout, cursor, new String[]{"CODE", "DESCR"}, new int[]{R.id.ColContrID, R.id.ColContrDescr}, 0);
+            contrsSpinner.setAdapter(adapter);
+        });
     }
 
     private void setFilterOnContrSpinner() {
@@ -256,7 +258,7 @@ public class SalesFragment extends Fragment {
 
     private void showResultFragment(String tpName) {
         if (!dbHelper.isTableExisted("REAL")) {
-            Config.sout("Таблица REAL не существует, обновите базу данных");
+            Config.sout("Таблица REAL не существует, обновите базу данных", getContext());
             return;
         }
 
@@ -292,9 +294,7 @@ public class SalesFragment extends Fragment {
             new AlertDialog.Builder(getActivity())
                     .setTitle("Продажи")
                     .setMessage(allSum + " руб.\n" + allCount + " шт.")
-                    .setPositiveButton("Закрыть", (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    })
+                    .setPositiveButton("Закрыть", (dialogInterface, i) -> dialogInterface.dismiss())
                     .setCancelable(true)
                     .show();
         }

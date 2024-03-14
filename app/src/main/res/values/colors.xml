@@ -25,7 +25,12 @@
     <color name="gridViewSecondColor">#fafafa</color>
     <color name="gridViewFirstColor">#c9ebff</color>
 
+<!--    <color name="gridViewSecondColor">#fff</color>-->
+    <color name="gridViewFirstColorJournal">#c9ebff</color>
+<!--    <color name="gridViewFirstColor">#F5F9F9</color>-->
+
     <color name="selectedNomen">#D5D9C2</color>
+<!--    <color name="selectedNomen">#D5DEE1</color>-->
     <color name="multiSelectedNomen">#D8BFD8</color>
 
     <color name="dividerColor">#d3d3d3</color>

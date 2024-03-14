@@ -1,25 +1,33 @@
-package com.amber.armtp;
+package com.amber.armtp.extra;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.amber.armtp.R;
+
 public class Config {
-    public static void sout(Object text) {
+    public static void sout(Object text, Context context) {
         try {
-            GlobalVars.CurAc.runOnUiThread(() -> Toast.makeText(GlobalVars.CurAc, String.valueOf(text), Toast.LENGTH_SHORT).show());
+            new Handler().post(() -> Toast.makeText(context, String.valueOf(text), Toast.LENGTH_SHORT).show());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void sout(Object text, int length) {
-        GlobalVars.CurAc.runOnUiThread(() -> Toast.makeText(GlobalVars.CurAc, String.valueOf(text), length).show());
+    public static void sout(Object text, Context context, int length) {
+        try {
+            new Handler().post(() -> Toast.makeText(context, String.valueOf(text), length).show());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void printCursor(Cursor cursor) {
@@ -40,14 +48,13 @@ public class Config {
         }
     }
 
-    public static void hideKeyBoard() {
-        InputMethodManager inputMethodManager = (InputMethodManager) GlobalVars.CurAc.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(GlobalVars.CurAc.getCurrentFocus().getWindowToken(), 0);
+    public static void hideKeyBoard(FragmentActivity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 
-        SearchView searchView = GlobalVars.CurAc.findViewById(R.id.menu_search);
+        SearchView searchView = activity.findViewById(R.id.menu_search);
         if (searchView != null) {
             searchView.clearFocus();
-//            searchView.requestFocus();
         }
     }
 

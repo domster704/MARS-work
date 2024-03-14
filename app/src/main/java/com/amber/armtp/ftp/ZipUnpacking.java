@@ -1,10 +1,10 @@
 package com.amber.armtp.ftp;
 
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.github.junrar.Junrar;
-import com.github.junrar.exception.RarException;
+import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,14 +16,27 @@ public class ZipUnpacking {
         this.fileDir = filePathInAndroid;
     }
 
+    @SuppressLint("NewApi")
     private boolean unZip(File archiveFile) {
         final File destinationFolder = new File(archiveFile.getParent());
-        try {
-            Junrar.extract(archiveFile, destinationFolder);
+
+        String source = archiveFile.getPath();
+        String destination = destinationFolder.getPath();
+
+        try (ZipFile zipFile = new ZipFile(source)) {
+            zipFile.extractAll(destination);
             return true;
-        } catch (RarException | IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
+//        try (InputStream stream = new FileInputStream(archiveFile)) {
+//            Junrar.extract(stream, destinationFolder);
+//            return true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
     }
 
     public boolean doUnpacking() {

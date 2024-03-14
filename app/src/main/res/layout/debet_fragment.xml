@@ -86,11 +86,22 @@
                     android:textColor="#000000" />
 
             <TextView
-                    android:id="@+id/tvA7"
+                    android:id="@+id/tvDatasverki"
                     android:layout_width="100dp"
                     android:layout_height="@dimen/tableHeadersHeight"
                     android:layout_alignParentTop="true"
                     android:layout_toEndOf="@+id/tvDogovor"
+                    android:background="@drawable/table_header"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/debetDatasverki"
+                    android:textColor="#000000" />
+
+            <TextView
+                    android:id="@+id/tvA7"
+                    android:layout_width="100dp"
+                    android:layout_height="@dimen/tableHeadersHeight"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/tvDatasverki"
                     android:background="@drawable/table_header"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/debetA7"

@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amber.armtp.annotations.PGShowing;
+import com.amber.armtp.extra.ProgressBarShower;
 
 public class DBAppHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "appData.db";
@@ -34,28 +34,25 @@ public class DBAppHelper extends SQLiteOpenHelper {
         return super.getWritableDatabase();
     }
 
-    @PGShowing
-    public void putDemp(SQLiteDatabase dbNomen) {
-        Cursor nomen = dbNomen.rawQuery("SELECT DISTINCT DEMP FROM NOMEN", null);
+    public void putSectionsFromDownloadedDB(Context context, SQLiteDatabase dbNomen) {
+        new ProgressBarShower(context).setFunction(() -> {
+            Cursor nomen = dbNomen.rawQuery("SELECT DISTINCT DEMP FROM NOMEN", null);
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM DEMP");
-        for (int i = 0; i < nomen.getCount(); i++) {
-            nomen.moveToNext();
-            db.execSQL("INSERT INTO DEMP(DEMP) VALUES('" + nomen.getString(nomen.getColumnIndex("DEMP")) + "')");
-        }
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.execSQL("DELETE FROM DEMP");
+            for (int i = 0; i < nomen.getCount(); i++) {
+                nomen.moveToNext();
+                db.execSQL("INSERT INTO DEMP(DEMP) VALUES('" + nomen.getString(nomen.getColumnIndex("DEMP")) + "')");
+            }
 
-        nomen.close();
+            nomen.close();
+            return null;
+        }).start();
     }
 
     public Cursor getWCs() {
-        Cursor cursor;
         try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT 0 as _id, 'Выберите' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
-
-            return cursor;
+            return this.getReadableDatabase().rawQuery("SELECT 0 as _id, 'Выберите' AS DEMP UNION SELECT ROWID as _id, DEMP FROM DEMP", null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -65,16 +62,22 @@ public class DBAppHelper extends SQLiteOpenHelper {
     public String getWCByID(String id) {
         if (id.equals("0"))
             return "Выберите";
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT DEMP FROM DEMP WHERE rowid ='" + id + "'", null);
-        c.moveToNext();
-        return c.getString(0);
+        try (Cursor c = this.getReadableDatabase().rawQuery("SELECT DEMP FROM DEMP WHERE rowid ='" + id + "'", null)){
+            if (c.moveToNext()) {
+                return c.getString(0);
+            }
+        }
+        return "0";
     }
 
     public String getIDByWC(String WC) {
         if (WC.equals("0") || WC.equals("Выберите"))
             return "0";
-        Cursor c = this.getReadableDatabase().rawQuery("SELECT rowid FROM DEMP WHERE DEMP=?", new String[] {WC});
-        c.moveToNext();
-        return c.getString(0);
+        try (Cursor c = this.getReadableDatabase().rawQuery("SELECT rowid FROM DEMP WHERE DEMP=?", new String[]{WC})){
+            if (c.moveToNext()) {
+                return c.getString(0);
+            }
+        }
+        return "0";
     }
 }

@@ -17,12 +17,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.annotations.PGShowing;
 import com.amber.armtp.dbHelpers.DBAppHelper;
 import com.amber.armtp.dbHelpers.DBHelper;
 import com.amber.armtp.dbHelpers.DBOrdersHelper;
@@ -50,11 +48,10 @@ public class MainActivity extends AppCompatActivity {
     public SharedPreferences settings;
     public SharedPreferences.Editor editor;
     public SharedPreferences sPref;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public GlobalVars globalVariable;
+
+    public DBHelper db;
+    public DBAppHelper dbAppHelper;
+    public DBOrdersHelper dbOrdersHelper;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Fragment fragment = null;
     FragmentTransaction fragmentTransaction;
@@ -66,18 +63,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-//        if (globalVariable.viewFlipper != null) {
-//            int Lay = globalVariable.viewFlipper.getDisplayedChild();
-//            if (Lay == 1) {
-//                globalVariable.ordStatus = null;
-//                globalVariable.viewFlipper.setDisplayedChild(0);
-//                globalVariable.OrdersAdapter.notifyDataSetChanged();
-//            }
-//        }
     }
 
-    @SuppressLint({"WrongConstant", "WifiManagerLeak"})
+    @SuppressLint({"WrongConstant", "WifiManagerLeak", "NonConstantResourceId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,12 +111,6 @@ public class MainActivity extends AppCompatActivity {
         ServerDetails serverDetails = ServerDetails.getInstance(host, dirDB, port, user, password, dirAPK);
         serverDetails.timeout = timeout;
 
-        globalVariable = (GlobalVars) getApplicationContext();
-
-        globalVariable.setContext(getApplicationContext());
-
-        globalVariable.glbContext = getApplicationContext();
-
         settings = getSharedPreferences("apk_version", 0);
         editor = settings.edit();
 
@@ -154,53 +136,44 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (globalVariable.db == null) {
-            globalVariable.db = new DBHelper(getApplicationContext());
-        }
-
-        if (globalVariable.dbOrders == null) {
-            globalVariable.dbOrders = new DBOrdersHelper(getApplicationContext());
-        }
-
-        if (globalVariable.dbApp == null) {
-            globalVariable.dbApp = new DBAppHelper(getApplicationContext());
-        }
+        db = new DBHelper(getApplicationContext());
+        dbAppHelper = new DBAppHelper(getApplicationContext());
+        dbOrdersHelper = new DBOrdersHelper(getApplicationContext());
 
         // armtp3.db
         try {
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SGI (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS NOMEN (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, SGI TEXT, GRUPPA TEXT, KOD5 TEXT, DESCR TEXT, DEMP TEXT, FOCUSID TEXT, GOFRA INTEGER, FOTO TEXT, POSTDATA DATE, OST INTEGER, PD NUMERIC DEFAULT 0, ZAKAZ NUMERIC DEFAULT 0, PRICE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS PRICES (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, NOMENID TEXT, TIPCE TEXT, PRICE NUMERIC)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT, STATUS TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTRCODE TEXT, CODE TEXT, DESCR TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT, DESCR TEXT NOT NULL)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEBET (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTR TEXT, CONTR_ID TEXT, SCHET TEXT, STATUS TEXT, KREDIT TEXT, DOGOVOR DATE, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, A35 NUMERIC, A42 NUMERIC, A49 NUMERIC, A56 NUMERIC, A63 NUMERIC, A64 NUMERIC, DOLG NUMERIC, OTGR30 NUMERIC, OPL30 NUMERIC, K_OBOR NUMERIC, FIRMA TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS STATUS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
-//            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS REAL (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VYCHERK (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, NOM TEXT, COL NUMERIC)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOKUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
-            globalVariable.db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
-//            globalVariable.db.getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS prices_kod5_index ON PRICES (NOMEN)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SGI (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS GRUPS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, SGIID TEXT NOT NULL, DESCR TEXT NOT NULL)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS NOMEN (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, SGI TEXT, GRUPPA TEXT, KOD5 TEXT, DESCR TEXT, DEMP TEXT, FOCUSID TEXT, GOFRA INTEGER, FOTO TEXT, POSTDATA DATE, OST INTEGER, PD NUMERIC DEFAULT 0, ZAKAZ NUMERIC DEFAULT 0, PRICE NUMERIC DEFAULT 0)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS PRICES (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, NOMENID TEXT, TIPCE TEXT, PRICE NUMERIC)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS CONTRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT NOT NULL, DESCR TEXT, STATUS TEXT)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ADDRS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTRCODE TEXT, CODE TEXT, DESCR TEXT)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS TORG_PRED (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, CODE TEXT, DESCR TEXT NOT NULL)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEBET (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, KONTR TEXT, CONTR_ID TEXT, SCHET TEXT, STATUS TEXT, KREDIT TEXT, DOGOVOR DATE, A7 NUMERIC, A14 NUMERIC, A21 NUMERIC, A28 NUMERIC, A35 NUMERIC, A42 NUMERIC, A49 NUMERIC, A56 NUMERIC, A63 NUMERIC, A64 NUMERIC, DOLG NUMERIC, OTGR30 NUMERIC, OPL30 NUMERIC, K_OBOR NUMERIC, FIRMA TEXT)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS STATUS (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
+//            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS REAL (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, STATUS TEXT)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VYCHERK (rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, NOM TEXT, COL NUMERIC)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS SKIDKI (CONTRID TEXT, SGI TEXT, GRUPID TEXT, TIPCE TEXT, SALE NUMERIC DEFAULT 0)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS FOKUS (CODE TEXT, DESCR TEXT, DATAN DATE, DATAK DATE)");
+            db.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ORDERS (TP TEXT, CONTR TEXT, ADDR TEXT, DATA TEXT, COMMENT TEXT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
 
-        globalVariable.db.setBackupIp();
+        db.setBackupIp();
 
         // order.db
         try {
-            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT, SUM FLOAT, OUTED INTEGER)");
-            globalVariable.dbOrders.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE FLOAT, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0, SUM FLOAT)");
+            dbOrdersHelper.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DOCID TEXT, TP TEXT, CONTR BLOB, ADDR TEXT, DOC_DATE REAL, DELIVERY_DATE TEXT, COMMENT TEXT, STATUS INTEGER DEFAULT 0, CONTR_DES TEXT, ADDR_DES TEXT, SUM FLOAT, OUTED INTEGER)");
+            dbOrdersHelper.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS ZAKAZY_DT (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ZAKAZ_ID TEXT, NOMEN TEXT, DESCR TEXT, QTY INTEGER, PRICE FLOAT, IS_OUTED INTEGER DEFAULT 0, OUT_QTY INTEGER DEFAULT 0, SUM FLOAT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
         // appData.db
         try {
-            globalVariable.dbApp.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEMP (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DEMP TEXT)");
+            dbAppHelper.getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS DEMP (ROWID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, DEMP TEXT)");
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -233,64 +206,51 @@ public class MainActivity extends AppCompatActivity {
 
         // Initializing NavigationView
         NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            // This method will trigger on item Click of navigation menu
-            @SuppressLint("NonConstantResourceId")
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                // Checking if the item is in checked state or not, if not make it in checked state
-                menuItem.setChecked(!menuItem.isChecked());
+        // This method will trigger on item Click of navigation menu
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            // Checking if the item is in checked state or not, if not make it in checked state
+            menuItem.setChecked(!menuItem.isChecked());
 
-                // Closing drawer on item click
-                drawerLayout.closeDrawers();
-                for (Fragment i : getSupportFragmentManager().getFragments()) {
-                    System.out.println(i.getClass());
-                }
-                // Check to see which item was being clicked and perform appropriate action
-                switch (menuItem.getItemId()) {
-                    // Replacing the main content with ContentFragment Which is our Inbox View;
-                    case R.id.nav_update_data:
-//                        getSupportFragmentManager().beginTransaction().remove()
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new UpdateDataFragment(), "frag_update_data");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_journal:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new JournalFragment(), "frag_journal");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_order_header:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new OrderHeadFragment(), "frag_order_header");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_debet:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new DebetFragment(), "frag_debet");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_admin:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new SettingFragment(), "frag_set");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_report:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new ReportFragment(), "frag_report");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                    case R.id.nav_exit:
-//                        getFragmentManager().popBackStack();
-                        finish();
-                        System.exit(0);
-                        return true;
-                    default:
-//                        getFragmentManager().popBackStack();
-                        DisplayFragment(new DefaultFragment(), "frag_default");
-                        setToolbarTitle(menuItem.getTitle());
-                        return true;
-                }
+            // Closing drawer on item click
+            drawerLayout.closeDrawers();
+            for (Fragment i : getSupportFragmentManager().getFragments()) {
+                System.out.println(i.getClass());
+            }
+            // Check to see which item was being clicked and perform appropriate action
+            switch (menuItem.getItemId()) {
+                // Replacing the main content with ContentFragment Which is our Inbox View;
+                case R.id.nav_update_data:
+                    DisplayFragment(new UpdateDataFragment(), "frag_update_data");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_journal:
+                    DisplayFragment(new JournalFragment(), "frag_journal");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_order_header:
+                    DisplayFragment(new OrderHeadFragment(), "frag_order_header");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_debet:
+                    DisplayFragment(new DebetFragment(), "frag_debet");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_admin:
+                    DisplayFragment(new SettingFragment(), "frag_set");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_report:
+                    DisplayFragment(new ReportFragment(), "frag_report");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
+                case R.id.nav_exit:
+                    finish();
+                    System.exit(0);
+                    return true;
+                default:
+                    DisplayFragment(new DefaultFragment(), "frag_default");
+                    setToolbarTitle(menuItem.getTitle());
+                    return true;
             }
         });
 
@@ -309,13 +269,14 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     initLastUpdate();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         };
 
 
         //Setting the actionbarToggle to drawer layout
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
@@ -375,12 +336,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    @PGShowing
     private void initLastUpdate() {
+//        new ProgressBarShower(this).setFunction(() -> {
         tvLastUpdate = findViewById(R.id.tvLastUpdateText);
         if (tvLastUpdate != null) {
-            tvLastUpdate.setText(globalVariable.ReadLastUpdate());
+            tvLastUpdate.setText(db.getLastUpdateTime());
         }
+//        }).start();
+
     }
 
     private void DisplayFragment(Fragment Frag, String Tag) {

@@ -5,12 +5,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class PhotoDotsAdapter {
-    private Context context;
-    private int count;
+    private final Context context;
+    private final int count;
     private int currentPosition;
     private int previousPosition;
-
-
     private LinearLayout dotsLayout;
 
     public PhotoDotsAdapter(Context context, int count, int currentPosition) {

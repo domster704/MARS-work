@@ -5,7 +5,6 @@ package com.amber.armtp;
  */
 public class ServerDetails {
     private static ServerDetails instance;
-
     public int timeout = 15 * 1000;
     public String user;
     public String password;

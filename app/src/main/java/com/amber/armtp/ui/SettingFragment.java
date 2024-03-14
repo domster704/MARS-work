@@ -2,9 +2,9 @@ package com.amber.armtp.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,15 +17,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.R;
 import com.amber.armtp.ServerDetails;
-import com.amber.armtp.annotations.Async;
+import com.amber.armtp.dbHelpers.DBHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Objects;
 
 /**
  * Панель настроек
@@ -34,8 +32,6 @@ import java.util.Objects;
  */
 public class SettingFragment extends Fragment implements View.OnClickListener {
     public static int nomenDescriptionFontSize = 14;
-    public GlobalVars glbVars;
-
     private SharedPreferences settings;
     private SharedPreferences.Editor editor, settingsEditor;
 
@@ -44,6 +40,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     private EditText etTpSetting;
     private EditText etTimeout;
 
+    private DBHelper db;
+
     public SettingFragment() {
     }
 
@@ -51,7 +49,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.setting_fragment, container, false);
-        glbVars.CurView = v;
         setHasOptionsMenu(true);
         return v;
     }
@@ -60,10 +57,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) Objects.requireNonNull(getActivity()).getApplicationContext();
-        glbVars.setContext(getActivity().getApplicationContext());
-        GlobalVars.CurFragmentContext = getActivity();
-        GlobalVars.CurAc = getActivity();
     }
 
     /**
@@ -72,6 +65,8 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        db = new DBHelper(getActivity().getApplicationContext());
 
         SharedPreferences serverSettings = getActivity().getSharedPreferences("apk_version", 0);
         editor = serverSettings.edit();
@@ -156,30 +151,26 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Удалить все фотографии")
                         .setMessage("Вы уверены, что хотите удалить все фотографии товаров с этого устройства?")
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                            @Async
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                File file = new File(glbVars.getPhotoDir());
-                                int countOfFiles = file.listFiles().length;
-                                for (File elem : file.listFiles()) {
-                                    boolean isDeleted = elem.delete();
-                                    if (!isDeleted) {
-                                        try {
-                                            throw new FileNotFoundException("Файл не найден");
-                                        } catch (FileNotFoundException e) {
-                                            e.printStackTrace();
-                                        }
+                        .setPositiveButton("Да", (dialogInterface, i) -> getActivity().runOnUiThread(() -> {
+                            File file = new File(getPhotoDir());
+                            int countOfFiles = file.listFiles().length;
+                            for (File elem : file.listFiles()) {
+                                boolean isDeleted = elem.delete();
+                                if (!isDeleted) {
+                                    try {
+                                        throw new FileNotFoundException("Файл не найден");
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
                                     }
                                 }
-                                if (countOfFiles != 0) {
-                                    Config.sout("Фотографии успешно удалены");
-                                    glbVars.db.clearPhoto();
-                                } else {
-                                    Config.sout("Отсутствуют фотографии на устройстве");
-                                }
                             }
-                        })
+                            if (countOfFiles != 0) {
+                                Config.sout("Фотографии успешно удалены", getContext());
+                                db.clearPhoto();
+                            } else {
+                                Config.sout("Отсутствуют фотографии на устройстве", getContext());
+                            }
+                        }))
                         .setNeutralButton("Нет", (dialogInterface, i) -> dialogInterface.dismiss())
                         .show();
                 break;
@@ -194,7 +185,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.SettingsSave) {
-            Config.hideKeyBoard();
+            Config.hideKeyBoard(getActivity());
             changeServerData();
             changeFontSize();
             setTpInSalesFragment();
@@ -203,7 +194,6 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
-    @Async
     private void changeServerData() {
         String host = etFtpServer.getText().toString();
         String port = etFtpPort.getText().toString();
@@ -226,13 +216,12 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         ServerDetails.getInstance().setBackupIp(backupHost);
         editor.commit();
 
-        Config.sout("Настройки сохранены");
+        Config.sout("Настройки сохранены", getContext());
     }
 
     /**
      * Пока что изменяет шрифт только в поле DESCR (Наименование) во фрагменте Формирование
      */
-    @Async
     private void changeFontSize() {
         if (Integer.parseInt(fontSize.getText().toString()) == settings.getInt("fontSize", -1)) {
             return;
@@ -247,7 +236,7 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         settingsEditor.putInt("fontSize", nomenDescriptionFontSize);
         settingsEditor.apply();
 
-        Config.sout("Размер шрифта изменён на " + nomenDescriptionFontSize);
+        Config.sout("Размер шрифта изменён на " + nomenDescriptionFontSize, getContext());
     }
 
     private void setTpInSalesFragment() {
@@ -262,6 +251,22 @@ public class SettingFragment extends Fragment implements View.OnClickListener {
         ServerDetails.getInstance().timeout = Integer.parseInt(etTimeout.getText().toString());
         editor.putInt("timeout", ServerDetails.getInstance().timeout);
         editor.apply();
-        Config.sout("Таймаут изменён на " + ServerDetails.getInstance().timeout);
+        Config.sout("Таймаут изменён на " + ServerDetails.getInstance().timeout, getContext());
+    }
+
+    public String getPhotoDir() {
+        String photo_dir;
+        File file = getActivity().getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File extPhoto, arm_photo = null;
+        extPhoto = new File(file.toString());
+
+        if (extPhoto.canWrite()) {
+            arm_photo = new File(extPhoto.toString());
+            if (!arm_photo.exists()) {
+                arm_photo.mkdir();
+            }
+        }
+        photo_dir = arm_photo.toString();
+        return photo_dir;
     }
 }

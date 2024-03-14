@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amber.armtp.Config;
-import com.amber.armtp.GlobalVars;
+import com.amber.armtp.extra.Config;
 import com.amber.armtp.MainActivity;
 import com.amber.armtp.R;
+import com.amber.armtp.dbHelpers.DBAppHelper;
+import com.amber.armtp.dbHelpers.DBHelper;
+import com.amber.armtp.dbHelpers.DBOrdersHelper;
+import com.amber.armtp.extra.ExtraFunctions;
 import com.amber.armtp.ftp.Downloader;
 import com.amber.armtp.interfaces.ServerChecker;
 
@@ -28,11 +32,9 @@ import com.amber.armtp.interfaces.ServerChecker;
  */
 public class UpdateDataFragment extends Fragment implements View.OnClickListener, ServerChecker {
     public static UIData[] uiData;
-    public static boolean isNotEnoughMemory = false;
 
     private final Handler handlerDB = new Handler();
     private final Handler handlerApp = new Handler();
-    public GlobalVars glbVars;
 
     private TextView tvDB, tvApp;
     private ProgressBar pgDB, pgApp;
@@ -42,22 +44,15 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.update_data_fragment_new, container, false);
-//        v.setKeepScreenOn(true);
-        glbVars.CurView = v;
-        return v;
+        return inflater.inflate(R.layout.update_data_fragment_new, container, false);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        glbVars = (GlobalVars) getActivity().getApplicationContext();
-        glbVars.setContext(getActivity().getApplicationContext());
-        GlobalVars.CurFragmentContext = getActivity();
-        GlobalVars.CurAc = getActivity();
 
-        Config.hideKeyBoard();
+        Config.hideKeyBoard(getActivity());
     }
 
     @Override
@@ -74,8 +69,12 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        glbVars.toolbar = getActivity().findViewById(R.id.toolbar);
-        glbVars.toolbar.setSubtitle("");
+        DBHelper db = new DBHelper(getActivity().getApplicationContext());
+        DBAppHelper dbAppHelper = new DBAppHelper(getActivity().getApplicationContext());
+        DBOrdersHelper dbOrdersHelper = new DBOrdersHelper(getActivity().getApplicationContext());
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setSubtitle("");
 
         Button btnDBUpdate = getActivity().findViewById(R.id.btnDBUpdate);
         btnDBUpdate.setOnClickListener(this);
@@ -97,7 +96,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         uiData[0] = new UIData(tvDB, pgDB, tvDBCount, tvDBPerc, handlerDB);
         uiData[1] = new UIData(tvApp, pgApp, tvAppCount, tvAppPerc, handlerApp);
 
-        downloader = new Downloader(glbVars, getActivity());
+        downloader = new Downloader(getActivity(), db, dbAppHelper, dbOrdersHelper);
         TextView tvAppNewVer = getActivity().findViewById(R.id.newVerApp);
         new Thread(() -> {
             try {
@@ -106,7 +105,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     if (versionData[0].equals("true")) {
                         tvAppNewVer.setVisibility(View.VISIBLE);
                         tvAppNewVer.setText(tvAppNewVer.getText().toString() + ": " + versionData[1]);
-                    } else if (versionData[0].equals("false")){
+                    } else if (versionData[0].equals("false")) {
                         tvAppNewVer.setText(R.string.newVersionAvailable);
                         tvAppNewVer.setVisibility(View.GONE);
                     }
@@ -126,8 +125,8 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnDBUpdate: {
-                if (!glbVars.isNetworkAvailable()) {
-                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
+                if (!ExtraFunctions.isNetworkAvailable(getActivity())) {
+                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом", getContext());
                     return;
                 }
 
@@ -144,19 +143,19 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                runCheckServerForAvailability(mainLogic);
+                runCheckServerForAvailability(getContext(), mainLogic);
                 return;
             }
             case R.id.btnAppUpdate: {
-                if (!glbVars.isNetworkAvailable()) {
-                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом");
+                if (!ExtraFunctions.isNetworkAvailable(getActivity())) {
+                    Config.sout("Нет доступного интернет соединения. Проверьте соединение с Интернетом", getContext());
                     return;
                 }
 
                 Thread mainLogic = new Thread(() -> {
                     String status = downloader.isServerVersionNewer()[0];
                     if (status.equals("false")) {
-                        Config.sout("На сервере нет новой версии");
+                        Config.sout("На сервере нет новой версии", getContext());
                         return;
                     } else if (status.equals("")) {
                         return;
@@ -174,7 +173,7 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                runCheckServerForAvailability(mainLogic);
+                runCheckServerForAvailability(getContext(), mainLogic);
                 break;
             }
         }
@@ -201,16 +200,4 @@ public class UpdateDataFragment extends Fragment implements View.OnClickListener
         long availableSpace = (long) (statFs.getFreeBytes() / MainActivity.SIZE_MB);
         return availableSpace > 800;
     }
-
-//    public void TotalExtMemory()
-//    {
-//        StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
-//        System.out.println(statFs.getTotalBytes() / MainActivity.SIZE_MB + " 0*");
-//        statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-//        System.out.println(statFs.getAvailableBytes() / MainActivity.SIZE_MB + " 1*");
-//        statFs = new StatFs(Environment.getDownloadCacheDirectory().getAbsolutePath());
-//        System.out.println(statFs.getFreeBytes() / MainActivity.SIZE_MB + " 2*");
-//        statFs = new StatFs(Environment.getDataDirectory().getAbsolutePath());
-//        System.out.println(statFs.getFreeBytes() / MainActivity.SIZE_MB + " 3*");
-//    }
 }

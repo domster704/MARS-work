@@ -23,14 +23,14 @@
                 android:textStyle="bold" />
     </LinearLayout>
 
+<!--    android:layout_marginHorizontal="5dp"-->
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/counter_agent_info_body"
-            android:paddingHorizontal="10dp"
+            android:paddingHorizontal="20dp"
             android:paddingVertical="15dp"
-            android:layout_marginHorizontal="5dp"
             android:layout_marginBottom="3dp">
 
         <LinearLayout
@@ -95,6 +95,29 @@
 
             <TextView
                     android:id="@+id/emailContrInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfo"
+                    android:textColor="@color/grayForField"
+                    android:singleLine="false"
+                    android:textIsSelectable="true"/>
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontSizeInCounterAgentInfoForFieldHeader"
+                    android:text="ИНН/КПП"
+                    android:textColor="@color/grayForFieldHeader"
+                    android:layout_marginBottom="2dp" />
+
+            <TextView
+                    android:id="@+id/innContrInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/fontSizeInCounterAgentInfo"

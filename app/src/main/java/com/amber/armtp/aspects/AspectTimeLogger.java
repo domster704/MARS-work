@@ -1,9 +1,5 @@
 package com.amber.armtp.aspects;
 
-import android.widget.Toast;
-
-import com.amber.armtp.Config;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -28,7 +24,7 @@ public class AspectTimeLogger {
             long duration = (endTime - startTime);
 //            Log.d("time", signature.getName() + " " + String.valueOf(duration / (1000000000f)) + " sec.");
             System.out.println(signature.getName() + " " + String.valueOf(duration / (1e9f)) + " sec.");
-           Config.sout(signature.getName() + " " + String.valueOf(duration / (1e9f)) + " sec.", Toast.LENGTH_LONG);
+//            Config.sout(signature.getName() + " " + String.valueOf(duration / (1e9f)) + " sec.", Toast.LENGTH_LONG);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

@@ -2,7 +2,6 @@ package com.amber.armtp.aspects;
 
 import android.os.Handler;
 
-import com.amber.armtp.Config;
 import com.amber.armtp.annotations.DelayedCalled;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,7 +35,7 @@ public class AspectDelayedCalled {
             }, delay);
         } catch (Exception e) {
             e.printStackTrace();
-            Config.sout(e);
+//            Config.sout(e);
         }
     }
 }

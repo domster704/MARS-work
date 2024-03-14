@@ -1,12 +1,9 @@
 package com.amber.armtp.dbHelpers;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import com.amber.armtp.Config;
 
 import java.util.HashMap;
 
@@ -34,11 +31,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getZakazy() {
-        Cursor cursor;
         try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT" +
+            return this.getReadableDatabase().rawQuery("SELECT" +
                     " ZAKAZY.ROWID AS _id," +
                     " ZAKAZY.DOC_DATE," +
                     " CONTR_DES AS CONTR," +
@@ -53,7 +47,6 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
                     " WHERE" +
                     " DATE(substr(ZAKAZY.DOC_DATE, 7, 4) || '-' || substr(ZAKAZY.DOC_DATE, 4, 2) || '-' || substr(ZAKAZY.DOC_DATE, 1, 2))" +
                     " ORDER BY _id DESC", null);
-            return cursor;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -61,12 +54,8 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getZakazDetails(String ZakazID) {
-        Cursor cursor;
         try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, IS_OUTED, OUT_QTY, SUM FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
-            return cursor;
+            return this.getReadableDatabase().rawQuery("SELECT ROWID AS _id, ZAKAZ_ID, NOMEN, DESCR, QTY, PRICE, IS_OUTED, OUT_QTY, SUM FROM ZAKAZY_DT WHERE ZAKAZ_ID='" + ZakazID + "'", null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -74,16 +63,10 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
     }
 
     public void setZakazStatus(String Status, int id) {
-        SQLiteDatabase db;
-        db = this.getWritableDatabase();
-        db.beginTransaction();
         try {
-            db.execSQL("UPDATE ZAKAZY SET STATUS='" + Status + "' WHERE ROWID=" + id);
-            db.setTransactionSuccessful();
+            this.getWritableDatabase().execSQL("UPDATE ZAKAZY SET STATUS='" + Status + "' WHERE ROWID=" + id);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            db.endTransaction();
         }
     }
 
@@ -106,43 +89,11 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int getDocNumber() {
-        Cursor c = null;
-        int DocNo = 0;
-        try {
-            SQLiteDatabase db;
-            db = this.getReadableDatabase();
-            c = db.rawQuery("SELECT CASE WHEN MAX(ROWID)+1 IS NULL THEN 1 ELSE MAX(ROWID)+1 END AS [DOCNO] FROM ZAKAZY;", null);
-            if (c.moveToFirst()) {
-                DocNo = c.getInt(0);
-            }
-            return DocNo;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    public void updateOrderQty(String ZakID, String ID, int Qty) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put("QTY", Qty);
-            db.update("ZAKAZY_DT", updatedValues, "NOMEN='" + ID + "' AND ZAKAZ_ID='" + ZakID + "'", null);
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
     public HashMap<String, String> getOrderData(String id) {
-        SQLiteDatabase db = this.getReadableDatabase();
         HashMap<String, String> data = new HashMap<>();
-        try (Cursor c = db.rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null)) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+        try (Cursor c = this.getReadableDatabase().rawQuery("SELECT TP, CONTR, ADDR, DELIVERY_DATE, COMMENT FROM ZAKAZY WHERE DOCID='" + id + "'", null)) {
             c.moveToNext();
 
             data.put("TP", c.getString(c.getColumnIndex("TP")));
@@ -150,20 +101,12 @@ public class DBOrdersHelper extends SQLiteOpenHelper {
             data.put("ADDR", c.getString(c.getColumnIndex("ADDR")));
             data.put("DELIVERY_DATE", c.getString(c.getColumnIndex("DELIVERY_DATE")));
             data.put("COMMENT", c.getString(c.getColumnIndex("COMMENT")));
+            db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
-            Config.sout("Ошибка во время копирования заголовка");
+        } finally {
+            db.endTransaction();
         }
-
         return data;
-    }
-
-    public boolean isTableExisted(String tableName) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        try (Cursor ignored1 = db.rawQuery("SELECT 1 FROM " + tableName, null)) {
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
     }
 }

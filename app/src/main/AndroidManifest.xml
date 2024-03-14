@@ -25,14 +25,13 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+<!--    android:name=".GlobalVars"-->
     <application
-            android:name=".GlobalVars"
             android:allowBackup="true"
             android:icon="@drawable/logo_orange"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-
         <provider
                 android:name="android.support.v4.content.FileProvider"
                 android:authorities="com.amber.armtp.provider"
@@ -59,6 +58,5 @@
             </intent-filter>
         </activity>
     </application>
-</manifest>
 
-        <!--    android:windowSoftInputMode="adjustNothing"-->
+</manifest>

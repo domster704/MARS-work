@@ -20,6 +20,4 @@ class KPIFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
     }
-
-
 }
